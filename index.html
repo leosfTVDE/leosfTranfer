@@ -333,6 +333,13 @@
         </div>
       </div>
 
+      <div class="cfg-grupo">
+        <div class="cfg-titulo">Recibo</div>
+        <div class="cfg-row">
+          <div><label>IVA sobre recibo (%)</label><input type="number" step="0.1" id="cfg_iva_pct"></div>
+        </div>
+      </div>
+
       <div class="btn-acoes">
         <button class="btn-resetar" id="btnResetar">Restaurar padrão</button>
         <button class="btn-salvar" id="btnAplicar">Aplicar</button>
@@ -391,6 +398,7 @@
     <div class="checks">
       <label class="chk"><input type="checkbox" id="bagagem"> Bagagem extra (+€7)</label>
       <label class="chk"><input type="checkbox" id="cadeira"> Cadeirinha (+€8)</label>
+      <label class="chk"><input type="checkbox" id="recibo"> Emitir recibo (+IVA)</label>
     </div>
   </div>
 
@@ -401,7 +409,7 @@
     <div class="detalhe" id="detalhe"></div>
   </div>
 
-  <p class="nota">Portagens não são calculadas automaticamente — não há forma simples e sem custo de puxar isso do Google Maps/Waze num app leve como este. Confirme o valor da portagem no app de navegação antes da corrida e insira aqui manualmente.</p>
+  <p class="nota">Portagens não são calculadas automaticamente — não há forma simples e sem custo de puxar isso do Google Maps/Waze num app leve como este. Confirme o valor da portagem no app de navegação antes da corrida e insira aqui manualmente.<br><br>"Emitir recibo" acrescenta o IVA sobre o valor total da corrida (taxa configurável em Minhas tarifas, padrão 6%).</p>
 
 </main>
 
@@ -417,7 +425,8 @@
     longo_van_kmrate: 0.90,
     espera_sedan: 13, espera_van: 18,
     noite_pct: 15,
-    bagagem: 7, cadeira: 8
+    bagagem: 7, cadeira: 8,
+    iva_pct: 6
   };
   let cfg = { ...DEFAULTS };
 
@@ -483,7 +492,7 @@
   setupSeg('segVeiculo','veiculo');
   setupSeg('segHorario','horario');
 
-  ['km','espera','portagem','bagagem','cadeira'].forEach(id=>{
+  ['km','espera','portagem','bagagem','cadeira','recibo'].forEach(id=>{
     document.getElementById(id).addEventListener('input', calcular);
     document.getElementById(id).addEventListener('change', calcular);
   });
@@ -524,9 +533,18 @@
     const esperaValor = (esperaMin/60) * taxaEspera;
     const extras = bagagem + cadeira + portagem + esperaValor;
 
-    const finalMin = Math.round(min + extras);
-    const finalMax = Math.round(max + extras);
-    const finalMed = Math.round(base + extras);
+    const comRecibo = document.getElementById('recibo').checked;
+    const fatorIva = comRecibo ? (1 + cfg.iva_pct/100) : 1;
+
+    const subtotalMin = min + extras;
+    const subtotalMax = max + extras;
+    const subtotalMed = base + extras;
+
+    const ivaValorMed = subtotalMed * (fatorIva - 1);
+
+    const finalMin = Math.round(subtotalMin * fatorIva);
+    const finalMax = Math.round(subtotalMax * fatorIva);
+    const finalMed = Math.round(subtotalMed * fatorIva);
 
     document.getElementById('valorFinal').textContent = finalMed;
     document.getElementById('faixaTexto').textContent = `faixa sugerida: €${finalMin} – €${finalMax}`;
@@ -537,6 +555,7 @@
     if(bagagem>0) det += `<div><span>Bagagem extra</span><span>€${bagagem}</span></div>`;
     if(cadeira>0) det += `<div><span>Cadeirinha</span><span>€${cadeira}</span></div>`;
     if(portagem>0) det += `<div><span>Portagens</span><span>€${portagem.toFixed(0)}</span></div>`;
+    if(comRecibo) det += `<div><span>IVA recibo (${cfg.iva_pct}%)</span><span>€${ivaValorMed.toFixed(2)}</span></div>`;
     document.getElementById('detalhe').innerHTML = det;
   }
 
