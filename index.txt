@@ -1,0 +1,851 @@
+<!DOCTYPE html>
+<html lang="pt-PT">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Trajeto — Tarifas de Transfer</title>
+<link rel="icon" type="image/png" sizes="32x32" href="favicon-v2.png">
+<link rel="apple-touch-icon" href="apple-touch-icon-v2.png">
+<link rel="manifest" href="manifest.json">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Trajeto">
+<meta name="theme-color" content="#0d1b2a">
+<style>
+  :root{
+    --azul-noite:#0d1b2a;
+    --azul-doca:#1b3a4b;
+    --azulejo:#2a6f77;
+    --terracota:#c1552c;
+    --areia:#f2ead8;
+    --branco:#fffaf1;
+    --texto:#12242e;
+    --linha:#d9cdb2;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    font-family: 'Georgia', 'Iowan Old Style', serif;
+    background:
+      radial-gradient(circle at 20% 10%, rgba(42,111,119,.15), transparent 40%),
+      var(--areia);
+    color:var(--texto);
+    padding:0 0 40px;
+  }
+  header{
+    background: linear-gradient(135deg, var(--azul-noite), var(--azul-doca));
+    color:var(--branco);
+    padding:28px 20px 24px;
+    position:relative;
+    overflow:hidden;
+  }
+  header::after{
+    content:"";
+    position:absolute;
+    right:-40px; top:-40px;
+    width:160px; height:160px;
+    border-radius:50%;
+    background:radial-gradient(circle, rgba(193,85,44,.35), transparent 70%);
+  }
+  .eyebrow{
+    font-family: 'Helvetica Neue', Arial, sans-serif;
+    text-transform:uppercase;
+    letter-spacing:.14em;
+    font-size:11px;
+    color:#e8c9a0;
+    margin:0 0 6px;
+  }
+  h1{
+    margin:0;
+    font-size:28px;
+    font-weight:400;
+    letter-spacing:.01em;
+  }
+  h1 em{
+    font-style:italic;
+    color:#e8c9a0;
+  }
+  .sub{
+    font-family:'Helvetica Neue', Arial, sans-serif;
+    font-size:13px;
+    color:#c9d6da;
+    margin-top:8px;
+    max-width:520px;
+    line-height:1.5;
+  }
+  main{
+    max-width:520px;
+    margin:0 auto;
+    padding:20px 18px 0;
+  }
+  .card{
+    background:var(--branco);
+    border:1px solid var(--linha);
+    border-radius:10px;
+    padding:18px 18px 20px;
+    margin-bottom:16px;
+    box-shadow: 0 2px 10px rgba(13,27,42,.05);
+  }
+  .card h2{
+    font-family:'Helvetica Neue', Arial, sans-serif;
+    font-size:11px;
+    text-transform:uppercase;
+    letter-spacing:.12em;
+    color:var(--azulejo);
+    margin:0 0 14px;
+    display:flex;
+    align-items:center;
+    gap:8px;
+  }
+  .card h2::before{
+    content:"";
+    width:16px;height:1px;
+    background:var(--terracota);
+    display:inline-block;
+  }
+  label{
+    display:block;
+    font-family:'Helvetica Neue', Arial, sans-serif;
+    font-size:13px;
+    color:#4a5a60;
+    margin:14px 0 6px;
+  }
+  label:first-of-type{margin-top:0;}
+  .seg{
+    display:flex;
+    border:1px solid var(--linha);
+    border-radius:8px;
+    overflow:hidden;
+  }
+  .seg button{
+    flex:1;
+    padding:10px 6px;
+    border:none;
+    background:var(--branco);
+    font-family:'Helvetica Neue', Arial, sans-serif;
+    font-size:13px;
+    color:var(--texto);
+    cursor:pointer;
+    border-right:1px solid var(--linha);
+    transition:.15s;
+  }
+  .seg button:last-child{border-right:none;}
+  .seg button.active{
+    background:var(--azulejo);
+    color:#fff;
+  }
+  input[type="number"]{
+    width:100%;
+    padding:10px 12px;
+    border:1px solid var(--linha);
+    border-radius:8px;
+    font-family:'Helvetica Neue', Arial, sans-serif;
+    font-size:15px;
+    background:#fdfbf6;
+  }
+  input[type="number"]:focus{outline:2px solid var(--azulejo); outline-offset:1px;}
+  .row2{display:flex; gap:10px;}
+  .row2 > div{flex:1;}
+  .checks{
+    display:flex;
+    flex-wrap:wrap;
+    gap:10px;
+    margin-top:14px;
+  }
+  .chk{
+    display:flex;
+    align-items:center;
+    gap:6px;
+    font-family:'Helvetica Neue', Arial, sans-serif;
+    font-size:13px;
+    background:#fdfbf6;
+    border:1px solid var(--linha);
+    padding:7px 10px;
+    border-radius:20px;
+    cursor:pointer;
+  }
+  .chk input{accent-color:var(--terracota);}
+  .resultado{
+    background: linear-gradient(135deg, var(--azul-noite), var(--azul-doca));
+    color:var(--branco);
+    border-radius:10px;
+    padding:22px 20px;
+    text-align:center;
+    position:relative;
+    overflow:hidden;
+  }
+  .resultado .eyebrow{color:#e8c9a0; margin-bottom:4px;}
+  .valor{
+    font-size:40px;
+    font-weight:400;
+    margin:6px 0 2px;
+    letter-spacing:.01em;
+  }
+  .valor small{font-size:16px; color:#c9d6da;}
+  .faixa{
+    font-family:'Helvetica Neue', Arial, sans-serif;
+    font-size:12px;
+    color:#c9d6da;
+  }
+  .detalhe{
+    margin-top:16px;
+    text-align:left;
+    font-family:'Helvetica Neue', Arial, sans-serif;
+    font-size:12.5px;
+    color:#c9d6da;
+    border-top:1px solid rgba(255,255,255,.15);
+    padding-top:12px;
+  }
+  .detalhe div{display:flex; justify-content:space-between; padding:2px 0;}
+  .nota{
+    font-family:'Helvetica Neue', Arial, sans-serif;
+    font-size:11.5px;
+    color:#8a7f66;
+    text-align:center;
+    margin-top:18px;
+    line-height:1.6;
+    padding:0 10px;
+  }
+  .btn-config{
+    margin-top:16px;
+    font-family:'Helvetica Neue', Arial, sans-serif;
+    font-size:12.5px;
+    letter-spacing:.03em;
+    background:rgba(255,255,255,.1);
+    border:1px solid rgba(255,255,255,.25);
+    color:#e8c9a0;
+    padding:8px 14px;
+    border-radius:20px;
+    cursor:pointer;
+  }
+  .btn-config:hover{background:rgba(255,255,255,.18);}
+  #painelConfig{display:none;}
+  #painelConfig .card{border-color:var(--terracota);}
+  .cfg-grupo{
+    margin-bottom:16px;
+    padding-bottom:14px;
+    border-bottom:1px solid var(--linha);
+  }
+  .cfg-grupo:last-of-type{border-bottom:none; margin-bottom:0; padding-bottom:0;}
+  .cfg-titulo{
+    font-family:'Helvetica Neue', Arial, sans-serif;
+    font-size:12.5px;
+    font-weight:bold;
+    color:var(--texto);
+    margin-bottom:8px;
+  }
+  .cfg-row{display:flex; gap:10px; align-items:flex-end;}
+  .cfg-row > div{flex:1;}
+  .cfg-row label{font-size:11.5px; margin:8px 0 4px;}
+  .btn-acoes{
+    display:flex;
+    gap:10px;
+    margin-top:6px;
+  }
+  .btn-acoes button{
+    flex:1;
+    padding:10px;
+    border-radius:8px;
+    border:1px solid var(--linha);
+    font-family:'Helvetica Neue', Arial, sans-serif;
+    font-size:13px;
+    cursor:pointer;
+    background:#fdfbf6;
+  }
+  .btn-salvar{background:var(--azulejo) !important; color:#fff !important; border:none !important;}
+  .btn-resetar{color:var(--terracota);}
+  textarea{
+    width:100%;
+    min-height:70px;
+    padding:10px;
+    border:1px solid var(--linha);
+    border-radius:8px;
+    font-family:'Courier New', monospace;
+    font-size:11.5px;
+    background:#fdfbf6;
+    resize:vertical;
+  }
+  input[type="text"], input[type="date"], input[type="time"]{
+    width:100%;
+    padding:10px 12px;
+    border:1px solid var(--linha);
+    border-radius:8px;
+    font-family:'Helvetica Neue', Arial, sans-serif;
+    font-size:15px;
+    background:#fdfbf6;
+  }
+  input[type="text"]:focus, input[type="date"]:focus, input[type="time"]:focus{
+    outline:2px solid var(--azulejo); outline-offset:1px;
+  }
+  .btn-agendar{
+    width:100%;
+    margin-top:16px;
+    font-family:'Helvetica Neue', Arial, sans-serif;
+    font-size:13.5px;
+    letter-spacing:.03em;
+    background:rgba(255,255,255,.1);
+    border:1px solid rgba(255,255,255,.3);
+    color:var(--branco);
+    padding:11px 14px;
+    border-radius:20px;
+    cursor:pointer;
+  }
+  .btn-agendar:hover{background:rgba(255,255,255,.18);}
+  #painelAgendar{display:none;}
+  #painelAgendar .card{border-color:var(--azulejo);}
+  .ag-row2{display:flex; gap:10px;}
+  .ag-row2 > div{flex:1;}
+  .btn-guardar-agendamento{
+    width:100%;
+    margin-top:16px;
+    padding:12px;
+    border-radius:8px;
+    border:none;
+    background:var(--terracota);
+    color:#fff;
+    font-family:'Helvetica Neue', Arial, sans-serif;
+    font-size:14px;
+    cursor:pointer;
+  }
+  .lista-agendamentos{display:flex; flex-direction:column; gap:10px;}
+  .ag-item{
+    border:1px solid var(--linha);
+    border-radius:8px;
+    padding:12px 14px;
+    background:#fdfbf6;
+  }
+  .ag-item .ag-trajeto{
+    font-family:'Helvetica Neue', Arial, sans-serif;
+    font-size:13.5px;
+    font-weight:bold;
+    color:var(--texto);
+    margin-bottom:4px;
+  }
+  .ag-item .ag-meta{
+    font-family:'Helvetica Neue', Arial, sans-serif;
+    font-size:12px;
+    color:#6a7378;
+    line-height:1.6;
+  }
+  .ag-item .ag-valor{
+    color:var(--terracota);
+    font-weight:bold;
+  }
+  .ag-acoes{
+    display:flex;
+    gap:8px;
+    margin-top:10px;
+  }
+  .ag-acoes button{
+    flex:1;
+    padding:8px;
+    border-radius:6px;
+    border:1px solid var(--linha);
+    font-family:'Helvetica Neue', Arial, sans-serif;
+    font-size:12px;
+    cursor:pointer;
+    background:#fff;
+  }
+  .ag-btn-cal{background:var(--azulejo) !important; color:#fff !important; border:none !important;}
+  .ag-btn-del{color:var(--terracota);}
+  .ag-vazio{
+    font-family:'Helvetica Neue', Arial, sans-serif;
+    font-size:12.5px;
+    color:#8a7f66;
+    text-align:center;
+    padding:6px 0;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <p class="eyebrow">Motorista de Transfer · Lisboa</p>
+  <h1><em>Trajeto</em></h1>
+  <p class="sub">Preencha os dados da corrida e veja na hora o valor sugerido para o cliente. O cálculo não fica guardado; se agendares a corrida, o agendamento fica só neste navegador.</p>
+  <button id="btnConfig" class="btn-config">⚙ Minhas tarifas</button>
+</header>
+
+<main>
+
+  <div id="painelConfig">
+    <div class="card">
+      <h2>Minhas tarifas</h2>
+
+      <div class="cfg-grupo">
+        <div class="cfg-titulo">Aeroporto ⇄ Centro (valor fixo, dia)</div>
+        <div class="cfg-row">
+          <div><label>Sedan mín. (€)</label><input type="number" id="cfg_curto_sedan_min"></div>
+          <div><label>Sedan máx. (€)</label><input type="number" id="cfg_curto_sedan_max"></div>
+        </div>
+        <div class="cfg-row">
+          <div><label>Van mín. (€)</label><input type="number" id="cfg_curto_van_min"></div>
+          <div><label>Van máx. (€)</label><input type="number" id="cfg_curto_van_max"></div>
+        </div>
+      </div>
+
+      <div class="cfg-grupo">
+        <div class="cfg-titulo">20–50 km (mínimo + €/km)</div>
+        <div class="cfg-row">
+          <div><label>Sedan €/km</label><input type="number" step="0.01" id="cfg_medio_sedan_kmrate"></div>
+          <div><label>Van €/km</label><input type="number" step="0.01" id="cfg_medio_van_kmrate"></div>
+        </div>
+        <div class="cfg-row">
+          <div><label>Sedan mínimo (€)</label><input type="number" id="cfg_medio_sedan_min"></div>
+          <div><label>Van mínimo (€)</label><input type="number" id="cfg_medio_van_min"></div>
+        </div>
+      </div>
+
+      <div class="cfg-grupo">
+        <div class="cfg-titulo">+50 km (€/km)</div>
+        <div class="cfg-row">
+          <div><label>Sedan €/km</label><input type="number" step="0.01" id="cfg_longo_sedan_kmrate"></div>
+          <div><label>Van €/km</label><input type="number" step="0.01" id="cfg_longo_van_kmrate"></div>
+        </div>
+      </div>
+
+      <div class="cfg-grupo">
+        <div class="cfg-titulo">Tempo e adicional noturno</div>
+        <div class="cfg-row">
+          <div><label>Espera sedan (€/h)</label><input type="number" id="cfg_espera_sedan"></div>
+          <div><label>Espera van (€/h)</label><input type="number" id="cfg_espera_van"></div>
+        </div>
+        <div class="cfg-row">
+          <div><label>Acréscimo noturno (%)</label><input type="number" id="cfg_noite_pct"></div>
+        </div>
+      </div>
+
+      <div class="cfg-grupo">
+        <div class="cfg-titulo">Extras</div>
+        <div class="cfg-row">
+          <div><label>Bagagem extra (€)</label><input type="number" id="cfg_bagagem"></div>
+          <div><label>Cadeirinha (€)</label><input type="number" id="cfg_cadeira"></div>
+        </div>
+      </div>
+
+      <div class="cfg-grupo">
+        <div class="cfg-titulo">Recibo</div>
+        <div class="cfg-row">
+          <div><label>IVA sobre recibo (%)</label><input type="number" step="0.1" id="cfg_iva_pct"></div>
+        </div>
+      </div>
+
+      <div class="btn-acoes">
+        <button class="btn-resetar" id="btnResetar">Restaurar padrão</button>
+        <button class="btn-salvar" id="btnAplicar">Aplicar</button>
+      </div>
+
+      <label style="margin-top:16px;">Copiar/colar configuração (para guardar num app de notas seu)</label>
+      <textarea id="cfgTexto"></textarea>
+      <div class="btn-acoes">
+        <button id="btnCopiar">Copiar configuração</button>
+        <button id="btnColar">Colar e aplicar</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>Tipo de trajeto</h2>
+    <div class="seg" id="segTrajeto">
+      <button data-v="curto" class="active">Aeroporto ⇄ Centro</button>
+      <button data-v="medio">20–50 km</button>
+      <button data-v="longo">+50 km</button>
+    </div>
+
+    <div id="blocoKm" style="display:none;">
+      <label for="km">Distância (km)</label>
+      <input type="number" id="km" placeholder="ex: 35" min="0">
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>Veículo e horário</h2>
+    <label>Veículo</label>
+    <div class="seg" id="segVeiculo">
+      <button data-v="sedan" class="active">Sedan (1–3 pax)</button>
+      <button data-v="van">Van / Executivo (4–6 pax)</button>
+    </div>
+
+    <label>Horário</label>
+    <div class="seg" id="segHorario">
+      <button data-v="dia" class="active">Dia (6h–21h)</button>
+      <button data-v="noite">Noite (21h–6h)</button>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>Extras</h2>
+    <div class="row2">
+      <div>
+        <label for="espera">Espera (min)</label>
+        <input type="number" id="espera" placeholder="0" min="0">
+      </div>
+      <div>
+        <label for="portagem">Portagens (€)</label>
+        <input type="number" id="portagem" placeholder="0" min="0">
+      </div>
+    </div>
+    <div class="checks">
+      <label class="chk"><input type="checkbox" id="bagagem"> Bagagem extra (+€7)</label>
+      <label class="chk"><input type="checkbox" id="cadeira"> Cadeirinha (+€8)</label>
+      <label class="chk"><input type="checkbox" id="recibo"> Emitir recibo (+IVA)</label>
+    </div>
+  </div>
+
+  <div class="resultado">
+    <p class="eyebrow">Valor sugerido</p>
+    <div class="valor">€<span id="valorFinal">0</span></div>
+    <div class="faixa" id="faixaTexto"></div>
+    <div class="detalhe" id="detalhe"></div>
+    <button class="btn-agendar" id="btnAbrirAgendar">📅 Agendar esta corrida</button>
+  </div>
+
+  <div id="painelAgendar">
+    <div class="card">
+      <h2>Agendar corrida</h2>
+      <label for="ag_partida">Endereço de partida</label>
+      <input type="text" id="ag_partida" placeholder="ex: Aeroporto de Lisboa, T1">
+      <label for="ag_chegada">Endereço de chegada</label>
+      <input type="text" id="ag_chegada" placeholder="ex: Hotel Avenida Palace">
+      <div class="ag-row2">
+        <div>
+          <label for="ag_data">Data</label>
+          <input type="date" id="ag_data">
+        </div>
+        <div>
+          <label for="ag_hora">Horário</label>
+          <input type="time" id="ag_hora">
+        </div>
+      </div>
+      <label for="ag_cliente">Nome do cliente</label>
+      <input type="text" id="ag_cliente" placeholder="ex: João Ferreira">
+      <label for="ag_fornecedor">Fornecedor do serviço</label>
+      <input type="text" id="ag_fornecedor" placeholder="ex: particular / nome da empresa">
+      <label for="ag_valor">Valor (€)</label>
+      <input type="number" id="ag_valor" min="0">
+      <button class="btn-guardar-agendamento" id="btnGuardarAgendamento">Guardar e adicionar ao calendário</button>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>Meus agendamentos</h2>
+    <div class="lista-agendamentos" id="listaAgendamentos"></div>
+  </div>
+
+  <p class="nota">Portagens não são calculadas automaticamente — não há forma simples e sem custo de puxar isso do Google Maps/Waze num app leve como este. Confirme o valor da portagem no app de navegação antes da corrida e insira aqui manualmente.<br><br>"Emitir recibo" acrescenta o IVA sobre o valor total da corrida (taxa configurável em Minhas tarifas, padrão 6%).<br><br>Os agendamentos ficam guardados só neste telemóvel/navegador. O lembrete 24h antes é feito pelo teu Calendário — ao guardar um agendamento, o ficheiro de convite é aberto para adicionares (o alarme já vem configurado).</p>
+
+</main>
+
+<script>
+  const state = { trajeto:'curto', veiculo:'sedan', horario:'dia' };
+
+  const DEFAULTS = {
+    curto_sedan_min: 20, curto_sedan_max: 25,
+    curto_van_min: 35,   curto_van_max: 45,
+    medio_sedan_kmrate: 0.85, medio_sedan_min: 35,
+    medio_van_kmrate: 1.35,   medio_van_min: 55,
+    longo_sedan_kmrate: 0.70,
+    longo_van_kmrate: 0.90,
+    espera_sedan: 13, espera_van: 18,
+    noite_pct: 15,
+    bagagem: 7, cadeira: 8,
+    iva_pct: 6
+  };
+  let cfg = { ...DEFAULTS };
+
+  function preencherPainel(c){
+    Object.keys(DEFAULTS).forEach(k=>{
+      const el = document.getElementById('cfg_'+k);
+      if(el) el.value = c[k];
+    });
+  }
+  function lerPainel(){
+    const novo = {};
+    Object.keys(DEFAULTS).forEach(k=>{
+      const el = document.getElementById('cfg_'+k);
+      const v = parseFloat(el.value);
+      novo[k] = isNaN(v) ? DEFAULTS[k] : v;
+    });
+    return novo;
+  }
+  preencherPainel(cfg);
+
+  document.getElementById('btnConfig').addEventListener('click', ()=>{
+    const p = document.getElementById('painelConfig');
+    p.style.display = p.style.display === 'block' ? 'none' : 'block';
+  });
+  document.getElementById('btnResetar').addEventListener('click', ()=>{
+    cfg = { ...DEFAULTS };
+    preencherPainel(cfg);
+    calcular();
+  });
+  document.getElementById('btnAplicar').addEventListener('click', ()=>{
+    cfg = lerPainel();
+    calcular();
+    document.getElementById('painelConfig').style.display = 'none';
+  });
+  document.getElementById('btnCopiar').addEventListener('click', ()=>{
+    document.getElementById('cfgTexto').value = JSON.stringify(cfg);
+  });
+  document.getElementById('btnColar').addEventListener('click', ()=>{
+    try{
+      const colado = JSON.parse(document.getElementById('cfgTexto').value);
+      cfg = { ...DEFAULTS, ...colado };
+      preencherPainel(cfg);
+      calcular();
+    }catch(e){
+      alert('Texto de configuração inválido.');
+    }
+  });
+
+  function setupSeg(id, key){
+    const el = document.getElementById(id);
+    el.querySelectorAll('button').forEach(btn=>{
+      btn.addEventListener('click', ()=>{
+        el.querySelectorAll('button').forEach(b=>b.classList.remove('active'));
+        btn.classList.add('active');
+        state[key] = btn.dataset.v;
+        document.getElementById('blocoKm').style.display =
+          (state.trajeto === 'medio' || state.trajeto === 'longo') ? 'block' : 'none';
+        calcular();
+      });
+    });
+  }
+  setupSeg('segTrajeto','trajeto');
+  setupSeg('segVeiculo','veiculo');
+  setupSeg('segHorario','horario');
+
+  ['km','espera','portagem','bagagem','cadeira','recibo'].forEach(id=>{
+    document.getElementById(id).addEventListener('input', calcular);
+    document.getElementById(id).addEventListener('change', calcular);
+  });
+
+  function calcular(){
+    const km = parseFloat(document.getElementById('km').value) || 0;
+    const esperaMin = parseFloat(document.getElementById('espera').value) || 0;
+    const portagem = parseFloat(document.getElementById('portagem').value) || 0;
+    const bagagem = document.getElementById('bagagem').checked ? cfg.bagagem : 0;
+    const cadeira = document.getElementById('cadeira').checked ? cfg.cadeira : 0;
+
+    let base = 0, min = 0, max = 0;
+    const isVan = state.veiculo === 'van';
+    const isNoite = state.horario === 'noite';
+    const fatorNoite = 1 + (cfg.noite_pct/100);
+
+    if(state.trajeto === 'curto'){
+      min = isVan ? cfg.curto_van_min : cfg.curto_sedan_min;
+      max = isVan ? cfg.curto_van_max : cfg.curto_sedan_max;
+      if(isNoite){ min *= fatorNoite; max *= fatorNoite; }
+      base = (min+max)/2;
+    } else if(state.trajeto === 'medio'){
+      const kmrate = isVan ? cfg.medio_van_kmrate : cfg.medio_sedan_kmrate;
+      const minimo = isVan ? cfg.medio_van_min : cfg.medio_sedan_min;
+      base = Math.max(minimo, km*kmrate);
+      if(isNoite) base *= fatorNoite;
+      min = base * 0.92;
+      max = base * 1.10;
+    } else { // longo
+      const kmrate = isVan ? cfg.longo_van_kmrate : cfg.longo_sedan_kmrate;
+      base = km * kmrate;
+      if(isNoite) base *= fatorNoite;
+      min = base * 0.92;
+      max = base * 1.10;
+    }
+
+    const taxaEspera = isVan ? cfg.espera_van : cfg.espera_sedan;
+    const esperaValor = (esperaMin/60) * taxaEspera;
+    const extras = bagagem + cadeira + portagem + esperaValor;
+
+    const comRecibo = document.getElementById('recibo').checked;
+    const fatorIva = comRecibo ? (1 + cfg.iva_pct/100) : 1;
+
+    const subtotalMin = min + extras;
+    const subtotalMax = max + extras;
+    const subtotalMed = base + extras;
+
+    const ivaValorMed = subtotalMed * (fatorIva - 1);
+
+    const finalMin = Math.round(subtotalMin * fatorIva);
+    const finalMax = Math.round(subtotalMax * fatorIva);
+    const finalMed = Math.round(subtotalMed * fatorIva);
+
+    document.getElementById('valorFinal').textContent = finalMed;
+    document.getElementById('faixaTexto').textContent = `faixa sugerida: €${finalMin} – €${finalMax}`;
+
+    let det = '';
+    det += `<div><span>Tarifa base</span><span>€${Math.round(base)}</span></div>`;
+    if(esperaValor>0) det += `<div><span>Espera (${esperaMin} min)</span><span>€${esperaValor.toFixed(0)}</span></div>`;
+    if(bagagem>0) det += `<div><span>Bagagem extra</span><span>€${bagagem}</span></div>`;
+    if(cadeira>0) det += `<div><span>Cadeirinha</span><span>€${cadeira}</span></div>`;
+    if(portagem>0) det += `<div><span>Portagens</span><span>€${portagem.toFixed(0)}</span></div>`;
+    if(comRecibo) det += `<div><span>IVA recibo (${cfg.iva_pct}%)</span><span>€${ivaValorMed.toFixed(2)}</span></div>`;
+    document.getElementById('detalhe').innerHTML = det;
+  }
+
+  calcular();
+
+  // ---------- Agendamento ----------
+  const AG_KEY = 'trajeto_agendamentos';
+
+  function lerAgendamentos(){
+    try{ return JSON.parse(localStorage.getItem(AG_KEY)) || []; }
+    catch(e){ return []; }
+  }
+  function gravarAgendamentos(lista){
+    localStorage.setItem(AG_KEY, JSON.stringify(lista));
+  }
+
+  document.getElementById('btnAbrirAgendar').addEventListener('click', ()=>{
+    const p = document.getElementById('painelAgendar');
+    const abrir = p.style.display !== 'block';
+    p.style.display = abrir ? 'block' : 'none';
+    if(abrir){
+      document.getElementById('ag_valor').value = document.getElementById('valorFinal').textContent;
+      if(!document.getElementById('ag_data').value){
+        const amanha = new Date();
+        amanha.setDate(amanha.getDate()+1);
+        document.getElementById('ag_data').value = amanha.toISOString().slice(0,10);
+      }
+      p.scrollIntoView({behavior:'smooth', block:'start'});
+    }
+  });
+
+  function pad(n){ return String(n).padStart(2,'0'); }
+
+  function escapeICS(txt){
+    return String(txt).replace(/\\/g,'\\\\').replace(/;/g,'\\;').replace(/,/g,'\\,').replace(/\n/g,'\\n');
+  }
+
+  function gerarICS(ag){
+    const [ano,mes,dia] = ag.data.split('-').map(Number);
+    const [hora,min] = ag.hora.split(':').map(Number);
+    const inicio = new Date(ano, mes-1, dia, hora, min);
+    const fim = new Date(inicio.getTime() + 60*60*1000);
+    const fmt = (d)=> `${d.getFullYear()}${pad(d.getMonth()+1)}${pad(d.getDate())}T${pad(d.getHours())}${pad(d.getMinutes())}00`;
+    const agora = new Date();
+    const dtstamp = `${agora.getUTCFullYear()}${pad(agora.getUTCMonth()+1)}${pad(agora.getUTCDate())}T${pad(agora.getUTCHours())}${pad(agora.getUTCMinutes())}${pad(agora.getUTCSeconds())}Z`;
+    const desc = `Partida: ${ag.partida}\nChegada: ${ag.chegada}\nValor: €${ag.valor}${ag.fornecedor ? '\nFornecedor: ' + ag.fornecedor : ''}`;
+
+    return [
+      'BEGIN:VCALENDAR',
+      'VERSION:2.0',
+      'PRODID:-//Trajeto//Agendamento//PT',
+      'BEGIN:VEVENT',
+      `UID:${ag.id}@trajeto.app`,
+      `DTSTAMP:${dtstamp}`,
+      `DTSTART:${fmt(inicio)}`,
+      `DTEND:${fmt(fim)}`,
+      `SUMMARY:${escapeICS('Transfer: ' + ag.cliente)}`,
+      `DESCRIPTION:${escapeICS(desc)}`,
+      `LOCATION:${escapeICS(ag.partida)}`,
+      'BEGIN:VALARM',
+      'ACTION:DISPLAY',
+      `DESCRIPTION:${escapeICS('Lembrete: transfer de ' + ag.cliente + ' amanhã')}`,
+      'TRIGGER:-P1D',
+      'END:VALARM',
+      'END:VEVENT',
+      'END:VCALENDAR'
+    ].join('\r\n');
+  }
+
+  function abrirICS(ag){
+    const conteudo = gerarICS(ag);
+    const blob = new Blob([conteudo], {type:'text/calendar;charset=utf-8'});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `trajeto-${ag.cliente.replace(/\s+/g,'_')}-${ag.data}.ics`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    setTimeout(()=> URL.revokeObjectURL(url), 4000);
+  }
+
+  function renderLista(){
+    const lista = lerAgendamentos().sort((a,b)=> (a.data+a.hora).localeCompare(b.data+b.hora));
+    const el = document.getElementById('listaAgendamentos');
+    if(lista.length === 0){
+      el.innerHTML = '<p class="ag-vazio">Ainda não tens agendamentos guardados.</p>';
+      return;
+    }
+    el.innerHTML = lista.map(ag => `
+      <div class="ag-item" data-id="${ag.id}">
+        <div class="ag-trajeto">${ag.partida} → ${ag.chegada}</div>
+        <div class="ag-meta">
+          📅 ${ag.data.split('-').reverse().join('/')} às ${ag.hora}<br>
+          👤 ${ag.cliente} &nbsp;·&nbsp; <span class="ag-valor">€${ag.valor}</span>
+          ${ag.fornecedor ? `<br>🏷 Fornecedor: ${ag.fornecedor}` : ''}
+        </div>
+        <div class="ag-acoes">
+          <button class="ag-btn-cal" data-acao="cal">📅 Calendário</button>
+          <button class="ag-btn-del" data-acao="del">🗑 Remover</button>
+        </div>
+      </div>
+    `).join('');
+  }
+
+  document.getElementById('listaAgendamentos').addEventListener('click', (e)=>{
+    const btn = e.target.closest('button');
+    if(!btn) return;
+    const item = e.target.closest('.ag-item');
+    const id = item.dataset.id;
+    const lista = lerAgendamentos();
+    const ag = lista.find(a => a.id === id);
+    if(!ag) return;
+
+    if(btn.dataset.acao === 'cal'){
+      abrirICS(ag);
+    } else if(btn.dataset.acao === 'del'){
+      if(confirm('Remover este agendamento?')){
+        gravarAgendamentos(lista.filter(a => a.id !== id));
+        renderLista();
+      }
+    }
+  });
+
+  document.getElementById('btnGuardarAgendamento').addEventListener('click', ()=>{
+    const partida = document.getElementById('ag_partida').value.trim();
+    const chegada = document.getElementById('ag_chegada').value.trim();
+    const data = document.getElementById('ag_data').value;
+    const hora = document.getElementById('ag_hora').value;
+    const cliente = document.getElementById('ag_cliente').value.trim();
+    const fornecedor = document.getElementById('ag_fornecedor').value.trim();
+    const valor = document.getElementById('ag_valor').value;
+
+    if(!partida || !chegada || !data || !hora || !cliente){
+      alert('Preenche partida, chegada, data, horário e nome do cliente.');
+      return;
+    }
+
+    const ag = {
+      id: Date.now().toString(36) + Math.random().toString(36).slice(2,7),
+      partida, chegada, data, hora, cliente, fornecedor,
+      valor: valor || document.getElementById('valorFinal').textContent
+    };
+
+    const lista = lerAgendamentos();
+    lista.push(ag);
+    gravarAgendamentos(lista);
+    renderLista();
+    abrirICS(ag);
+
+    document.getElementById('ag_partida').value = '';
+    document.getElementById('ag_chegada').value = '';
+    document.getElementById('ag_cliente').value = '';
+    document.getElementById('ag_fornecedor').value = '';
+    document.getElementById('painelAgendar').style.display = 'none';
+  });
+
+  renderLista();
+</script>
+
+
+<script>
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('sw.js').catch(()=>{});
+  });
+}
+</script>
+</body>
+</html>
