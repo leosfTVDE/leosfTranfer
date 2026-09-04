@@ -265,6 +265,96 @@
     background:#fdfbf6;
     resize:vertical;
   }
+  input[type="text"], input[type="date"], input[type="time"]{
+    width:100%;
+    padding:10px 12px;
+    border:1px solid var(--linha);
+    border-radius:8px;
+    font-family:'Helvetica Neue', Arial, sans-serif;
+    font-size:15px;
+    background:#fdfbf6;
+  }
+  input[type="text"]:focus, input[type="date"]:focus, input[type="time"]:focus{
+    outline:2px solid var(--azulejo); outline-offset:1px;
+  }
+  .btn-agendar{
+    width:100%;
+    margin-top:16px;
+    font-family:'Helvetica Neue', Arial, sans-serif;
+    font-size:13.5px;
+    letter-spacing:.03em;
+    background:rgba(255,255,255,.1);
+    border:1px solid rgba(255,255,255,.3);
+    color:var(--branco);
+    padding:11px 14px;
+    border-radius:20px;
+    cursor:pointer;
+  }
+  .btn-agendar:hover{background:rgba(255,255,255,.18);}
+  #painelAgendar{display:none;}
+  #painelAgendar .card{border-color:var(--azulejo);}
+  .ag-row2{display:flex; gap:10px;}
+  .ag-row2 > div{flex:1;}
+  .btn-guardar-agendamento{
+    width:100%;
+    margin-top:16px;
+    padding:12px;
+    border-radius:8px;
+    border:none;
+    background:var(--terracota);
+    color:#fff;
+    font-family:'Helvetica Neue', Arial, sans-serif;
+    font-size:14px;
+    cursor:pointer;
+  }
+  .lista-agendamentos{display:flex; flex-direction:column; gap:10px;}
+  .ag-item{
+    border:1px solid var(--linha);
+    border-radius:8px;
+    padding:12px 14px;
+    background:#fdfbf6;
+  }
+  .ag-item .ag-trajeto{
+    font-family:'Helvetica Neue', Arial, sans-serif;
+    font-size:13.5px;
+    font-weight:bold;
+    color:var(--texto);
+    margin-bottom:4px;
+  }
+  .ag-item .ag-meta{
+    font-family:'Helvetica Neue', Arial, sans-serif;
+    font-size:12px;
+    color:#6a7378;
+    line-height:1.6;
+  }
+  .ag-item .ag-valor{
+    color:var(--terracota);
+    font-weight:bold;
+  }
+  .ag-acoes{
+    display:flex;
+    gap:8px;
+    margin-top:10px;
+  }
+  .ag-acoes button{
+    flex:1;
+    padding:8px;
+    border-radius:6px;
+    border:1px solid var(--linha);
+    font-family:'Helvetica Neue', Arial, sans-serif;
+    font-size:12px;
+    cursor:pointer;
+    background:#fff;
+  }
+  .ag-btn-cal{background:var(--azulejo) !important; color:#fff !important; border:none !important;}
+  .ag-btn-del{color:var(--terracota);}
+  .ag-vazio{
+    font-family:'Helvetica Neue', Arial, sans-serif;
+    font-size:12.5px;
+    color:#8a7f66;
+    text-align:center;
+    padding:6px 0;
+  }
 </style>
 </head>
 <body>
@@ -272,7 +362,7 @@
 <header>
   <p class="eyebrow">Motorista de Transfer · Lisboa</p>
   <h1><em>Trajeto</em></h1>
-  <p class="sub">Preencha os dados da corrida e veja na hora o valor sugerido para o cliente. Nada é guardado — tudo fica só neste navegador, nesta sessão.</p>
+  <p class="sub">Preencha os dados da corrida e veja na hora o valor sugerido para o cliente. O cálculo não fica guardado; se agendares a corrida, o agendamento fica só neste navegador.</p>
   <button id="btnConfig" class="btn-config">⚙ Minhas tarifas</button>
 </header>
 
@@ -407,9 +497,42 @@
     <div class="valor">€<span id="valorFinal">0</span></div>
     <div class="faixa" id="faixaTexto"></div>
     <div class="detalhe" id="detalhe"></div>
+    <button class="btn-agendar" id="btnAbrirAgendar">📅 Agendar esta corrida</button>
   </div>
 
-  <p class="nota">Portagens não são calculadas automaticamente — não há forma simples e sem custo de puxar isso do Google Maps/Waze num app leve como este. Confirme o valor da portagem no app de navegação antes da corrida e insira aqui manualmente.<br><br>"Emitir recibo" acrescenta o IVA sobre o valor total da corrida (taxa configurável em Minhas tarifas, padrão 6%).</p>
+  <div id="painelAgendar">
+    <div class="card">
+      <h2>Agendar corrida</h2>
+      <label for="ag_partida">Endereço de partida</label>
+      <input type="text" id="ag_partida" placeholder="ex: Aeroporto de Lisboa, T1">
+      <label for="ag_chegada">Endereço de chegada</label>
+      <input type="text" id="ag_chegada" placeholder="ex: Hotel Avenida Palace">
+      <div class="ag-row2">
+        <div>
+          <label for="ag_data">Data</label>
+          <input type="date" id="ag_data">
+        </div>
+        <div>
+          <label for="ag_hora">Horário</label>
+          <input type="time" id="ag_hora">
+        </div>
+      </div>
+      <label for="ag_cliente">Nome do cliente</label>
+      <input type="text" id="ag_cliente" placeholder="ex: João Ferreira">
+      <label for="ag_fornecedor">Fornecedor do serviço</label>
+      <input type="text" id="ag_fornecedor" placeholder="ex: particular / nome da empresa">
+      <label for="ag_valor">Valor (€)</label>
+      <input type="number" id="ag_valor" min="0">
+      <button class="btn-guardar-agendamento" id="btnGuardarAgendamento">Guardar e adicionar ao calendário</button>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>Meus agendamentos</h2>
+    <div class="lista-agendamentos" id="listaAgendamentos"></div>
+  </div>
+
+  <p class="nota">Portagens não são calculadas automaticamente — não há forma simples e sem custo de puxar isso do Google Maps/Waze num app leve como este. Confirme o valor da portagem no app de navegação antes da corrida e insira aqui manualmente.<br><br>"Emitir recibo" acrescenta o IVA sobre o valor total da corrida (taxa configurável em Minhas tarifas, padrão 6%).<br><br>Os agendamentos ficam guardados só neste telemóvel/navegador. O lembrete 24h antes é feito pelo teu Calendário — ao guardar um agendamento, o ficheiro de convite é aberto para adicionares (o alarme já vem configurado).</p>
 
 </main>
 
@@ -560,6 +683,160 @@
   }
 
   calcular();
+
+  // ---------- Agendamento ----------
+  const AG_KEY = 'trajeto_agendamentos';
+
+  function lerAgendamentos(){
+    try{ return JSON.parse(localStorage.getItem(AG_KEY)) || []; }
+    catch(e){ return []; }
+  }
+  function gravarAgendamentos(lista){
+    localStorage.setItem(AG_KEY, JSON.stringify(lista));
+  }
+
+  document.getElementById('btnAbrirAgendar').addEventListener('click', ()=>{
+    const p = document.getElementById('painelAgendar');
+    const abrir = p.style.display !== 'block';
+    p.style.display = abrir ? 'block' : 'none';
+    if(abrir){
+      document.getElementById('ag_valor').value = document.getElementById('valorFinal').textContent;
+      if(!document.getElementById('ag_data').value){
+        const amanha = new Date();
+        amanha.setDate(amanha.getDate()+1);
+        document.getElementById('ag_data').value = amanha.toISOString().slice(0,10);
+      }
+      p.scrollIntoView({behavior:'smooth', block:'start'});
+    }
+  });
+
+  function pad(n){ return String(n).padStart(2,'0'); }
+
+  function escapeICS(txt){
+    return String(txt).replace(/\\/g,'\\\\').replace(/;/g,'\\;').replace(/,/g,'\\,').replace(/\n/g,'\\n');
+  }
+
+  function gerarICS(ag){
+    const [ano,mes,dia] = ag.data.split('-').map(Number);
+    const [hora,min] = ag.hora.split(':').map(Number);
+    const inicio = new Date(ano, mes-1, dia, hora, min);
+    const fim = new Date(inicio.getTime() + 60*60*1000);
+    const fmt = (d)=> `${d.getFullYear()}${pad(d.getMonth()+1)}${pad(d.getDate())}T${pad(d.getHours())}${pad(d.getMinutes())}00`;
+    const agora = new Date();
+    const dtstamp = `${agora.getUTCFullYear()}${pad(agora.getUTCMonth()+1)}${pad(agora.getUTCDate())}T${pad(agora.getUTCHours())}${pad(agora.getUTCMinutes())}${pad(agora.getUTCSeconds())}Z`;
+    const desc = `Partida: ${ag.partida}\nChegada: ${ag.chegada}\nValor: €${ag.valor}${ag.fornecedor ? '\nFornecedor: ' + ag.fornecedor : ''}`;
+
+    return [
+      'BEGIN:VCALENDAR',
+      'VERSION:2.0',
+      'PRODID:-//Trajeto//Agendamento//PT',
+      'BEGIN:VEVENT',
+      `UID:${ag.id}@trajeto.app`,
+      `DTSTAMP:${dtstamp}`,
+      `DTSTART:${fmt(inicio)}`,
+      `DTEND:${fmt(fim)}`,
+      `SUMMARY:${escapeICS('Transfer: ' + ag.cliente)}`,
+      `DESCRIPTION:${escapeICS(desc)}`,
+      `LOCATION:${escapeICS(ag.partida)}`,
+      'BEGIN:VALARM',
+      'ACTION:DISPLAY',
+      `DESCRIPTION:${escapeICS('Lembrete: transfer de ' + ag.cliente + ' amanhã')}`,
+      'TRIGGER:-P1D',
+      'END:VALARM',
+      'END:VEVENT',
+      'END:VCALENDAR'
+    ].join('\r\n');
+  }
+
+  function abrirICS(ag){
+    const conteudo = gerarICS(ag);
+    const blob = new Blob([conteudo], {type:'text/calendar;charset=utf-8'});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `trajeto-${ag.cliente.replace(/\s+/g,'_')}-${ag.data}.ics`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    setTimeout(()=> URL.revokeObjectURL(url), 4000);
+  }
+
+  function renderLista(){
+    const lista = lerAgendamentos().sort((a,b)=> (a.data+a.hora).localeCompare(b.data+b.hora));
+    const el = document.getElementById('listaAgendamentos');
+    if(lista.length === 0){
+      el.innerHTML = '<p class="ag-vazio">Ainda não tens agendamentos guardados.</p>';
+      return;
+    }
+    el.innerHTML = lista.map(ag => `
+      <div class="ag-item" data-id="${ag.id}">
+        <div class="ag-trajeto">${ag.partida} → ${ag.chegada}</div>
+        <div class="ag-meta">
+          📅 ${ag.data.split('-').reverse().join('/')} às ${ag.hora}<br>
+          👤 ${ag.cliente} &nbsp;·&nbsp; <span class="ag-valor">€${ag.valor}</span>
+          ${ag.fornecedor ? `<br>🏷 Fornecedor: ${ag.fornecedor}` : ''}
+        </div>
+        <div class="ag-acoes">
+          <button class="ag-btn-cal" data-acao="cal">📅 Calendário</button>
+          <button class="ag-btn-del" data-acao="del">🗑 Remover</button>
+        </div>
+      </div>
+    `).join('');
+  }
+
+  document.getElementById('listaAgendamentos').addEventListener('click', (e)=>{
+    const btn = e.target.closest('button');
+    if(!btn) return;
+    const item = e.target.closest('.ag-item');
+    const id = item.dataset.id;
+    const lista = lerAgendamentos();
+    const ag = lista.find(a => a.id === id);
+    if(!ag) return;
+
+    if(btn.dataset.acao === 'cal'){
+      abrirICS(ag);
+    } else if(btn.dataset.acao === 'del'){
+      if(confirm('Remover este agendamento?')){
+        gravarAgendamentos(lista.filter(a => a.id !== id));
+        renderLista();
+      }
+    }
+  });
+
+  document.getElementById('btnGuardarAgendamento').addEventListener('click', ()=>{
+    const partida = document.getElementById('ag_partida').value.trim();
+    const chegada = document.getElementById('ag_chegada').value.trim();
+    const data = document.getElementById('ag_data').value;
+    const hora = document.getElementById('ag_hora').value;
+    const cliente = document.getElementById('ag_cliente').value.trim();
+    const fornecedor = document.getElementById('ag_fornecedor').value.trim();
+    const valor = document.getElementById('ag_valor').value;
+
+    if(!partida || !chegada || !data || !hora || !cliente){
+      alert('Preenche partida, chegada, data, horário e nome do cliente.');
+      return;
+    }
+
+    const ag = {
+      id: Date.now().toString(36) + Math.random().toString(36).slice(2,7),
+      partida, chegada, data, hora, cliente, fornecedor,
+      valor: valor || document.getElementById('valorFinal').textContent
+    };
+
+    const lista = lerAgendamentos();
+    lista.push(ag);
+    gravarAgendamentos(lista);
+    renderLista();
+    abrirICS(ag);
+
+    document.getElementById('ag_partida').value = '';
+    document.getElementById('ag_chegada').value = '';
+    document.getElementById('ag_cliente').value = '';
+    document.getElementById('ag_fornecedor').value = '';
+    document.getElementById('painelAgendar').style.display = 'none';
+  });
+
+  renderLista();
 </script>
 
 
