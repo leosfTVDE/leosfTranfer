@@ -359,12 +359,37 @@
   }
   .ag-btn-cal{background:var(--azulejo) !important; color:#fff !important; border:none !important;}
   .ag-btn-del{color:var(--terracota);}
-  .ag-vazio{
+  .ct-energia{
+    padding:10px 12px;
+    border:1px solid var(--linha);
+    border-radius:8px;
+    background:#eef0ec;
+    color:#6a7378;
     font-family:'Helvetica Neue', Arial, sans-serif;
-    font-size:12.5px;
-    color:#8a7f66;
+    font-size:15px;
+  }
+  .ct-min{
+    font-family: Georgia, 'Times New Roman', serif;
+    font-size:28px;
+    color:#c9d6da;
+  }
+  .ct-rec{
+    font-family: Georgia, 'Times New Roman', serif;
+    font-weight:bold;
+    font-size:40px;
+    color:var(--branco);
+  }
+  .ct-cobrar-input{
+    width:100%;
+    padding:14px;
+    border-radius:10px;
+    border:none;
     text-align:center;
-    padding:6px 0;
+    font-family: Georgia, 'Times New Roman', serif;
+    font-weight:bold;
+    font-size:28px;
+    color:var(--terracota);
+    background:rgba(255,255,255,.95);
   }
 </style>
 </head>
@@ -378,6 +403,11 @@
 </header>
 
 <main>
+
+  <div class="seg" id="segModo" style="margin-bottom:18px;">
+    <button data-v="principal" class="active">Corridas locais</button>
+    <button data-v="transfer">Transfer rápido</button>
+  </div>
 
   <div id="painelConfig">
     <div class="card">
@@ -427,6 +457,17 @@
       </div>
 
       <div class="cfg-grupo">
+        <div class="cfg-titulo">Regresso vazio (€/hora)</div>
+        <div class="cfg-row">
+          <div><label>Sedan (€/h)</label><input type="number" id="cfg_hora_sedan"></div>
+          <div><label>Van (€/h)</label><input type="number" id="cfg_hora_van"></div>
+        </div>
+        <div class="cfg-row">
+          <div><label>% da hora na volta</label><input type="number" id="cfg_hora_volta_pct"></div>
+        </div>
+      </div>
+
+      <div class="cfg-grupo">
         <div class="cfg-titulo">Extras</div>
         <div class="cfg-row">
           <div><label>Bagagem extra (€)</label><input type="number" id="cfg_bagagem"></div>
@@ -438,6 +479,21 @@
         <div class="cfg-titulo">Recibo</div>
         <div class="cfg-row">
           <div><label>IVA sobre recibo (%)</label><input type="number" step="0.1" id="cfg_iva_pct"></div>
+        </div>
+      </div>
+
+      <div class="cfg-grupo">
+        <div class="cfg-titulo">Calculadora de Transfer</div>
+        <div class="cfg-row">
+          <div><label>Mín. transfer curto (€)</label><input type="number" id="cfg_ct_curto_min"></div>
+          <div><label>Mín. por hora (€)</label><input type="number" id="cfg_ct_hora_min"></div>
+        </div>
+        <div class="cfg-row">
+          <div><label>Referência €/km (+20km)</label><input type="number" step="0.01" id="cfg_ct_km_rate"></div>
+          <div><label>Energia €/km</label><input type="number" step="0.01" id="cfg_ct_energia_km"></div>
+        </div>
+        <div class="cfg-row">
+          <div><label>Margem adicional (%)</label><input type="number" id="cfg_ct_margem_pct"></div>
         </div>
       </div>
 
@@ -454,6 +510,8 @@
       </div>
     </div>
   </div>
+
+  <div id="viewPrincipal">
 
   <div class="card">
     <h2>Tipo de trajeto</h2>
@@ -486,7 +544,11 @@
 
   <div class="card">
     <h2>Extras</h2>
-    <div class="row2">
+    <label class="chk" style="margin-bottom:12px;">
+      <input type="checkbox" id="regressoVazio"> Regresso vazio (cobrar tempo da volta)
+    </label>
+
+    <div id="blocoDuracaoSimples" class="row2">
       <div>
         <label for="duracao">Duração da viagem (min)</label>
         <input type="number" id="duracao" placeholder="0" min="0">
@@ -496,6 +558,26 @@
         <input type="number" id="espera" placeholder="0" min="0">
       </div>
     </div>
+
+    <div id="blocoDuracaoDupla" style="display:none;">
+      <div class="row2">
+        <div>
+          <label for="duracaoIda">Duração ida (min)</label>
+          <input type="number" id="duracaoIda" placeholder="0" min="0">
+        </div>
+        <div>
+          <label for="duracaoVolta">Duração volta (min)</label>
+          <input type="number" id="duracaoVolta" placeholder="0" min="0">
+        </div>
+      </div>
+      <div class="row2">
+        <div>
+          <label for="esperaDupla">Espera (min)</label>
+          <input type="number" id="esperaDupla" placeholder="0" min="0">
+        </div>
+      </div>
+    </div>
+
     <div class="row2">
       <div>
         <label for="portagem">Portagens (€)</label>
@@ -552,6 +634,36 @@
 
   <p class="nota">Portagens não são calculadas automaticamente — não há forma simples e sem custo de puxar isso do Google Maps/Waze num app leve como este. Confirme o valor da portagem no app de navegação antes da corrida e insira aqui manualmente.<br><br>"Emitir recibo" acrescenta o IVA sobre o valor total da corrida (taxa configurável em Minhas tarifas, padrão 6%).<br><br>Os agendamentos ficam guardados só neste telemóvel/navegador. O lembrete 24h antes é feito pelo teu Calendário — ao guardar um agendamento, o ficheiro de convite é aberto para adicionares (o alarme já vem configurado).</p>
 
+  </div>
+
+  <div id="viewTransfer" style="display:none;">
+    <div class="card">
+      <h2>📍 Calculadora de Transfer</h2>
+      <label for="ct_km">Distância (km)</label>
+      <input type="number" id="ct_km" placeholder="ex: 34" min="0">
+      <label for="ct_tempo">⏱️ Tempo estimado (min)</label>
+      <input type="number" id="ct_tempo" placeholder="ex: 30" min="0">
+      <label for="ct_portagem">🛣️ Portagem (€)</label>
+      <input type="number" id="ct_portagem" placeholder="ex: 3.50" min="0" step="0.01">
+      <label>⚡ Energia (calculada automaticamente)</label>
+      <div class="ct-energia" id="ct_energia_display">€0,00</div>
+    </div>
+
+    <div class="resultado">
+      <p class="eyebrow">Valor mínimo</p>
+      <div class="ct-min" id="ct_valorMinimo">€0</div>
+      <p class="eyebrow" style="margin-top:14px;">Valor recomendado</p>
+      <div class="ct-rec" id="ct_valorRecomendado">€0</div>
+      <p class="eyebrow" style="margin-top:16px;">💰 Cobrar do cliente</p>
+      <input type="number" id="ct_cobrar" class="ct-cobrar-input" step="0.5">
+      <button class="btn-agendar" id="ct_btnNovo" style="margin-top:14px;">🔄 Novo cálculo</button>
+    </div>
+
+    <p class="nota">A Calculadora de Transfer não soma ida + volta automaticamente — o valor é só do trajeto que estás a orçar. Se costumas conseguir corrida de retorno (ex: zona de Cascais), isso é decisão comercial tua, não é adicionado aqui. Ajusta os valores de referência em "Minhas tarifas".</p>
+  </div>
+
+  <p style="text-align:center; font-family:'Helvetica Neue', Arial, sans-serif; font-size:11px; color:#8a7f66; margin-top:24px;">Trajeto · v2.0</p>
+
 </main>
 
 <script>
@@ -565,9 +677,11 @@
     longo_sedan_kmrate: 0.70,
     longo_van_kmrate: 0.90,
     espera_sedan: 13, espera_van: 18,
+    hora_sedan: 15, hora_van: 20, hora_volta_pct: 50,
     noite_pct: 15,
     bagagem: 7, cadeira: 8,
-    iva_pct: 6
+    iva_pct: 6,
+    ct_curto_min: 25, ct_hora_min: 25, ct_km_rate: 1.00, ct_energia_km: 0.07, ct_margem_pct: 0
   };
   let cfg = { ...DEFAULTS };
 
@@ -596,10 +710,12 @@
     cfg = { ...DEFAULTS };
     preencherPainel(cfg);
     calcular();
+    calcularTransfer();
   });
   document.getElementById('btnAplicar').addEventListener('click', ()=>{
     cfg = lerPainel();
     calcular();
+    calcularTransfer();
     document.getElementById('painelConfig').style.display = 'none';
   });
   document.getElementById('btnCopiar').addEventListener('click', ()=>{
@@ -611,10 +727,59 @@
       cfg = { ...DEFAULTS, ...colado };
       preencherPainel(cfg);
       calcular();
+      calcularTransfer();
     }catch(e){
       alert('Texto de configuração inválido.');
     }
   });
+
+  document.getElementById('segModo').querySelectorAll('button').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      document.getElementById('segModo').querySelectorAll('button').forEach(b=>b.classList.remove('active'));
+      btn.classList.add('active');
+      const t = btn.dataset.v;
+      document.getElementById('viewPrincipal').style.display = t === 'principal' ? 'block' : 'none';
+      document.getElementById('viewTransfer').style.display = t === 'transfer' ? 'block' : 'none';
+    });
+  });
+
+  function calcularTransfer(){
+    const km = parseFloat(document.getElementById('ct_km').value) || 0;
+    const tempoMin = parseFloat(document.getElementById('ct_tempo').value) || 0;
+    const portagem = parseFloat(document.getElementById('ct_portagem').value) || 0;
+
+    const energia = km * cfg.ct_energia_km;
+    document.getElementById('ct_energia_display').textContent = `€${energia.toFixed(2)}`;
+
+    const valorKm = km <= 20 ? cfg.ct_curto_min : km * cfg.ct_km_rate;
+    const valorTempo = (tempoMin/60) * cfg.ct_hora_min;
+
+    const valorMinimo = Math.max(valorKm, valorTempo);
+    const valorRecomendado = valorMinimo * (1 + cfg.ct_margem_pct/100) + portagem + energia;
+
+    document.getElementById('ct_valorMinimo').textContent = `€${valorMinimo.toFixed(2)}`;
+    document.getElementById('ct_valorRecomendado').textContent = `€${valorRecomendado.toFixed(2)}`;
+
+    const campoCobrar = document.getElementById('ct_cobrar');
+    if(!campoCobrar.dataset.editado){
+      campoCobrar.value = valorRecomendado.toFixed(2);
+    }
+  }
+
+  ['ct_km','ct_tempo','ct_portagem'].forEach(id=>{
+    document.getElementById(id).addEventListener('input', calcularTransfer);
+  });
+  document.getElementById('ct_cobrar').addEventListener('input', (e)=>{
+    e.target.dataset.editado = '1';
+  });
+  document.getElementById('ct_btnNovo').addEventListener('click', ()=>{
+    ['ct_km','ct_tempo','ct_portagem','ct_cobrar'].forEach(id=>{
+      document.getElementById(id).value = '';
+    });
+    delete document.getElementById('ct_cobrar').dataset.editado;
+    calcularTransfer();
+  });
+  calcularTransfer();
 
   function setupSeg(id, key){
     const el = document.getElementById(id);
@@ -633,15 +798,29 @@
   setupSeg('segVeiculo','veiculo');
   setupSeg('segHorario','horario');
 
-  ['km','duracao','espera','portagem','bagagem','cadeira','recibo'].forEach(id=>{
+  document.getElementById('regressoVazio').addEventListener('change', (e)=>{
+    const dupla = e.target.checked;
+    document.getElementById('blocoDuracaoSimples').style.display = dupla ? 'none' : 'flex';
+    document.getElementById('blocoDuracaoDupla').style.display = dupla ? 'block' : 'none';
+    calcular();
+  });
+
+  ['km','duracao','duracaoIda','duracaoVolta','espera','esperaDupla','portagem','bagagem','cadeira','recibo'].forEach(id=>{
     document.getElementById(id).addEventListener('input', calcular);
     document.getElementById(id).addEventListener('change', calcular);
   });
 
   function calcular(){
     const km = parseFloat(document.getElementById('km').value) || 0;
+    const regressoVazio = document.getElementById('regressoVazio').checked;
+
     const duracaoMin = parseFloat(document.getElementById('duracao').value) || 0;
-    const esperaMin = parseFloat(document.getElementById('espera').value) || 0;
+    const esperaMin = regressoVazio
+      ? (parseFloat(document.getElementById('esperaDupla').value) || 0)
+      : (parseFloat(document.getElementById('espera').value) || 0);
+    const duracaoIdaMin = parseFloat(document.getElementById('duracaoIda').value) || 0;
+    const duracaoVoltaMin = parseFloat(document.getElementById('duracaoVolta').value) || 0;
+
     const portagem = parseFloat(document.getElementById('portagem').value) || 0;
     const bagagem = document.getElementById('bagagem').checked ? cfg.bagagem : 0;
     const cadeira = document.getElementById('cadeira').checked ? cfg.cadeira : 0;
@@ -673,7 +852,15 @@
 
     const taxaEspera = isVan ? cfg.espera_van : cfg.espera_sedan;
     const esperaValor = (esperaMin/60) * taxaEspera;
-    const extras = bagagem + cadeira + portagem + esperaValor;
+
+    let horaExtra = 0;
+    if(regressoVazio){
+      const taxaHora = isVan ? cfg.hora_van : cfg.hora_sedan;
+      const voltaFator = cfg.hora_volta_pct/100;
+      horaExtra = (duracaoIdaMin/60)*taxaHora + (duracaoVoltaMin/60)*taxaHora*voltaFator;
+    }
+
+    const extras = bagagem + cadeira + portagem + esperaValor + horaExtra;
 
     const comRecibo = document.getElementById('recibo').checked;
     const fatorIva = comRecibo ? (1 + cfg.iva_pct/100) : 1;
@@ -691,10 +878,13 @@
     document.getElementById('valorFinal').textContent = finalMed;
     document.getElementById('faixaTexto').textContent = `faixa sugerida: €${finalMin} – €${finalMax}`;
 
-    const tempoTotalMin = duracaoMin + esperaMin;
+    const tempoTotalMin = regressoVazio
+      ? (duracaoIdaMin + duracaoVoltaMin + esperaMin)
+      : (duracaoMin + esperaMin);
     const porHoraWrap = document.getElementById('porHoraWrap');
     if(tempoTotalMin > 0){
-      const porHora = finalMed / (tempoTotalMin/60);
+      const valorSemPortagem = finalMed - Math.round(portagem * fatorIva);
+      const porHora = valorSemPortagem / (tempoTotalMin/60);
       porHoraWrap.innerHTML = `<span class="porHora">≈ €${porHora.toFixed(0)}/hora</span>`;
     } else {
       porHoraWrap.innerHTML = '';
@@ -702,6 +892,9 @@
 
     let det = '';
     det += `<div><span>Tarifa base</span><span>€${Math.round(base)}</span></div>`;
+    if(regressoVazio && horaExtra>0){
+      det += `<div><span>Hora ida+volta (${duracaoIdaMin}min + ${duracaoVoltaMin}min a ${cfg.hora_volta_pct}%)</span><span>€${horaExtra.toFixed(0)}</span></div>`;
+    }
     if(esperaValor>0) det += `<div><span>Espera (${esperaMin} min)</span><span>€${esperaValor.toFixed(0)}</span></div>`;
     if(bagagem>0) det += `<div><span>Bagagem extra</span><span>€${bagagem}</span></div>`;
     if(cadeira>0) det += `<div><span>Cadeirinha</span><span>€${cadeira}</span></div>`;
