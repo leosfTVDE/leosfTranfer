@@ -314,12 +314,13 @@
   }
   .ag-acoes{
     display:flex;
+    flex-wrap:wrap;
     gap:8px;
     margin-top:10px;
   }
   .ag-acoes button{
-    flex:1;
-    padding:8px;
+    flex:1 1 calc(50% - 4px);
+    padding:8px 4px;
     border-radius:6px;
     border:1px solid var(--linha);
     font-family:'Helvetica Neue', Arial, sans-serif;
@@ -328,7 +329,40 @@
     background:#fff;
   }
   .ag-btn-cal{background:var(--azulejo) !important; color:#fff !important; border:none !important;}
+  .ag-btn-wpp{background:#25D366 !important; color:#fff !important; border:none !important;}
+  .ag-btn-ok{background:var(--terracota) !important; color:#fff !important; border:none !important;}
   .ag-btn-del{color:var(--terracota);}
+  .ag-item-realizado{opacity:.72; border-color:var(--azulejo);}
+  .ag-badge-ok{
+    display:inline-block;
+    font-family:'Helvetica Neue', Arial, sans-serif;
+    font-size:10.5px;
+    font-weight:bold;
+    color:#fff;
+    background:var(--azulejo);
+    padding:2px 8px;
+    border-radius:10px;
+    margin-left:6px;
+    vertical-align:middle;
+  }
+  .fat-resumo{
+    display:flex;
+    gap:10px;
+    margin-bottom:16px;
+  }
+  .fat-card{
+    flex:1;
+    background: linear-gradient(135deg, var(--azul-noite), var(--azul-doca));
+    color:var(--branco);
+    border-radius:10px;
+    padding:14px 10px;
+    text-align:center;
+  }
+  .fat-card .eyebrow{color:#e8c9a0; font-size:9.5px; margin-bottom:4px;}
+  .fat-card .fat-valor{
+    font-family: Georgia, 'Times New Roman', serif;
+    font-size:20px;
+  }
   .ag-vazio{
     font-family:'Helvetica Neue', Arial, sans-serif;
     font-size:12.5px;
@@ -392,14 +426,18 @@
 
   <div class="seg" id="segModo" style="margin-bottom:18px;">
     <button data-v="transfer" class="active">Transfer rápido</button>
-    <button data-v="aeroporto">Aeroporto ⇄ Lisboa</button>
+    <button data-v="aeroporto">Aeroporto</button>
+    <button data-v="faturamento">Faturamento</button>
   </div>
 
   <div id="painelConfig">
     <div class="card">
       <h2>Minhas tarifas</h2>
 
-      <div class="cfg-grupo">
+      <label for="cfg_nome">O teu nome (para as mensagens ao cliente)</label>
+      <input type="text" id="cfg_nome" placeholder="ex: Carlos">
+
+      <div class="cfg-grupo" style="margin-top:16px;">
         <div class="cfg-titulo">Aeroporto ⇄ Lisboa (valor fixo)</div>
         <div class="cfg-row">
           <div><label>Sedan: Aeroporto → Centro (€)</label><input type="number" id="cfg_ap_sedan_ida"></div>
@@ -563,6 +601,8 @@
         </div>
         <label for="ag_cliente">Nome do cliente</label>
         <input type="text" id="ag_cliente" placeholder="ex: João Ferreira">
+        <label for="ag_telefone">Telefone do cliente (com indicativo)</label>
+        <input type="text" id="ag_telefone" placeholder="ex: 351 912 345 678">
         <label for="ag_fornecedor">Fornecedor do serviço</label>
         <input type="text" id="ag_fornecedor" placeholder="ex: particular / nome da empresa">
         <label for="ag_valor">Valor (€)</label>
@@ -611,7 +651,31 @@
     <p class="nota">Tarifa fixa para trajetos entre o Aeroporto de Lisboa e hotéis no centro. Ajusta os valores em "Minhas tarifas".</p>
   </div>
 
-  <p style="text-align:center; font-family:'Helvetica Neue', Arial, sans-serif; font-size:11px; color:#8a7f66; margin-top:24px;">Trajeto · v3.0</p>
+  <div id="viewFaturamento" style="display:none;">
+    <div class="fat-resumo">
+      <div class="fat-card">
+        <p class="eyebrow">Hoje</p>
+        <div class="fat-valor" id="fat_hoje">€0</div>
+      </div>
+      <div class="fat-card">
+        <p class="eyebrow">Esta semana</p>
+        <div class="fat-valor" id="fat_semana">€0</div>
+      </div>
+      <div class="fat-card">
+        <p class="eyebrow">Este mês</p>
+        <div class="fat-valor" id="fat_mes">€0</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>Corridas faturadas</h2>
+      <div class="lista-agendamentos" id="listaFaturamento"></div>
+    </div>
+
+    <p class="nota">Aparecem aqui os agendamentos marcados como "✅ Concluído" na aba Transfer rápido. Os totais somam o valor guardado em cada agendamento.</p>
+  </div>
+
+  <p style="text-align:center; font-family:'Helvetica Neue', Arial, sans-serif; font-size:11px; color:#8a7f66; margin-top:24px;">Trajeto · v3.1</p>
 
 </main>
 
@@ -649,6 +713,7 @@
     return novo;
   }
   preencherPainel(cfg);
+  document.getElementById('cfg_nome').value = localStorage.getItem('trajeto_nome') || '';
 
   document.getElementById('btnConfig').addEventListener('click', ()=>{
     const p = document.getElementById('painelConfig');
@@ -662,6 +727,7 @@
   });
   document.getElementById('btnAplicar').addEventListener('click', ()=>{
     cfg = lerPainel();
+    localStorage.setItem('trajeto_nome', document.getElementById('cfg_nome').value.trim());
     calcularTransfer();
     calcularAeroporto();
     document.getElementById('painelConfig').style.display = 'none';
@@ -688,6 +754,8 @@
       const t = btn.dataset.v;
       document.getElementById('viewTransfer').style.display = t === 'transfer' ? 'block' : 'none';
       document.getElementById('viewAeroporto').style.display = t === 'aeroporto' ? 'block' : 'none';
+      document.getElementById('viewFaturamento').style.display = t === 'faturamento' ? 'block' : 'none';
+      if(t === 'faturamento') renderFaturamento();
     });
   });
 
@@ -885,8 +953,8 @@
       return;
     }
     el.innerHTML = lista.map(ag => `
-      <div class="ag-item" data-id="${ag.id}">
-        <div class="ag-trajeto">${ag.partida} → ${ag.chegada}</div>
+      <div class="ag-item ${ag.realizado ? 'ag-item-realizado' : ''}" data-id="${ag.id}">
+        <div class="ag-trajeto">${ag.partida} → ${ag.chegada}${ag.realizado ? '<span class="ag-badge-ok">✔ Concluído</span>' : ''}</div>
         <div class="ag-meta">
           📅 ${ag.data.split('-').reverse().join('/')} às ${ag.hora}<br>
           👤 ${ag.cliente} &nbsp;·&nbsp; <span class="ag-valor">€${ag.valor}</span>
@@ -894,10 +962,40 @@
         </div>
         <div class="ag-acoes">
           <button class="ag-btn-cal" data-acao="cal">📅 Calendário</button>
+          <button class="ag-btn-wpp" data-acao="wpp">✉️ Mensagem</button>
+          <button class="ag-btn-ok" data-acao="realizado">${ag.realizado ? '↩️ Desfazer' : '✅ Concluído'}</button>
           <button class="ag-btn-del" data-acao="del">🗑 Remover</button>
         </div>
       </div>
     `).join('');
+  }
+
+  function normalizarTelefone(tel){
+    let d = String(tel).replace(/[^\d+]/g,'');
+    if(d.startsWith('+')) d = d.slice(1);
+    if(d.startsWith('00')) d = d.slice(2);
+    if(d.length === 9) d = '351' + d; // nº português sem indicativo
+    return d;
+  }
+
+  function gerarMensagem(ag){
+    const dataFmt = ag.data.split('-').reverse().join('/');
+    const nome = localStorage.getItem('trajeto_nome') || '';
+    const assinatura = nome ? `Aqui é o ${nome}` : 'Aqui é o teu motorista';
+    return `Olá ${ag.cliente}! 👋\n\n${assinatura} — confirmo os dados do seu transfer:\n\n📍 De: ${ag.partida}\n📍 Para: ${ag.chegada}\n📅 Data: ${dataFmt}\n🕐 Horário: ${ag.hora}\n💰 Valor: €${ag.valor}\n\nPode confirmar este serviço, por favor? Fico a aguardar a sua resposta. Obrigado! 🚗`;
+  }
+
+  function enviarMensagem(ag){
+    const texto = gerarMensagem(ag);
+    if(ag.telefone){
+      const tel = normalizarTelefone(ag.telefone);
+      window.open(`https://wa.me/${tel}?text=${encodeURIComponent(texto)}`, '_blank');
+    } else if(navigator.clipboard){
+      navigator.clipboard.writeText(texto);
+      alert('Não há telefone guardado — mensagem copiada! Cola no WhatsApp. (Adiciona o telefone no próximo agendamento para abrir direto.)');
+    } else {
+      alert(texto);
+    }
   }
 
   document.getElementById('listaAgendamentos').addEventListener('click', (e)=>{
@@ -911,13 +1009,68 @@
 
     if(btn.dataset.acao === 'cal'){
       abrirICS(ag);
+    } else if(btn.dataset.acao === 'wpp'){
+      enviarMensagem(ag);
+    } else if(btn.dataset.acao === 'realizado'){
+      ag.realizado = !ag.realizado;
+      gravarAgendamentos(lista);
+      renderLista();
+      renderFaturamento();
     } else if(btn.dataset.acao === 'del'){
       if(confirm('Remover este agendamento?')){
         gravarAgendamentos(lista.filter(a => a.id !== id));
         renderLista();
+        renderFaturamento();
       }
     }
   });
+
+  // ---------- Faturamento ----------
+  function inicioSemana(d){
+    const dia = new Date(d);
+    const diaSemana = (dia.getDay() + 6) % 7; // 0 = segunda
+    dia.setDate(dia.getDate() - diaSemana);
+    dia.setHours(0,0,0,0);
+    return dia;
+  }
+
+  function renderFaturamento(){
+    const lista = lerAgendamentos().filter(a => a.realizado);
+    const hoje = new Date();
+    const hojeStr = hoje.toISOString().slice(0,10);
+    const inicioSem = inicioSemana(hoje);
+    const mesAtual = hojeStr.slice(0,7);
+
+    let totalHoje = 0, totalSemana = 0, totalMes = 0;
+    lista.forEach(ag=>{
+      const v = parseFloat(ag.valor) || 0;
+      const dataAg = new Date(ag.data + 'T00:00:00');
+      if(ag.data === hojeStr) totalHoje += v;
+      if(dataAg >= inicioSem) totalSemana += v;
+      if(ag.data.slice(0,7) === mesAtual) totalMes += v;
+    });
+
+    document.getElementById('fat_hoje').textContent = `€${totalHoje.toFixed(0)}`;
+    document.getElementById('fat_semana').textContent = `€${totalSemana.toFixed(0)}`;
+    document.getElementById('fat_mes').textContent = `€${totalMes.toFixed(0)}`;
+
+    const el = document.getElementById('listaFaturamento');
+    const ordenada = [...lista].sort((a,b)=> (b.data+b.hora).localeCompare(a.data+a.hora));
+    if(ordenada.length === 0){
+      el.innerHTML = '<p class="ag-vazio">Ainda não tens corridas faturadas. Marca um agendamento como "✅ Concluído".</p>';
+      return;
+    }
+    el.innerHTML = ordenada.map(ag => `
+      <div class="ag-item">
+        <div class="ag-trajeto">${ag.partida} → ${ag.chegada}</div>
+        <div class="ag-meta">
+          📅 ${ag.data.split('-').reverse().join('/')}<br>
+          👤 ${ag.cliente} &nbsp;·&nbsp; <span class="ag-valor">€${ag.valor}</span>
+          ${ag.fornecedor ? `<br>🏷 Fornecedor: ${ag.fornecedor}` : ''}
+        </div>
+      </div>
+    `).join('');
+  }
 
   document.getElementById('btnGuardarAgendamento').addEventListener('click', ()=>{
     const partida = document.getElementById('ag_partida').value.trim();
@@ -925,6 +1078,7 @@
     const data = document.getElementById('ag_data').value;
     const hora = document.getElementById('ag_hora').value;
     const cliente = document.getElementById('ag_cliente').value.trim();
+    const telefone = document.getElementById('ag_telefone').value.trim();
     const fornecedor = document.getElementById('ag_fornecedor').value.trim();
     const valor = document.getElementById('ag_valor').value;
 
@@ -935,8 +1089,9 @@
 
     const ag = {
       id: Date.now().toString(36) + Math.random().toString(36).slice(2,7),
-      partida, chegada, data, hora, cliente, fornecedor,
-      valor: valor || document.getElementById('ct_cobrar').value
+      partida, chegada, data, hora, cliente, telefone, fornecedor,
+      valor: valor || document.getElementById('ct_cobrar').value,
+      realizado: false
     };
 
     const lista = lerAgendamentos();
@@ -948,11 +1103,13 @@
     document.getElementById('ag_partida').value = '';
     document.getElementById('ag_chegada').value = '';
     document.getElementById('ag_cliente').value = '';
+    document.getElementById('ag_telefone').value = '';
     document.getElementById('ag_fornecedor').value = '';
     document.getElementById('painelAgendar').style.display = 'none';
   });
 
   renderLista();
+  renderFaturamento();
 </script>
 
 
