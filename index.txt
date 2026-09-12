@@ -187,25 +187,6 @@
     font-size:12px;
     color:#c9d6da;
   }
-  .detalhe{
-    margin-top:16px;
-    text-align:left;
-    font-family:'Helvetica Neue', Arial, sans-serif;
-    font-size:12.5px;
-    color:#c9d6da;
-    border-top:1px solid rgba(255,255,255,.15);
-    padding-top:12px;
-  }
-  .detalhe div{display:flex; justify-content:space-between; padding:2px 0;}
-  .nota{
-    font-family:'Helvetica Neue', Arial, sans-serif;
-    font-size:11.5px;
-    color:#8a7f66;
-    text-align:center;
-    margin-top:18px;
-    line-height:1.6;
-    padding:0 10px;
-  }
   .btn-config{
     margin-top:16px;
     font-family:'Helvetica Neue', Arial, sans-serif;
@@ -331,14 +312,33 @@
     color:var(--terracota);
     font-weight:bold;
   }
-  .ag-acoes{
+  .ag-nav{
     display:flex;
     gap:8px;
     margin-top:10px;
   }
-  .ag-acoes button{
+  .ag-nav button{
     flex:1;
-    padding:8px;
+    padding:11px 6px;
+    border-radius:8px;
+    border:none;
+    font-family:'Helvetica Neue', Arial, sans-serif;
+    font-size:13px;
+    font-weight:bold;
+    cursor:pointer;
+    color:#fff;
+  }
+  .ag-btn-buscar{background:var(--azulejo);}
+  .ag-btn-levar{background:var(--terracota);}
+  .ag-acoes{
+    display:flex;
+    flex-wrap:wrap;
+    gap:8px;
+    margin-top:10px;
+  }
+  .ag-acoes button{
+    flex:1 1 calc(50% - 4px);
+    padding:8px 4px;
     border-radius:6px;
     border:1px solid var(--linha);
     font-family:'Helvetica Neue', Arial, sans-serif;
@@ -347,13 +347,87 @@
     background:#fff;
   }
   .ag-btn-cal{background:var(--azulejo) !important; color:#fff !important; border:none !important;}
+  .ag-btn-wpp{background:#25D366 !important; color:#fff !important; border:none !important;}
+  .ag-btn-ok{background:var(--terracota) !important; color:#fff !important; border:none !important;}
   .ag-btn-del{color:var(--terracota);}
+  .ag-item-realizado{opacity:.72; border-color:var(--azulejo);}
+  .ag-badge-ok{
+    display:inline-block;
+    font-family:'Helvetica Neue', Arial, sans-serif;
+    font-size:10.5px;
+    font-weight:bold;
+    color:#fff;
+    background:var(--azulejo);
+    padding:2px 8px;
+    border-radius:10px;
+    margin-left:6px;
+    vertical-align:middle;
+  }
+  .fat-resumo{
+    display:flex;
+    gap:10px;
+    margin-bottom:16px;
+  }
+  .fat-card{
+    flex:1;
+    background: linear-gradient(135deg, var(--azul-noite), var(--azul-doca));
+    color:var(--branco);
+    border-radius:10px;
+    padding:14px 10px;
+    text-align:center;
+  }
+  .fat-card .eyebrow{color:#e8c9a0; font-size:9.5px; margin-bottom:4px;}
+  .fat-card .fat-valor{
+    font-family: Georgia, 'Times New Roman', serif;
+    font-size:20px;
+  }
   .ag-vazio{
     font-family:'Helvetica Neue', Arial, sans-serif;
     font-size:12.5px;
     color:#8a7f66;
     text-align:center;
     padding:6px 0;
+  }
+  .ct-energia{
+    padding:10px 12px;
+    border:1px solid var(--linha);
+    border-radius:8px;
+    background:#eef0ec;
+    color:#6a7378;
+    font-family:'Helvetica Neue', Arial, sans-serif;
+    font-size:15px;
+  }
+  .ct-min{
+    font-family: Georgia, 'Times New Roman', serif;
+    font-size:28px;
+    color:#c9d6da;
+  }
+  .ct-rec{
+    font-family: Georgia, 'Times New Roman', serif;
+    font-weight:bold;
+    font-size:40px;
+    color:var(--branco);
+  }
+  .ct-cobrar-input{
+    width:100%;
+    padding:14px;
+    border-radius:10px;
+    border:none;
+    text-align:center;
+    font-family: Georgia, 'Times New Roman', serif;
+    font-weight:bold;
+    font-size:28px;
+    color:var(--terracota);
+    background:rgba(255,255,255,.95);
+  }
+  .nota{
+    font-family:'Helvetica Neue', Arial, sans-serif;
+    font-size:11.5px;
+    color:#8a7f66;
+    text-align:center;
+    margin-top:18px;
+    line-height:1.6;
+    padding:0 10px;
   }
 </style>
 </head>
@@ -362,50 +436,62 @@
 <header>
   <p class="eyebrow">Motorista de Transfer · Lisboa</p>
   <h1><em>Trajeto</em></h1>
-  <p class="sub">Preencha os dados da corrida e veja na hora o valor sugerido para o cliente. O cálculo não fica guardado; se agendares a corrida, o agendamento fica só neste navegador.</p>
+  <p class="sub">Preenche os dados da corrida e vê na hora o valor sugerido. O cálculo não fica guardado; se agendares, o agendamento fica só neste navegador.</p>
   <button id="btnConfig" class="btn-config">⚙ Minhas tarifas</button>
 </header>
 
 <main>
 
+  <div class="seg" id="segModo" style="margin-bottom:18px;">
+    <button data-v="transfer" class="active">Transfer rápido</button>
+    <button data-v="aeroporto">Aeroporto</button>
+    <button data-v="faturamento">Faturamento</button>
+  </div>
+
   <div id="painelConfig">
     <div class="card">
       <h2>Minhas tarifas</h2>
 
-      <div class="cfg-grupo">
-        <div class="cfg-titulo">Aeroporto ⇄ Centro (valor fixo, dia)</div>
+      <label for="cfg_nome">O teu nome (para as mensagens ao cliente)</label>
+      <input type="text" id="cfg_nome" placeholder="ex: Carlos">
+
+      <div class="cfg-grupo" style="margin-top:16px;">
+        <div class="cfg-titulo">Aeroporto ⇄ Lisboa (valor fixo)</div>
         <div class="cfg-row">
-          <div><label>Sedan mín. (€)</label><input type="number" id="cfg_curto_sedan_min"></div>
-          <div><label>Sedan máx. (€)</label><input type="number" id="cfg_curto_sedan_max"></div>
+          <div><label>Sedan: Aeroporto → Centro (€)</label><input type="number" id="cfg_ap_sedan_ida"></div>
+          <div><label>Sedan: Centro → Aeroporto (€)</label><input type="number" id="cfg_ap_sedan_volta"></div>
         </div>
         <div class="cfg-row">
-          <div><label>Van mín. (€)</label><input type="number" id="cfg_curto_van_min"></div>
-          <div><label>Van máx. (€)</label><input type="number" id="cfg_curto_van_max"></div>
+          <div><label>Van: Aeroporto → Centro (€)</label><input type="number" id="cfg_ap_van_ida"></div>
+          <div><label>Van: Centro → Aeroporto (€)</label><input type="number" id="cfg_ap_van_volta"></div>
         </div>
       </div>
 
       <div class="cfg-grupo">
-        <div class="cfg-titulo">20–50 km (mínimo + €/km)</div>
+        <div class="cfg-titulo">Calculadora de Transfer</div>
         <div class="cfg-row">
-          <div><label>Sedan €/km</label><input type="number" step="0.01" id="cfg_medio_sedan_kmrate"></div>
-          <div><label>Van €/km</label><input type="number" step="0.01" id="cfg_medio_van_kmrate"></div>
+          <div><label>Mín. curto sedan (€)</label><input type="number" id="cfg_ct_curto_min_sedan"></div>
+          <div><label>Mín. curto van (€)</label><input type="number" id="cfg_ct_curto_min_van"></div>
         </div>
         <div class="cfg-row">
-          <div><label>Sedan mínimo (€)</label><input type="number" id="cfg_medio_sedan_min"></div>
-          <div><label>Van mínimo (€)</label><input type="number" id="cfg_medio_van_min"></div>
+          <div><label>€/hora sedan</label><input type="number" id="cfg_ct_hora_sedan"></div>
+          <div><label>€/hora van</label><input type="number" id="cfg_ct_hora_van"></div>
+        </div>
+        <div class="cfg-row">
+          <div><label>€/km sedan (+20km)</label><input type="number" step="0.01" id="cfg_ct_km_rate_sedan"></div>
+          <div><label>€/km van (+20km)</label><input type="number" step="0.01" id="cfg_ct_km_rate_van"></div>
+        </div>
+        <div class="cfg-row">
+          <div><label>% da hora na volta vazia</label><input type="number" id="cfg_ct_volta_pct"></div>
+          <div><label>Margem adicional (%)</label><input type="number" id="cfg_ct_margem_pct"></div>
+        </div>
+        <div class="cfg-row">
+          <div><label>Energia €/km (Tesla)</label><input type="number" step="0.01" id="cfg_ct_energia_km"></div>
         </div>
       </div>
 
       <div class="cfg-grupo">
-        <div class="cfg-titulo">+50 km (€/km)</div>
-        <div class="cfg-row">
-          <div><label>Sedan €/km</label><input type="number" step="0.01" id="cfg_longo_sedan_kmrate"></div>
-          <div><label>Van €/km</label><input type="number" step="0.01" id="cfg_longo_van_kmrate"></div>
-        </div>
-      </div>
-
-      <div class="cfg-grupo">
-        <div class="cfg-titulo">Tempo e adicional noturno</div>
+        <div class="cfg-titulo">Espera e adicional noturno</div>
         <div class="cfg-row">
           <div><label>Espera sedan (€/h)</label><input type="number" id="cfg_espera_sedan"></div>
           <div><label>Espera van (€/h)</label><input type="number" id="cfg_espera_van"></div>
@@ -444,108 +530,184 @@
     </div>
   </div>
 
-  <div class="card">
-    <h2>Tipo de trajeto</h2>
-    <div class="seg" id="segTrajeto">
-      <button data-v="curto" class="active">Aeroporto ⇄ Centro</button>
-      <button data-v="medio">20–50 km</button>
-      <button data-v="longo">+50 km</button>
-    </div>
+  <div id="viewTransfer">
 
-    <div id="blocoKm" style="display:none;">
-      <label for="km">Distância (km)</label>
-      <input type="number" id="km" placeholder="ex: 35" min="0">
-    </div>
-  </div>
-
-  <div class="card">
-    <h2>Veículo e horário</h2>
-    <label>Veículo</label>
-    <div class="seg" id="segVeiculo">
-      <button data-v="sedan" class="active">Sedan (1–3 pax)</button>
-      <button data-v="van">Van / Executivo (4–6 pax)</button>
-    </div>
-
-    <label>Horário</label>
-    <div class="seg" id="segHorario">
-      <button data-v="dia" class="active">Dia (6h–21h)</button>
-      <button data-v="noite">Noite (21h–6h)</button>
-    </div>
-  </div>
-
-  <div class="card">
-    <h2>Extras</h2>
-    <div class="row2">
-      <div>
-        <label for="espera">Espera (min)</label>
-        <input type="number" id="espera" placeholder="0" min="0">
-      </div>
-      <div>
-        <label for="portagem">Portagens (€)</label>
-        <input type="number" id="portagem" placeholder="0" min="0">
-      </div>
-    </div>
-    <div class="checks">
-      <label class="chk"><input type="checkbox" id="bagagem"> Bagagem extra (+€7)</label>
-      <label class="chk"><input type="checkbox" id="cadeira"> Cadeirinha (+€8)</label>
-      <label class="chk"><input type="checkbox" id="recibo"> Emitir recibo (+IVA)</label>
-    </div>
-  </div>
-
-  <div class="resultado">
-    <p class="eyebrow">Valor sugerido</p>
-    <div class="valor">€<span id="valorFinal">0</span></div>
-    <div class="faixa" id="faixaTexto"></div>
-    <div class="detalhe" id="detalhe"></div>
-    <button class="btn-agendar" id="btnAbrirAgendar">📅 Agendar esta corrida</button>
-  </div>
-
-  <div id="painelAgendar">
     <div class="card">
-      <h2>Agendar corrida</h2>
-      <label for="ag_partida">Endereço de partida</label>
-      <input type="text" id="ag_partida" placeholder="ex: Aeroporto de Lisboa, T1">
-      <label for="ag_chegada">Endereço de chegada</label>
-      <input type="text" id="ag_chegada" placeholder="ex: Hotel Avenida Palace">
-      <div class="ag-row2">
+      <h2>Veículo</h2>
+      <div class="seg" id="segVeiculoT">
+        <button data-v="sedan" class="active">Sedan (1–3 pax)</button>
+        <button data-v="van">Van / Executivo (4–6 pax)</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>📍 Calculadora de Transfer</h2>
+      <label for="ct_km">Distância (km)</label>
+      <input type="number" id="ct_km" placeholder="ex: 34" min="0">
+
+      <label class="chk" style="margin-top:14px;">
+        <input type="checkbox" id="regressoVazio"> Regresso vazio (cobrar tempo da volta)
+      </label>
+
+      <div id="blocoDuracaoSimples" class="row2" style="margin-top:14px;">
         <div>
-          <label for="ag_data">Data</label>
-          <input type="date" id="ag_data">
+          <label for="ct_tempo">⏱️ Tempo estimado (min)</label>
+          <input type="number" id="ct_tempo" placeholder="ex: 30" min="0">
         </div>
         <div>
-          <label for="ag_hora">Horário</label>
-          <input type="time" id="ag_hora">
+          <label for="ct_espera">Espera (min)</label>
+          <input type="number" id="ct_espera" placeholder="0" min="0">
         </div>
       </div>
-      <label for="ag_cliente">Nome do cliente</label>
-      <input type="text" id="ag_cliente" placeholder="ex: João Ferreira">
-      <label for="ag_fornecedor">Fornecedor do serviço</label>
-      <input type="text" id="ag_fornecedor" placeholder="ex: particular / nome da empresa">
-      <label for="ag_valor">Valor (€)</label>
-      <input type="number" id="ag_valor" min="0">
-      <button class="btn-guardar-agendamento" id="btnGuardarAgendamento">Guardar e adicionar ao calendário</button>
+
+      <div id="blocoDuracaoDupla" class="row2" style="display:none; margin-top:14px;">
+        <div>
+          <label for="ct_duracaoIda">Duração ida (min)</label>
+          <input type="number" id="ct_duracaoIda" placeholder="0" min="0">
+        </div>
+        <div>
+          <label for="ct_duracaoVolta">Duração volta (min)</label>
+          <input type="number" id="ct_duracaoVolta" placeholder="0" min="0">
+        </div>
+      </div>
+      <div id="blocoEsperaDupla" class="row2" style="display:none; margin-top:14px;">
+        <div>
+          <label for="ct_esperaDupla">Espera (min)</label>
+          <input type="number" id="ct_esperaDupla" placeholder="0" min="0">
+        </div>
+      </div>
+
+      <label for="ct_portagem">🛣️ Portagem (€)</label>
+      <input type="number" id="ct_portagem" placeholder="ex: 3.50" min="0" step="0.01">
+      <label>⚡ Energia (calculada automaticamente)</label>
+      <div class="ct-energia" id="ct_energia_display">€0,00</div>
+
+      <div class="checks">
+        <label class="chk"><input type="checkbox" id="ct_bagagem"> Bagagem extra (+€7)</label>
+        <label class="chk"><input type="checkbox" id="ct_cadeira"> Cadeirinha (+€8)</label>
+        <label class="chk"><input type="checkbox" id="ct_recibo"> Emitir recibo (+IVA)</label>
+      </div>
     </div>
+
+    <div class="resultado">
+      <p class="eyebrow">Valor mínimo</p>
+      <div class="ct-min" id="ct_valorMinimo">€0</div>
+      <p class="eyebrow" style="margin-top:14px;">Valor recomendado</p>
+      <div class="ct-rec" id="ct_valorRecomendado">€0</div>
+      <p class="eyebrow" style="margin-top:16px;">💰 Cobrar do cliente</p>
+      <input type="number" id="ct_cobrar" class="ct-cobrar-input" step="0.5">
+      <button class="btn-agendar" id="ct_btnNovo" style="margin-top:14px;">🔄 Novo cálculo</button>
+      <button class="btn-agendar" id="btnAbrirAgendar">📅 Agendar esta corrida</button>
+    </div>
+
+    <div id="painelAgendar">
+      <div class="card">
+        <h2>Agendar corrida</h2>
+        <label for="ag_partida">Endereço de partida</label>
+        <input type="text" id="ag_partida" placeholder="ex: Aeroporto de Lisboa, T1">
+        <label for="ag_chegada">Endereço de chegada</label>
+        <input type="text" id="ag_chegada" placeholder="ex: Hotel Avenida Palace">
+        <div class="ag-row2">
+          <div>
+            <label for="ag_data">Data</label>
+            <input type="date" id="ag_data">
+          </div>
+          <div>
+            <label for="ag_hora">Horário</label>
+            <input type="time" id="ag_hora">
+          </div>
+        </div>
+        <label for="ag_cliente">Nome do cliente</label>
+        <input type="text" id="ag_cliente" placeholder="ex: João Ferreira">
+        <label for="ag_telefone">Telefone do cliente (com indicativo)</label>
+        <input type="text" id="ag_telefone" placeholder="ex: 351 912 345 678">
+        <label for="ag_fornecedor">Fornecedor do serviço</label>
+        <input type="text" id="ag_fornecedor" placeholder="ex: particular / nome da empresa">
+        <label for="ag_valor">Valor (€)</label>
+        <input type="number" id="ag_valor" min="0">
+        <button class="btn-guardar-agendamento" id="btnGuardarAgendamento">Guardar e adicionar ao calendário</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>Meus agendamentos</h2>
+      <div class="lista-agendamentos" id="listaAgendamentos"></div>
+    </div>
+
+    <p class="nota">Os botões "Ir buscar cliente" e "Iniciar viagem" abrem o Waze já com o destino certo — ele usa a tua localização atual como ponto de partida automaticamente (precisa do Waze instalado no telemóvel).<br><br>A calculadora não soma ida + volta automaticamente, a não ser que marques "Regresso vazio". Portagens não são calculadas automaticamente — confirma no Waze/Google Maps e insere aqui manualmente.<br><br>Os agendamentos ficam guardados só neste telemóvel/navegador. O lembrete 24h antes é feito pelo teu Calendário.</p>
   </div>
 
-  <div class="card">
-    <h2>Meus agendamentos</h2>
-    <div class="lista-agendamentos" id="listaAgendamentos"></div>
+  <div id="viewAeroporto" style="display:none;">
+    <div class="card">
+      <h2>Direção</h2>
+      <div class="seg" id="segDirecaoAp">
+        <button data-v="ida" class="active">Aeroporto → Centro</button>
+        <button data-v="volta">Centro → Aeroporto</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>Veículo e horário</h2>
+      <label>Veículo</label>
+      <div class="seg" id="segVeiculoAp">
+        <button data-v="sedan" class="active">Sedan (1–3 pax)</button>
+        <button data-v="van">Van / Executivo (4–6 pax)</button>
+      </div>
+      <label>Horário</label>
+      <div class="seg" id="segHorarioAp">
+        <button data-v="dia" class="active">Dia (6h–21h)</button>
+        <button data-v="noite">Noite (21h–6h)</button>
+      </div>
+    </div>
+
+    <div class="resultado">
+      <p class="eyebrow">Valor da corrida</p>
+      <div class="valor">€<span id="ap_valor">0</span></div>
+      <div class="faixa" id="ap_detalhe"></div>
+    </div>
+
+    <p class="nota">Tarifa fixa para trajetos entre o Aeroporto de Lisboa e hotéis no centro. Ajusta os valores em "Minhas tarifas".</p>
   </div>
 
-  <p class="nota">Portagens não são calculadas automaticamente — não há forma simples e sem custo de puxar isso do Google Maps/Waze num app leve como este. Confirme o valor da portagem no app de navegação antes da corrida e insira aqui manualmente.<br><br>"Emitir recibo" acrescenta o IVA sobre o valor total da corrida (taxa configurável em Minhas tarifas, padrão 6%).<br><br>Os agendamentos ficam guardados só neste telemóvel/navegador. O lembrete 24h antes é feito pelo teu Calendário — ao guardar um agendamento, o ficheiro de convite é aberto para adicionares (o alarme já vem configurado).</p>
+  <div id="viewFaturamento" style="display:none;">
+    <div class="fat-resumo">
+      <div class="fat-card">
+        <p class="eyebrow">Hoje</p>
+        <div class="fat-valor" id="fat_hoje">€0</div>
+      </div>
+      <div class="fat-card">
+        <p class="eyebrow">Esta semana</p>
+        <div class="fat-valor" id="fat_semana">€0</div>
+      </div>
+      <div class="fat-card">
+        <p class="eyebrow">Este mês</p>
+        <div class="fat-valor" id="fat_mes">€0</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>Corridas faturadas</h2>
+      <div class="lista-agendamentos" id="listaFaturamento"></div>
+    </div>
+
+    <p class="nota">Aparecem aqui os agendamentos marcados como "✅ Concluído" na aba Transfer rápido. Os totais somam o valor guardado em cada agendamento.</p>
+  </div>
+
+  <p style="text-align:center; font-family:'Helvetica Neue', Arial, sans-serif; font-size:11px; color:#8a7f66; margin-top:24px;">Trajeto · v3.2</p>
 
 </main>
 
 <script>
-  const state = { trajeto:'curto', veiculo:'sedan', horario:'dia' };
+  const state = { veiculoT:'sedan', veiculoAp:'sedan', horarioAp:'dia', direcaoAp:'ida' };
 
   const DEFAULTS = {
-    curto_sedan_min: 20, curto_sedan_max: 25,
-    curto_van_min: 35,   curto_van_max: 45,
-    medio_sedan_kmrate: 0.85, medio_sedan_min: 35,
-    medio_van_kmrate: 1.35,   medio_van_min: 55,
-    longo_sedan_kmrate: 0.70,
-    longo_van_kmrate: 0.90,
+    ap_sedan_ida: 25, ap_sedan_volta: 20,
+    ap_van_ida: 40,   ap_van_volta: 32,
+    ct_curto_min_sedan: 25, ct_curto_min_van: 35,
+    ct_hora_sedan: 25, ct_hora_van: 30,
+    ct_km_rate_sedan: 1.00, ct_km_rate_van: 1.30,
+    ct_volta_pct: 50, ct_margem_pct: 0,
+    ct_energia_km: 0.07,
     espera_sedan: 13, espera_van: 18,
     noite_pct: 15,
     bagagem: 7, cadeira: 8,
@@ -569,6 +731,7 @@
     return novo;
   }
   preencherPainel(cfg);
+  document.getElementById('cfg_nome').value = localStorage.getItem('trajeto_nome') || '';
 
   document.getElementById('btnConfig').addEventListener('click', ()=>{
     const p = document.getElementById('painelConfig');
@@ -577,11 +740,14 @@
   document.getElementById('btnResetar').addEventListener('click', ()=>{
     cfg = { ...DEFAULTS };
     preencherPainel(cfg);
-    calcular();
+    calcularTransfer();
+    calcularAeroporto();
   });
   document.getElementById('btnAplicar').addEventListener('click', ()=>{
     cfg = lerPainel();
-    calcular();
+    localStorage.setItem('trajeto_nome', document.getElementById('cfg_nome').value.trim());
+    calcularTransfer();
+    calcularAeroporto();
     document.getElementById('painelConfig').style.display = 'none';
   });
   document.getElementById('btnCopiar').addEventListener('click', ()=>{
@@ -592,97 +758,133 @@
       const colado = JSON.parse(document.getElementById('cfgTexto').value);
       cfg = { ...DEFAULTS, ...colado };
       preencherPainel(cfg);
-      calcular();
+      calcularTransfer();
+      calcularAeroporto();
     }catch(e){
       alert('Texto de configuração inválido.');
     }
   });
 
-  function setupSeg(id, key){
+  document.getElementById('segModo').querySelectorAll('button').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      document.getElementById('segModo').querySelectorAll('button').forEach(b=>b.classList.remove('active'));
+      btn.classList.add('active');
+      const t = btn.dataset.v;
+      document.getElementById('viewTransfer').style.display = t === 'transfer' ? 'block' : 'none';
+      document.getElementById('viewAeroporto').style.display = t === 'aeroporto' ? 'block' : 'none';
+      document.getElementById('viewFaturamento').style.display = t === 'faturamento' ? 'block' : 'none';
+      if(t === 'faturamento') renderFaturamento();
+    });
+  });
+
+  function setupSeg(id, key, cb){
     const el = document.getElementById(id);
     el.querySelectorAll('button').forEach(btn=>{
       btn.addEventListener('click', ()=>{
         el.querySelectorAll('button').forEach(b=>b.classList.remove('active'));
         btn.classList.add('active');
         state[key] = btn.dataset.v;
-        document.getElementById('blocoKm').style.display =
-          (state.trajeto === 'medio' || state.trajeto === 'longo') ? 'block' : 'none';
-        calcular();
+        cb();
       });
     });
   }
-  setupSeg('segTrajeto','trajeto');
-  setupSeg('segVeiculo','veiculo');
-  setupSeg('segHorario','horario');
+  setupSeg('segVeiculoT', 'veiculoT', calcularTransfer);
+  setupSeg('segDirecaoAp', 'direcaoAp', calcularAeroporto);
+  setupSeg('segVeiculoAp', 'veiculoAp', calcularAeroporto);
+  setupSeg('segHorarioAp', 'horarioAp', calcularAeroporto);
 
-  ['km','espera','portagem','bagagem','cadeira','recibo'].forEach(id=>{
-    document.getElementById(id).addEventListener('input', calcular);
-    document.getElementById(id).addEventListener('change', calcular);
+  document.getElementById('regressoVazio').addEventListener('change', (e)=>{
+    const dupla = e.target.checked;
+    document.getElementById('blocoDuracaoSimples').style.display = dupla ? 'none' : 'flex';
+    document.getElementById('blocoDuracaoDupla').style.display = dupla ? 'flex' : 'none';
+    document.getElementById('blocoEsperaDupla').style.display = dupla ? 'flex' : 'none';
+    calcularTransfer();
   });
 
-  function calcular(){
-    const km = parseFloat(document.getElementById('km').value) || 0;
-    const esperaMin = parseFloat(document.getElementById('espera').value) || 0;
-    const portagem = parseFloat(document.getElementById('portagem').value) || 0;
-    const bagagem = document.getElementById('bagagem').checked ? cfg.bagagem : 0;
-    const cadeira = document.getElementById('cadeira').checked ? cfg.cadeira : 0;
+  ['ct_km','ct_tempo','ct_espera','ct_duracaoIda','ct_duracaoVolta','ct_esperaDupla','ct_portagem','ct_bagagem','ct_cadeira','ct_recibo'].forEach(id=>{
+    document.getElementById(id).addEventListener('input', calcularTransfer);
+    document.getElementById(id).addEventListener('change', calcularTransfer);
+  });
 
-    let base = 0, min = 0, max = 0;
-    const isVan = state.veiculo === 'van';
-    const isNoite = state.horario === 'noite';
-    const fatorNoite = 1 + (cfg.noite_pct/100);
+  function calcularTransfer(){
+    const km = parseFloat(document.getElementById('ct_km').value) || 0;
+    const regressoVazio = document.getElementById('regressoVazio').checked;
+    const isVan = state.veiculoT === 'van';
 
-    if(state.trajeto === 'curto'){
-      min = isVan ? cfg.curto_van_min : cfg.curto_sedan_min;
-      max = isVan ? cfg.curto_van_max : cfg.curto_sedan_max;
-      if(isNoite){ min *= fatorNoite; max *= fatorNoite; }
-      base = (min+max)/2;
-    } else if(state.trajeto === 'medio'){
-      const kmrate = isVan ? cfg.medio_van_kmrate : cfg.medio_sedan_kmrate;
-      const minimo = isVan ? cfg.medio_van_min : cfg.medio_sedan_min;
-      base = Math.max(minimo, km*kmrate);
-      if(isNoite) base *= fatorNoite;
-      min = base * 0.92;
-      max = base * 1.10;
-    } else { // longo
-      const kmrate = isVan ? cfg.longo_van_kmrate : cfg.longo_sedan_kmrate;
-      base = km * kmrate;
-      if(isNoite) base *= fatorNoite;
-      min = base * 0.92;
-      max = base * 1.10;
+    const portagem = parseFloat(document.getElementById('ct_portagem').value) || 0;
+    const bagagemVal = document.getElementById('ct_bagagem').checked ? cfg.bagagem : 0;
+    const cadeiraVal = document.getElementById('ct_cadeira').checked ? cfg.cadeira : 0;
+    const comRecibo = document.getElementById('ct_recibo').checked;
+
+    const energia = km * cfg.ct_energia_km;
+    document.getElementById('ct_energia_display').textContent = `€${energia.toFixed(2)}`;
+
+    const curtoMin = isVan ? cfg.ct_curto_min_van : cfg.ct_curto_min_sedan;
+    const kmRate = isVan ? cfg.ct_km_rate_van : cfg.ct_km_rate_sedan;
+    const horaRate = isVan ? cfg.ct_hora_van : cfg.ct_hora_sedan;
+    const taxaEspera = isVan ? cfg.espera_van : cfg.espera_sedan;
+
+    const valorKm = km <= 20 ? curtoMin : km * kmRate;
+
+    let esperaMin = 0, valorServico;
+    if(regressoVazio){
+      const duracaoIdaMin = parseFloat(document.getElementById('ct_duracaoIda').value) || 0;
+      const duracaoVoltaMin = parseFloat(document.getElementById('ct_duracaoVolta').value) || 0;
+      esperaMin = parseFloat(document.getElementById('ct_esperaDupla').value) || 0;
+      const horaExtra = (duracaoIdaMin/60)*horaRate + (duracaoVoltaMin/60)*horaRate*(cfg.ct_volta_pct/100);
+      valorServico = Math.max(valorKm, horaExtra);
+    } else {
+      const tempoMin = parseFloat(document.getElementById('ct_tempo').value) || 0;
+      esperaMin = parseFloat(document.getElementById('ct_espera').value) || 0;
+      const valorTempo = (tempoMin/60) * horaRate;
+      valorServico = Math.max(valorKm, valorTempo);
     }
 
-    const taxaEspera = isVan ? cfg.espera_van : cfg.espera_sedan;
     const esperaValor = (esperaMin/60) * taxaEspera;
-    const extras = bagagem + cadeira + portagem + esperaValor;
+    const valorMinimo = valorServico;
+    let valorRecomendado = valorMinimo * (1 + cfg.ct_margem_pct/100) + portagem + energia + esperaValor + bagagemVal + cadeiraVal;
+    if(comRecibo) valorRecomendado *= (1 + cfg.iva_pct/100);
 
-    const comRecibo = document.getElementById('recibo').checked;
-    const fatorIva = comRecibo ? (1 + cfg.iva_pct/100) : 1;
+    document.getElementById('ct_valorMinimo').textContent = `€${valorMinimo.toFixed(2)}`;
+    document.getElementById('ct_valorRecomendado').textContent = `€${valorRecomendado.toFixed(2)}`;
 
-    const subtotalMin = min + extras;
-    const subtotalMax = max + extras;
-    const subtotalMed = base + extras;
-
-    const ivaValorMed = subtotalMed * (fatorIva - 1);
-
-    const finalMin = Math.round(subtotalMin * fatorIva);
-    const finalMax = Math.round(subtotalMax * fatorIva);
-    const finalMed = Math.round(subtotalMed * fatorIva);
-
-    document.getElementById('valorFinal').textContent = finalMed;
-    document.getElementById('faixaTexto').textContent = `faixa sugerida: €${finalMin} – €${finalMax}`;
-
-    let det = '';
-    det += `<div><span>Tarifa base</span><span>€${Math.round(base)}</span></div>`;
-    if(esperaValor>0) det += `<div><span>Espera (${esperaMin} min)</span><span>€${esperaValor.toFixed(0)}</span></div>`;
-    if(bagagem>0) det += `<div><span>Bagagem extra</span><span>€${bagagem}</span></div>`;
-    if(cadeira>0) det += `<div><span>Cadeirinha</span><span>€${cadeira}</span></div>`;
-    if(portagem>0) det += `<div><span>Portagens</span><span>€${portagem.toFixed(0)}</span></div>`;
-    if(comRecibo) det += `<div><span>IVA recibo (${cfg.iva_pct}%)</span><span>€${ivaValorMed.toFixed(2)}</span></div>`;
-    document.getElementById('detalhe').innerHTML = det;
+    const campoCobrar = document.getElementById('ct_cobrar');
+    if(!campoCobrar.dataset.editado){
+      campoCobrar.value = valorRecomendado.toFixed(2);
+    }
   }
 
-  calcular();
+  document.getElementById('ct_cobrar').addEventListener('input', (e)=>{
+    e.target.dataset.editado = '1';
+  });
+  document.getElementById('ct_btnNovo').addEventListener('click', ()=>{
+    ['ct_km','ct_tempo','ct_espera','ct_duracaoIda','ct_duracaoVolta','ct_esperaDupla','ct_portagem','ct_cobrar'].forEach(id=>{
+      document.getElementById(id).value = '';
+    });
+    ['ct_bagagem','ct_cadeira','ct_recibo','regressoVazio'].forEach(id=>{
+      document.getElementById(id).checked = false;
+    });
+    document.getElementById('blocoDuracaoSimples').style.display = 'flex';
+    document.getElementById('blocoDuracaoDupla').style.display = 'none';
+    document.getElementById('blocoEsperaDupla').style.display = 'none';
+    delete document.getElementById('ct_cobrar').dataset.editado;
+    calcularTransfer();
+  });
+  calcularTransfer();
+
+  function calcularAeroporto(){
+    const isVan = state.veiculoAp === 'van';
+    const isNoite = state.horarioAp === 'noite';
+    let valor = state.direcaoAp === 'ida'
+      ? (isVan ? cfg.ap_van_ida : cfg.ap_sedan_ida)
+      : (isVan ? cfg.ap_van_volta : cfg.ap_sedan_volta);
+    if(isNoite) valor *= (1 + cfg.noite_pct/100);
+
+    document.getElementById('ap_valor').textContent = valor.toFixed(0);
+    document.getElementById('ap_detalhe').textContent =
+      isNoite ? `com acréscimo noturno de ${cfg.noite_pct}%` : 'tarifa de dia';
+  }
+  calcularAeroporto();
 
   // ---------- Agendamento ----------
   const AG_KEY = 'trajeto_agendamentos';
@@ -700,7 +902,7 @@
     const abrir = p.style.display !== 'block';
     p.style.display = abrir ? 'block' : 'none';
     if(abrir){
-      document.getElementById('ag_valor').value = document.getElementById('valorFinal').textContent;
+      document.getElementById('ag_valor').value = document.getElementById('ct_cobrar').value;
       if(!document.getElementById('ag_data').value){
         const amanha = new Date();
         amanha.setDate(amanha.getDate()+1);
@@ -769,19 +971,58 @@
       return;
     }
     el.innerHTML = lista.map(ag => `
-      <div class="ag-item" data-id="${ag.id}">
-        <div class="ag-trajeto">${ag.partida} → ${ag.chegada}</div>
+      <div class="ag-item ${ag.realizado ? 'ag-item-realizado' : ''}" data-id="${ag.id}">
+        <div class="ag-trajeto">${ag.partida} → ${ag.chegada}${ag.realizado ? '<span class="ag-badge-ok">✔ Concluído</span>' : ''}</div>
         <div class="ag-meta">
           📅 ${ag.data.split('-').reverse().join('/')} às ${ag.hora}<br>
           👤 ${ag.cliente} &nbsp;·&nbsp; <span class="ag-valor">€${ag.valor}</span>
           ${ag.fornecedor ? `<br>🏷 Fornecedor: ${ag.fornecedor}` : ''}
         </div>
+        <div class="ag-nav">
+          <button class="ag-btn-buscar" data-acao="buscar">🚗 Ir buscar cliente</button>
+          <button class="ag-btn-levar" data-acao="levar">🏁 Iniciar viagem</button>
+        </div>
         <div class="ag-acoes">
           <button class="ag-btn-cal" data-acao="cal">📅 Calendário</button>
+          <button class="ag-btn-wpp" data-acao="wpp">✉️ Mensagem</button>
+          <button class="ag-btn-ok" data-acao="realizado">${ag.realizado ? '↩️ Desfazer' : '✅ Concluído'}</button>
           <button class="ag-btn-del" data-acao="del">🗑 Remover</button>
         </div>
       </div>
     `).join('');
+  }
+
+  function normalizarTelefone(tel){
+    let d = String(tel).replace(/[^\d+]/g,'');
+    if(d.startsWith('+')) d = d.slice(1);
+    if(d.startsWith('00')) d = d.slice(2);
+    if(d.length === 9) d = '351' + d; // nº português sem indicativo
+    return d;
+  }
+
+  function gerarMensagem(ag){
+    const dataFmt = ag.data.split('-').reverse().join('/');
+    const nome = localStorage.getItem('trajeto_nome') || '';
+    const assinatura = nome ? `Aqui é o ${nome}` : 'Aqui é o teu motorista';
+    return `Olá ${ag.cliente}! 👋\n\n${assinatura} — confirmo os dados do seu transfer:\n\n📍 De: ${ag.partida}\n📍 Para: ${ag.chegada}\n📅 Data: ${dataFmt}\n🕐 Horário: ${ag.hora}\n💰 Valor: €${ag.valor}\n\nPode confirmar este serviço, por favor? Fico a aguardar a sua resposta. Obrigado! 🚗`;
+  }
+
+  function enviarMensagem(ag){
+    const texto = gerarMensagem(ag);
+    if(ag.telefone){
+      const tel = normalizarTelefone(ag.telefone);
+      window.open(`https://wa.me/${tel}?text=${encodeURIComponent(texto)}`, '_blank');
+    } else if(navigator.clipboard){
+      navigator.clipboard.writeText(texto);
+      alert('Não há telefone guardado — mensagem copiada! Cola no WhatsApp. (Adiciona o telefone no próximo agendamento para abrir direto.)');
+    } else {
+      alert(texto);
+    }
+  }
+
+  function abrirWaze(endereco){
+    const url = `https://waze.com/ul?q=${encodeURIComponent(endereco)}&navigate=yes`;
+    window.open(url, '_blank');
   }
 
   document.getElementById('listaAgendamentos').addEventListener('click', (e)=>{
@@ -793,15 +1034,74 @@
     const ag = lista.find(a => a.id === id);
     if(!ag) return;
 
-    if(btn.dataset.acao === 'cal'){
+    if(btn.dataset.acao === 'buscar'){
+      abrirWaze(ag.partida);
+    } else if(btn.dataset.acao === 'levar'){
+      abrirWaze(ag.chegada);
+    } else if(btn.dataset.acao === 'cal'){
       abrirICS(ag);
+    } else if(btn.dataset.acao === 'wpp'){
+      enviarMensagem(ag);
+    } else if(btn.dataset.acao === 'realizado'){
+      ag.realizado = !ag.realizado;
+      gravarAgendamentos(lista);
+      renderLista();
+      renderFaturamento();
     } else if(btn.dataset.acao === 'del'){
       if(confirm('Remover este agendamento?')){
         gravarAgendamentos(lista.filter(a => a.id !== id));
         renderLista();
+        renderFaturamento();
       }
     }
   });
+
+  // ---------- Faturamento ----------
+  function inicioSemana(d){
+    const dia = new Date(d);
+    const diaSemana = (dia.getDay() + 6) % 7; // 0 = segunda
+    dia.setDate(dia.getDate() - diaSemana);
+    dia.setHours(0,0,0,0);
+    return dia;
+  }
+
+  function renderFaturamento(){
+    const lista = lerAgendamentos().filter(a => a.realizado);
+    const hoje = new Date();
+    const hojeStr = hoje.toISOString().slice(0,10);
+    const inicioSem = inicioSemana(hoje);
+    const mesAtual = hojeStr.slice(0,7);
+
+    let totalHoje = 0, totalSemana = 0, totalMes = 0;
+    lista.forEach(ag=>{
+      const v = parseFloat(ag.valor) || 0;
+      const dataAg = new Date(ag.data + 'T00:00:00');
+      if(ag.data === hojeStr) totalHoje += v;
+      if(dataAg >= inicioSem) totalSemana += v;
+      if(ag.data.slice(0,7) === mesAtual) totalMes += v;
+    });
+
+    document.getElementById('fat_hoje').textContent = `€${totalHoje.toFixed(0)}`;
+    document.getElementById('fat_semana').textContent = `€${totalSemana.toFixed(0)}`;
+    document.getElementById('fat_mes').textContent = `€${totalMes.toFixed(0)}`;
+
+    const el = document.getElementById('listaFaturamento');
+    const ordenada = [...lista].sort((a,b)=> (b.data+b.hora).localeCompare(a.data+a.hora));
+    if(ordenada.length === 0){
+      el.innerHTML = '<p class="ag-vazio">Ainda não tens corridas faturadas. Marca um agendamento como "✅ Concluído".</p>';
+      return;
+    }
+    el.innerHTML = ordenada.map(ag => `
+      <div class="ag-item">
+        <div class="ag-trajeto">${ag.partida} → ${ag.chegada}</div>
+        <div class="ag-meta">
+          📅 ${ag.data.split('-').reverse().join('/')}<br>
+          👤 ${ag.cliente} &nbsp;·&nbsp; <span class="ag-valor">€${ag.valor}</span>
+          ${ag.fornecedor ? `<br>🏷 Fornecedor: ${ag.fornecedor}` : ''}
+        </div>
+      </div>
+    `).join('');
+  }
 
   document.getElementById('btnGuardarAgendamento').addEventListener('click', ()=>{
     const partida = document.getElementById('ag_partida').value.trim();
@@ -809,6 +1109,7 @@
     const data = document.getElementById('ag_data').value;
     const hora = document.getElementById('ag_hora').value;
     const cliente = document.getElementById('ag_cliente').value.trim();
+    const telefone = document.getElementById('ag_telefone').value.trim();
     const fornecedor = document.getElementById('ag_fornecedor').value.trim();
     const valor = document.getElementById('ag_valor').value;
 
@@ -819,8 +1120,9 @@
 
     const ag = {
       id: Date.now().toString(36) + Math.random().toString(36).slice(2,7),
-      partida, chegada, data, hora, cliente, fornecedor,
-      valor: valor || document.getElementById('valorFinal').textContent
+      partida, chegada, data, hora, cliente, telefone, fornecedor,
+      valor: valor || document.getElementById('ct_cobrar').value,
+      realizado: false
     };
 
     const lista = lerAgendamentos();
@@ -832,11 +1134,13 @@
     document.getElementById('ag_partida').value = '';
     document.getElementById('ag_chegada').value = '';
     document.getElementById('ag_cliente').value = '';
+    document.getElementById('ag_telefone').value = '';
     document.getElementById('ag_fornecedor').value = '';
     document.getElementById('painelAgendar').style.display = 'none';
   });
 
   renderLista();
+  renderFaturamento();
 </script>
 
 
