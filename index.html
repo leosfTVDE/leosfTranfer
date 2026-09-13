@@ -420,6 +420,37 @@
     color:var(--terracota);
     background:rgba(255,255,255,.95);
   }
+  .fat-periodo-nav{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    margin-top:14px;
+  }
+  .fat-periodo-nav button{
+    width:38px; height:38px;
+    border-radius:50%;
+    border:1px solid var(--linha);
+    background:#fdfbf6;
+    font-size:16px;
+    cursor:pointer;
+    color:var(--azulejo);
+  }
+  .fat-periodo-nav button:disabled{opacity:.35; cursor:default;}
+  .fat-periodo-label{
+    font-family:'Helvetica Neue', Arial, sans-serif;
+    font-size:13.5px;
+    font-weight:bold;
+    color:var(--texto);
+    text-transform:capitalize;
+  }
+  .fat-periodo-total{
+    text-align:center;
+    font-family: Georgia, 'Times New Roman', serif;
+    font-weight:bold;
+    font-size:32px;
+    color:var(--terracota);
+    margin-top:10px;
+  }
   .nota{
     font-family:'Helvetica Neue', Arial, sans-serif;
     font-size:11.5px;
@@ -631,6 +662,10 @@
 
     <div class="card">
       <h2>Meus agendamentos</h2>
+      <div class="seg" id="segFiltroAg" style="margin-bottom:14px;">
+        <button data-v="ativos" class="active">Ativos</button>
+        <button data-v="concluidos">Concluídos</button>
+      </div>
       <div class="lista-agendamentos" id="listaAgendamentos"></div>
     </div>
 
@@ -686,6 +721,21 @@
     </div>
 
     <div class="card">
+      <h2>Histórico</h2>
+      <div class="seg" id="segFatModo">
+        <button data-v="dia">Dia</button>
+        <button data-v="semana">Semana</button>
+        <button data-v="mes" class="active">Mês</button>
+      </div>
+      <div class="fat-periodo-nav">
+        <button id="fatPrev">◀</button>
+        <span class="fat-periodo-label" id="fatPeriodoLabel"></span>
+        <button id="fatNext">▶</button>
+      </div>
+      <div class="fat-periodo-total" id="fatPeriodoTotal">€0</div>
+    </div>
+
+    <div class="card">
       <h2>Corridas faturadas</h2>
       <div class="lista-agendamentos" id="listaFaturamento"></div>
     </div>
@@ -693,7 +743,7 @@
     <p class="nota">Aparecem aqui os agendamentos marcados como "✅ Concluído" na aba Transfer rápido. Os totais somam o valor guardado em cada agendamento.</p>
   </div>
 
-  <p style="text-align:center; font-family:'Helvetica Neue', Arial, sans-serif; font-size:11px; color:#8a7f66; margin-top:24px;">Trajeto · v3.5</p>
+  <p style="text-align:center; font-family:'Helvetica Neue', Arial, sans-serif; font-size:11px; color:#8a7f66; margin-top:24px;">Trajeto · v3.6</p>
 
 </main>
 
@@ -966,11 +1016,26 @@
     setTimeout(()=> URL.revokeObjectURL(url), 4000);
   }
 
+  let filtroAg = 'ativos';
+  document.getElementById('segFiltroAg').querySelectorAll('button').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      document.getElementById('segFiltroAg').querySelectorAll('button').forEach(b=>b.classList.remove('active'));
+      btn.classList.add('active');
+      filtroAg = btn.dataset.v;
+      renderLista();
+    });
+  });
+
   function renderLista(){
-    const lista = lerAgendamentos().sort((a,b)=> (a.data+a.hora).localeCompare(b.data+b.hora));
+    const todos = lerAgendamentos();
+    const lista = todos
+      .filter(ag => filtroAg === 'concluidos' ? ag.realizado : !ag.realizado)
+      .sort((a,b)=> (a.data+a.hora).localeCompare(b.data+b.hora));
     const el = document.getElementById('listaAgendamentos');
     if(lista.length === 0){
-      el.innerHTML = '<p class="ag-vazio">Ainda não tens agendamentos guardados.</p>';
+      el.innerHTML = filtroAg === 'concluidos'
+        ? '<p class="ag-vazio">Ainda não tens agendamentos concluídos.</p>'
+        : '<p class="ag-vazio">Nenhum agendamento ativo — tudo tratado! 🎉</p>';
       return;
     }
     el.innerHTML = lista.map(ag => `
@@ -1083,6 +1148,9 @@
   });
 
   // ---------- Faturamento ----------
+  let fatModo = 'mes';
+  let fatOffset = 0;
+
   function inicioSemana(d){
     const dia = new Date(d);
     const diaSemana = (dia.getDay() + 6) % 7; // 0 = segunda
@@ -1091,30 +1159,88 @@
     return dia;
   }
 
-  function renderFaturamento(){
-    const lista = lerAgendamentos().filter(a => a.realizado);
+  function fmtDataPT(d){
+    return `${pad(d.getDate())}/${pad(d.getMonth()+1)}/${d.getFullYear()}`;
+  }
+
+  function getPeriodo(modo, offset){
     const hoje = new Date();
-    const hojeStr = hoje.toISOString().slice(0,10);
+    if(modo === 'dia'){
+      const d = new Date(hoje);
+      d.setDate(d.getDate() + offset);
+      const iso = `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
+      return { inicio: iso, fim: iso, label: fmtDataPT(d) };
+    }
+    if(modo === 'semana'){
+      const base = inicioSemana(hoje);
+      base.setDate(base.getDate() + offset*7);
+      const fimSem = new Date(base);
+      fimSem.setDate(fimSem.getDate() + 6);
+      return {
+        inicio: `${base.getFullYear()}-${pad(base.getMonth()+1)}-${pad(base.getDate())}`,
+        fim: `${fimSem.getFullYear()}-${pad(fimSem.getMonth()+1)}-${pad(fimSem.getDate())}`,
+        label: `${fmtDataPT(base)} – ${fmtDataPT(fimSem)}`
+      };
+    }
+    // mês
+    const d = new Date(hoje.getFullYear(), hoje.getMonth() + offset, 1);
+    const fimMes = new Date(d.getFullYear(), d.getMonth()+1, 0);
+    return {
+      inicio: `${d.getFullYear()}-${pad(d.getMonth()+1)}-01`,
+      fim: `${fimMes.getFullYear()}-${pad(fimMes.getMonth()+1)}-${pad(fimMes.getDate())}`,
+      label: d.toLocaleDateString('pt-PT', {month:'long', year:'numeric'})
+    };
+  }
+
+  document.getElementById('segFatModo').querySelectorAll('button').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      document.getElementById('segFatModo').querySelectorAll('button').forEach(b=>b.classList.remove('active'));
+      btn.classList.add('active');
+      fatModo = btn.dataset.v;
+      fatOffset = 0;
+      renderFaturamento();
+    });
+  });
+  document.getElementById('fatPrev').addEventListener('click', ()=>{
+    fatOffset -= 1;
+    renderFaturamento();
+  });
+  document.getElementById('fatNext').addEventListener('click', ()=>{
+    fatOffset = Math.min(0, fatOffset + 1);
+    renderFaturamento();
+  });
+
+  function renderFaturamento(){
+    const todos = lerAgendamentos().filter(a => a.realizado);
+    const hoje = new Date();
+    const hojeStr = `${hoje.getFullYear()}-${pad(hoje.getMonth()+1)}-${pad(hoje.getDate())}`;
     const inicioSem = inicioSemana(hoje);
     const mesAtual = hojeStr.slice(0,7);
 
     let totalHoje = 0, totalSemana = 0, totalMes = 0;
-    lista.forEach(ag=>{
+    todos.forEach(ag=>{
       const v = parseFloat(ag.valor) || 0;
       const dataAg = new Date(ag.data + 'T00:00:00');
       if(ag.data === hojeStr) totalHoje += v;
       if(dataAg >= inicioSem) totalSemana += v;
       if(ag.data.slice(0,7) === mesAtual) totalMes += v;
     });
-
     document.getElementById('fat_hoje').textContent = `€${totalHoje.toFixed(0)}`;
     document.getElementById('fat_semana').textContent = `€${totalSemana.toFixed(0)}`;
     document.getElementById('fat_mes').textContent = `€${totalMes.toFixed(0)}`;
 
+    const periodo = getPeriodo(fatModo, fatOffset);
+    document.getElementById('fatPeriodoLabel').textContent = periodo.label;
+    document.getElementById('fatNext').disabled = fatOffset >= 0;
+
+    const doPeriodo = todos.filter(ag => ag.data >= periodo.inicio && ag.data <= periodo.fim);
+    const totalPeriodo = doPeriodo.reduce((s,ag)=> s + (parseFloat(ag.valor)||0), 0);
+    document.getElementById('fatPeriodoTotal').textContent = `€${totalPeriodo.toFixed(2)}`;
+
     const el = document.getElementById('listaFaturamento');
-    const ordenada = [...lista].sort((a,b)=> (b.data+b.hora).localeCompare(a.data+a.hora));
+    const ordenada = [...doPeriodo].sort((a,b)=> (b.data+b.hora).localeCompare(a.data+a.hora));
     if(ordenada.length === 0){
-      el.innerHTML = '<p class="ag-vazio">Ainda não tens corridas faturadas. Marca um agendamento como "✅ Concluído".</p>';
+      el.innerHTML = '<p class="ag-vazio">Sem corridas faturadas neste período.</p>';
       return;
     }
     el.innerHTML = ordenada.map(ag => `
