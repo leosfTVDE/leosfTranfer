@@ -312,6 +312,24 @@
     color:var(--terracota);
     font-weight:bold;
   }
+  .ag-nav{
+    display:flex;
+    gap:8px;
+    margin-top:10px;
+  }
+  .ag-nav button{
+    flex:1;
+    padding:11px 6px;
+    border-radius:8px;
+    border:none;
+    font-family:'Helvetica Neue', Arial, sans-serif;
+    font-size:13px;
+    font-weight:bold;
+    cursor:pointer;
+    color:#fff;
+  }
+  .ag-btn-buscar{background:var(--azulejo);}
+  .ag-btn-levar{background:var(--terracota);}
   .ag-acoes{
     display:flex;
     flex-wrap:wrap;
@@ -616,7 +634,7 @@
       <div class="lista-agendamentos" id="listaAgendamentos"></div>
     </div>
 
-    <p class="nota">A calculadora não soma ida + volta automaticamente, a não ser que marques "Regresso vazio". Portagens não são calculadas automaticamente — confirma no Waze/Google Maps e insere aqui manualmente.<br><br>Os agendamentos ficam guardados só neste telemóvel/navegador. O lembrete 24h antes é feito pelo teu Calendário.</p>
+    <p class="nota">Os botões "Ir buscar cliente" e "Iniciar viagem" abrem o Waze já com o destino certo — ele usa a tua localização atual como ponto de partida automaticamente (precisa do Waze instalado no telemóvel).<br><br>A calculadora não soma ida + volta automaticamente, a não ser que marques "Regresso vazio". Portagens não são calculadas automaticamente — confirma no Waze/Google Maps e insere aqui manualmente.<br><br>Os agendamentos ficam guardados só neste telemóvel/navegador. O lembrete 24h antes é feito pelo teu Calendário.</p>
   </div>
 
   <div id="viewAeroporto" style="display:none;">
@@ -675,7 +693,7 @@
     <p class="nota">Aparecem aqui os agendamentos marcados como "✅ Concluído" na aba Transfer rápido. Os totais somam o valor guardado em cada agendamento.</p>
   </div>
 
-  <p style="text-align:center; font-family:'Helvetica Neue', Arial, sans-serif; font-size:11px; color:#8a7f66; margin-top:24px;">Trajeto · v3.1</p>
+  <p style="text-align:center; font-family:'Helvetica Neue', Arial, sans-serif; font-size:11px; color:#8a7f66; margin-top:24px;">Trajeto · v3.5</p>
 
 </main>
 
@@ -870,6 +888,7 @@
 
   // ---------- Agendamento ----------
   const AG_KEY = 'trajeto_agendamentos';
+  let editandoId = null;
 
   function lerAgendamentos(){
     try{ return JSON.parse(localStorage.getItem(AG_KEY)) || []; }
@@ -884,6 +903,8 @@
     const abrir = p.style.display !== 'block';
     p.style.display = abrir ? 'block' : 'none';
     if(abrir){
+      editandoId = null;
+      document.getElementById('btnGuardarAgendamento').textContent = 'Guardar e adicionar ao calendário';
       document.getElementById('ag_valor').value = document.getElementById('ct_cobrar').value;
       if(!document.getElementById('ag_data').value){
         const amanha = new Date();
@@ -960,7 +981,12 @@
           👤 ${ag.cliente} &nbsp;·&nbsp; <span class="ag-valor">€${ag.valor}</span>
           ${ag.fornecedor ? `<br>🏷 Fornecedor: ${ag.fornecedor}` : ''}
         </div>
+        <div class="ag-nav">
+          <button class="ag-btn-buscar" data-acao="buscar">🚗 Ir buscar cliente</button>
+          <button class="ag-btn-levar" data-acao="levar">🏁 Iniciar viagem</button>
+        </div>
         <div class="ag-acoes">
+          <button class="ag-btn-cal" data-acao="editar">✏️ Editar</button>
           <button class="ag-btn-cal" data-acao="cal">📅 Calendário</button>
           <button class="ag-btn-wpp" data-acao="wpp">✉️ Mensagem</button>
           <button class="ag-btn-ok" data-acao="realizado">${ag.realizado ? '↩️ Desfazer' : '✅ Concluído'}</button>
@@ -998,6 +1024,31 @@
     }
   }
 
+  function abrirWaze(endereco){
+    const url = `https://waze.com/ul?q=${encodeURIComponent(endereco)}&navigate=yes`;
+    window.open(url, '_blank');
+  }
+
+  function preencherFormAgendamento(ag){
+    document.getElementById('ag_partida').value = ag.partida;
+    document.getElementById('ag_chegada').value = ag.chegada;
+    document.getElementById('ag_data').value = ag.data;
+    document.getElementById('ag_hora').value = ag.hora;
+    document.getElementById('ag_cliente').value = ag.cliente;
+    document.getElementById('ag_telefone').value = ag.telefone || '';
+    document.getElementById('ag_fornecedor').value = ag.fornecedor || '';
+    document.getElementById('ag_valor').value = ag.valor;
+  }
+
+  function abrirEdicao(ag){
+    editandoId = ag.id;
+    preencherFormAgendamento(ag);
+    document.getElementById('btnGuardarAgendamento').textContent = 'Guardar alterações';
+    const p = document.getElementById('painelAgendar');
+    p.style.display = 'block';
+    p.scrollIntoView({behavior:'smooth', block:'start'});
+  }
+
   document.getElementById('listaAgendamentos').addEventListener('click', (e)=>{
     const btn = e.target.closest('button');
     if(!btn) return;
@@ -1007,7 +1058,13 @@
     const ag = lista.find(a => a.id === id);
     if(!ag) return;
 
-    if(btn.dataset.acao === 'cal'){
+    if(btn.dataset.acao === 'buscar'){
+      abrirWaze(ag.partida);
+    } else if(btn.dataset.acao === 'levar'){
+      abrirWaze(ag.chegada);
+    } else if(btn.dataset.acao === 'editar'){
+      abrirEdicao(ag);
+    } else if(btn.dataset.acao === 'cal'){
       abrirICS(ag);
     } else if(btn.dataset.acao === 'wpp'){
       enviarMensagem(ag);
@@ -1087,18 +1144,38 @@
       return;
     }
 
-    const ag = {
-      id: Date.now().toString(36) + Math.random().toString(36).slice(2,7),
-      partida, chegada, data, hora, cliente, telefone, fornecedor,
-      valor: valor || document.getElementById('ct_cobrar').value,
-      realizado: false
-    };
-
     const lista = lerAgendamentos();
-    lista.push(ag);
-    gravarAgendamentos(lista);
-    renderLista();
-    abrirICS(ag);
+
+    if(editandoId){
+      const ag = lista.find(a => a.id === editandoId);
+      if(ag){
+        ag.partida = partida;
+        ag.chegada = chegada;
+        ag.data = data;
+        ag.hora = hora;
+        ag.cliente = cliente;
+        ag.telefone = telefone;
+        ag.fornecedor = fornecedor;
+        ag.valor = valor || ag.valor;
+        gravarAgendamentos(lista);
+        renderLista();
+        renderFaturamento();
+        abrirICS(ag);
+      }
+      editandoId = null;
+      document.getElementById('btnGuardarAgendamento').textContent = 'Guardar e adicionar ao calendário';
+    } else {
+      const ag = {
+        id: Date.now().toString(36) + Math.random().toString(36).slice(2,7),
+        partida, chegada, data, hora, cliente, telefone, fornecedor,
+        valor: valor || document.getElementById('ct_cobrar').value,
+        realizado: false
+      };
+      lista.push(ag);
+      gravarAgendamentos(lista);
+      renderLista();
+      abrirICS(ag);
+    }
 
     document.getElementById('ag_partida').value = '';
     document.getElementById('ag_chegada').value = '';
