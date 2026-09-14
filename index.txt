@@ -420,6 +420,37 @@
     color:var(--terracota);
     background:rgba(255,255,255,.95);
   }
+  .fat-periodo-nav{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    margin-top:14px;
+  }
+  .fat-periodo-nav button{
+    width:38px; height:38px;
+    border-radius:50%;
+    border:1px solid var(--linha);
+    background:#fdfbf6;
+    font-size:16px;
+    cursor:pointer;
+    color:var(--azulejo);
+  }
+  .fat-periodo-nav button:disabled{opacity:.35; cursor:default;}
+  .fat-periodo-label{
+    font-family:'Helvetica Neue', Arial, sans-serif;
+    font-size:13.5px;
+    font-weight:bold;
+    color:var(--texto);
+    text-transform:capitalize;
+  }
+  .fat-periodo-total{
+    text-align:center;
+    font-family: Georgia, 'Times New Roman', serif;
+    font-weight:bold;
+    font-size:32px;
+    color:var(--terracota);
+    margin-top:10px;
+  }
   .nota{
     font-family:'Helvetica Neue', Arial, sans-serif;
     font-size:11.5px;
@@ -454,6 +485,13 @@
 
       <label for="cfg_nome">O teu nome (para as mensagens ao cliente)</label>
       <input type="text" id="cfg_nome" placeholder="ex: Carlos">
+
+      <label style="margin-top:14px;">Formas de pagamento aceites</label>
+      <div class="checks">
+        <label class="chk"><input type="checkbox" id="cfg_pag_mbway" checked> MB WAY</label>
+        <label class="chk"><input type="checkbox" id="cfg_pag_dinheiro" checked> Dinheiro</label>
+        <label class="chk"><input type="checkbox" id="cfg_pag_cartao" checked> Cartão bancário</label>
+      </div>
 
       <div class="cfg-grupo" style="margin-top:16px;">
         <div class="cfg-titulo">Aeroporto ⇄ Lisboa (valor fixo)</div>
@@ -542,6 +580,16 @@
 
     <div class="card">
       <h2>📍 Calculadora de Transfer</h2>
+      <div class="row2">
+        <div>
+          <label for="ct_origem">Origem (opcional)</label>
+          <input type="text" id="ct_origem" placeholder="ex: Aeroporto de Lisboa">
+        </div>
+        <div>
+          <label for="ct_destino">Destino (opcional)</label>
+          <input type="text" id="ct_destino" placeholder="ex: Cascais">
+        </div>
+      </div>
       <label for="ct_km">Distância (km)</label>
       <input type="number" id="ct_km" placeholder="ex: 34" min="0">
 
@@ -596,6 +644,7 @@
       <div class="ct-rec" id="ct_valorRecomendado">€0</div>
       <p class="eyebrow" style="margin-top:16px;">💰 Cobrar do cliente</p>
       <input type="number" id="ct_cobrar" class="ct-cobrar-input" step="0.5">
+      <button class="btn-agendar" id="btnCopiarOrcamento">📋 Copiar orçamento</button>
       <button class="btn-agendar" id="ct_btnNovo" style="margin-top:14px;">🔄 Novo cálculo</button>
       <button class="btn-agendar" id="btnAbrirAgendar">📅 Agendar esta corrida</button>
     </div>
@@ -631,6 +680,10 @@
 
     <div class="card">
       <h2>Meus agendamentos</h2>
+      <div class="seg" id="segFiltroAg" style="margin-bottom:14px;">
+        <button data-v="ativos" class="active">Ativos</button>
+        <button data-v="concluidos">Concluídos</button>
+      </div>
       <div class="lista-agendamentos" id="listaAgendamentos"></div>
     </div>
 
@@ -686,6 +739,21 @@
     </div>
 
     <div class="card">
+      <h2>Histórico</h2>
+      <div class="seg" id="segFatModo">
+        <button data-v="dia">Dia</button>
+        <button data-v="semana">Semana</button>
+        <button data-v="mes" class="active">Mês</button>
+      </div>
+      <div class="fat-periodo-nav">
+        <button id="fatPrev">◀</button>
+        <span class="fat-periodo-label" id="fatPeriodoLabel"></span>
+        <button id="fatNext">▶</button>
+      </div>
+      <div class="fat-periodo-total" id="fatPeriodoTotal">€0</div>
+    </div>
+
+    <div class="card">
       <h2>Corridas faturadas</h2>
       <div class="lista-agendamentos" id="listaFaturamento"></div>
     </div>
@@ -693,7 +761,7 @@
     <p class="nota">Aparecem aqui os agendamentos marcados como "✅ Concluído" na aba Transfer rápido. Os totais somam o valor guardado em cada agendamento.</p>
   </div>
 
-  <p style="text-align:center; font-family:'Helvetica Neue', Arial, sans-serif; font-size:11px; color:#8a7f66; margin-top:24px;">Trajeto · v3.2</p>
+  <p style="text-align:center; font-family:'Helvetica Neue', Arial, sans-serif; font-size:11px; color:#8a7f66; margin-top:24px;">Trajeto · v3.9</p>
 
 </main>
 
@@ -732,6 +800,14 @@
   }
   preencherPainel(cfg);
   document.getElementById('cfg_nome').value = localStorage.getItem('trajeto_nome') || '';
+  (function(){
+    const pagGuardado = JSON.parse(localStorage.getItem('trajeto_pagamentos') || 'null');
+    if(pagGuardado){
+      document.getElementById('cfg_pag_mbway').checked = !!pagGuardado.mbway;
+      document.getElementById('cfg_pag_dinheiro').checked = !!pagGuardado.dinheiro;
+      document.getElementById('cfg_pag_cartao').checked = !!pagGuardado.cartao;
+    }
+  })();
 
   document.getElementById('btnConfig').addEventListener('click', ()=>{
     const p = document.getElementById('painelConfig');
@@ -746,6 +822,11 @@
   document.getElementById('btnAplicar').addEventListener('click', ()=>{
     cfg = lerPainel();
     localStorage.setItem('trajeto_nome', document.getElementById('cfg_nome').value.trim());
+    localStorage.setItem('trajeto_pagamentos', JSON.stringify({
+      mbway: document.getElementById('cfg_pag_mbway').checked,
+      dinheiro: document.getElementById('cfg_pag_dinheiro').checked,
+      cartao: document.getElementById('cfg_pag_cartao').checked
+    }));
     calcularTransfer();
     calcularAeroporto();
     document.getElementById('painelConfig').style.display = 'none';
@@ -858,7 +939,7 @@
     e.target.dataset.editado = '1';
   });
   document.getElementById('ct_btnNovo').addEventListener('click', ()=>{
-    ['ct_km','ct_tempo','ct_espera','ct_duracaoIda','ct_duracaoVolta','ct_esperaDupla','ct_portagem','ct_cobrar'].forEach(id=>{
+    ['ct_origem','ct_destino','ct_km','ct_tempo','ct_espera','ct_duracaoIda','ct_duracaoVolta','ct_esperaDupla','ct_portagem','ct_cobrar'].forEach(id=>{
       document.getElementById(id).value = '';
     });
     ['ct_bagagem','ct_cadeira','ct_recibo','regressoVazio'].forEach(id=>{
@@ -871,6 +952,50 @@
     calcularTransfer();
   });
   calcularTransfer();
+
+  // ---------- Orçamento (mensagem pronta a copiar) ----------
+  function gerarMensagemOrcamento(){
+    const origem = document.getElementById('ct_origem').value.trim();
+    const destino = document.getElementById('ct_destino').value.trim();
+    const km = document.getElementById('ct_km').value || '0';
+    const veiculo = state.veiculoT === 'van' ? 'Van' : 'Sedan';
+    const valor = document.getElementById('ct_cobrar').value || document.getElementById('ct_valorRecomendado').textContent.replace('€','');
+    const nome = (localStorage.getItem('trajeto_nome') || '').trim();
+
+    const pag = JSON.parse(localStorage.getItem('trajeto_pagamentos') || 'null') || { mbway:true, dinheiro:true, cartao:true };
+    const metodos = [];
+    if(pag.mbway) metodos.push('MB WAY');
+    if(pag.dinheiro) metodos.push('Dinheiro');
+    if(pag.cartao) metodos.push('Cartão bancário');
+
+    let msg = 'Olá! 👋 Orçamento do seu transfer:\n\n';
+    if(origem && destino){
+      msg += `📍 ${origem} → ${destino}\n`;
+    }
+    msg += `🚗 ${veiculo} · ${km} km\n\n`;
+    msg += `💶 €${valor} — valor final, sem surpresas\n`;
+    if(metodos.length > 0){
+      msg += `💳 Pagamento: ${metodos.join(', ')}\n`;
+    }
+    msg += '\nTenho disponibilidade para esta data. Posso confirmar já a sua reserva — é só dizer! 😊\n\n';
+    msg += nome ? `${nome} · Motorista TVDE, Lisboa` : 'Motorista TVDE, Lisboa';
+    return msg;
+  }
+
+  document.getElementById('btnCopiarOrcamento').addEventListener('click', ()=>{
+    const texto = gerarMensagemOrcamento();
+    const btn = document.getElementById('btnCopiarOrcamento');
+    const original = btn.textContent;
+    const marcarCopiado = ()=>{
+      btn.textContent = '✅ Copiado!';
+      setTimeout(()=>{ btn.textContent = original; }, 1800);
+    };
+    if(navigator.clipboard){
+      navigator.clipboard.writeText(texto).then(marcarCopiado).catch(()=>{ alert(texto); });
+    } else {
+      alert(texto);
+    }
+  });
 
   function calcularAeroporto(){
     const isVan = state.veiculoAp === 'van';
@@ -888,6 +1013,7 @@
 
   // ---------- Agendamento ----------
   const AG_KEY = 'trajeto_agendamentos';
+  let editandoId = null;
 
   function lerAgendamentos(){
     try{ return JSON.parse(localStorage.getItem(AG_KEY)) || []; }
@@ -902,7 +1028,11 @@
     const abrir = p.style.display !== 'block';
     p.style.display = abrir ? 'block' : 'none';
     if(abrir){
+      editandoId = null;
+      document.getElementById('btnGuardarAgendamento').textContent = 'Guardar e adicionar ao calendário';
       document.getElementById('ag_valor').value = document.getElementById('ct_cobrar').value;
+      if(!document.getElementById('ag_partida').value) document.getElementById('ag_partida').value = document.getElementById('ct_origem').value;
+      if(!document.getElementById('ag_chegada').value) document.getElementById('ag_chegada').value = document.getElementById('ct_destino').value;
       if(!document.getElementById('ag_data').value){
         const amanha = new Date();
         amanha.setDate(amanha.getDate()+1);
@@ -963,11 +1093,26 @@
     setTimeout(()=> URL.revokeObjectURL(url), 4000);
   }
 
+  let filtroAg = 'ativos';
+  document.getElementById('segFiltroAg').querySelectorAll('button').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      document.getElementById('segFiltroAg').querySelectorAll('button').forEach(b=>b.classList.remove('active'));
+      btn.classList.add('active');
+      filtroAg = btn.dataset.v;
+      renderLista();
+    });
+  });
+
   function renderLista(){
-    const lista = lerAgendamentos().sort((a,b)=> (a.data+a.hora).localeCompare(b.data+b.hora));
+    const todos = lerAgendamentos();
+    const lista = todos
+      .filter(ag => filtroAg === 'concluidos' ? ag.realizado : !ag.realizado)
+      .sort((a,b)=> (a.data+a.hora).localeCompare(b.data+b.hora));
     const el = document.getElementById('listaAgendamentos');
     if(lista.length === 0){
-      el.innerHTML = '<p class="ag-vazio">Ainda não tens agendamentos guardados.</p>';
+      el.innerHTML = filtroAg === 'concluidos'
+        ? '<p class="ag-vazio">Ainda não tens agendamentos concluídos.</p>'
+        : '<p class="ag-vazio">Nenhum agendamento ativo — tudo tratado! 🎉</p>';
       return;
     }
     el.innerHTML = lista.map(ag => `
@@ -983,6 +1128,7 @@
           <button class="ag-btn-levar" data-acao="levar">🏁 Iniciar viagem</button>
         </div>
         <div class="ag-acoes">
+          <button class="ag-btn-cal" data-acao="editar">✏️ Editar</button>
           <button class="ag-btn-cal" data-acao="cal">📅 Calendário</button>
           <button class="ag-btn-wpp" data-acao="wpp">✉️ Mensagem</button>
           <button class="ag-btn-ok" data-acao="realizado">${ag.realizado ? '↩️ Desfazer' : '✅ Concluído'}</button>
@@ -1025,6 +1171,26 @@
     window.open(url, '_blank');
   }
 
+  function preencherFormAgendamento(ag){
+    document.getElementById('ag_partida').value = ag.partida;
+    document.getElementById('ag_chegada').value = ag.chegada;
+    document.getElementById('ag_data').value = ag.data;
+    document.getElementById('ag_hora').value = ag.hora;
+    document.getElementById('ag_cliente').value = ag.cliente;
+    document.getElementById('ag_telefone').value = ag.telefone || '';
+    document.getElementById('ag_fornecedor').value = ag.fornecedor || '';
+    document.getElementById('ag_valor').value = ag.valor;
+  }
+
+  function abrirEdicao(ag){
+    editandoId = ag.id;
+    preencherFormAgendamento(ag);
+    document.getElementById('btnGuardarAgendamento').textContent = 'Guardar alterações';
+    const p = document.getElementById('painelAgendar');
+    p.style.display = 'block';
+    p.scrollIntoView({behavior:'smooth', block:'start'});
+  }
+
   document.getElementById('listaAgendamentos').addEventListener('click', (e)=>{
     const btn = e.target.closest('button');
     if(!btn) return;
@@ -1038,6 +1204,8 @@
       abrirWaze(ag.partida);
     } else if(btn.dataset.acao === 'levar'){
       abrirWaze(ag.chegada);
+    } else if(btn.dataset.acao === 'editar'){
+      abrirEdicao(ag);
     } else if(btn.dataset.acao === 'cal'){
       abrirICS(ag);
     } else if(btn.dataset.acao === 'wpp'){
@@ -1057,6 +1225,9 @@
   });
 
   // ---------- Faturamento ----------
+  let fatModo = 'mes';
+  let fatOffset = 0;
+
   function inicioSemana(d){
     const dia = new Date(d);
     const diaSemana = (dia.getDay() + 6) % 7; // 0 = segunda
@@ -1065,30 +1236,88 @@
     return dia;
   }
 
-  function renderFaturamento(){
-    const lista = lerAgendamentos().filter(a => a.realizado);
+  function fmtDataPT(d){
+    return `${pad(d.getDate())}/${pad(d.getMonth()+1)}/${d.getFullYear()}`;
+  }
+
+  function getPeriodo(modo, offset){
     const hoje = new Date();
-    const hojeStr = hoje.toISOString().slice(0,10);
+    if(modo === 'dia'){
+      const d = new Date(hoje);
+      d.setDate(d.getDate() + offset);
+      const iso = `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
+      return { inicio: iso, fim: iso, label: fmtDataPT(d) };
+    }
+    if(modo === 'semana'){
+      const base = inicioSemana(hoje);
+      base.setDate(base.getDate() + offset*7);
+      const fimSem = new Date(base);
+      fimSem.setDate(fimSem.getDate() + 6);
+      return {
+        inicio: `${base.getFullYear()}-${pad(base.getMonth()+1)}-${pad(base.getDate())}`,
+        fim: `${fimSem.getFullYear()}-${pad(fimSem.getMonth()+1)}-${pad(fimSem.getDate())}`,
+        label: `${fmtDataPT(base)} – ${fmtDataPT(fimSem)}`
+      };
+    }
+    // mês
+    const d = new Date(hoje.getFullYear(), hoje.getMonth() + offset, 1);
+    const fimMes = new Date(d.getFullYear(), d.getMonth()+1, 0);
+    return {
+      inicio: `${d.getFullYear()}-${pad(d.getMonth()+1)}-01`,
+      fim: `${fimMes.getFullYear()}-${pad(fimMes.getMonth()+1)}-${pad(fimMes.getDate())}`,
+      label: d.toLocaleDateString('pt-PT', {month:'long', year:'numeric'})
+    };
+  }
+
+  document.getElementById('segFatModo').querySelectorAll('button').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      document.getElementById('segFatModo').querySelectorAll('button').forEach(b=>b.classList.remove('active'));
+      btn.classList.add('active');
+      fatModo = btn.dataset.v;
+      fatOffset = 0;
+      renderFaturamento();
+    });
+  });
+  document.getElementById('fatPrev').addEventListener('click', ()=>{
+    fatOffset -= 1;
+    renderFaturamento();
+  });
+  document.getElementById('fatNext').addEventListener('click', ()=>{
+    fatOffset = Math.min(0, fatOffset + 1);
+    renderFaturamento();
+  });
+
+  function renderFaturamento(){
+    const todos = lerAgendamentos().filter(a => a.realizado);
+    const hoje = new Date();
+    const hojeStr = `${hoje.getFullYear()}-${pad(hoje.getMonth()+1)}-${pad(hoje.getDate())}`;
     const inicioSem = inicioSemana(hoje);
     const mesAtual = hojeStr.slice(0,7);
 
     let totalHoje = 0, totalSemana = 0, totalMes = 0;
-    lista.forEach(ag=>{
+    todos.forEach(ag=>{
       const v = parseFloat(ag.valor) || 0;
       const dataAg = new Date(ag.data + 'T00:00:00');
       if(ag.data === hojeStr) totalHoje += v;
       if(dataAg >= inicioSem) totalSemana += v;
       if(ag.data.slice(0,7) === mesAtual) totalMes += v;
     });
-
     document.getElementById('fat_hoje').textContent = `€${totalHoje.toFixed(0)}`;
     document.getElementById('fat_semana').textContent = `€${totalSemana.toFixed(0)}`;
     document.getElementById('fat_mes').textContent = `€${totalMes.toFixed(0)}`;
 
+    const periodo = getPeriodo(fatModo, fatOffset);
+    document.getElementById('fatPeriodoLabel').textContent = periodo.label;
+    document.getElementById('fatNext').disabled = fatOffset >= 0;
+
+    const doPeriodo = todos.filter(ag => ag.data >= periodo.inicio && ag.data <= periodo.fim);
+    const totalPeriodo = doPeriodo.reduce((s,ag)=> s + (parseFloat(ag.valor)||0), 0);
+    document.getElementById('fatPeriodoTotal').textContent = `€${totalPeriodo.toFixed(2)}`;
+
     const el = document.getElementById('listaFaturamento');
-    const ordenada = [...lista].sort((a,b)=> (b.data+b.hora).localeCompare(a.data+a.hora));
+    const ordenada = [...doPeriodo].sort((a,b)=> (b.data+b.hora).localeCompare(a.data+a.hora));
     if(ordenada.length === 0){
-      el.innerHTML = '<p class="ag-vazio">Ainda não tens corridas faturadas. Marca um agendamento como "✅ Concluído".</p>';
+      el.innerHTML = '<p class="ag-vazio">Sem corridas faturadas neste período.</p>';
       return;
     }
     el.innerHTML = ordenada.map(ag => `
@@ -1118,18 +1347,38 @@
       return;
     }
 
-    const ag = {
-      id: Date.now().toString(36) + Math.random().toString(36).slice(2,7),
-      partida, chegada, data, hora, cliente, telefone, fornecedor,
-      valor: valor || document.getElementById('ct_cobrar').value,
-      realizado: false
-    };
-
     const lista = lerAgendamentos();
-    lista.push(ag);
-    gravarAgendamentos(lista);
-    renderLista();
-    abrirICS(ag);
+
+    if(editandoId){
+      const ag = lista.find(a => a.id === editandoId);
+      if(ag){
+        ag.partida = partida;
+        ag.chegada = chegada;
+        ag.data = data;
+        ag.hora = hora;
+        ag.cliente = cliente;
+        ag.telefone = telefone;
+        ag.fornecedor = fornecedor;
+        ag.valor = valor || ag.valor;
+        gravarAgendamentos(lista);
+        renderLista();
+        renderFaturamento();
+        abrirICS(ag);
+      }
+      editandoId = null;
+      document.getElementById('btnGuardarAgendamento').textContent = 'Guardar e adicionar ao calendário';
+    } else {
+      const ag = {
+        id: Date.now().toString(36) + Math.random().toString(36).slice(2,7),
+        partida, chegada, data, hora, cliente, telefone, fornecedor,
+        valor: valor || document.getElementById('ct_cobrar').value,
+        realizado: false
+      };
+      lista.push(ag);
+      gravarAgendamentos(lista);
+      renderLista();
+      abrirICS(ag);
+    }
 
     document.getElementById('ag_partida').value = '';
     document.getElementById('ag_chegada').value = '';
