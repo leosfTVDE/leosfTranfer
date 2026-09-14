@@ -486,6 +486,13 @@
       <label for="cfg_nome">O teu nome (para as mensagens ao cliente)</label>
       <input type="text" id="cfg_nome" placeholder="ex: Carlos">
 
+      <label style="margin-top:14px;">Formas de pagamento aceites</label>
+      <div class="checks">
+        <label class="chk"><input type="checkbox" id="cfg_pag_mbway" checked> MB WAY</label>
+        <label class="chk"><input type="checkbox" id="cfg_pag_dinheiro" checked> Dinheiro</label>
+        <label class="chk"><input type="checkbox" id="cfg_pag_cartao" checked> Cartão bancário</label>
+      </div>
+
       <div class="cfg-grupo" style="margin-top:16px;">
         <div class="cfg-titulo">Aeroporto ⇄ Lisboa (valor fixo)</div>
         <div class="cfg-row">
@@ -573,6 +580,16 @@
 
     <div class="card">
       <h2>📍 Calculadora de Transfer</h2>
+      <div class="row2">
+        <div>
+          <label for="ct_origem">Origem (opcional)</label>
+          <input type="text" id="ct_origem" placeholder="ex: Aeroporto de Lisboa">
+        </div>
+        <div>
+          <label for="ct_destino">Destino (opcional)</label>
+          <input type="text" id="ct_destino" placeholder="ex: Cascais">
+        </div>
+      </div>
       <label for="ct_km">Distância (km)</label>
       <input type="number" id="ct_km" placeholder="ex: 34" min="0">
 
@@ -627,6 +644,7 @@
       <div class="ct-rec" id="ct_valorRecomendado">€0</div>
       <p class="eyebrow" style="margin-top:16px;">💰 Cobrar do cliente</p>
       <input type="number" id="ct_cobrar" class="ct-cobrar-input" step="0.5">
+      <button class="btn-agendar" id="btnCopiarOrcamento">📋 Copiar orçamento</button>
       <button class="btn-agendar" id="ct_btnNovo" style="margin-top:14px;">🔄 Novo cálculo</button>
       <button class="btn-agendar" id="btnAbrirAgendar">📅 Agendar esta corrida</button>
     </div>
@@ -743,7 +761,7 @@
     <p class="nota">Aparecem aqui os agendamentos marcados como "✅ Concluído" na aba Transfer rápido. Os totais somam o valor guardado em cada agendamento.</p>
   </div>
 
-  <p style="text-align:center; font-family:'Helvetica Neue', Arial, sans-serif; font-size:11px; color:#8a7f66; margin-top:24px;">Trajeto · v3.6</p>
+  <p style="text-align:center; font-family:'Helvetica Neue', Arial, sans-serif; font-size:11px; color:#8a7f66; margin-top:24px;">Trajeto · v3.9</p>
 
 </main>
 
@@ -782,6 +800,14 @@
   }
   preencherPainel(cfg);
   document.getElementById('cfg_nome').value = localStorage.getItem('trajeto_nome') || '';
+  (function(){
+    const pagGuardado = JSON.parse(localStorage.getItem('trajeto_pagamentos') || 'null');
+    if(pagGuardado){
+      document.getElementById('cfg_pag_mbway').checked = !!pagGuardado.mbway;
+      document.getElementById('cfg_pag_dinheiro').checked = !!pagGuardado.dinheiro;
+      document.getElementById('cfg_pag_cartao').checked = !!pagGuardado.cartao;
+    }
+  })();
 
   document.getElementById('btnConfig').addEventListener('click', ()=>{
     const p = document.getElementById('painelConfig');
@@ -796,6 +822,11 @@
   document.getElementById('btnAplicar').addEventListener('click', ()=>{
     cfg = lerPainel();
     localStorage.setItem('trajeto_nome', document.getElementById('cfg_nome').value.trim());
+    localStorage.setItem('trajeto_pagamentos', JSON.stringify({
+      mbway: document.getElementById('cfg_pag_mbway').checked,
+      dinheiro: document.getElementById('cfg_pag_dinheiro').checked,
+      cartao: document.getElementById('cfg_pag_cartao').checked
+    }));
     calcularTransfer();
     calcularAeroporto();
     document.getElementById('painelConfig').style.display = 'none';
@@ -908,7 +939,7 @@
     e.target.dataset.editado = '1';
   });
   document.getElementById('ct_btnNovo').addEventListener('click', ()=>{
-    ['ct_km','ct_tempo','ct_espera','ct_duracaoIda','ct_duracaoVolta','ct_esperaDupla','ct_portagem','ct_cobrar'].forEach(id=>{
+    ['ct_origem','ct_destino','ct_km','ct_tempo','ct_espera','ct_duracaoIda','ct_duracaoVolta','ct_esperaDupla','ct_portagem','ct_cobrar'].forEach(id=>{
       document.getElementById(id).value = '';
     });
     ['ct_bagagem','ct_cadeira','ct_recibo','regressoVazio'].forEach(id=>{
@@ -921,6 +952,50 @@
     calcularTransfer();
   });
   calcularTransfer();
+
+  // ---------- Orçamento (mensagem pronta a copiar) ----------
+  function gerarMensagemOrcamento(){
+    const origem = document.getElementById('ct_origem').value.trim();
+    const destino = document.getElementById('ct_destino').value.trim();
+    const km = document.getElementById('ct_km').value || '0';
+    const veiculo = state.veiculoT === 'van' ? 'Van' : 'Sedan';
+    const valor = document.getElementById('ct_cobrar').value || document.getElementById('ct_valorRecomendado').textContent.replace('€','');
+    const nome = (localStorage.getItem('trajeto_nome') || '').trim();
+
+    const pag = JSON.parse(localStorage.getItem('trajeto_pagamentos') || 'null') || { mbway:true, dinheiro:true, cartao:true };
+    const metodos = [];
+    if(pag.mbway) metodos.push('MB WAY');
+    if(pag.dinheiro) metodos.push('Dinheiro');
+    if(pag.cartao) metodos.push('Cartão bancário');
+
+    let msg = 'Olá! 👋 Orçamento do seu transfer:\n\n';
+    if(origem && destino){
+      msg += `📍 ${origem} → ${destino}\n`;
+    }
+    msg += `🚗 ${veiculo} · ${km} km\n\n`;
+    msg += `💶 €${valor} — valor final, sem surpresas\n`;
+    if(metodos.length > 0){
+      msg += `💳 Pagamento: ${metodos.join(', ')}\n`;
+    }
+    msg += '\nTenho disponibilidade para esta data. Posso confirmar já a sua reserva — é só dizer! 😊\n\n';
+    msg += nome ? `${nome} · Motorista TVDE, Lisboa` : 'Motorista TVDE, Lisboa';
+    return msg;
+  }
+
+  document.getElementById('btnCopiarOrcamento').addEventListener('click', ()=>{
+    const texto = gerarMensagemOrcamento();
+    const btn = document.getElementById('btnCopiarOrcamento');
+    const original = btn.textContent;
+    const marcarCopiado = ()=>{
+      btn.textContent = '✅ Copiado!';
+      setTimeout(()=>{ btn.textContent = original; }, 1800);
+    };
+    if(navigator.clipboard){
+      navigator.clipboard.writeText(texto).then(marcarCopiado).catch(()=>{ alert(texto); });
+    } else {
+      alert(texto);
+    }
+  });
 
   function calcularAeroporto(){
     const isVan = state.veiculoAp === 'van';
@@ -956,6 +1031,8 @@
       editandoId = null;
       document.getElementById('btnGuardarAgendamento').textContent = 'Guardar e adicionar ao calendário';
       document.getElementById('ag_valor').value = document.getElementById('ct_cobrar').value;
+      if(!document.getElementById('ag_partida').value) document.getElementById('ag_partida').value = document.getElementById('ct_origem').value;
+      if(!document.getElementById('ag_chegada').value) document.getElementById('ag_chegada').value = document.getElementById('ct_destino').value;
       if(!document.getElementById('ag_data').value){
         const amanha = new Date();
         amanha.setDate(amanha.getDate()+1);
