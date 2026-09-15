@@ -885,7 +885,7 @@
     <p class="nota">Aparecem aqui os agendamentos marcados como "✅ Concluído" na aba Transfer rápido. Os totais somam o valor guardado em cada agendamento.</p>
   </div>
 
-  <p style="text-align:center; font-family:'Helvetica Neue', Arial, sans-serif; font-size:11px; color:#8a7f66; margin-top:24px;">Trajeto · v4.3</p>
+  <p style="text-align:center; font-family:'Helvetica Neue', Arial, sans-serif; font-size:11px; color:#8a7f66; margin-top:24px;">Trajeto · v4.4</p>
 
 </main>
 
@@ -1304,6 +1304,7 @@
           <button class="ag-btn-cal" data-acao="editar">✏️ Editar</button>
           <button class="ag-btn-cal" data-acao="cal">📅 Calendário</button>
           <button class="ag-btn-wpp" data-acao="wpp">✉️ Mensagem</button>
+          <button class="ag-btn-wpp" data-acao="repassar">↗️ Repassar</button>
           <button class="ag-btn-ok" data-acao="realizado">${ag.realizado ? '↩️ Desfazer' : '✅ Concluído'}</button>
           ${btnRecebido}
           <button class="ag-btn-del" data-acao="del">🗑 Remover</button>
@@ -1354,6 +1355,40 @@
     document.getElementById('ag_telefone').value = ag.telefone || '';
     document.getElementById('ag_fornecedor').value = ag.fornecedor || '';
     document.getElementById('ag_valor').value = ag.valor;
+  }
+
+  function gerarLinkRepasse(ag){
+    const base = window.location.origin + window.location.pathname;
+    const params = new URLSearchParams({
+      partida: ag.partida || '',
+      chegada: ag.chegada || '',
+      data: ag.data || '',
+      hora: ag.hora || '',
+      cliente: ag.cliente || '',
+      telefone: ag.telefone || '',
+      fornecedor: ag.fornecedor || '',
+      valor: ag.valor || ''
+    });
+    return `${base}?${params.toString()}`;
+  }
+
+  function gerarMensagemRepasse(ag){
+    const dataFmt = ag.data.split('-').reverse().join('/');
+    const link = gerarLinkRepasse(ag);
+    return `🚗 Transfer para repassar\n\n📍 De: ${ag.partida}\n📍 Para: ${ag.chegada}\n📅 Data: ${dataFmt} às ${ag.hora}\n👤 Cliente: ${ag.cliente}${ag.telefone ? '\n📞 Telefone: ' + ag.telefone : ''}\n💶 Valor: €${ag.valor}\n\nSe tiveres a app Trajeto, abre este link para adicionar automaticamente aos teus agendamentos:\n${link}`;
+  }
+
+  function repassarAgendamento(ag){
+    const texto = gerarMensagemRepasse(ag);
+    window.open(`https://wa.me/?text=${encodeURIComponent(texto)}`, '_blank');
+    setTimeout(()=>{
+      if(confirm('Repassaste este transfer? Se sim, queres removê-lo da tua lista de agendamentos?')){
+        const lista = lerAgendamentos();
+        gravarAgendamentos(lista.filter(a => a.id !== ag.id));
+        renderLista();
+        renderFaturamento();
+      }
+    }, 800);
   }
 
   let idPendenteModal = null;
@@ -1412,6 +1447,8 @@
       abrirICS(ag);
     } else if(btn.dataset.acao === 'wpp'){
       enviarMensagem(ag);
+    } else if(btn.dataset.acao === 'repassar'){
+      repassarAgendamento(ag);
     } else if(btn.dataset.acao === 'realizado'){
       if(!ag.realizado){
         abrirModalPagamento(id);
@@ -1712,6 +1749,39 @@
     };
     reader.readAsText(file);
   });
+
+  // ---------- Receção de pedido externo (link partilhado, ex: via WhatsApp) ----------
+  // Formato: index.html?partida=...&chegada=...&data=YYYY-MM-DD&hora=HH:MM
+  //          &cliente=...&telefone=...&fornecedor=...&valor=...
+  function verificarPedidoExterno(){
+    const params = new URLSearchParams(window.location.search);
+    if(!params.has('partida') && !params.has('cliente')) return;
+
+    editandoId = null;
+    preencherFormAgendamento({
+      partida: params.get('partida') || '',
+      chegada: params.get('chegada') || '',
+      data: params.get('data') || '',
+      hora: params.get('hora') || '',
+      cliente: params.get('cliente') || '',
+      telefone: params.get('telefone') || '',
+      fornecedor: params.get('fornecedor') || '',
+      valor: params.get('valor') || ''
+    });
+    document.getElementById('btnGuardarAgendamento').textContent = 'Guardar e adicionar ao calendário';
+
+    document.getElementById('segModo').querySelectorAll('button').forEach(b=>b.classList.remove('active'));
+    document.querySelector('#segModo button[data-v="transfer"]').classList.add('active');
+    document.getElementById('viewTransfer').style.display = 'block';
+    document.getElementById('viewAeroporto').style.display = 'none';
+    document.getElementById('viewFaturamento').style.display = 'none';
+
+    document.getElementById('painelAgendar').style.display = 'block';
+    setTimeout(()=>{
+      document.getElementById('painelAgendar').scrollIntoView({behavior:'smooth', block:'start'});
+    }, 150);
+  }
+  verificarPedidoExterno();
 </script>
 
 
