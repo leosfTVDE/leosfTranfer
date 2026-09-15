@@ -497,6 +497,54 @@
     font-size:28px;
     color:var(--terracota);
   }
+  .modal-overlay{
+    display:none;
+    position:fixed;
+    inset:0;
+    background:rgba(13,27,42,.78);
+    z-index:1000;
+    align-items:center;
+    justify-content:center;
+    padding:24px;
+  }
+  .modal-overlay.aberto{display:flex;}
+  .modal-card{
+    background:var(--branco);
+    border-radius:14px;
+    padding:24px 22px;
+    max-width:360px;
+    width:100%;
+    box-shadow:0 10px 40px rgba(0,0,0,.3);
+  }
+  .modal-card h2{
+    font-family:'Helvetica Neue', Arial, sans-serif;
+    font-size:12px;
+    text-transform:uppercase;
+    letter-spacing:.12em;
+    color:var(--azulejo);
+    margin:0 0 10px;
+  }
+  .modal-card p{
+    font-family:'Helvetica Neue', Arial, sans-serif;
+    font-size:14.5px;
+    color:var(--texto);
+    line-height:1.5;
+    margin:0 0 20px;
+  }
+  .modal-btn{
+    width:100%;
+    padding:14px;
+    border-radius:10px;
+    border:none;
+    font-family:'Helvetica Neue', Arial, sans-serif;
+    font-size:15px;
+    font-weight:bold;
+    cursor:pointer;
+    margin-bottom:10px;
+  }
+  .modal-btn:last-child{margin-bottom:0;}
+  .modal-btn-recebido{background:#2e8b57; color:#fff;}
+  .modal-btn-pendente{background:var(--terracota); color:#fff;}
   .nota{
     font-family:'Helvetica Neue', Arial, sans-serif;
     font-size:11.5px;
@@ -837,9 +885,18 @@
     <p class="nota">Aparecem aqui os agendamentos marcados como "✅ Concluído" na aba Transfer rápido. Os totais somam o valor guardado em cada agendamento.</p>
   </div>
 
-  <p style="text-align:center; font-family:'Helvetica Neue', Arial, sans-serif; font-size:11px; color:#8a7f66; margin-top:24px;">Trajeto · v4.2</p>
+  <p style="text-align:center; font-family:'Helvetica Neue', Arial, sans-serif; font-size:11px; color:#8a7f66; margin-top:24px;">Trajeto · v4.3</p>
 
 </main>
+
+<div class="modal-overlay" id="modalPagamento">
+  <div class="modal-card">
+    <h2>Concluir corrida</h2>
+    <p>O pagamento desta corrida já foi recebido?</p>
+    <button class="modal-btn modal-btn-recebido" id="btnModalRecebido">💰 Sim, já recebi</button>
+    <button class="modal-btn modal-btn-pendente" id="btnModalPendente">⏳ Ainda não recebi</button>
+  </div>
+</div>
 
 <script>
   const state = { veiculoT:'sedan', veiculoAp:'sedan', horarioAp:'dia', direcaoAp:'ida' };
@@ -1299,6 +1356,34 @@
     document.getElementById('ag_valor').value = ag.valor;
   }
 
+  let idPendenteModal = null;
+  function abrirModalPagamento(id){
+    idPendenteModal = id;
+    document.getElementById('modalPagamento').classList.add('aberto');
+  }
+  function fecharModalPagamento(){
+    idPendenteModal = null;
+    document.getElementById('modalPagamento').classList.remove('aberto');
+  }
+  function concluirComPagamento(status){
+    if(!idPendenteModal) return;
+    const lista = lerAgendamentos();
+    const ag = lista.find(a => a.id === idPendenteModal);
+    if(ag){
+      ag.realizado = true;
+      ag.pagamento = status;
+      gravarAgendamentos(lista);
+      renderLista();
+      renderFaturamento();
+    }
+    fecharModalPagamento();
+  }
+  document.getElementById('btnModalRecebido').addEventListener('click', ()=> concluirComPagamento('recebido'));
+  document.getElementById('btnModalPendente').addEventListener('click', ()=> concluirComPagamento('pendente'));
+  document.getElementById('modalPagamento').addEventListener('click', (e)=>{
+    if(e.target.id === 'modalPagamento') fecharModalPagamento();
+  });
+
   function abrirEdicao(ag){
     editandoId = ag.id;
     preencherFormAgendamento(ag);
@@ -1329,15 +1414,13 @@
       enviarMensagem(ag);
     } else if(btn.dataset.acao === 'realizado'){
       if(!ag.realizado){
-        const recebido = confirm('Concluir corrida — o pagamento já foi recebido?\n\nOK = Já recebi\nCancelar = Ainda vou receber (fica marcado como pendente)');
-        ag.pagamento = recebido ? 'recebido' : 'pendente';
-        ag.realizado = true;
+        abrirModalPagamento(id);
       } else {
         ag.realizado = false;
+        gravarAgendamentos(lista);
+        renderLista();
+        renderFaturamento();
       }
-      gravarAgendamentos(lista);
-      renderLista();
-      renderFaturamento();
     } else if(btn.dataset.acao === 'marcarRecebido'){
       ag.pagamento = 'recebido';
       gravarAgendamentos(lista);
@@ -1639,6 +1722,11 @@ if ('serviceWorker' in navigator) {
       .then((reg) => {
         reg.update();
         setInterval(() => reg.update(), 60 * 1000);
+        document.addEventListener('visibilitychange', () => {
+          if(!document.hidden) reg.update();
+        });
+        window.addEventListener('pageshow', () => reg.update());
+        window.addEventListener('focus', () => reg.update());
       })
       .catch(()=>{});
 
