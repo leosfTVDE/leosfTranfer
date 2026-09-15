@@ -451,6 +451,52 @@
     color:var(--terracota);
     margin-top:10px;
   }
+  .ag-badge-pago{
+    display:inline-block;
+    font-family:'Helvetica Neue', Arial, sans-serif;
+    font-size:10.5px;
+    font-weight:bold;
+    color:#fff;
+    background:#2e8b57;
+    padding:2px 8px;
+    border-radius:10px;
+    margin-left:6px;
+    vertical-align:middle;
+  }
+  .ag-badge-pendente{
+    display:inline-block;
+    font-family:'Helvetica Neue', Arial, sans-serif;
+    font-size:10.5px;
+    font-weight:bold;
+    color:#fff;
+    background:var(--terracota);
+    padding:2px 8px;
+    border-radius:10px;
+    margin-left:6px;
+    vertical-align:middle;
+  }
+  .fat-receber-card{
+    background:#fdf0e6;
+    border:1px solid var(--terracota);
+    border-radius:10px;
+    padding:16px 18px;
+    margin-bottom:16px;
+  }
+  .fat-receber-card .fat-receber-titulo{
+    font-family:'Helvetica Neue', Arial, sans-serif;
+    font-size:11px;
+    text-transform:uppercase;
+    letter-spacing:.1em;
+    color:var(--terracota);
+    font-weight:bold;
+    margin:0 0 6px;
+  }
+  .fat-receber-card .fat-receber-total{
+    font-family: Georgia, 'Times New Roman', serif;
+    font-weight:bold;
+    font-size:28px;
+    color:var(--terracota);
+  }
   .nota{
     font-family:'Helvetica Neue', Arial, sans-serif;
     font-size:11.5px;
@@ -762,6 +808,12 @@
       </div>
     </div>
 
+    <div class="fat-receber-card" id="fatReceberCard">
+      <p class="fat-receber-titulo">⏳ A receber (de sempre)</p>
+      <div class="fat-receber-total" id="fatReceberTotal">€0</div>
+      <div class="lista-agendamentos" id="listaAReceber" style="margin-top:12px;"></div>
+    </div>
+
     <div class="card">
       <h2>Histórico</h2>
       <div class="seg" id="segFatModo">
@@ -785,7 +837,7 @@
     <p class="nota">Aparecem aqui os agendamentos marcados como "✅ Concluído" na aba Transfer rápido. Os totais somam o valor guardado em cada agendamento.</p>
   </div>
 
-  <p style="text-align:center; font-family:'Helvetica Neue', Arial, sans-serif; font-size:11px; color:#8a7f66; margin-top:24px;">Trajeto · v4.0</p>
+  <p style="text-align:center; font-family:'Helvetica Neue', Arial, sans-serif; font-size:11px; color:#8a7f66; margin-top:24px;">Trajeto · v4.2</p>
 
 </main>
 
@@ -1173,9 +1225,15 @@
         : '<p class="ag-vazio">Nenhum agendamento ativo — tudo tratado! 🎉</p>';
       return;
     }
-    el.innerHTML = lista.map(ag => `
+    el.innerHTML = lista.map(ag => {
+      const seloPagamento = !ag.realizado ? '' :
+        ag.pagamento === 'recebido' ? '<span class="ag-badge-pago">💰 Recebido</span>' :
+        '<span class="ag-badge-pendente">⏳ A receber</span>';
+      const btnRecebido = (ag.realizado && ag.pagamento === 'pendente')
+        ? `<button class="ag-btn-ok" data-acao="marcarRecebido">💰 Marcar como recebido</button>` : '';
+      return `
       <div class="ag-item ${ag.realizado ? 'ag-item-realizado' : ''}" data-id="${ag.id}">
-        <div class="ag-trajeto">${ag.partida} → ${ag.chegada}${ag.realizado ? '<span class="ag-badge-ok">✔ Concluído</span>' : ''}</div>
+        <div class="ag-trajeto">${ag.partida} → ${ag.chegada}${ag.realizado ? '<span class="ag-badge-ok">✔ Concluído</span>' : ''}${seloPagamento}</div>
         <div class="ag-meta">
           📅 ${ag.data.split('-').reverse().join('/')} às ${ag.hora}<br>
           👤 ${ag.cliente} &nbsp;·&nbsp; <span class="ag-valor">€${ag.valor}</span>
@@ -1190,10 +1248,11 @@
           <button class="ag-btn-cal" data-acao="cal">📅 Calendário</button>
           <button class="ag-btn-wpp" data-acao="wpp">✉️ Mensagem</button>
           <button class="ag-btn-ok" data-acao="realizado">${ag.realizado ? '↩️ Desfazer' : '✅ Concluído'}</button>
+          ${btnRecebido}
           <button class="ag-btn-del" data-acao="del">🗑 Remover</button>
         </div>
       </div>
-    `).join('');
+    `;}).join('');
   }
 
   function normalizarTelefone(tel){
@@ -1269,7 +1328,18 @@
     } else if(btn.dataset.acao === 'wpp'){
       enviarMensagem(ag);
     } else if(btn.dataset.acao === 'realizado'){
-      ag.realizado = !ag.realizado;
+      if(!ag.realizado){
+        const recebido = confirm('Concluir corrida — o pagamento já foi recebido?\n\nOK = Já recebi\nCancelar = Ainda vou receber (fica marcado como pendente)');
+        ag.pagamento = recebido ? 'recebido' : 'pendente';
+        ag.realizado = true;
+      } else {
+        ag.realizado = false;
+      }
+      gravarAgendamentos(lista);
+      renderLista();
+      renderFaturamento();
+    } else if(btn.dataset.acao === 'marcarRecebido'){
+      ag.pagamento = 'recebido';
       gravarAgendamentos(lista);
       renderLista();
       renderFaturamento();
@@ -1364,6 +1434,30 @@
     document.getElementById('fat_semana').textContent = `€${totalSemana.toFixed(0)}`;
     document.getElementById('fat_mes').textContent = `€${totalMes.toFixed(0)}`;
 
+    // ---- A receber (de sempre, não depende do período selecionado) ----
+    const pendentes = todos.filter(ag => ag.pagamento === 'pendente');
+    const totalPendente = pendentes.reduce((s,ag)=> s + (parseFloat(ag.valor)||0), 0);
+    document.getElementById('fatReceberTotal').textContent = `€${totalPendente.toFixed(2)}`;
+    const elReceber = document.getElementById('listaAReceber');
+    if(pendentes.length === 0){
+      elReceber.innerHTML = '<p class="ag-vazio">Nada pendente — tudo recebido! 🎉</p>';
+    } else {
+      const pendentesOrd = [...pendentes].sort((a,b)=> (a.data+a.hora).localeCompare(b.data+b.hora));
+      elReceber.innerHTML = pendentesOrd.map(ag => `
+        <div class="ag-item" data-id="${ag.id}">
+          <div class="ag-trajeto">${ag.partida} → ${ag.chegada}</div>
+          <div class="ag-meta">
+            📅 ${ag.data.split('-').reverse().join('/')}<br>
+            👤 ${ag.cliente} &nbsp;·&nbsp; <span class="ag-valor">€${ag.valor}</span>
+            ${ag.fornecedor ? `<br>🏷 Fornecedor: ${ag.fornecedor}` : ''}
+          </div>
+          <div class="ag-acoes">
+            <button class="ag-btn-ok" data-acao="marcarRecebido">💰 Marcar como recebido</button>
+          </div>
+        </div>
+      `).join('');
+    }
+
     const periodo = getPeriodo(fatModo, fatOffset);
     document.getElementById('fatPeriodoLabel').textContent = periodo.label;
     document.getElementById('fatNext').disabled = fatOffset >= 0;
@@ -1378,16 +1472,19 @@
       el.innerHTML = '<p class="ag-vazio">Sem corridas faturadas neste período.</p>';
       return;
     }
-    el.innerHTML = ordenada.map(ag => `
+    el.innerHTML = ordenada.map(ag => {
+      const selo = ag.pagamento === 'recebido' ? '<span class="ag-badge-pago">💰 Recebido</span>' : '<span class="ag-badge-pendente">⏳ A receber</span>';
+      return `
       <div class="ag-item">
-        <div class="ag-trajeto">${ag.partida} → ${ag.chegada}</div>
+        <div class="ag-trajeto">${ag.partida} → ${ag.chegada}${selo}</div>
         <div class="ag-meta">
           📅 ${ag.data.split('-').reverse().join('/')}<br>
           👤 ${ag.cliente} &nbsp;·&nbsp; <span class="ag-valor">€${ag.valor}</span>
           ${ag.fornecedor ? `<br>🏷 Fornecedor: ${ag.fornecedor}` : ''}
         </div>
       </div>
-    `).join('');
+    `;
+    }).join('');
   }
 
   document.getElementById('btnGuardarAgendamento').addEventListener('click', ()=>{
@@ -1444,6 +1541,20 @@
     document.getElementById('ag_telefone').value = '';
     document.getElementById('ag_fornecedor').value = '';
     document.getElementById('painelAgendar').style.display = 'none';
+  });
+
+  document.getElementById('listaAReceber').addEventListener('click', (e)=>{
+    const btn = e.target.closest('button');
+    if(!btn || btn.dataset.acao !== 'marcarRecebido') return;
+    const item = e.target.closest('.ag-item');
+    const id = item.dataset.id;
+    const lista = lerAgendamentos();
+    const ag = lista.find(a => a.id === id);
+    if(!ag) return;
+    ag.pagamento = 'recebido';
+    gravarAgendamentos(lista);
+    renderLista();
+    renderFaturamento();
   });
 
   renderLista();
@@ -1524,7 +1635,19 @@
 <script>
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
-    navigator.serviceWorker.register('sw.js').catch(()=>{});
+    navigator.serviceWorker.register('sw.js', { updateViaCache: 'none' })
+      .then((reg) => {
+        reg.update();
+        setInterval(() => reg.update(), 60 * 1000);
+      })
+      .catch(()=>{});
+
+    let jaRecarregou = false;
+    navigator.serviceWorker.addEventListener('controllerchange', () => {
+      if(jaRecarregou) return;
+      jaRecarregou = true;
+      window.location.reload();
+    });
   });
 }
 </script>
