@@ -1,4 +1,4 @@
-const CACHE_NAME = 'trajeto-v19';
+const CACHE_NAME = 'trajeto-v20';
 const ASSETS = [
   './',
   './index.html',
@@ -25,8 +25,16 @@ self.addEventListener('activate', (event) => {
   self.clients.claim();
 });
 
+// Rede primeiro: sempre tenta buscar a versão mais recente.
+// Só usa a cópia guardada se não houver internet (fallback offline).
 self.addEventListener('fetch', (event) => {
   event.respondWith(
-    caches.match(event.request).then((cached) => cached || fetch(event.request))
+    fetch(event.request)
+      .then((response) => {
+        const copia = response.clone();
+        caches.open(CACHE_NAME).then((cache) => cache.put(event.request, copia));
+        return response;
+      })
+      .catch(() => caches.match(event.request))
   );
 });
