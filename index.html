@@ -1037,9 +1037,18 @@
     <p class="nota">Aparecem aqui os agendamentos marcados como "✅ Concluído" na aba Transfer rápido. Os totais somam o valor guardado em cada agendamento.</p>
   </div>
 
-  <p style="text-align:center; font-family:'Helvetica Neue', Arial, sans-serif; font-size:11px; color:#8a7f66; margin-top:24px;">Trajeto · v5.0</p>
+  <p style="text-align:center; font-family:'Helvetica Neue', Arial, sans-serif; font-size:11px; color:#8a7f66; margin-top:24px;">Trajeto · v5.1</p>
 
 </main>
+
+<div class="modal-overlay" id="modalConflito">
+  <div class="modal-card">
+    <h2>Sincronizar dados</h2>
+    <p>Já existem agendamentos guardados na nuvem (de outro aparelho), e este aparelho também já tem dados guardados. Qual queres manter?</p>
+    <button class="modal-btn modal-btn-recebido" id="btnConflitoNuvem">☁️ Usar os da nuvem</button>
+    <button class="modal-btn modal-btn-pendente" id="btnConflitoLocal">📱 Usar os deste aparelho</button>
+  </div>
+</div>
 
 <div class="modal-overlay" id="modalAuth">
   <div class="modal-card">
@@ -1455,22 +1464,46 @@
     }
   }
 
-  async function aoLogar(){
-    const dadosNuvem = await window.TrajetoCloud.buscarDaNuvem();
-    const localAgendamentos = lerAgendamentos();
-    const nuvemTemDados = dadosNuvem && Array.isArray(dadosNuvem.agendamentos) && dadosNuvem.agendamentos.length > 0;
+  function perguntarConflito(){
+    return new Promise((resolve)=>{
+      const modal = document.getElementById('modalConflito');
+      const btnNuvem = document.getElementById('btnConflitoNuvem');
+      const btnLocal = document.getElementById('btnConflitoLocal');
+      modal.classList.add('aberto');
+      function limpar(){
+        modal.classList.remove('aberto');
+        btnNuvem.removeEventListener('click', onNuvem);
+        btnLocal.removeEventListener('click', onLocal);
+      }
+      function onNuvem(){ limpar(); resolve(true); }
+      function onLocal(){ limpar(); resolve(false); }
+      btnNuvem.addEventListener('click', onNuvem);
+      btnLocal.addEventListener('click', onLocal);
+    });
+  }
 
-    if(nuvemTemDados && localAgendamentos.length > 0){
-      const usarNuvem = confirm('Já existem agendamentos guardados na nuvem (de outro aparelho).\n\nOK = usar os da nuvem (substitui os deste aparelho)\nCancelar = enviar os deste aparelho para a nuvem (substitui os da nuvem)');
-      if(usarNuvem){
+  async function aoLogar(){
+    const uid = window.TrajetoCloud.utilizadorAtual.uid;
+    const jaResolvidoNesteAparelho = localStorage.getItem('trajeto_sync_uid') === uid;
+
+    if(!jaResolvidoNesteAparelho){
+      const dadosNuvem = await window.TrajetoCloud.buscarDaNuvem();
+      const localAgendamentos = lerAgendamentos();
+      const nuvemTemDados = dadosNuvem && Array.isArray(dadosNuvem.agendamentos) && dadosNuvem.agendamentos.length > 0;
+
+      if(nuvemTemDados && localAgendamentos.length > 0){
+        const usarNuvem = await perguntarConflito();
+        if(usarNuvem){
+          aplicarDadosDaNuvem(dadosNuvem);
+        } else {
+          await window.TrajetoCloud.enviarParaNuvem(montarDadosParaNuvem());
+        }
+      } else if(nuvemTemDados){
         aplicarDadosDaNuvem(dadosNuvem);
       } else {
         await window.TrajetoCloud.enviarParaNuvem(montarDadosParaNuvem());
       }
-    } else if(nuvemTemDados){
-      aplicarDadosDaNuvem(dadosNuvem);
-    } else {
-      await window.TrajetoCloud.enviarParaNuvem(montarDadosParaNuvem());
+      localStorage.setItem('trajeto_sync_uid', uid);
     }
 
     window.TrajetoCloud.ligarOuvinte((dadosRecebidos)=>{
