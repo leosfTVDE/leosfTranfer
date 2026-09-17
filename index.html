@@ -523,30 +523,30 @@
     position:fixed;
     inset:0;
     z-index:2000;
-    background: linear-gradient(135deg, var(--azul-noite), var(--azul-doca));
+    background:#ffffff;
   }
   .placar-overlay.aberto{display:block;}
   .placar-picker{
     height:100%;
     overflow-y:auto;
     padding:28px 22px;
-    color:var(--branco);
+    color:var(--texto);
   }
   .placar-picker h2{
     font-family:'Helvetica Neue', Arial, sans-serif;
     font-size:13px;
     text-transform:uppercase;
     letter-spacing:.12em;
-    color:#e8c9a0;
+    color:var(--terracota);
     margin:36px 0 16px;
   }
   .placar-opcao{
     display:block;
     width:100%;
     text-align:left;
-    background:rgba(255,255,255,.1);
-    border:1px solid rgba(255,255,255,.25);
-    color:var(--branco);
+    background:var(--areia);
+    border:1px solid var(--linha);
+    color:var(--texto);
     padding:14px 16px;
     border-radius:10px;
     font-family:'Helvetica Neue', Arial, sans-serif;
@@ -555,7 +555,7 @@
     cursor:pointer;
   }
   .placar-picker label{
-    color:#e8c9a0;
+    color:var(--azulejo);
     margin:18px 0 6px;
   }
   .placar-picker input{
@@ -579,9 +579,9 @@
     top:18px; right:18px;
     width:40px; height:40px;
     border-radius:50%;
-    border:1px solid rgba(255,255,255,.3);
-    background:rgba(255,255,255,.1);
-    color:var(--branco);
+    border:1px solid var(--linha);
+    background:var(--areia);
+    color:var(--texto);
     font-size:18px;
     cursor:pointer;
     z-index:1;
@@ -594,7 +594,7 @@
     justify-content:center;
     text-align:center;
     padding:24px;
-    color:var(--branco);
+    color:var(--texto);
   }
   .placar-nome{
     font-family: Georgia, 'Times New Roman', serif;
@@ -602,18 +602,20 @@
     font-size:clamp(40px, 12vw, 160px);
     line-height:1.05;
     word-break:break-word;
+    color:var(--azul-noite);
   }
   .placar-voo{
     font-family:'Helvetica Neue', Arial, sans-serif;
     font-size:clamp(16px, 3.5vw, 34px);
-    color:#e8c9a0;
+    color:var(--terracota);
     margin-top:18px;
     letter-spacing:.06em;
+    font-weight:bold;
   }
   .placar-fornecedor{
     font-family:'Helvetica Neue', Arial, sans-serif;
     font-size:clamp(11px, 1.8vw, 16px);
-    color:#c9d6da;
+    color:#6a7378;
     margin-top:30px;
     text-transform:uppercase;
     letter-spacing:.1em;
@@ -626,9 +628,9 @@
   .placar-acoes button{
     padding:12px 20px;
     border-radius:10px;
-    border:1px solid rgba(255,255,255,.3);
-    background:rgba(255,255,255,.1);
-    color:var(--branco);
+    border:1px solid var(--linha);
+    background:var(--areia);
+    color:var(--texto);
     font-family:'Helvetica Neue', Arial, sans-serif;
     font-size:14px;
     cursor:pointer;
@@ -716,6 +718,15 @@
 
       <label for="cfg_nome">O teu nome (para as mensagens ao cliente)</label>
       <input type="text" id="cfg_nome" placeholder="ex: Carlos">
+
+      <div class="cfg-grupo" style="margin-top:16px;">
+        <div class="cfg-titulo">☁️ Sincronização entre aparelhos</div>
+        <div id="syncStatusTexto" style="font-family:'Helvetica Neue', Arial, sans-serif; font-size:13px; color:#6a7378; margin-bottom:10px;">A verificar...</div>
+        <div class="btn-acoes">
+          <button id="btnAbrirAuth">Entrar / Criar conta</button>
+          <button id="btnSairAuth" class="btn-resetar" style="display:none;">Sair</button>
+        </div>
+      </div>
 
       <label style="margin-top:14px;">Formas de pagamento aceites</label>
       <div class="checks">
@@ -1026,9 +1037,22 @@
     <p class="nota">Aparecem aqui os agendamentos marcados como "✅ Concluído" na aba Transfer rápido. Os totais somam o valor guardado em cada agendamento.</p>
   </div>
 
-  <p style="text-align:center; font-family:'Helvetica Neue', Arial, sans-serif; font-size:11px; color:#8a7f66; margin-top:24px;">Trajeto · v4.5</p>
+  <p style="text-align:center; font-family:'Helvetica Neue', Arial, sans-serif; font-size:11px; color:#8a7f66; margin-top:24px;">Trajeto · v5.0</p>
 
 </main>
+
+<div class="modal-overlay" id="modalAuth">
+  <div class="modal-card">
+    <h2>Sincronizar dados</h2>
+    <p>Entra com o teu email para ligar este aparelho à tua conta. Usa o mesmo email nos dois aparelhos (telemóvel e tablet).</p>
+    <input type="email" id="auth_email" placeholder="Email" style="margin-bottom:10px; width:100%; padding:10px 12px; border:1px solid var(--linha); border-radius:8px; font-family:'Helvetica Neue', Arial, sans-serif; font-size:15px; background:#fdfbf6;">
+    <input type="password" id="auth_senha" placeholder="Palavra-passe (mín. 6 caracteres)" style="margin-bottom:14px; width:100%; padding:10px 12px; border:1px solid var(--linha); border-radius:8px; font-family:'Helvetica Neue', Arial, sans-serif; font-size:15px; background:#fdfbf6;">
+    <button class="modal-btn modal-btn-recebido" id="btnAuthEntrar">Entrar</button>
+    <button class="modal-btn modal-btn-pendente" id="btnAuthCriar">Criar conta nova</button>
+    <p id="authErro" style="color:var(--terracota); font-family:'Helvetica Neue', Arial, sans-serif; font-size:12.5px; margin:10px 0 0; text-align:center;"></p>
+    <button id="btnAuthFechar" style="width:100%; margin-top:14px; background:none; border:none; color:#8a7378; font-family:'Helvetica Neue', Arial, sans-serif; font-size:13px; cursor:pointer;">Fechar</button>
+  </div>
+</div>
 
 <div class="placar-overlay" id="placarOverlay">
   <div class="placar-picker" id="placarPicker">
@@ -1142,6 +1166,7 @@
     const tipoMsg = document.querySelector('#segMsgTipo button.active').dataset.v;
     localStorage.setItem('trajeto_msg_tipo', tipoMsg);
     localStorage.setItem('trajeto_msg_custom', document.getElementById('cfg_msg_custom').value);
+    sincronizarNuvem();
     calcularTransfer();
     calcularAeroporto();
     document.getElementById('painelConfig').style.display = 'none';
@@ -1343,31 +1368,17 @@
 
   // ---------- Agendamento ----------
   //
-  // PREPARAÇÃO PARA SINCRONIZAÇÃO NA NUVEM (Firebase / Supabase) — ainda não ligado.
-  // Todo o app lê e grava agendamentos só através de lerAgendamentos() e
-  // gravarAgendamentos() — nunca mexe diretamente no localStorage por fora
-  // destas duas funções. Isto é de propósito: quando ligarmos a nuvem, só
-  // precisamos de trocar o "miolo" destas duas funções (hoje leem/escrevem
-  // no localStorage; no futuro, chamam a API do Firebase ou do Supabase) —
-  // o resto do código (formulário, listas, faturamento, placar, etc.) não
-  // muda nada, porque continua só a chamar lerAgendamentos()/gravarAgendamentos().
-  //
-  // Passos, quando formos ligar (Firebase ou Supabase, ambos com plano
-  // gratuito suficiente para este uso):
-  //  1. Criar o projeto (Firebase Console ou supabase.com) e ativar uma
-  //     base de dados (Firestore no Firebase; Postgres no Supabase).
-  //  2. Colar aqui as credenciais do projeto (chave pública — não é secreta,
-  //     é normal ela aparecer no código de um site como este).
-  //  3. Trocar lerAgendamentos()/gravarAgendamentos() para chamar a base de
-  //     dados em vez do localStorage (ex: no Firebase, algo como
-  //     getDocs(collection(db,'agendamentos')) e setDoc(...); no Supabase,
-  //     supabase.from('agendamentos').select() e .upsert(...)).
-  //  4. Manter o localStorage como cópia local (cache), para o app continuar
-  //     a funcionar mesmo sem internet por uns instantes.
+  // SINCRONIZAÇÃO NA NUVEM (Firebase) — já ligada.
+  // O módulo Firebase (no fim do ficheiro, <script type="module">) expõe
+  // window.TrajetoCloud com entrar/criarConta/sair/enviarParaNuvem/
+  // buscarDaNuvem/ligarOuvinte. gravarAgendamentos() e a gravação das
+  // configurações continuam a escrever sempre no localStorage primeiro
+  // (o app funciona na mesma sem internet) — sincronizarNuvem() só faz
+  // um envio extra, em segundo plano, quando há sessão iniciada.
   //
   const CLOUD_SYNC = {
-    ativo: false,       // passa a true quando ligarmos a nuvem
-    provedor: null      // 'firebase' | 'supabase'
+    ativo: true,
+    provedor: 'firebase'
   };
 
   const AG_KEY = 'trajeto_agendamentos';
@@ -1379,7 +1390,156 @@
   }
   function gravarAgendamentos(lista){
     localStorage.setItem(AG_KEY, JSON.stringify(lista));
+    sincronizarNuvem();
   }
+
+  // ---------- Sincronização na nuvem ----------
+  let sincronizacaoTimer = null;
+  function montarDadosParaNuvem(){
+    return {
+      agendamentos: lerAgendamentos(),
+      cfg: cfg,
+      nome: localStorage.getItem('trajeto_nome') || '',
+      pagamentos: JSON.parse(localStorage.getItem('trajeto_pagamentos') || 'null') || { mbway:true, dinheiro:true, cartao:true },
+      msgTipo: localStorage.getItem('trajeto_msg_tipo') || 'auto',
+      msgCustom: localStorage.getItem('trajeto_msg_custom') || ''
+    };
+  }
+  function sincronizarNuvem(){
+    if(!window.TrajetoCloud || !window.TrajetoCloud.utilizadorAtual) return;
+    clearTimeout(sincronizacaoTimer);
+    sincronizacaoTimer = setTimeout(()=>{
+      window.TrajetoCloud.enviarParaNuvem(montarDadosParaNuvem());
+    }, 600);
+  }
+  function aplicarDadosDaNuvem(dados){
+    if(Array.isArray(dados.agendamentos)){
+      localStorage.setItem(AG_KEY, JSON.stringify(dados.agendamentos));
+    }
+    if(dados.cfg){
+      cfg = { ...DEFAULTS, ...dados.cfg };
+      preencherPainel(cfg);
+    }
+    if(typeof dados.nome === 'string'){
+      localStorage.setItem('trajeto_nome', dados.nome);
+      document.getElementById('cfg_nome').value = dados.nome;
+    }
+    if(dados.pagamentos){
+      localStorage.setItem('trajeto_pagamentos', JSON.stringify(dados.pagamentos));
+      aplicarPagamentosUI(dados.pagamentos);
+    }
+    if(dados.msgTipo || typeof dados.msgCustom === 'string'){
+      if(dados.msgTipo) localStorage.setItem('trajeto_msg_tipo', dados.msgTipo);
+      if(typeof dados.msgCustom === 'string') localStorage.setItem('trajeto_msg_custom', dados.msgCustom);
+      aplicarMsgTipoUI(dados.msgTipo || 'auto', dados.msgCustom || '');
+    }
+    renderLista();
+    renderFaturamento();
+    calcularTransfer();
+    calcularAeroporto();
+  }
+
+  function atualizarUISincronizacao(){
+    const logado = window.TrajetoCloud && window.TrajetoCloud.utilizadorAtual;
+    const statusEl = document.getElementById('syncStatusTexto');
+    const btnEntrar = document.getElementById('btnAbrirAuth');
+    const btnSair = document.getElementById('btnSairAuth');
+    if(logado){
+      statusEl.textContent = `Sincronizado como ${window.TrajetoCloud.utilizadorAtual.email}`;
+      btnEntrar.style.display = 'none';
+      btnSair.style.display = 'block';
+    } else {
+      statusEl.textContent = 'Não sincronizado — os dados ficam só neste aparelho.';
+      btnEntrar.style.display = 'block';
+      btnSair.style.display = 'none';
+    }
+  }
+
+  async function aoLogar(){
+    const dadosNuvem = await window.TrajetoCloud.buscarDaNuvem();
+    const localAgendamentos = lerAgendamentos();
+    const nuvemTemDados = dadosNuvem && Array.isArray(dadosNuvem.agendamentos) && dadosNuvem.agendamentos.length > 0;
+
+    if(nuvemTemDados && localAgendamentos.length > 0){
+      const usarNuvem = confirm('Já existem agendamentos guardados na nuvem (de outro aparelho).\n\nOK = usar os da nuvem (substitui os deste aparelho)\nCancelar = enviar os deste aparelho para a nuvem (substitui os da nuvem)');
+      if(usarNuvem){
+        aplicarDadosDaNuvem(dadosNuvem);
+      } else {
+        await window.TrajetoCloud.enviarParaNuvem(montarDadosParaNuvem());
+      }
+    } else if(nuvemTemDados){
+      aplicarDadosDaNuvem(dadosNuvem);
+    } else {
+      await window.TrajetoCloud.enviarParaNuvem(montarDadosParaNuvem());
+    }
+
+    window.TrajetoCloud.ligarOuvinte((dadosRecebidos)=>{
+      aplicarDadosDaNuvem(dadosRecebidos);
+    });
+    atualizarUISincronizacao();
+  }
+
+  function traduzirErroAuth(codigo){
+    const mapa = {
+      'auth/email-already-in-use': 'Já existe uma conta com este email — tenta "Entrar" em vez de "Criar conta".',
+      'auth/invalid-email': 'Email inválido.',
+      'auth/weak-password': 'A palavra-passe precisa de pelo menos 6 caracteres.',
+      'auth/wrong-password': 'Palavra-passe incorreta.',
+      'auth/user-not-found': 'Não existe conta com este email — usa "Criar conta".',
+      'auth/invalid-credential': 'Email ou palavra-passe incorretos.'
+    };
+    return mapa[codigo] || 'Não foi possível entrar. Confirma o email e a palavra-passe.';
+  }
+
+  async function tratarLogin(criarNova){
+    const email = document.getElementById('auth_email').value.trim();
+    const senha = document.getElementById('auth_senha').value;
+    const erroEl = document.getElementById('authErro');
+    erroEl.textContent = '';
+    if(!email || !senha){ erroEl.textContent = 'Preenche o email e a palavra-passe.'; return; }
+    if(!window.TrajetoCloud){ erroEl.textContent = 'A ligação à nuvem ainda não carregou — tenta de novo em instantes.'; return; }
+    try{
+      if(criarNova){
+        await window.TrajetoCloud.criarConta(email, senha);
+      } else {
+        await window.TrajetoCloud.entrar(email, senha);
+      }
+      document.getElementById('modalAuth').classList.remove('aberto');
+    }catch(err){
+      erroEl.textContent = traduzirErroAuth(err.code);
+    }
+  }
+
+  document.getElementById('btnAbrirAuth').addEventListener('click', ()=>{
+    document.getElementById('authErro').textContent = '';
+    document.getElementById('modalAuth').classList.add('aberto');
+  });
+  document.getElementById('btnAuthFechar').addEventListener('click', ()=>{
+    document.getElementById('modalAuth').classList.remove('aberto');
+  });
+  document.getElementById('modalAuth').addEventListener('click', (e)=>{
+    if(e.target.id === 'modalAuth') document.getElementById('modalAuth').classList.remove('aberto');
+  });
+  document.getElementById('btnAuthEntrar').addEventListener('click', ()=> tratarLogin(false));
+  document.getElementById('btnAuthCriar').addEventListener('click', ()=> tratarLogin(true));
+  document.getElementById('btnSairAuth').addEventListener('click', async ()=>{
+    if(window.TrajetoCloud) await window.TrajetoCloud.sair();
+    atualizarUISincronizacao();
+  });
+
+  function iniciarObservadorNuvem(){
+    if(!window.TrajetoCloud){
+      setTimeout(iniciarObservadorNuvem, 150);
+      return;
+    }
+    window.TrajetoCloud.onAuthChange(async (user)=>{
+      atualizarUISincronizacao();
+      if(user){
+        await aoLogar();
+      }
+    });
+  }
+  iniciarObservadorNuvem();
 
   document.getElementById('btnAbrirAgendar').addEventListener('click', ()=>{
     const p = document.getElementById('painelAgendar');
@@ -2017,6 +2177,7 @@
           localStorage.setItem('trajeto_msg_custom', dados.msgCustom);
         }
         aplicarMsgTipoUI(dados.msgTipo || 'auto', dados.msgCustom || '');
+        sincronizarNuvem();
 
         renderLista();
         renderFaturamento();
@@ -2089,6 +2250,80 @@ if ('serviceWorker' in navigator) {
     });
   });
 }
+</script>
+
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js";
+  import {
+    getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword,
+    onAuthStateChanged, signOut
+  } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js";
+  import {
+    getFirestore, doc, setDoc, getDoc, onSnapshot
+  } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyCqJBnzZh5MWP9G3ZP1nOThb4W2KCLf2a4",
+    authDomain: "trajeto-app.firebaseapp.com",
+    projectId: "trajeto-app",
+    storageBucket: "trajeto-app.firebasestorage.app",
+    messagingSenderId: "149828521686",
+    appId: "1:149828521686:web:255f9dd3f9056be451c377"
+  };
+
+  const fbApp = initializeApp(firebaseConfig);
+  const auth = getAuth(fbApp);
+  const db = getFirestore(fbApp);
+
+  let ultimoEnvioLocal = 0;
+  let cancelarOuvinte = null;
+
+  function docDoUtilizador(uid){
+    return doc(db, 'trajeto_utilizadores', uid);
+  }
+
+  async function enviarParaNuvem(dados){
+    if(!auth.currentUser) return;
+    ultimoEnvioLocal = Date.now();
+    try{
+      await setDoc(docDoUtilizador(auth.currentUser.uid), {
+        ...dados,
+        atualizadoEm: ultimoEnvioLocal
+      });
+    }catch(e){ console.error('Falha ao sincronizar com a nuvem', e); }
+  }
+
+  async function buscarDaNuvem(){
+    if(!auth.currentUser) return null;
+    const snap = await getDoc(docDoUtilizador(auth.currentUser.uid));
+    return snap.exists() ? snap.data() : null;
+  }
+
+  function ligarOuvinte(aoReceber){
+    if(!auth.currentUser) return;
+    if(cancelarOuvinte) cancelarOuvinte();
+    cancelarOuvinte = onSnapshot(docDoUtilizador(auth.currentUser.uid), (snap)=>{
+      if(!snap.exists()) return;
+      const dados = snap.data();
+      // Ignora o eco do que este próprio aparelho acabou de enviar
+      if(dados.atualizadoEm && Math.abs(dados.atualizadoEm - ultimoEnvioLocal) < 2000) return;
+      aoReceber(dados);
+    });
+  }
+
+  window.TrajetoCloud = {
+    entrar: (email, senha) => signInWithEmailAndPassword(auth, email, senha),
+    criarConta: (email, senha) => createUserWithEmailAndPassword(auth, email, senha),
+    sair: () => {
+      if(cancelarOuvinte){ cancelarOuvinte(); cancelarOuvinte = null; }
+      return signOut(auth);
+    },
+    enviarParaNuvem,
+    buscarDaNuvem,
+    ligarOuvinte,
+    onAuthChange: (cb) => onAuthStateChanged(auth, cb),
+    get utilizadorAtual(){ return auth.currentUser; }
+  };
 </script>
 </body>
 </html>
