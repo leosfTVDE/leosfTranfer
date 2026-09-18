@@ -11,6 +11,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Trajeto">
 <meta name="theme-color" content="#0d1b2a">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
 <style>
   :root{
     --azul-noite:#0d1b2a;
@@ -294,6 +295,25 @@
   }
   .btn-agendar:hover{background:rgba(255,255,255,.18);}
   #painelAgendar{display:none;}
+  .ag-secao{
+    font-family:'Helvetica Neue', Arial, sans-serif;
+    font-size:11.5px;
+    font-weight:bold;
+    text-transform:uppercase;
+    letter-spacing:.1em;
+    color:var(--azulejo);
+    margin:22px 0 12px;
+    padding-top:16px;
+    border-top:1px solid var(--linha);
+  }
+  .ag-secao:first-of-type{margin-top:0; padding-top:0; border-top:none;}
+  .mapa-preview{
+    height:130px;
+    border-radius:10px;
+    margin-top:8px;
+    border:1px solid var(--linha);
+    background:#eef0ec;
+  }
   #painelAgendar .card{border-color:var(--azulejo);}
   .ag-row2{display:flex; gap:10px;}
   .ag-row2 > div{flex:1;}
@@ -918,10 +938,32 @@
     <div id="painelAgendar">
       <div class="card">
         <h2>Agendar corrida</h2>
+
+        <div class="ag-secao">📍 Trajeto</div>
         <label for="ag_partida">Endereço de partida</label>
         <input type="text" id="ag_partida" placeholder="ex: Aeroporto de Lisboa, T1">
-        <label for="ag_chegada">Endereço de chegada</label>
+        <div class="mapa-preview" id="mapa_partida"></div>
+        <label for="ag_chegada" style="margin-top:14px;">Endereço de chegada</label>
         <input type="text" id="ag_chegada" placeholder="ex: Hotel Avenida Palace">
+        <div class="mapa-preview" id="mapa_chegada"></div>
+
+        <div class="ag-secao">👤 Cliente</div>
+        <label for="ag_cliente">Nome do cliente</label>
+        <input type="text" id="ag_cliente" placeholder="ex: João Ferreira">
+        <label for="ag_telefone">Telefone (com indicativo)</label>
+        <input type="text" id="ag_telefone" placeholder="ex: 351 912 345 678">
+        <div class="ag-row2">
+          <div>
+            <label for="ag_nomeplaca">Nome na placa</label>
+            <input type="text" id="ag_nomeplaca" placeholder="opcional">
+          </div>
+          <div>
+            <label for="ag_voo">Nº do voo</label>
+            <input type="text" id="ag_voo" placeholder="opcional">
+          </div>
+        </div>
+
+        <div class="ag-secao">🗒️ Detalhes</div>
         <div class="ag-row2">
           <div>
             <label for="ag_data">Data</label>
@@ -932,18 +974,11 @@
             <input type="time" id="ag_hora">
           </div>
         </div>
-        <label for="ag_cliente">Nome do cliente</label>
-        <input type="text" id="ag_cliente" placeholder="ex: João Ferreira">
-        <label for="ag_telefone">Telefone do cliente (com indicativo)</label>
-        <input type="text" id="ag_telefone" placeholder="ex: 351 912 345 678">
-        <label for="ag_nomeplaca">Nome na placa (opcional, se for diferente do cliente)</label>
-        <input type="text" id="ag_nomeplaca" placeholder="ex: Sr. Smith">
-        <label for="ag_voo">Número do voo (opcional)</label>
-        <input type="text" id="ag_voo" placeholder="ex: TP1234">
         <label for="ag_fornecedor">Fornecedor do serviço</label>
         <input type="text" id="ag_fornecedor" placeholder="ex: particular / nome da empresa">
         <label for="ag_valor">Valor (€)</label>
         <input type="number" id="ag_valor" min="0">
+
         <button class="btn-guardar-agendamento" id="btnGuardarAgendamento">Guardar e adicionar ao calendário</button>
       </div>
     </div>
@@ -1037,7 +1072,7 @@
     <p class="nota">Aparecem aqui os agendamentos marcados como "✅ Concluído" na aba Transfer rápido. Os totais somam o valor guardado em cada agendamento.</p>
   </div>
 
-  <p style="text-align:center; font-family:'Helvetica Neue', Arial, sans-serif; font-size:11px; color:#8a7f66; margin-top:24px;">Trajeto · v5.1</p>
+  <p style="text-align:center; font-family:'Helvetica Neue', Arial, sans-serif; font-size:11px; color:#8a7f66; margin-top:24px;">Trajeto · v5.2</p>
 
 </main>
 
@@ -1093,6 +1128,8 @@
     <button class="modal-btn modal-btn-pendente" id="btnModalPendente">⏳ Ainda não recebi</button>
   </div>
 </div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
 
 <script>
   const state = { veiculoT:'sedan', veiculoAp:'sedan', horarioAp:'dia', direcaoAp:'ida' };
@@ -1584,6 +1621,8 @@
       document.getElementById('ag_valor').value = document.getElementById('ct_cobrar').value;
       if(!document.getElementById('ag_partida').value) document.getElementById('ag_partida').value = document.getElementById('ct_origem').value;
       if(!document.getElementById('ag_chegada').value) document.getElementById('ag_chegada').value = document.getElementById('ct_destino').value;
+      atualizarMapaEndereco('partida', 'mapa_partida', document.getElementById('ag_partida').value);
+      atualizarMapaEndereco('chegada', 'mapa_chegada', document.getElementById('ag_chegada').value);
       if(!document.getElementById('ag_data').value){
         const amanha = new Date();
         amanha.setDate(amanha.getDate()+1);
@@ -1730,6 +1769,50 @@
     window.open(url, '_blank');
   }
 
+  // ---------- Mapas de pré-visualização (OpenStreetMap, sem chave) ----------
+  const mapasEndereco = {
+    partida: { mapa: null, marcador: null },
+    chegada: { mapa: null, marcador: null }
+  };
+
+  function garantirMapa(chave, containerId){
+    if(!mapasEndereco[chave].mapa){
+      const mapa = L.map(containerId, { zoomControl:false, attributionControl:false }).setView([38.7223, -9.1393], 11);
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom:19 }).addTo(mapa);
+      mapasEndereco[chave].mapa = mapa;
+    }
+    return mapasEndereco[chave].mapa;
+  }
+
+  async function atualizarMapaEndereco(chave, containerId, endereco){
+    if(!endereco || endereco.trim().length < 3) return;
+    try{
+      const resp = await fetch(`https://nominatim.openstreetmap.org/search?format=json&limit=1&q=${encodeURIComponent(endereco)}`);
+      if(!resp.ok) return;
+      const dados = await resp.json();
+      if(!dados || dados.length === 0) return;
+      const lat = parseFloat(dados[0].lat), lon = parseFloat(dados[0].lon);
+      const mapa = garantirMapa(chave, containerId);
+      mapa.setView([lat, lon], 15);
+      setTimeout(()=> mapa.invalidateSize(), 50);
+      if(mapasEndereco[chave].marcador){
+        mapasEndereco[chave].marcador.setLatLng([lat, lon]);
+      } else {
+        mapasEndereco[chave].marcador = L.marker([lat, lon]).addTo(mapa);
+      }
+    }catch(e){ /* sem internet ou endereço não encontrado — o campo de texto continua normal */ }
+  }
+
+  let timerMapaPartida = null, timerMapaChegada = null;
+  document.getElementById('ag_partida').addEventListener('input', (e)=>{
+    clearTimeout(timerMapaPartida);
+    timerMapaPartida = setTimeout(()=> atualizarMapaEndereco('partida', 'mapa_partida', e.target.value), 900);
+  });
+  document.getElementById('ag_chegada').addEventListener('input', (e)=>{
+    clearTimeout(timerMapaChegada);
+    timerMapaChegada = setTimeout(()=> atualizarMapaEndereco('chegada', 'mapa_chegada', e.target.value), 900);
+  });
+
   function preencherFormAgendamento(ag){
     document.getElementById('ag_partida').value = ag.partida;
     document.getElementById('ag_chegada').value = ag.chegada;
@@ -1741,6 +1824,8 @@
     document.getElementById('ag_voo').value = ag.voo || '';
     document.getElementById('ag_fornecedor').value = ag.fornecedor || '';
     document.getElementById('ag_valor').value = ag.valor;
+    atualizarMapaEndereco('partida', 'mapa_partida', ag.partida);
+    atualizarMapaEndereco('chegada', 'mapa_chegada', ag.chegada);
   }
 
   function gerarLinkRepasse(ag){
