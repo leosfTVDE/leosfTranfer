@@ -719,9 +719,10 @@
 <main>
 
   <div class="seg" id="segModo" style="margin-bottom:18px;">
-    <button data-v="transfer" class="active">Transfer rápido</button>
+    <button data-v="transfer" class="active">Transfer</button>
     <button data-v="aeroporto">Aeroporto</button>
     <button data-v="faturamento">Faturamento</button>
+    <button data-v="pedidos">📥 Pedidos</button>
   </div>
 
   <div id="painelConfig">
@@ -1062,7 +1063,15 @@
     <p class="nota">Aparecem aqui os agendamentos marcados como "✅ Concluído" na aba Transfer rápido. Os totais somam o valor guardado em cada agendamento.</p>
   </div>
 
-  <p style="text-align:center; font-family:'Helvetica Neue', Arial, sans-serif; font-size:11px; color:#8a7f66; margin-top:24px;">Trajeto · v5.3</p>
+  <div id="viewPedidos" style="display:none;">
+    <div class="card">
+      <h2>📥 Pedidos novos</h2>
+      <div class="lista-agendamentos" id="listaPedidos"></div>
+    </div>
+    <p class="nota">Estes pedidos vêm do teu site de cotações. "Aceitar" cria logo um agendamento (ainda podes editar tudo depois); "Recusar" só remove daqui.<br><br>Precisas de estar com sessão iniciada (em "Minhas tarifas") para veres os pedidos novos.</p>
+  </div>
+
+  <p style="text-align:center; font-family:'Helvetica Neue', Arial, sans-serif; font-size:11px; color:#8a7f66; margin-top:24px;">Trajeto · v5.4</p>
 
 </main>
 
@@ -1228,6 +1237,7 @@
       document.getElementById('viewTransfer').style.display = t === 'transfer' ? 'block' : 'none';
       document.getElementById('viewAeroporto').style.display = t === 'aeroporto' ? 'block' : 'none';
       document.getElementById('viewFaturamento').style.display = t === 'faturamento' ? 'block' : 'none';
+      document.getElementById('viewPedidos').style.display = t === 'pedidos' ? 'block' : 'none';
       if(t === 'faturamento') renderFaturamento();
     });
   });
@@ -1533,6 +1543,9 @@
 
     window.TrajetoCloud.ligarOuvinte((dadosRecebidos)=>{
       aplicarDadosDaNuvem(dadosRecebidos);
+    });
+    window.TrajetoCloud.ligarOuvintePedidos((pedidos)=>{
+      renderPedidos(pedidos);
     });
     atualizarUISincronizacao();
   }
@@ -2028,6 +2041,66 @@
     renderFaturamento();
   });
 
+  // ---------- Pedidos novos (vindos do site público) ----------
+  function renderPedidos(pedidos){
+    window._trajetoPedidosAtuais = pedidos || [];
+    const el = document.getElementById('listaPedidos');
+    if(!pedidos || pedidos.length === 0){
+      el.innerHTML = '<p class="ag-vazio">Sem pedidos novos por agora.</p>';
+      return;
+    }
+    const ordenados = [...pedidos].sort((a,b)=> (a.data+a.hora).localeCompare(b.data+b.hora));
+    el.innerHTML = ordenados.map(p => `
+      <div class="ag-item" data-id="${p.id}">
+        <div class="ag-trajeto">${p.partida} → ${p.chegada}</div>
+        <div class="ag-meta">
+          📅 ${p.data.split('-').reverse().join('/')} às ${p.hora}<br>
+          👤 ${p.nome} &nbsp;·&nbsp; 📞 ${p.contacto}
+          ${p.passageiros ? `<br>🧑‍🤝‍🧑 ${p.passageiros} passageiro(s)` : ''}
+          ${p.observacoes ? `<br>📝 ${p.observacoes}` : ''}
+        </div>
+        <div class="ag-acoes">
+          <button class="ag-btn-ok" data-acao="aceitarPedido">✅ Aceitar</button>
+          <button class="ag-btn-del" data-acao="recusarPedido">✖️ Recusar</button>
+        </div>
+      </div>
+    `).join('');
+  }
+
+  document.getElementById('listaPedidos').addEventListener('click', async (e)=>{
+    const btn = e.target.closest('button');
+    if(!btn) return;
+    const id = e.target.closest('.ag-item').dataset.id;
+    if(!window.TrajetoCloud) return;
+
+    if(btn.dataset.acao === 'recusarPedido'){
+      if(confirm('Recusar este pedido?')){
+        await window.TrajetoCloud.atualizarStatusPedido(id, 'recusado');
+      }
+    } else if(btn.dataset.acao === 'aceitarPedido'){
+      // reconstruímos os dados a partir do próprio pedido guardado na listaPedidos mais recente
+      const pedidos = window._trajetoPedidosAtuais || [];
+      const p = pedidos.find(x => x.id === id);
+      if(!p) return;
+
+      const ag = {
+        id: Date.now().toString(36) + Math.random().toString(36).slice(2,7),
+        partida: p.partida, chegada: p.chegada, data: p.data, hora: p.hora,
+        cliente: p.nome, telefone: p.contacto, nomePlaca: '', voo: '',
+        fornecedor: 'Site — pedido online',
+        valor: '',
+        realizado: false
+      };
+      const lista = lerAgendamentos();
+      lista.push(ag);
+      gravarAgendamentos(lista);
+      renderLista();
+
+      await window.TrajetoCloud.atualizarStatusPedido(id, 'aceite');
+      alert('Pedido aceite! Já ficou guardado em "Meus agendamentos" — abre-o para ajustares o valor e confirmar.');
+    }
+  });
+
   function renderFaturamento(){
     const todos = lerAgendamentos().filter(a => a.realizado);
     const hoje = new Date();
@@ -2275,6 +2348,7 @@
     document.getElementById('viewTransfer').style.display = 'block';
     document.getElementById('viewAeroporto').style.display = 'none';
     document.getElementById('viewFaturamento').style.display = 'none';
+    document.getElementById('viewPedidos').style.display = 'none';
 
     document.getElementById('painelAgendar').style.display = 'block';
     setTimeout(()=>{
@@ -2317,7 +2391,8 @@ if ('serviceWorker' in navigator) {
     onAuthStateChanged, signOut
   } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js";
   import {
-    getFirestore, doc, setDoc, getDoc, onSnapshot
+    getFirestore, doc, setDoc, getDoc, onSnapshot,
+    collection, query, where, updateDoc
   } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
 
   const firebaseConfig = {
@@ -2369,16 +2444,34 @@ if ('serviceWorker' in navigator) {
     });
   }
 
+  let cancelarOuvintePedidos = null;
+  function ligarOuvintePedidos(aoReceber){
+    if(!auth.currentUser) return;
+    if(cancelarOuvintePedidos) cancelarOuvintePedidos();
+    const q = query(collection(db, 'trajeto_pedidos'), where('status', '==', 'pendente'));
+    cancelarOuvintePedidos = onSnapshot(q, (snap)=>{
+      const pedidos = [];
+      snap.forEach(d => pedidos.push({ id: d.id, ...d.data() }));
+      aoReceber(pedidos);
+    });
+  }
+  async function atualizarStatusPedido(id, novoStatus){
+    await updateDoc(doc(db, 'trajeto_pedidos', id), { status: novoStatus });
+  }
+
   window.TrajetoCloud = {
     entrar: (email, senha) => signInWithEmailAndPassword(auth, email, senha),
     criarConta: (email, senha) => createUserWithEmailAndPassword(auth, email, senha),
     sair: () => {
       if(cancelarOuvinte){ cancelarOuvinte(); cancelarOuvinte = null; }
+      if(cancelarOuvintePedidos){ cancelarOuvintePedidos(); cancelarOuvintePedidos = null; }
       return signOut(auth);
     },
     enviarParaNuvem,
     buscarDaNuvem,
     ligarOuvinte,
+    ligarOuvintePedidos,
+    atualizarStatusPedido,
     onAuthChange: (cb) => onAuthStateChanged(auth, cb),
     get utilizadorAtual(){ return auth.currentUser; }
   };
