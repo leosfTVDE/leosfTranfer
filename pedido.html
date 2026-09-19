@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="pt-PT">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pedir Transfer — Cotação Rápida</title>
+<meta name="theme-color" content="#0d1b2a">
+<style>
+  :root{
+    --azul-noite:#0d1b2a;
+    --azul-doca:#1b3a4b;
+    --azulejo:#2a6f77;
+    --terracota:#c1552c;
+    --areia:#f2ead8;
+    --branco:#fffaf1;
+    --texto:#12242e;
+    --linha:#d9cdb2;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    font-family: 'Georgia', 'Iowan Old Style', serif;
+    background:
+      radial-gradient(circle at 20% 10%, rgba(42,111,119,.15), transparent 40%),
+      var(--areia);
+    color:var(--texto);
+    padding:0 0 40px;
+  }
+  header{
+    background: linear-gradient(135deg, var(--azul-noite), var(--azul-doca));
+    color:var(--branco);
+    padding:34px 20px 30px;
+    text-align:center;
+  }
+  .eyebrow{
+    font-family:'Helvetica Neue', Arial, sans-serif;
+    text-transform:uppercase;
+    letter-spacing:.14em;
+    font-size:11px;
+    color:#e8c9a0;
+    margin:0 0 6px;
+  }
+  h1{
+    margin:0;
+    font-size:30px;
+    font-weight:400;
+  }
+  h1 em{font-style:italic; color:#e8c9a0;}
+  .sub{
+    font-family:'Helvetica Neue', Arial, sans-serif;
+    font-size:14px;
+    color:#c9d6da;
+    margin-top:10px;
+    max-width:440px;
+    margin-left:auto;
+    margin-right:auto;
+    line-height:1.5;
+  }
+  main{
+    max-width:480px;
+    margin:0 auto;
+    padding:24px 18px 0;
+  }
+  .card{
+    background:var(--branco);
+    border:1px solid var(--linha);
+    border-radius:10px;
+    padding:22px 20px 24px;
+    box-shadow:0 2px 10px rgba(13,27,42,.06);
+  }
+  label{
+    display:block;
+    font-family:'Helvetica Neue', Arial, sans-serif;
+    font-size:13px;
+    color:#4a5a60;
+    margin:16px 0 6px;
+  }
+  label:first-of-type{margin-top:0;}
+  input, textarea{
+    width:100%;
+    padding:11px 13px;
+    border:1px solid var(--linha);
+    border-radius:8px;
+    font-family:'Helvetica Neue', Arial, sans-serif;
+    font-size:15px;
+    background:#fdfbf6;
+  }
+  input:focus, textarea:focus{outline:2px solid var(--azulejo); outline-offset:1px;}
+  textarea{min-height:70px; resize:vertical;}
+  .row2{display:flex; gap:10px;}
+  .row2 > div{flex:1;}
+  .btn-enviar{
+    width:100%;
+    margin-top:22px;
+    padding:14px;
+    border-radius:10px;
+    border:none;
+    background:var(--terracota);
+    color:#fff;
+    font-family:'Helvetica Neue', Arial, sans-serif;
+    font-size:15.5px;
+    font-weight:bold;
+    cursor:pointer;
+  }
+  .btn-enviar:disabled{opacity:.6; cursor:default;}
+  .erro{
+    color:var(--terracota);
+    font-family:'Helvetica Neue', Arial, sans-serif;
+    font-size:12.5px;
+    text-align:center;
+    margin-top:10px;
+    min-height:16px;
+  }
+  .confirmacao{
+    display:none;
+    text-align:center;
+    padding:20px 6px;
+  }
+  .confirmacao .icone{font-size:44px; margin-bottom:10px;}
+  .confirmacao h2{
+    font-family:'Helvetica Neue', Arial, sans-serif;
+    font-size:18px;
+    color:var(--texto);
+    margin:0 0 8px;
+  }
+  .confirmacao p{
+    font-family:'Helvetica Neue', Arial, sans-serif;
+    font-size:14px;
+    color:#4a5a60;
+    line-height:1.6;
+  }
+  .nota{
+    font-family:'Helvetica Neue', Arial, sans-serif;
+    font-size:11.5px;
+    color:#8a7f66;
+    text-align:center;
+    margin-top:18px;
+    line-height:1.6;
+    padding:0 10px;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <p class="eyebrow">Transfer privado · Lisboa e arredores</p>
+  <h1>Peça a sua <em>cotação</em></h1>
+  <p class="sub">Preencha os dados do seu trajeto e entramos em contacto consigo o mais rápido possível para confirmar o preço e a reserva.</p>
+</header>
+
+<main>
+  <div class="card" id="cardForm">
+    <form id="formPedido">
+      <label for="p_nome">O seu nome</label>
+      <input type="text" id="p_nome" placeholder="ex: João Ferreira" required>
+
+      <label for="p_contacto">Telefone ou email para contacto</label>
+      <input type="text" id="p_contacto" placeholder="ex: +351 912 345 678" required>
+
+      <label for="p_partida">Local de partida</label>
+      <input type="text" id="p_partida" placeholder="ex: Aeroporto de Lisboa, T1" required>
+
+      <label for="p_chegada">Local de chegada</label>
+      <input type="text" id="p_chegada" placeholder="ex: Hotel Avenida Palace" required>
+
+      <div class="row2">
+        <div>
+          <label for="p_data">Data</label>
+          <input type="date" id="p_data" required>
+        </div>
+        <div>
+          <label for="p_hora">Horário</label>
+          <input type="time" id="p_hora" required>
+        </div>
+      </div>
+
+      <label for="p_passageiros">Número de passageiros</label>
+      <input type="number" id="p_passageiros" min="1" max="8" placeholder="ex: 2">
+
+      <label for="p_obs">Observações (opcional)</label>
+      <textarea id="p_obs" placeholder="ex: bagagem extra, cadeirinha para criança, número de voo..."></textarea>
+
+      <button type="submit" class="btn-enviar" id="btnEnviar">Pedir cotação</button>
+      <p class="erro" id="erroForm"></p>
+    </form>
+
+    <div class="confirmacao" id="confirmacao">
+      <div class="icone">✅</div>
+      <h2>Pedido enviado!</h2>
+      <p>Recebemos o seu pedido de transfer. Vamos analisar e entrar em contacto consigo em breve para confirmar o preço e a reserva.</p>
+    </div>
+  </div>
+
+  <p class="nota">Este pedido é só um orçamento — a reserva fica confirmada depois de recebermos a sua resposta.</p>
+</main>
+
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js";
+  import { getFirestore, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyCqJBnzZh5MWP9G3ZP1nOThb4W2KCLf2a4",
+    authDomain: "trajeto-app.firebaseapp.com",
+    projectId: "trajeto-app",
+    storageBucket: "trajeto-app.firebasestorage.app",
+    messagingSenderId: "149828521686",
+    appId: "1:149828521686:web:255f9dd3f9056be451c377"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
+
+  const form = document.getElementById('formPedido');
+  const btnEnviar = document.getElementById('btnEnviar');
+  const erroEl = document.getElementById('erroForm');
+
+  form.addEventListener('submit', async (e)=>{
+    e.preventDefault();
+    erroEl.textContent = '';
+
+    const pedido = {
+      nome: document.getElementById('p_nome').value.trim(),
+      contacto: document.getElementById('p_contacto').value.trim(),
+      partida: document.getElementById('p_partida').value.trim(),
+      chegada: document.getElementById('p_chegada').value.trim(),
+      data: document.getElementById('p_data').value,
+      hora: document.getElementById('p_hora').value,
+      passageiros: document.getElementById('p_passageiros').value || '',
+      observacoes: document.getElementById('p_obs').value.trim(),
+      status: 'pendente',
+      criadoEm: serverTimestamp()
+    };
+
+    if(!pedido.nome || !pedido.contacto || !pedido.partida || !pedido.chegada || !pedido.data || !pedido.hora){
+      erroEl.textContent = 'Preenche todos os campos obrigatórios.';
+      return;
+    }
+
+    btnEnviar.disabled = true;
+    btnEnviar.textContent = 'A enviar...';
+
+    try{
+      await addDoc(collection(db, 'trajeto_pedidos'), pedido);
+      document.getElementById('cardForm').querySelector('form').style.display = 'none';
+      document.getElementById('confirmacao').style.display = 'block';
+    }catch(err){
+      erroEl.textContent = 'Não foi possível enviar o pedido. Tenta novamente ou contacta-nos diretamente.';
+      btnEnviar.disabled = false;
+      btnEnviar.textContent = 'Pedir cotação';
+    }
+  });
+</script>
+</body>
+</html>
