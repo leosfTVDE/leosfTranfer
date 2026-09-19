@@ -155,6 +155,25 @@
     background:var(--azulejo);
     color:#fff;
   }
+  .seg button{position:relative;}
+  .selo-contagem{
+    position:absolute;
+    top:2px;
+    right:4px;
+    min-width:16px;
+    height:16px;
+    padding:0 4px;
+    border-radius:8px;
+    background:var(--terracota);
+    color:#fff;
+    font-family:'Helvetica Neue', Arial, sans-serif;
+    font-size:10px;
+    font-weight:bold;
+    line-height:16px;
+    text-align:center;
+    display:none;
+  }
+  .selo-contagem.mostrar{display:block;}
   input[type="number"]{
     width:100%;
     padding:10px 12px;
@@ -722,7 +741,7 @@
     <button data-v="transfer" class="active">Transfer</button>
     <button data-v="aeroporto">Aeroporto</button>
     <button data-v="faturamento">Faturamento</button>
-    <button data-v="pedidos">📥 Pedidos</button>
+    <button data-v="pedidos">📥 Pedidos<span class="selo-contagem" id="seloPedidos">0</span></button>
   </div>
 
   <div id="painelConfig">
@@ -1071,7 +1090,7 @@
     <p class="nota">Estes pedidos vêm do teu site de cotações. "Aceitar" cria logo um agendamento (ainda podes editar tudo depois); "Recusar" só remove daqui.<br><br>Precisas de estar com sessão iniciada (em "Minhas tarifas") para veres os pedidos novos.</p>
   </div>
 
-  <p style="text-align:center; font-family:'Helvetica Neue', Arial, sans-serif; font-size:11px; color:#8a7f66; margin-top:24px;">Trajeto · v5.4</p>
+  <p style="text-align:center; font-family:'Helvetica Neue', Arial, sans-serif; font-size:11px; color:#8a7f66; margin-top:24px;">Trajeto · v5.6</p>
 
 </main>
 
@@ -2044,6 +2063,12 @@
   // ---------- Pedidos novos (vindos do site público) ----------
   function renderPedidos(pedidos){
     window._trajetoPedidosAtuais = pedidos || [];
+
+    const selo = document.getElementById('seloPedidos');
+    const qtd = (pedidos || []).length;
+    selo.textContent = qtd > 9 ? '9+' : String(qtd);
+    selo.classList.toggle('mostrar', qtd > 0);
+
     const el = document.getElementById('listaPedidos');
     if(!pedidos || pedidos.length === 0){
       el.innerHTML = '<p class="ag-vazio">Sem pedidos novos por agora.</p>';
