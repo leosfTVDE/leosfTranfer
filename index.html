@@ -1092,7 +1092,7 @@
     <p class="nota">Estes pedidos vêm do teu site de cotações. "Aceitar" cria logo um agendamento (ainda podes editar tudo depois); "Recusar" só remove daqui.<br><br>Precisas de estar com sessão iniciada (em "Minhas tarifas") para veres os pedidos novos.</p>
   </div>
 
-  <p style="text-align:center; font-family:'Helvetica Neue', Arial, sans-serif; font-size:11px; color:#8a7f66; margin-top:24px;">Trajeto · v5.7</p>
+  <p style="text-align:center; font-family:'Helvetica Neue', Arial, sans-serif; font-size:11px; color:#8a7f66; margin-top:24px;">Trajeto · v5.8</p>
 
 </main>
 
@@ -1102,6 +1102,17 @@
     <p>Já existem agendamentos guardados na nuvem (de outro aparelho), e este aparelho também já tem dados guardados. Qual queres manter?</p>
     <button class="modal-btn modal-btn-recebido" id="btnConflitoNuvem">☁️ Usar os da nuvem</button>
     <button class="modal-btn modal-btn-pendente" id="btnConflitoLocal">📱 Usar os deste aparelho</button>
+  </div>
+</div>
+
+<div class="modal-overlay" id="modalBoasVindas">
+  <div class="modal-card">
+    <h2>👋 Bem-vindo ao Trajeto</h2>
+    <p>Esta é a ferramenta de gestão do <strong>motorista</strong> — tarifas, agendamentos e faturamento.</p>
+    <p>Se procuras <strong>pedir um orçamento de transfer</strong>, o site certo é este:</p>
+    <p style="text-align:center; font-family:'Helvetica Neue', Arial, sans-serif; font-weight:bold; color:var(--terracota); font-size:15px; word-break:break-all;">trajetotransfer.pt/pedido.html</p>
+    <button class="modal-btn modal-btn-recebido" id="btnCopiarLinkPedido">📋 Copiar link</button>
+    <button class="modal-btn modal-btn-pendente" id="btnFecharBoasVindas">Entendi, continuar</button>
   </div>
 </div>
 
@@ -2392,6 +2403,26 @@
     }, 150);
   }
   verificarPedidoExterno();
+
+  // ---------- Aviso de boas-vindas (só na primeira vez neste aparelho) ----------
+  const LINK_PEDIDO = 'https://trajetotransfer.pt/pedido.html';
+  if(!localStorage.getItem('trajeto_viu_aviso_inicial')){
+    document.getElementById('modalBoasVindas').classList.add('aberto');
+  }
+  document.getElementById('btnFecharBoasVindas').addEventListener('click', ()=>{
+    localStorage.setItem('trajeto_viu_aviso_inicial', '1');
+    document.getElementById('modalBoasVindas').classList.remove('aberto');
+  });
+  document.getElementById('btnCopiarLinkPedido').addEventListener('click', ()=>{
+    const btn = document.getElementById('btnCopiarLinkPedido');
+    const original = btn.textContent;
+    if(navigator.clipboard){
+      navigator.clipboard.writeText(LINK_PEDIDO).then(()=>{
+        btn.textContent = '✅ Copiado!';
+        setTimeout(()=>{ btn.textContent = original; }, 1800);
+      });
+    }
+  });
 </script>
 
 
