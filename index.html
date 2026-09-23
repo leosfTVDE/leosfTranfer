@@ -1110,6 +1110,15 @@
     <button class="btn-agendar" id="tr_btnNovo" style="margin-top:14px;">🔄 Novo cálculo</button>
     <button class="btn-agendar" id="btnAgendarTour">📅 Agendar este tour</button>
 
+    <div class="card" style="margin-top:20px;">
+      <h2>Meus tours agendados</h2>
+      <div class="seg" id="segFiltroAgTour" style="margin-bottom:14px;">
+        <button data-v="ativos" class="active">Ativos</button>
+        <button data-v="concluidos">Concluídos</button>
+      </div>
+      <div class="lista-agendamentos" id="listaAgendamentosTour"></div>
+    </div>
+
     <p class="nota">Configura os teus passeios e preços em "Minhas tarifas" → "🗺️ Tours".</p>
   </div>
 
@@ -1198,7 +1207,7 @@
     <p class="nota">Estes pedidos vêm do teu site de cotações. "Aceitar" cria logo um agendamento (ainda podes editar tudo depois); "Recusar" só remove daqui.<br><br>Precisas de estar com sessão iniciada (em "Minhas tarifas") para veres os pedidos novos.</p>
   </div>
 
-  <p style="text-align:center; font-family:'Helvetica Neue', Arial, sans-serif; font-size:11px; color:#8a7f66; margin-top:24px;">Trajeto · v6.8</p>
+  <p style="text-align:center; font-family:'Helvetica Neue', Arial, sans-serif; font-size:11px; color:#8a7f66; margin-top:24px;">Trajeto · v6.9</p>
 
 </main>
 
@@ -2104,6 +2113,7 @@
   }
 
   let filtroAg = 'ativos';
+  let filtroAgTour = 'ativos';
   document.getElementById('segFiltroAg').querySelectorAll('button').forEach(btn=>{
     btn.addEventListener('click', ()=>{
       document.getElementById('segFiltroAg').querySelectorAll('button').forEach(b=>b.classList.remove('active'));
@@ -2112,17 +2122,26 @@
       renderLista();
     });
   });
+  document.getElementById('segFiltroAgTour').querySelectorAll('button').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      document.getElementById('segFiltroAgTour').querySelectorAll('button').forEach(b=>b.classList.remove('active'));
+      btn.classList.add('active');
+      filtroAgTour = btn.dataset.v;
+      renderLista();
+    });
+  });
 
-  function renderLista(){
+  function renderListaGenerica(containerId, filtro, ehTourLista){
     const todos = lerAgendamentos();
     const lista = todos
-      .filter(ag => filtroAg === 'concluidos' ? ag.realizado : !ag.realizado)
+      .filter(ag => ehTourLista ? ag.tipo === 'tour' : ag.tipo !== 'tour')
+      .filter(ag => filtro === 'concluidos' ? ag.realizado : !ag.realizado)
       .sort((a,b)=> (a.data+a.hora).localeCompare(b.data+b.hora));
-    const el = document.getElementById('listaAgendamentos');
+    const el = document.getElementById(containerId);
     if(lista.length === 0){
-      el.innerHTML = filtroAg === 'concluidos'
+      el.innerHTML = filtro === 'concluidos'
         ? '<p class="ag-vazio">Ainda não tens agendamentos concluídos.</p>'
-        : '<p class="ag-vazio">Nenhum agendamento ativo — tudo tratado! 🎉</p>';
+        : (ehTourLista ? '<p class="ag-vazio">Nenhum tour ativo — tudo tratado! 🎉</p>' : '<p class="ag-vazio">Nenhum agendamento ativo — tudo tratado! 🎉</p>');
       return;
     }
     el.innerHTML = lista.map(ag => {
@@ -2161,6 +2180,11 @@
         </div>
       </div>
     `;}).join('');
+  }
+
+  function renderLista(){
+    renderListaGenerica('listaAgendamentos', filtroAg, false);
+    renderListaGenerica('listaAgendamentosTour', filtroAgTour, true);
   }
 
   function normalizarTelefone(tel){
@@ -2367,7 +2391,7 @@
     p.scrollIntoView({behavior:'smooth', block:'start'});
   }
 
-  document.getElementById('listaAgendamentos').addEventListener('click', (e)=>{
+  function handlerCliqueAgendamento(e){
     const btn = e.target.closest('button');
     if(!btn) return;
     const item = e.target.closest('.ag-item');
@@ -2409,7 +2433,9 @@
         renderFaturamento();
       }
     }
-  });
+  }
+  document.getElementById('listaAgendamentos').addEventListener('click', handlerCliqueAgendamento);
+  document.getElementById('listaAgendamentosTour').addEventListener('click', handlerCliqueAgendamento);
 
   // ---------- Faturamento ----------
   let fatModo = 'mes';
