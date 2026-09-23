@@ -1113,11 +1113,12 @@
       <p class="eyebrow">Valor do tour</p>
       <div class="valor">€<span id="tr_valor">0</span></div>
       <div class="faixa" id="tr_detalhe"></div>
+      <p class="eyebrow" style="margin-top:16px;">💰 Cobrar do cliente</p>
+      <input type="number" id="tr_cobrar" class="ct-cobrar-input" step="0.5">
+      <button class="btn-agendar" id="btnCopiarOrcamentoTour">📋 Copiar orçamento</button>
+      <button class="btn-agendar" id="tr_btnNovo" style="margin-top:14px;">🔄 Novo cálculo</button>
+      <button class="btn-agendar" id="btnAgendarTour">📅 Agendar este tour</button>
     </div>
-
-    <button class="btn-agendar" id="btnCopiarOrcamentoTour">📋 Copiar orçamento</button>
-    <button class="btn-agendar" id="tr_btnNovo" style="margin-top:14px;">🔄 Novo cálculo</button>
-    <button class="btn-agendar" id="btnAgendarTour">📅 Agendar este tour</button>
 
     <div class="card" style="margin-top:20px;">
       <h2>Meus tours agendados</h2>
@@ -1216,7 +1217,7 @@
     <p class="nota">Estes pedidos vêm do teu site de cotações. "Aceitar" cria logo um agendamento (ainda podes editar tudo depois); "Recusar" só remove daqui.<br><br>Precisas de estar com sessão iniciada (em "Minhas tarifas") para veres os pedidos novos.</p>
   </div>
 
-  <p style="text-align:center; font-family:'Helvetica Neue', Arial, sans-serif; font-size:11px; color:#8a7f66; margin-top:24px;">Trajeto · v7.0</p>
+  <p style="text-align:center; font-family:'Helvetica Neue', Arial, sans-serif; font-size:11px; color:#8a7f66; margin-top:24px;">Trajeto · v7.1</p>
 
 </main>
 
@@ -1663,9 +1664,11 @@
   function calcularTour(){
     const tours = lerTours();
     const t = tours.find(x => x.id === document.getElementById('tr_pacote').value);
+    const campoCobrarTour = document.getElementById('tr_cobrar');
     if(!t){
       document.getElementById('tr_valor').textContent = '0';
       document.getElementById('tr_detalhe').textContent = '';
+      if(!campoCobrarTour.dataset.editado) campoCobrarTour.value = '';
       return;
     }
     const isVan = state.veiculoTr === 'van';
@@ -1673,11 +1676,16 @@
     if(valor === '' || valor === null || valor === undefined || isNaN(valor)){
       document.getElementById('tr_valor').textContent = '—';
       document.getElementById('tr_detalhe').textContent = (t.duracao ? t.duracao + ' · ' : '') + 'preço de van ainda por definir';
+      if(!campoCobrarTour.dataset.editado) campoCobrarTour.value = '';
       return;
     }
     document.getElementById('tr_valor').textContent = Number(valor).toFixed(0);
     document.getElementById('tr_detalhe').textContent = t.duracao || '';
+    if(!campoCobrarTour.dataset.editado) campoCobrarTour.value = Number(valor).toFixed(2);
   }
+  document.getElementById('tr_cobrar').addEventListener('input', (e)=>{
+    e.target.dataset.editado = '1';
+  });
   document.getElementById('tr_pacote').addEventListener('change', calcularTour);
   calcularTour();
 
@@ -1685,6 +1693,7 @@
     document.getElementById('tr_pacote').selectedIndex = 0;
     document.getElementById('tr_data').value = '';
     document.getElementById('tr_passageiros').value = '';
+    delete document.getElementById('tr_cobrar').dataset.editado;
     state.veiculoTr = 'sedan';
     document.getElementById('segVeiculoTr').querySelectorAll('button').forEach(b=>{
       b.classList.toggle('active', b.dataset.v === 'sedan');
@@ -1697,8 +1706,8 @@
     const t = tours.find(x => x.id === document.getElementById('tr_pacote').value);
     if(!t) return '';
     const veiculo = state.veiculoTr === 'van' ? 'Van' : 'Sedan';
-    const valor = document.getElementById('tr_valor').textContent;
-    if(valor === '—') return '';
+    const valor = document.getElementById('tr_cobrar').value || document.getElementById('tr_valor').textContent;
+    if(!valor || valor === '—') return '';
     const nome = (localStorage.getItem('trajeto_nome') || '').trim();
     const pag = JSON.parse(localStorage.getItem('trajeto_pagamentos') || 'null') || { mbway:true, dinheiro:true, cartao:true };
     const metodos = [];
@@ -1753,8 +1762,8 @@
     document.getElementById('ag_tour_titulo').value = t.nome + (t.duracao ? ' · ' + t.duracao : '');
     document.getElementById('ag_partida').value = '';
     document.getElementById('ag_chegada').value = t.duracao || '';
-    const valorTour = document.getElementById('tr_valor').textContent;
-    document.getElementById('ag_valor').value = valorTour === '—' ? '' : valorTour;
+    const valorTour = document.getElementById('tr_cobrar').value || document.getElementById('tr_valor').textContent;
+    document.getElementById('ag_valor').value = (valorTour === '—' || !valorTour) ? '' : valorTour;
     document.getElementById('ag_data').value = document.getElementById('tr_data').value || '';
     const p = document.getElementById('painelAgendar');
     p.style.display = 'block';
