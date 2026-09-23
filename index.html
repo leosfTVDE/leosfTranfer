@@ -243,18 +243,34 @@
   #painelConfig{display:none;}
   #painelConfig .card{border-color:var(--terracota);}
   .cfg-grupo{
-    margin-bottom:16px;
-    padding-bottom:14px;
+    margin-bottom:10px;
     border-bottom:1px solid var(--linha);
   }
-  .cfg-grupo:last-of-type{border-bottom:none; margin-bottom:0; padding-bottom:0;}
+  .cfg-grupo:last-of-type{border-bottom:none; margin-bottom:0;}
   .cfg-titulo{
     font-family:'Helvetica Neue', Arial, sans-serif;
     font-size:12.5px;
     font-weight:bold;
     color:var(--texto);
-    margin-bottom:8px;
+    padding:12px 2px;
+    cursor:pointer;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    user-select:none;
   }
+  .cfg-titulo .seta{
+    font-size:11px;
+    color:var(--azulejo);
+    transition:transform .2s ease;
+  }
+  .cfg-titulo.aberto .seta{transform:rotate(90deg);}
+  .cfg-titulo-fixo{cursor:default;}
+  .cfg-conteudo{
+    display:none;
+    padding-bottom:14px;
+  }
+  .cfg-conteudo.aberto{display:block;}
   .cfg-row{display:flex; gap:10px; align-items:flex-end;}
   .cfg-row > div{flex:1;}
   .cfg-row label{font-size:11.5px; margin:8px 0 4px;}
@@ -751,129 +767,156 @@
       <label for="cfg_nome">O teu nome (para as mensagens ao cliente)</label>
       <input type="text" id="cfg_nome" placeholder="ex: Carlos">
 
-      <div class="cfg-grupo" style="margin-top:16px;">
-        <div class="cfg-titulo">☁️ Sincronização entre aparelhos</div>
-        <div id="syncStatusTexto" style="font-family:'Helvetica Neue', Arial, sans-serif; font-size:13px; color:#6a7378; margin-bottom:10px;">A verificar...</div>
-        <div class="btn-acoes">
-          <button id="btnAbrirAuth">Entrar / Criar conta</button>
-          <button id="btnSairAuth" class="btn-resetar" style="display:none;">Sair</button>
+      <div class="cfg-grupo" style="margin-top:16px; border-top:1px solid var(--linha); padding-top:2px;">
+        <div class="cfg-titulo cfg-titulo-fixo">☁️ Sincronização entre aparelhos</div>
+        <div style="padding-bottom:14px;">
+          <div id="syncStatusTexto" style="font-family:'Helvetica Neue', Arial, sans-serif; font-size:13px; color:#6a7378; margin-bottom:10px;">A verificar...</div>
+          <div class="btn-acoes">
+            <button id="btnAbrirAuth">Entrar / Criar conta</button>
+            <button id="btnSairAuth" class="btn-resetar" style="display:none;">Sair</button>
+          </div>
         </div>
       </div>
 
       <div class="cfg-grupo" id="grupoCodigoConvite" style="display:none;">
-        <div class="cfg-titulo">🔑 Códigos de acesso</div>
-        <p style="font-family:'Helvetica Neue', Arial, sans-serif; font-size:12px; color:#6a7378; margin:0 0 10px;">
-          Gera um código único para dares a outra pessoa criar conta no Trajeto.
-        </p>
-        <button id="btnGerarCodigo" style="width:100%; padding:10px; border-radius:8px; border:1px solid var(--linha); font-family:'Helvetica Neue', Arial, sans-serif; font-size:13px; cursor:pointer; background:#fdfbf6;">🔑 Gerar novo código</button>
-        <div id="codigoGeradoWrap" style="display:none; margin-top:12px; text-align:center;">
-          <div id="codigoGeradoTexto" style="font-family:'Courier New', monospace; font-size:20px; font-weight:bold; color:var(--terracota); letter-spacing:.05em; padding:10px; background:var(--areia); border-radius:8px;"></div>
-          <button id="btnCopiarCodigo" style="margin-top:8px; width:100%; padding:9px; border-radius:8px; border:1px solid var(--linha); font-family:'Helvetica Neue', Arial, sans-serif; font-size:12.5px; cursor:pointer; background:#fdfbf6;">📋 Copiar código</button>
-        </div>
-      </div>
-
-      <label style="margin-top:14px;">Formas de pagamento aceites</label>
-      <div class="checks">
-        <label class="chk"><input type="checkbox" id="cfg_pag_mbway" checked> MB WAY</label>
-        <label class="chk"><input type="checkbox" id="cfg_pag_dinheiro" checked> Dinheiro</label>
-        <label class="chk"><input type="checkbox" id="cfg_pag_cartao" checked> Cartão bancário</label>
-      </div>
-
-      <div class="cfg-grupo">
-        <div class="cfg-titulo">Mensagem de orçamento</div>
-        <div class="seg" id="segMsgTipo">
-          <button data-v="auto" class="active">Automática (PT)</button>
-          <button data-v="custom">Personalizada</button>
-        </div>
-        <div id="blocoMsgCustom" style="display:none; margin-top:12px;">
-          <label for="cfg_msg_custom">O teu texto — usa {origem} {destino} {km} {veiculo} {valor} {pagamento} {nome} onde quiseres, e o app substitui automaticamente</label>
-          <textarea id="cfg_msg_custom" style="min-height:130px;" placeholder="Hi! Here's your transfer quote: {origem} to {destino}, {km} km. Price: €{valor}. Payment: {pagamento}. Best, {nome}"></textarea>
+        <div class="cfg-titulo cfg-titulo-fixo">🔑 Códigos de acesso</div>
+        <div style="padding-bottom:14px;">
+          <p style="font-family:'Helvetica Neue', Arial, sans-serif; font-size:12px; color:#6a7378; margin:0 0 10px;">
+            Gera um código único para dares a outra pessoa criar conta no Trajeto.
+          </p>
+          <button id="btnGerarCodigo" style="width:100%; padding:10px; border-radius:8px; border:1px solid var(--linha); font-family:'Helvetica Neue', Arial, sans-serif; font-size:13px; cursor:pointer; background:#fdfbf6;">🔑 Gerar novo código</button>
+          <div id="codigoGeradoWrap" style="display:none; margin-top:12px; text-align:center;">
+            <div id="codigoGeradoTexto" style="font-family:'Courier New', monospace; font-size:20px; font-weight:bold; color:var(--terracota); letter-spacing:.05em; padding:10px; background:var(--areia); border-radius:8px;"></div>
+            <button id="btnCopiarCodigo" style="margin-top:8px; width:100%; padding:9px; border-radius:8px; border:1px solid var(--linha); font-family:'Helvetica Neue', Arial, sans-serif; font-size:12.5px; cursor:pointer; background:#fdfbf6;">📋 Copiar código</button>
+          </div>
         </div>
       </div>
 
       <div class="cfg-grupo">
-        <div class="cfg-titulo">Aeroporto ⇄ Lisboa (valor fixo)</div>
-        <div class="cfg-row">
-          <div><label>Sedan: Aeroporto → Centro (€)</label><input type="number" id="cfg_ap_sedan_ida"></div>
-          <div><label>Sedan: Centro → Aeroporto (€)</label><input type="number" id="cfg_ap_sedan_volta"></div>
-        </div>
-        <div class="cfg-row">
-          <div><label>Van: Aeroporto → Centro (€)</label><input type="number" id="cfg_ap_van_ida"></div>
-          <div><label>Van: Centro → Aeroporto (€)</label><input type="number" id="cfg_ap_van_volta"></div>
-        </div>
-      </div>
-
-      <div class="cfg-grupo">
-        <div class="cfg-titulo">Calculadora de Transfer</div>
-        <div class="cfg-row">
-          <div><label>Mín. curto sedan (€)</label><input type="number" id="cfg_ct_curto_min_sedan"></div>
-          <div><label>Mín. curto van (€)</label><input type="number" id="cfg_ct_curto_min_van"></div>
-        </div>
-        <div class="cfg-row">
-          <div><label>€/hora sedan</label><input type="number" id="cfg_ct_hora_sedan"></div>
-          <div><label>€/hora van</label><input type="number" id="cfg_ct_hora_van"></div>
-        </div>
-        <div class="cfg-row">
-          <div><label>€/km sedan (+20km)</label><input type="number" step="0.01" id="cfg_ct_km_rate_sedan"></div>
-          <div><label>€/km van (+20km)</label><input type="number" step="0.01" id="cfg_ct_km_rate_van"></div>
-        </div>
-        <div class="cfg-row">
-          <div><label>% da hora na volta vazia</label><input type="number" id="cfg_ct_volta_pct"></div>
-          <div><label>Margem adicional (%)</label><input type="number" id="cfg_ct_margem_pct"></div>
-        </div>
-        <div class="cfg-row">
-          <div><label>Energia €/km (Tesla)</label><input type="number" step="0.01" id="cfg_ct_energia_km"></div>
+        <div class="cfg-titulo" data-acordeao="pagamento">💳 Formas de pagamento aceites <span class="seta">▸</span></div>
+        <div class="cfg-conteudo" data-conteudo="pagamento">
+          <div class="checks">
+            <label class="chk"><input type="checkbox" id="cfg_pag_mbway" checked> MB WAY</label>
+            <label class="chk"><input type="checkbox" id="cfg_pag_dinheiro" checked> Dinheiro</label>
+            <label class="chk"><input type="checkbox" id="cfg_pag_cartao" checked> Cartão bancário</label>
+          </div>
         </div>
       </div>
 
       <div class="cfg-grupo">
-        <div class="cfg-titulo">Espera e adicional noturno</div>
-        <div class="cfg-row">
-          <div><label>Espera sedan (€/h)</label><input type="number" id="cfg_espera_sedan"></div>
-          <div><label>Espera van (€/h)</label><input type="number" id="cfg_espera_van"></div>
-        </div>
-        <div class="cfg-row">
-          <div><label>Acréscimo noturno (%)</label><input type="number" id="cfg_noite_pct"></div>
-        </div>
-      </div>
-
-      <div class="cfg-grupo">
-        <div class="cfg-titulo">Extras</div>
-        <div class="cfg-row">
-          <div><label>Bagagem extra (€)</label><input type="number" id="cfg_bagagem"></div>
-          <div><label>Cadeirinha (€)</label><input type="number" id="cfg_cadeira"></div>
+        <div class="cfg-titulo" data-acordeao="mensagem">✉️ Mensagem de orçamento <span class="seta">▸</span></div>
+        <div class="cfg-conteudo" data-conteudo="mensagem">
+          <div class="seg" id="segMsgTipo">
+            <button data-v="auto" class="active">Automática (PT)</button>
+            <button data-v="custom">Personalizada</button>
+          </div>
+          <div id="blocoMsgCustom" style="display:none; margin-top:12px;">
+            <label for="cfg_msg_custom">O teu texto — usa {origem} {destino} {km} {veiculo} {valor} {pagamento} {nome} onde quiseres, e o app substitui automaticamente</label>
+            <textarea id="cfg_msg_custom" style="min-height:130px;" placeholder="Hi! Here's your transfer quote: {origem} to {destino}, {km} km. Price: €{valor}. Payment: {pagamento}. Best, {nome}"></textarea>
+          </div>
         </div>
       </div>
 
       <div class="cfg-grupo">
-        <div class="cfg-titulo">Recibo</div>
-        <div class="cfg-row">
-          <div><label>IVA sobre recibo (%)</label><input type="number" step="0.1" id="cfg_iva_pct"></div>
+        <div class="cfg-titulo" data-acordeao="aeroporto">✈️ Aeroporto ⇄ Lisboa (valor fixo) <span class="seta">▸</span></div>
+        <div class="cfg-conteudo" data-conteudo="aeroporto">
+          <div class="cfg-row">
+            <div><label>Sedan: Aeroporto → Centro (€)</label><input type="number" id="cfg_ap_sedan_ida"></div>
+            <div><label>Sedan: Centro → Aeroporto (€)</label><input type="number" id="cfg_ap_sedan_volta"></div>
+          </div>
+          <div class="cfg-row">
+            <div><label>Van: Aeroporto → Centro (€)</label><input type="number" id="cfg_ap_van_ida"></div>
+            <div><label>Van: Centro → Aeroporto (€)</label><input type="number" id="cfg_ap_van_volta"></div>
+          </div>
         </div>
       </div>
 
-      <div class="btn-acoes">
+      <div class="cfg-grupo">
+        <div class="cfg-titulo" data-acordeao="calculadora">📍 Calculadora de Transfer <span class="seta">▸</span></div>
+        <div class="cfg-conteudo" data-conteudo="calculadora">
+          <div class="cfg-row">
+            <div><label>Mín. curto sedan (€)</label><input type="number" id="cfg_ct_curto_min_sedan"></div>
+            <div><label>Mín. curto van (€)</label><input type="number" id="cfg_ct_curto_min_van"></div>
+          </div>
+          <div class="cfg-row">
+            <div><label>€/hora sedan</label><input type="number" id="cfg_ct_hora_sedan"></div>
+            <div><label>€/hora van</label><input type="number" id="cfg_ct_hora_van"></div>
+          </div>
+          <div class="cfg-row">
+            <div><label>€/km sedan (+20km)</label><input type="number" step="0.01" id="cfg_ct_km_rate_sedan"></div>
+            <div><label>€/km van (+20km)</label><input type="number" step="0.01" id="cfg_ct_km_rate_van"></div>
+          </div>
+          <div class="cfg-row">
+            <div><label>% da hora na volta vazia</label><input type="number" id="cfg_ct_volta_pct"></div>
+            <div><label>Margem adicional (%)</label><input type="number" id="cfg_ct_margem_pct"></div>
+          </div>
+          <div class="cfg-row">
+            <div><label>Energia €/km (Tesla)</label><input type="number" step="0.01" id="cfg_ct_energia_km"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="cfg-grupo">
+        <div class="cfg-titulo" data-acordeao="espera">⏱️ Espera e adicional noturno <span class="seta">▸</span></div>
+        <div class="cfg-conteudo" data-conteudo="espera">
+          <div class="cfg-row">
+            <div><label>Espera sedan (€/h)</label><input type="number" id="cfg_espera_sedan"></div>
+            <div><label>Espera van (€/h)</label><input type="number" id="cfg_espera_van"></div>
+          </div>
+          <div class="cfg-row">
+            <div><label>Acréscimo noturno (%)</label><input type="number" id="cfg_noite_pct"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="cfg-grupo">
+        <div class="cfg-titulo" data-acordeao="extras">🧳 Extras <span class="seta">▸</span></div>
+        <div class="cfg-conteudo" data-conteudo="extras">
+          <div class="cfg-row">
+            <div><label>Bagagem extra (€)</label><input type="number" id="cfg_bagagem"></div>
+            <div><label>Cadeirinha (€)</label><input type="number" id="cfg_cadeira"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="cfg-grupo">
+        <div class="cfg-titulo" data-acordeao="recibo">🧾 Recibo <span class="seta">▸</span></div>
+        <div class="cfg-conteudo" data-conteudo="recibo">
+          <div class="cfg-row">
+            <div><label>IVA sobre recibo (%)</label><input type="number" step="0.1" id="cfg_iva_pct"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="btn-acoes" style="margin-top:16px;">
         <button class="btn-resetar" id="btnResetar">Restaurar padrão</button>
         <button class="btn-salvar" id="btnAplicar">Aplicar</button>
       </div>
 
-      <label style="margin-top:16px;">Copiar/colar configuração (para guardar num app de notas seu)</label>
-      <textarea id="cfgTexto"></textarea>
-      <div class="btn-acoes">
-        <button id="btnCopiar">Copiar configuração</button>
-        <button id="btnColar">Colar e aplicar</button>
+      <div class="cfg-grupo" style="margin-top:16px; border-top:1px solid var(--linha); padding-top:2px;">
+        <div class="cfg-titulo" data-acordeao="copiarcolar">📝 Copiar/colar configuração <span class="seta">▸</span></div>
+        <div class="cfg-conteudo" data-conteudo="copiarcolar">
+          <label style="margin-top:0;">Para guardar num app de notas seu</label>
+          <textarea id="cfgTexto"></textarea>
+          <div class="btn-acoes">
+            <button id="btnCopiar">Copiar configuração</button>
+            <button id="btnColar">Colar e aplicar</button>
+          </div>
+        </div>
       </div>
 
-      <div class="cfg-grupo" style="margin-top:16px; border-top:1px solid var(--linha); padding-top:16px;">
-        <div class="cfg-titulo">💾 Backup completo (agendamentos + tarifas)</div>
-        <p style="font-family:'Helvetica Neue', Arial, sans-serif; font-size:11.5px; color:#6a7378; margin:0 0 10px;">
-          Guarda um ficheiro no teu telemóvel antes de removeres o atalho da Tela de Início — assim não perdes os teus agendamentos. Depois é só importar de volta.
-        </p>
-        <div class="btn-acoes">
-          <button id="btnExportarBackup">⬇️ Exportar backup</button>
-          <button id="btnImportarBackup">⬆️ Importar backup</button>
+      <div class="cfg-grupo">
+        <div class="cfg-titulo" data-acordeao="backup">💾 Backup completo (agendamentos + tarifas) <span class="seta">▸</span></div>
+        <div class="cfg-conteudo" data-conteudo="backup">
+          <p style="font-family:'Helvetica Neue', Arial, sans-serif; font-size:11.5px; color:#6a7378; margin:0 0 10px;">
+            Guarda um ficheiro no teu telemóvel antes de removeres o atalho da Tela de Início — assim não perdes os teus agendamentos. Depois é só importar de volta.
+          </p>
+          <div class="btn-acoes">
+            <button id="btnExportarBackup">⬇️ Exportar backup</button>
+            <button id="btnImportarBackup">⬆️ Importar backup</button>
+          </div>
+          <input type="file" id="inputBackup" accept="application/json" style="display:none;">
         </div>
-        <input type="file" id="inputBackup" accept="application/json" style="display:none;">
       </div>
     </div>
   </div>
@@ -1104,7 +1147,7 @@
     <p class="nota">Estes pedidos vêm do teu site de cotações. "Aceitar" cria logo um agendamento (ainda podes editar tudo depois); "Recusar" só remove daqui.<br><br>Precisas de estar com sessão iniciada (em "Minhas tarifas") para veres os pedidos novos.</p>
   </div>
 
-  <p style="text-align:center; font-family:'Helvetica Neue', Arial, sans-serif; font-size:11px; color:#8a7f66; margin-top:24px;">Trajeto · v6.2</p>
+  <p style="text-align:center; font-family:'Helvetica Neue', Arial, sans-serif; font-size:11px; color:#8a7f66; margin-top:24px;">Trajeto · v6.4</p>
 
 </main>
 
@@ -1207,6 +1250,15 @@
   }
   preencherPainel(cfg);
   document.getElementById('cfg_nome').value = localStorage.getItem('trajeto_nome') || '';
+
+  document.querySelectorAll('#painelConfig [data-acordeao]').forEach(titulo=>{
+    titulo.addEventListener('click', ()=>{
+      const chave = titulo.dataset.acordeao;
+      const conteudo = document.querySelector(`[data-conteudo="${chave}"]`);
+      const aberto = titulo.classList.toggle('aberto');
+      conteudo.classList.toggle('aberto', aberto);
+    });
+  });
 
   function aplicarPagamentosUI(pag){
     document.getElementById('cfg_pag_mbway').checked = !!pag.mbway;
@@ -1527,12 +1579,15 @@
     calcularAeroporto();
   }
 
+  const EMAIL_ADMIN = 'leonardosf.tvde@gmail.com';
+
   function atualizarUISincronizacao(){
     const logado = window.TrajetoCloud && window.TrajetoCloud.utilizadorAtual;
+    const ehAdmin = logado && window.TrajetoCloud.utilizadorAtual.email === EMAIL_ADMIN;
     const statusEl = document.getElementById('syncStatusTexto');
     const btnEntrar = document.getElementById('btnAbrirAuth');
     const btnSair = document.getElementById('btnSairAuth');
-    document.getElementById('grupoCodigoConvite').style.display = logado ? 'block' : 'none';
+    document.getElementById('grupoCodigoConvite').style.display = ehAdmin ? 'block' : 'none';
     if(logado){
       statusEl.textContent = `Sincronizado como ${window.TrajetoCloud.utilizadorAtual.email}`;
       btnEntrar.style.display = 'none';
@@ -1602,7 +1657,7 @@
       'auth/weak-password': 'A palavra-passe precisa de pelo menos 6 caracteres.',
       'auth/wrong-password': 'Palavra-passe incorreta.',
       'auth/user-not-found': 'Não existe conta com este email — usa "Criar conta".',
-      'auth/invalid-credential': 'Email ou palavra-passe incorretos.'
+      'auth/invalid-credential': 'Email ou palavra-passe incorretos. Se ainda não tens conta, toca em "Criar conta nova".'
     };
     return mapa[codigo] || 'Não foi possível entrar. Confirma o email e a palavra-passe.';
   }
