@@ -1025,11 +1025,20 @@
       <div class="card">
         <h2>Agendar corrida</h2>
 
-        <div class="ag-secao">📍 Trajeto</div>
-        <label for="ag_partida">Endereço de partida</label>
+        <div class="ag-secao" id="ag_secaoTrajeto">📍 Trajeto</div>
+
+        <div id="blocoTourInfo" style="display:none;">
+          <label for="ag_tour_titulo">Tour</label>
+          <input type="text" id="ag_tour_titulo" readonly style="background:#f0ece0; color:#4a5a60; font-weight:bold;">
+          <input type="hidden" id="ag_tour_nome">
+        </div>
+
+        <label for="ag_partida" id="ag_label_partida">Endereço de partida</label>
         <input type="text" id="ag_partida" placeholder="ex: Aeroporto de Lisboa, T1">
-        <label for="ag_chegada" style="margin-top:14px;">Endereço de chegada</label>
-        <input type="text" id="ag_chegada" placeholder="ex: Hotel Avenida Palace">
+        <div id="blocoChegadaTransfer">
+          <label for="ag_chegada" style="margin-top:14px;">Endereço de chegada</label>
+          <input type="text" id="ag_chegada" placeholder="ex: Hotel Avenida Palace">
+        </div>
 
         <div class="ag-secao">👤 Cliente</div>
         <label for="ag_cliente">Nome do cliente</label>
@@ -1207,7 +1216,7 @@
     <p class="nota">Estes pedidos vêm do teu site de cotações. "Aceitar" cria logo um agendamento (ainda podes editar tudo depois); "Recusar" só remove daqui.<br><br>Precisas de estar com sessão iniciada (em "Minhas tarifas") para veres os pedidos novos.</p>
   </div>
 
-  <p style="text-align:center; font-family:'Helvetica Neue', Arial, sans-serif; font-size:11px; color:#8a7f66; margin-top:24px;">Trajeto · v6.9</p>
+  <p style="text-align:center; font-family:'Helvetica Neue', Arial, sans-serif; font-size:11px; color:#8a7f66; margin-top:24px;">Trajeto · v7.0</p>
 
 </main>
 
@@ -1723,6 +1732,15 @@
   });
 
   let proximoAgendamentoTipo = 'transfer';
+
+  function aplicarVisualTipoFormulario(tipo){
+    const ehTour = tipo === 'tour';
+    document.getElementById('ag_secaoTrajeto').textContent = ehTour ? '🗺️ Tour' : '📍 Trajeto';
+    document.getElementById('blocoTourInfo').style.display = ehTour ? 'block' : 'none';
+    document.getElementById('ag_label_partida').textContent = ehTour ? 'Local de recolha (hotel, casa, etc.)' : 'Endereço de partida';
+    document.getElementById('ag_partida').placeholder = ehTour ? 'ex: Hotel Avenida Palace' : 'ex: Aeroporto de Lisboa, T1';
+    document.getElementById('blocoChegadaTransfer').style.display = ehTour ? 'none' : 'block';
+  }
   document.getElementById('btnAgendarTour').addEventListener('click', ()=>{
     const tours = lerTours();
     const t = tours.find(x => x.id === document.getElementById('tr_pacote').value);
@@ -1730,7 +1748,10 @@
     proximoAgendamentoTipo = 'tour';
     editandoId = null;
     document.getElementById('btnGuardarAgendamento').textContent = 'Guardar e adicionar ao calendário';
-    document.getElementById('ag_partida').value = t.nome;
+    aplicarVisualTipoFormulario('tour');
+    document.getElementById('ag_tour_nome').value = t.nome;
+    document.getElementById('ag_tour_titulo').value = t.nome + (t.duracao ? ' · ' + t.duracao : '');
+    document.getElementById('ag_partida').value = '';
     document.getElementById('ag_chegada').value = t.duracao || '';
     const valorTour = document.getElementById('tr_valor').textContent;
     document.getElementById('ag_valor').value = valorTour === '—' ? '' : valorTour;
@@ -2048,6 +2069,7 @@
     if(abrir){
       editandoId = null;
       proximoAgendamentoTipo = 'transfer';
+      aplicarVisualTipoFormulario('transfer');
       document.getElementById('btnGuardarAgendamento').textContent = 'Guardar e adicionar ao calendário';
       document.getElementById('ag_valor').value = document.getElementById('ct_cobrar').value;
       if(!document.getElementById('ag_partida').value) document.getElementById('ag_partida').value = document.getElementById('ct_origem').value;
@@ -2152,9 +2174,14 @@
         ? `<button class="ag-btn-ok" data-acao="marcarRecebido">💰 Marcar como recebido</button>` : '';
       const ehTour = ag.tipo === 'tour';
       const linhaTrajeto = ehTour
-        ? `🗺️ ${ag.partida}${ag.chegada ? ' · ' + ag.chegada : ''}`
+        ? `🗺️ ${ag.tourNome || ag.partida}${ag.chegada ? ' · ' + ag.chegada : ''}`
         : `${ag.partida} → ${ag.chegada}`;
-      const navWaze = ehTour ? '' : `
+      const navWaze = ehTour
+        ? (ag.partida ? `
+        <div class="ag-nav">
+          <button class="ag-btn-buscar" data-acao="buscar">🚗 Ir buscar cliente</button>
+        </div>` : '')
+        : `
         <div class="ag-nav">
           <button class="ag-btn-buscar" data-acao="buscar">🚗 Ir buscar cliente</button>
           <button class="ag-btn-levar" data-acao="levar">🏁 Iniciar viagem</button>
@@ -2165,6 +2192,7 @@
         <div class="ag-meta">
           📅 ${ag.data.split('-').reverse().join('/')} às ${ag.hora}<br>
           👤 ${ag.cliente} &nbsp;·&nbsp; <span class="ag-valor">€${ag.valor}</span>
+          ${ehTour && ag.partida ? `<br>📍 Recolha: ${ag.partida}` : ''}
           ${ag.fornecedor ? `<br>🏷 Fornecedor: ${ag.fornecedor}` : ''}
           ${ag.observacoes ? `<br>📝 ${ag.observacoes}` : ''}
         </div>
@@ -2200,7 +2228,7 @@
     const nome = localStorage.getItem('trajeto_nome') || '';
     const assinatura = nome ? `Aqui é o ${nome}` : 'Aqui é o teu motorista';
     if(ag.tipo === 'tour'){
-      return `Olá ${ag.cliente}! 👋\n\n${assinatura} — confirmo os dados do seu tour:\n\n🗺️ Tour: ${ag.partida}${ag.chegada ? '\n⏱️ Duração: ' + ag.chegada : ''}\n📅 Data: ${dataFmt}\n🕐 Horário: ${ag.hora}\n💰 Valor: €${ag.valor}\n\nPode confirmar este serviço, por favor? Fico a aguardar a sua resposta. Obrigado! 🚗`;
+      return `Olá ${ag.cliente}! 👋\n\n${assinatura} — confirmo os dados do seu tour:\n\n🗺️ Tour: ${ag.tourNome || ''}${ag.chegada ? '\n⏱️ Duração: ' + ag.chegada : ''}${ag.partida ? '\n📍 Recolha: ' + ag.partida : ''}\n📅 Data: ${dataFmt}\n🕐 Horário: ${ag.hora}\n💰 Valor: €${ag.valor}\n\nPode confirmar este serviço, por favor? Fico a aguardar a sua resposta. Obrigado! 🚗`;
     }
     return `Olá ${ag.cliente}! 👋\n\n${assinatura} — confirmo os dados do seu transfer:\n\n📍 De: ${ag.partida}\n📍 Para: ${ag.chegada}\n📅 Data: ${dataFmt}\n🕐 Horário: ${ag.hora}\n💰 Valor: €${ag.valor}\n\nPode confirmar este serviço, por favor? Fico a aguardar a sua resposta. Obrigado! 🚗`;
   }
@@ -2224,8 +2252,11 @@
   }
 
   function preencherFormAgendamento(ag){
+    aplicarVisualTipoFormulario(ag.tipo || 'transfer');
     document.getElementById('ag_partida').value = ag.partida;
     document.getElementById('ag_chegada').value = ag.chegada;
+    document.getElementById('ag_tour_nome').value = ag.tourNome || '';
+    document.getElementById('ag_tour_titulo').value = ag.tourNome ? (ag.tourNome + (ag.chegada ? ' · ' + ag.chegada : '')) : '';
     document.getElementById('ag_data').value = ag.data;
     document.getElementById('ag_hora').value = ag.hora;
     document.getElementById('ag_cliente').value = ag.cliente;
@@ -2255,6 +2286,9 @@
   function gerarMensagemRepasse(ag){
     const dataFmt = ag.data.split('-').reverse().join('/');
     const link = gerarLinkRepasse(ag);
+    if(ag.tipo === 'tour'){
+      return `🗺️ Tour para repassar\n\n🗺️ Tour: ${ag.tourNome || ''}${ag.chegada ? ' · ' + ag.chegada : ''}${ag.partida ? '\n📍 Recolha: ' + ag.partida : ''}\n📅 Data: ${dataFmt} às ${ag.hora}\n👤 Cliente: ${ag.cliente}${ag.telefone ? '\n📞 Telefone: ' + ag.telefone : ''}\n💶 Valor: €${ag.valor}\n\nSe tiveres a app Trajeto, abre este link para adicionar automaticamente aos teus agendamentos:\n${link}`;
+    }
     return `🚗 Transfer para repassar\n\n📍 De: ${ag.partida}\n📍 Para: ${ag.chegada}\n📅 Data: ${dataFmt} às ${ag.hora}\n👤 Cliente: ${ag.cliente}${ag.telefone ? '\n📞 Telefone: ' + ag.telefone : ''}\n💶 Valor: €${ag.valor}\n\nSe tiveres a app Trajeto, abre este link para adicionar automaticamente aos teus agendamentos:\n${link}`;
   }
 
@@ -2526,6 +2560,7 @@
         <div class="ag-meta">
           📅 ${p.data.split('-').reverse().join('/')} às ${p.hora}<br>
           👤 ${p.nome} &nbsp;·&nbsp; 📞 ${p.contacto}
+          ${ehTour && p.partida ? `<br>📍 Recolha: ${p.partida}` : ''}
           ${p.passageiros ? `<br>🧑‍🤝‍🧑 ${p.passageiros} passageiro(s)` : ''}
           ${p.observacoes ? `<br>📝 ${p.observacoes}` : ''}
         </div>
@@ -2564,7 +2599,8 @@
         ag = {
           id: Date.now().toString(36) + Math.random().toString(36).slice(2,7),
           tipo: 'tour',
-          partida: p.tourNome || (tourCfg ? tourCfg.nome : 'Tour'),
+          tourNome: p.tourNome || (tourCfg ? tourCfg.nome : 'Tour'),
+          partida: p.partida || '',
           chegada: tourCfg ? (tourCfg.duracao || '') : '',
           data: p.data, hora: p.hora,
           cliente: p.nome, telefone: p.contacto, nomePlaca: '', voo: '',
@@ -2679,12 +2715,13 @@
     const fornecedor = document.getElementById('ag_fornecedor').value.trim();
     const valor = document.getElementById('ag_valor').value;
     const observacoes = document.getElementById('ag_observacoes').value.trim();
+    const tourNome = document.getElementById('ag_tour_nome').value.trim();
 
     const exigirChegada = proximoAgendamentoTipo !== 'tour';
     if(!partida || (exigirChegada && !chegada) || !data || !hora || !cliente){
       alert(exigirChegada
         ? 'Preenche partida, chegada, data, horário e nome do cliente.'
-        : 'Preenche o tour, a data, o horário e o nome do cliente.');
+        : 'Preenche o local de recolha, a data, o horário e o nome do cliente.');
       return;
     }
 
@@ -2704,6 +2741,7 @@
         ag.fornecedor = fornecedor;
         ag.valor = valor || ag.valor;
         ag.observacoes = observacoes;
+        if(ag.tipo === 'tour') ag.tourNome = tourNome;
         gravarAgendamentos(lista);
         renderLista();
         renderFaturamento();
@@ -2719,6 +2757,7 @@
         valor: valor || document.getElementById('ct_cobrar').value,
         realizado: false
       };
+      if(proximoAgendamentoTipo === 'tour') ag.tourNome = tourNome;
       lista.push(ag);
       gravarAgendamentos(lista);
       renderLista();
@@ -2726,6 +2765,8 @@
     }
     proximoAgendamentoTipo = 'transfer';
 
+    document.getElementById('ag_tour_nome').value = '';
+    document.getElementById('ag_tour_titulo').value = '';
     document.getElementById('ag_partida').value = '';
     document.getElementById('ag_chegada').value = '';
     document.getElementById('ag_cliente').value = '';
