@@ -760,6 +760,18 @@
         </div>
       </div>
 
+      <div class="cfg-grupo" id="grupoCodigoConvite" style="display:none;">
+        <div class="cfg-titulo">🔑 Códigos de acesso</div>
+        <p style="font-family:'Helvetica Neue', Arial, sans-serif; font-size:12px; color:#6a7378; margin:0 0 10px;">
+          Gera um código único para dares a outra pessoa criar conta no Trajeto.
+        </p>
+        <button id="btnGerarCodigo" style="width:100%; padding:10px; border-radius:8px; border:1px solid var(--linha); font-family:'Helvetica Neue', Arial, sans-serif; font-size:13px; cursor:pointer; background:#fdfbf6;">🔑 Gerar novo código</button>
+        <div id="codigoGeradoWrap" style="display:none; margin-top:12px; text-align:center;">
+          <div id="codigoGeradoTexto" style="font-family:'Courier New', monospace; font-size:20px; font-weight:bold; color:var(--terracota); letter-spacing:.05em; padding:10px; background:var(--areia); border-radius:8px;"></div>
+          <button id="btnCopiarCodigo" style="margin-top:8px; width:100%; padding:9px; border-radius:8px; border:1px solid var(--linha); font-family:'Helvetica Neue', Arial, sans-serif; font-size:12.5px; cursor:pointer; background:#fdfbf6;">📋 Copiar código</button>
+        </div>
+      </div>
+
       <label style="margin-top:14px;">Formas de pagamento aceites</label>
       <div class="checks">
         <label class="chk"><input type="checkbox" id="cfg_pag_mbway" checked> MB WAY</label>
@@ -1092,7 +1104,7 @@
     <p class="nota">Estes pedidos vêm do teu site de cotações. "Aceitar" cria logo um agendamento (ainda podes editar tudo depois); "Recusar" só remove daqui.<br><br>Precisas de estar com sessão iniciada (em "Minhas tarifas") para veres os pedidos novos.</p>
   </div>
 
-  <p style="text-align:center; font-family:'Helvetica Neue', Arial, sans-serif; font-size:11px; color:#8a7f66; margin-top:24px;">Trajeto · v6.1</p>
+  <p style="text-align:center; font-family:'Helvetica Neue', Arial, sans-serif; font-size:11px; color:#8a7f66; margin-top:24px;">Trajeto · v6.2</p>
 
 </main>
 
@@ -1520,6 +1532,7 @@
     const statusEl = document.getElementById('syncStatusTexto');
     const btnEntrar = document.getElementById('btnAbrirAuth');
     const btnSair = document.getElementById('btnSairAuth');
+    document.getElementById('grupoCodigoConvite').style.display = logado ? 'block' : 'none';
     if(logado){
       statusEl.textContent = `Sincronizado como ${window.TrajetoCloud.utilizadorAtual.email}`;
       btnEntrar.style.display = 'none';
@@ -1639,6 +1652,41 @@
   document.getElementById('btnSairAuth').addEventListener('click', async ()=>{
     if(window.TrajetoCloud) await window.TrajetoCloud.sair();
     atualizarUISincronizacao();
+  });
+
+  function gerarCodigoAleatorio(){
+    const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'; // sem 0/O e 1/I, para evitar confusão
+    let codigo = 'TRJ-';
+    for(let i=0; i<6; i++){
+      codigo += chars[Math.floor(Math.random()*chars.length)];
+    }
+    return codigo;
+  }
+
+  document.getElementById('btnGerarCodigo').addEventListener('click', async ()=>{
+    if(!window.TrajetoCloud || !window.TrajetoCloud.utilizadorAtual) return;
+    const btn = document.getElementById('btnGerarCodigo');
+    btn.disabled = true;
+    const codigo = gerarCodigoAleatorio();
+    try{
+      await window.TrajetoCloud.criarCodigoConvite(codigo);
+      document.getElementById('codigoGeradoTexto').textContent = codigo;
+      document.getElementById('codigoGeradoWrap').style.display = 'block';
+    }catch(e){
+      alert('Não foi possível gerar o código. Confirma se já publicaste as regras novas do Firestore.');
+    }
+    btn.disabled = false;
+  });
+  document.getElementById('btnCopiarCodigo').addEventListener('click', ()=>{
+    const codigo = document.getElementById('codigoGeradoTexto').textContent;
+    const btn = document.getElementById('btnCopiarCodigo');
+    const original = btn.textContent;
+    if(navigator.clipboard){
+      navigator.clipboard.writeText(codigo).then(()=>{
+        btn.textContent = '✅ Copiado!';
+        setTimeout(()=>{ btn.textContent = original; }, 1800);
+      });
+    }
   });
 
   function iniciarObservadorNuvem(){
@@ -2535,12 +2583,16 @@ if ('serviceWorker' in navigator) {
       await updateDoc(doc(db, 'trajeto_convites', codigo.trim()), { ativo: false });
     }catch(e){ /* se falhar, não impede a conta já criada — só não desativa o código */ }
   }
+  async function criarCodigoConvite(codigo){
+    await setDoc(doc(db, 'trajeto_convites', codigo), { ativo: true, criadoEm: Date.now() });
+  }
 
   window.TrajetoCloud = {
     entrar: (email, senha) => signInWithEmailAndPassword(auth, email, senha),
     criarConta: (email, senha) => createUserWithEmailAndPassword(auth, email, senha),
     verificarCodigoConvite,
     marcarCodigoUsado,
+    criarCodigoConvite,
     sair: () => {
       if(cancelarOuvinte){ cancelarOuvinte(); cancelarOuvinte = null; }
       if(cancelarOuvintePedidos){ cancelarOuvintePedidos(); cancelarOuvintePedidos = null; }
