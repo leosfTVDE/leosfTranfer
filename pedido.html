@@ -158,7 +158,7 @@
     margin:16px 0 6px;
   }
   label:first-of-type{margin-top:0;}
-  input, textarea{
+  input, textarea, select{
     width:100%;
     padding:11px 13px;
     border:1px solid var(--linha);
@@ -167,7 +167,7 @@
     font-size:15px;
     background:#fdfbf6;
   }
-  input:focus, textarea:focus{outline:2px solid var(--azulejo); outline-offset:1px;}
+  input:focus, textarea:focus, select:focus{outline:2px solid var(--azulejo); outline-offset:1px;}
   textarea{min-height:70px; resize:vertical;}
   .row2{display:flex; gap:10px;}
   .row2 > div{flex:1;}
@@ -219,6 +219,32 @@
     margin-top:18px;
     line-height:1.6;
     padding:0 10px;
+  }
+  .tipo-switch{
+    display:flex;
+    border:1px solid var(--linha);
+    border-radius:10px;
+    overflow:hidden;
+    margin-bottom:18px;
+  }
+  .tipo-switch button{
+    flex:1;
+    padding:11px;
+    border:none;
+    background:#fdfbf6;
+    color:var(--texto);
+    font-family:'Helvetica Neue', Arial, sans-serif;
+    font-size:14px;
+    font-weight:bold;
+    cursor:pointer;
+  }
+  .tipo-switch button.active{
+    background:var(--azulejo);
+    color:#fff;
+  }
+  .tipo-switch button:disabled{
+    opacity:.45;
+    cursor:not-allowed;
   }
 
   /* ---------- Testemunhos (preparado para o futuro) ---------- */
@@ -344,6 +370,11 @@
   </div>
 
   <div class="card" id="cardForm">
+    <div class="tipo-switch" id="tipoSwitch">
+      <button type="button" data-tipo="transfer" class="active" data-i18n="tab_transfer">Transfer</button>
+      <button type="button" data-tipo="tour" data-i18n="tab_tour">Tour</button>
+    </div>
+
     <form id="formPedido">
       <label for="p_nome" data-i18n="label_nome">O seu nome</label>
       <input type="text" id="p_nome" data-i18n-placeholder="ph_nome" placeholder="ex: João Ferreira" required>
@@ -351,11 +382,25 @@
       <label for="p_contacto" data-i18n="label_contacto">Telefone ou email para contacto</label>
       <input type="text" id="p_contacto" data-i18n-placeholder="ph_contacto" placeholder="ex: +351 912 345 678" required>
 
-      <label for="p_partida" data-i18n="label_partida">Local de partida</label>
-      <input type="text" id="p_partida" data-i18n-placeholder="ph_partida" placeholder="ex: Aeroporto de Lisboa, T1" required>
+      <div id="camposTransfer">
+        <label for="p_partida" data-i18n="label_partida">Local de partida</label>
+        <input type="text" id="p_partida" data-i18n-placeholder="ph_partida" placeholder="ex: Aeroporto de Lisboa, T1">
 
-      <label for="p_chegada" data-i18n="label_chegada">Local de chegada</label>
-      <input type="text" id="p_chegada" data-i18n-placeholder="ph_chegada" placeholder="ex: Hotel Avenida Palace" required>
+        <label for="p_chegada" data-i18n="label_chegada">Local de chegada</label>
+        <input type="text" id="p_chegada" data-i18n-placeholder="ph_chegada" placeholder="ex: Hotel Avenida Palace">
+      </div>
+
+      <div id="camposTour" style="display:none;">
+        <label for="p_tour" data-i18n="label_tour">Escolha o passeio</label>
+        <select id="p_tour"></select>
+        <p class="erro" id="semToursMsg" style="display:none; text-align:left;" data-i18n="sem_tours"></p>
+
+        <label for="p_veiculo_tour" data-i18n="label_veiculo_tour">Veículo</label>
+        <select id="p_veiculo_tour">
+          <option value="sedan" data-i18n="veic_sedan">Sedan (1–3 pessoas)</option>
+          <option value="van" data-i18n="veic_van">Van / Executivo (4–6 pessoas)</option>
+        </select>
+      </div>
 
       <div class="row2">
         <div>
@@ -438,7 +483,7 @@
   // const PARCEIROS = ['Hotel Cascais Mirage', 'Casa Alazul', 'Cascais Tours'];
 
   // Número de WhatsApp para o botão do rodapé (formato internacional, só dígitos)
-  const WHATSAPP_NUMERO = '351969698927';
+  const WHATSAPP_NUMERO = '351912345678';
 
   // ============================================================
 
@@ -454,6 +499,13 @@
       ph_nome: 'ex: João Ferreira',
       label_contacto: 'Telefone ou email para contacto',
       ph_contacto: 'ex: +351 912 345 678',
+      tab_transfer: 'Transfer',
+      tab_tour: 'Tour',
+      label_tour: 'Escolha o passeio',
+      sem_tours: 'Ainda não há passeios disponíveis — contacte-nos diretamente.',
+      label_veiculo_tour: 'Veículo',
+      veic_sedan: 'Sedan (1–3 pessoas)',
+      veic_van: 'Van / Executivo (4–6 pessoas)',
       label_partida: 'Local de partida',
       ph_partida: 'ex: Aeroporto de Lisboa, T1',
       label_chegada: 'Local de chegada',
@@ -487,6 +539,13 @@
       ph_nome: 'e.g. John Smith',
       label_contacto: 'Phone or email for contact',
       ph_contacto: 'e.g. +44 7911 123456',
+      tab_transfer: 'Transfer',
+      tab_tour: 'Tour',
+      label_tour: 'Choose the tour',
+      sem_tours: 'No tours available yet — please contact us directly.',
+      label_veiculo_tour: 'Vehicle',
+      veic_sedan: 'Sedan (1–3 people)',
+      veic_van: 'Van / Executive (4–6 people)',
       label_partida: 'Pickup location',
       ph_partida: 'e.g. Lisbon Airport, T1',
       label_chegada: 'Drop-off location',
@@ -587,11 +646,51 @@
 
   aplicarIdioma(idiomaAtual);
   renderParceiros();
+
+  // ---------- Seletor Transfer / Tour ----------
+  let tipoAtual = 'transfer';
+
+  function aplicarTipo(tipo){
+    tipoAtual = tipo;
+    document.getElementById('tipoSwitch').querySelectorAll('button').forEach(b=>{
+      b.classList.toggle('active', b.dataset.tipo === tipo);
+    });
+    const ehTour = tipo === 'tour';
+    document.getElementById('camposTransfer').style.display = ehTour ? 'none' : 'block';
+    document.getElementById('camposTour').style.display = ehTour ? 'block' : 'none';
+    document.getElementById('p_partida').required = !ehTour;
+    document.getElementById('p_chegada').required = !ehTour;
+  }
+  document.getElementById('tipoSwitch').querySelectorAll('button').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      if(btn.disabled) return;
+      aplicarTipo(btn.dataset.tipo);
+    });
+  });
+
+  function preencherSelectTours(){
+    const tours = window._trajetoTours || [];
+    const sel = document.getElementById('p_tour');
+    const semTours = document.getElementById('semToursMsg');
+    const btnTourTab = document.querySelector('#tipoSwitch button[data-tipo="tour"]');
+    if(tours.length === 0){
+      sel.style.display = 'none';
+      semTours.style.display = 'block';
+      btnTourTab.disabled = true;
+      return;
+    }
+    sel.style.display = 'block';
+    semTours.style.display = 'none';
+    btnTourTab.disabled = false;
+    sel.innerHTML = tours.map(t => `<option value="${t.id}">${t.nome}${t.duracao ? ' — ' + t.duracao : ''}</option>`).join('');
+  }
+  window.preencherSelectTours = preencherSelectTours;
+  preencherSelectTours();
 </script>
 
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js";
-  import { getFirestore, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
+  import { getFirestore, collection, addDoc, doc, getDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
 
   const firebaseConfig = {
     apiKey: "AIzaSyCqJBnzZh5MWP9G3ZP1nOThb4W2KCLf2a4",
@@ -605,6 +704,17 @@
   const app = initializeApp(firebaseConfig);
   const db = getFirestore(app);
 
+  // ---------- Buscar a lista de tours publicada pelo motorista ----------
+  (async ()=>{
+    try{
+      const snap = await getDoc(doc(db, 'trajeto_publico', 'tours'));
+      window._trajetoTours = (snap.exists() && Array.isArray(snap.data().tours)) ? snap.data().tours : [];
+    }catch(e){
+      window._trajetoTours = [];
+    }
+    if(window.preencherSelectTours) window.preencherSelectTours();
+  })();
+
   const form = document.getElementById('formPedido');
   const btnEnviar = document.getElementById('btnEnviar');
   const erroEl = document.getElementById('erroForm');
@@ -617,11 +727,12 @@
     const textos = { pt: {campos:'Preenche todos os campos obrigatórios.', envio:'Não foi possível enviar o pedido. Tenta novamente ou contacta-nos diretamente.', enviar:'Pedir cotação', enviando:'A enviar...'},
                       en: {campos:'Please fill in all required fields.', envio:'Could not send your request. Please try again or contact us directly.', enviar:'Request quote', enviando:'Sending...'} }[lang];
 
+    const tipo = document.querySelector('#tipoSwitch button.active').dataset.tipo;
+
     const pedido = {
+      tipo,
       nome: document.getElementById('p_nome').value.trim(),
       contacto: document.getElementById('p_contacto').value.trim(),
-      partida: document.getElementById('p_partida').value.trim(),
-      chegada: document.getElementById('p_chegada').value.trim(),
       data: document.getElementById('p_data').value,
       hora: document.getElementById('p_hora').value,
       passageiros: document.getElementById('p_passageiros').value || '',
@@ -631,9 +742,26 @@
       criadoEm: serverTimestamp()
     };
 
-    if(!pedido.nome || !pedido.contacto || !pedido.partida || !pedido.chegada || !pedido.data || !pedido.hora){
-      erroEl.textContent = textos.campos;
-      return;
+    if(tipo === 'tour'){
+      const tours = window._trajetoTours || [];
+      const tourId = document.getElementById('p_tour').value;
+      const tourEscolhido = tours.find(t => t.id === tourId);
+      pedido.tourId = tourId;
+      pedido.tourNome = tourEscolhido ? tourEscolhido.nome : '';
+      pedido.veiculo = document.getElementById('p_veiculo_tour').value;
+
+      if(!pedido.nome || !pedido.contacto || !pedido.tourNome || !pedido.data || !pedido.hora){
+        erroEl.textContent = textos.campos;
+        return;
+      }
+    } else {
+      pedido.partida = document.getElementById('p_partida').value.trim();
+      pedido.chegada = document.getElementById('p_chegada').value.trim();
+
+      if(!pedido.nome || !pedido.contacto || !pedido.partida || !pedido.chegada || !pedido.data || !pedido.hora){
+        erroEl.textContent = textos.campos;
+        return;
+      }
     }
 
     btnEnviar.disabled = true;
