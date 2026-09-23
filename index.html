@@ -1092,7 +1092,7 @@
     <p class="nota">Estes pedidos vêm do teu site de cotações. "Aceitar" cria logo um agendamento (ainda podes editar tudo depois); "Recusar" só remove daqui.<br><br>Precisas de estar com sessão iniciada (em "Minhas tarifas") para veres os pedidos novos.</p>
   </div>
 
-  <p style="text-align:center; font-family:'Helvetica Neue', Arial, sans-serif; font-size:11px; color:#8a7f66; margin-top:24px;">Trajeto · v5.8</p>
+  <p style="text-align:center; font-family:'Helvetica Neue', Arial, sans-serif; font-size:11px; color:#8a7f66; margin-top:24px;">Trajeto · v6.0</p>
 
 </main>
 
@@ -1105,14 +1105,13 @@
   </div>
 </div>
 
-<div class="modal-overlay" id="modalBoasVindas">
+<div class="modal-overlay aberto" id="gateAcesso" style="z-index:3000;">
   <div class="modal-card">
     <h2>👋 Bem-vindo ao Trajeto</h2>
-    <p>Esta é a ferramenta de gestão do <strong>motorista</strong> — tarifas, agendamentos e faturamento.</p>
-    <p>Se procuras <strong>pedir um orçamento de transfer</strong>, o site certo é este:</p>
-    <p style="text-align:center; font-family:'Helvetica Neue', Arial, sans-serif; font-weight:bold; color:var(--terracota); font-size:15px; word-break:break-all;">trajetotransfer.pt/pedido.html</p>
-    <button class="modal-btn modal-btn-recebido" id="btnCopiarLinkPedido">📋 Copiar link</button>
-    <button class="modal-btn modal-btn-pendente" id="btnFecharBoasVindas">Entendi, continuar</button>
+    <p>Esta é a ferramenta de gestão do <strong>motorista</strong> — acesso restrito.</p>
+    <button class="modal-btn modal-btn-recebido" id="btnAbrirLoginGate">🔑 Entrar</button>
+    <p style="text-align:center; font-family:'Helvetica Neue', Arial, sans-serif; font-size:13px; color:#4a5a60; margin:18px 0 10px;">Procuras pedir um transfer?</p>
+    <a class="modal-btn modal-btn-pendente" href="https://trajetotransfer.pt/pedido.html" style="display:block; text-align:center; text-decoration:none; box-sizing:border-box;">👉 Ir para o site de pedidos</a>
   </div>
 </div>
 
@@ -1121,7 +1120,8 @@
     <h2>Sincronizar dados</h2>
     <p>Entra com o teu email para ligar este aparelho à tua conta. Usa o mesmo email nos dois aparelhos (telemóvel e tablet).</p>
     <input type="email" id="auth_email" placeholder="Email" style="margin-bottom:10px; width:100%; padding:10px 12px; border:1px solid var(--linha); border-radius:8px; font-family:'Helvetica Neue', Arial, sans-serif; font-size:15px; background:#fdfbf6;">
-    <input type="password" id="auth_senha" placeholder="Palavra-passe (mín. 6 caracteres)" style="margin-bottom:14px; width:100%; padding:10px 12px; border:1px solid var(--linha); border-radius:8px; font-family:'Helvetica Neue', Arial, sans-serif; font-size:15px; background:#fdfbf6;">
+    <input type="password" id="auth_senha" placeholder="Palavra-passe (mín. 6 caracteres)" style="margin-bottom:10px; width:100%; padding:10px 12px; border:1px solid var(--linha); border-radius:8px; font-family:'Helvetica Neue', Arial, sans-serif; font-size:15px; background:#fdfbf6;">
+    <input type="text" id="auth_codigo" placeholder="Código de convite (só para criar conta)" style="margin-bottom:14px; width:100%; padding:10px 12px; border:1px solid var(--linha); border-radius:8px; font-family:'Helvetica Neue', Arial, sans-serif; font-size:15px; background:#fdfbf6;">
     <button class="modal-btn modal-btn-recebido" id="btnAuthEntrar">Entrar</button>
     <button class="modal-btn modal-btn-pendente" id="btnAuthCriar">Criar conta nova</button>
     <p id="authErro" style="color:var(--terracota); font-family:'Helvetica Neue', Arial, sans-serif; font-size:12.5px; margin:10px 0 0; text-align:center;"></p>
@@ -1597,13 +1597,18 @@
   async function tratarLogin(criarNova){
     const email = document.getElementById('auth_email').value.trim();
     const senha = document.getElementById('auth_senha').value;
+    const codigo = document.getElementById('auth_codigo').value.trim();
     const erroEl = document.getElementById('authErro');
     erroEl.textContent = '';
     if(!email || !senha){ erroEl.textContent = 'Preenche o email e a palavra-passe.'; return; }
     if(!window.TrajetoCloud){ erroEl.textContent = 'A ligação à nuvem ainda não carregou — tenta de novo em instantes.'; return; }
     try{
       if(criarNova){
+        if(!codigo){ erroEl.textContent = 'Precisas de um código de convite para criar conta.'; return; }
+        const valido = await window.TrajetoCloud.verificarCodigoConvite(codigo);
+        if(!valido){ erroEl.textContent = 'Código de convite inválido ou já usado.'; return; }
         await window.TrajetoCloud.criarConta(email, senha);
+        await window.TrajetoCloud.marcarCodigoUsado(codigo);
       } else {
         await window.TrajetoCloud.entrar(email, senha);
       }
@@ -1637,12 +1642,18 @@
     }
     window.TrajetoCloud.onAuthChange(async (user)=>{
       atualizarUISincronizacao();
+      document.getElementById('gateAcesso').classList.toggle('aberto', !user);
       if(user){
         await aoLogar();
       }
     });
   }
   iniciarObservadorNuvem();
+
+  document.getElementById('btnAbrirLoginGate').addEventListener('click', ()=>{
+    document.getElementById('authErro').textContent = '';
+    document.getElementById('modalAuth').classList.add('aberto');
+  });
 
   document.getElementById('btnAbrirAgendar').addEventListener('click', ()=>{
     const p = document.getElementById('painelAgendar');
@@ -2403,26 +2414,6 @@
     }, 150);
   }
   verificarPedidoExterno();
-
-  // ---------- Aviso de boas-vindas (só na primeira vez neste aparelho) ----------
-  const LINK_PEDIDO = 'https://trajetotransfer.pt/pedido.html';
-  if(!localStorage.getItem('trajeto_viu_aviso_inicial')){
-    document.getElementById('modalBoasVindas').classList.add('aberto');
-  }
-  document.getElementById('btnFecharBoasVindas').addEventListener('click', ()=>{
-    localStorage.setItem('trajeto_viu_aviso_inicial', '1');
-    document.getElementById('modalBoasVindas').classList.remove('aberto');
-  });
-  document.getElementById('btnCopiarLinkPedido').addEventListener('click', ()=>{
-    const btn = document.getElementById('btnCopiarLinkPedido');
-    const original = btn.textContent;
-    if(navigator.clipboard){
-      navigator.clipboard.writeText(LINK_PEDIDO).then(()=>{
-        btn.textContent = '✅ Copiado!';
-        setTimeout(()=>{ btn.textContent = original; }, 1800);
-      });
-    }
-  });
 </script>
 
 
@@ -2526,9 +2517,23 @@ if ('serviceWorker' in navigator) {
     await updateDoc(doc(db, 'trajeto_pedidos', id), { status: novoStatus });
   }
 
+  async function verificarCodigoConvite(codigo){
+    if(!codigo) return false;
+    const ref = doc(db, 'trajeto_convites', codigo.trim());
+    const snap = await getDoc(ref);
+    return snap.exists() && snap.data().ativo === true;
+  }
+  async function marcarCodigoUsado(codigo){
+    try{
+      await updateDoc(doc(db, 'trajeto_convites', codigo.trim()), { ativo: false });
+    }catch(e){ /* se falhar, não impede a conta já criada — só não desativa o código */ }
+  }
+
   window.TrajetoCloud = {
     entrar: (email, senha) => signInWithEmailAndPassword(auth, email, senha),
     criarConta: (email, senha) => createUserWithEmailAndPassword(auth, email, senha),
+    verificarCodigoConvite,
+    marcarCodigoUsado,
     sair: () => {
       if(cancelarOuvinte){ cancelarOuvinte(); cancelarOuvinte = null; }
       if(cancelarOuvintePedidos){ cancelarOuvintePedidos(); cancelarOuvintePedidos = null; }
