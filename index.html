@@ -1092,7 +1092,7 @@
     <p class="nota">Estes pedidos vêm do teu site de cotações. "Aceitar" cria logo um agendamento (ainda podes editar tudo depois); "Recusar" só remove daqui.<br><br>Precisas de estar com sessão iniciada (em "Minhas tarifas") para veres os pedidos novos.</p>
   </div>
 
-  <p style="text-align:center; font-family:'Helvetica Neue', Arial, sans-serif; font-size:11px; color:#8a7f66; margin-top:24px;">Trajeto · v6.0</p>
+  <p style="text-align:center; font-family:'Helvetica Neue', Arial, sans-serif; font-size:11px; color:#8a7f66; margin-top:24px;">Trajeto · v6.1</p>
 
 </main>
 
@@ -1618,15 +1618,21 @@
     }
   }
 
+  function fecharModalAuth(){
+    document.getElementById('modalAuth').classList.remove('aberto');
+    const logado = window.TrajetoCloud && window.TrajetoCloud.utilizadorAtual;
+    if(!logado){
+      document.getElementById('gateAcesso').classList.add('aberto');
+    }
+  }
+
   document.getElementById('btnAbrirAuth').addEventListener('click', ()=>{
     document.getElementById('authErro').textContent = '';
     document.getElementById('modalAuth').classList.add('aberto');
   });
-  document.getElementById('btnAuthFechar').addEventListener('click', ()=>{
-    document.getElementById('modalAuth').classList.remove('aberto');
-  });
+  document.getElementById('btnAuthFechar').addEventListener('click', fecharModalAuth);
   document.getElementById('modalAuth').addEventListener('click', (e)=>{
-    if(e.target.id === 'modalAuth') document.getElementById('modalAuth').classList.remove('aberto');
+    if(e.target.id === 'modalAuth') fecharModalAuth();
   });
   document.getElementById('btnAuthEntrar').addEventListener('click', ()=> tratarLogin(false));
   document.getElementById('btnAuthCriar').addEventListener('click', ()=> tratarLogin(true));
@@ -1652,6 +1658,7 @@
 
   document.getElementById('btnAbrirLoginGate').addEventListener('click', ()=>{
     document.getElementById('authErro').textContent = '';
+    document.getElementById('gateAcesso').classList.remove('aberto');
     document.getElementById('modalAuth').classList.add('aberto');
   });
 
