@@ -1107,6 +1107,7 @@
     </div>
 
     <button class="btn-agendar" id="btnCopiarOrcamentoTour">📋 Copiar orçamento</button>
+    <button class="btn-agendar" id="tr_btnNovo" style="margin-top:14px;">🔄 Novo cálculo</button>
     <button class="btn-agendar" id="btnAgendarTour">📅 Agendar este tour</button>
 
     <p class="nota">Configura os teus passeios e preços em "Minhas tarifas" → "🗺️ Tours".</p>
@@ -1197,7 +1198,7 @@
     <p class="nota">Estes pedidos vêm do teu site de cotações. "Aceitar" cria logo um agendamento (ainda podes editar tudo depois); "Recusar" só remove daqui.<br><br>Precisas de estar com sessão iniciada (em "Minhas tarifas") para veres os pedidos novos.</p>
   </div>
 
-  <p style="text-align:center; font-family:'Helvetica Neue', Arial, sans-serif; font-size:11px; color:#8a7f66; margin-top:24px;">Trajeto · v6.6</p>
+  <p style="text-align:center; font-family:'Helvetica Neue', Arial, sans-serif; font-size:11px; color:#8a7f66; margin-top:24px;">Trajeto · v6.7</p>
 
 </main>
 
@@ -1210,7 +1211,15 @@
   </div>
 </div>
 
-<div class="modal-overlay aberto" id="gateAcesso" style="z-index:3000;">
+<div class="modal-overlay aberto" id="carregandoInicial" style="z-index:3500; background:var(--azul-noite);">
+  <div style="text-align:center;">
+    <div style="width:34px; height:34px; margin:0 auto 14px; border:3px solid rgba(255,255,255,.25); border-top-color:var(--terracota); border-radius:50%; animation:girar 0.8s linear infinite;"></div>
+    <p style="color:#c9d6da; font-family:'Helvetica Neue', Arial, sans-serif; font-size:13px;">A verificar sessão...</p>
+  </div>
+</div>
+<style>@keyframes girar{to{transform:rotate(360deg);}}</style>
+
+<div class="modal-overlay" id="gateAcesso" style="z-index:3000;">
   <div class="modal-card">
     <h2>👋 Bem-vindo ao Trajeto</h2>
     <p>Esta é a ferramenta de gestão do <strong>motorista</strong> — acesso restrito.</p>
@@ -1654,6 +1663,17 @@
   document.getElementById('tr_pacote').addEventListener('change', calcularTour);
   calcularTour();
 
+  document.getElementById('tr_btnNovo').addEventListener('click', ()=>{
+    document.getElementById('tr_pacote').selectedIndex = 0;
+    document.getElementById('tr_data').value = '';
+    document.getElementById('tr_passageiros').value = '';
+    state.veiculoTr = 'sedan';
+    document.getElementById('segVeiculoTr').querySelectorAll('button').forEach(b=>{
+      b.classList.toggle('active', b.dataset.v === 'sedan');
+    });
+    calcularTour();
+  });
+
   function gerarMensagemOrcamentoTour(){
     const tours = lerTours();
     const t = tours.find(x => x.id === document.getElementById('tr_pacote').value);
@@ -1996,6 +2016,7 @@
       return;
     }
     window.TrajetoCloud.onAuthChange(async (user)=>{
+      document.getElementById('carregandoInicial').classList.remove('aberto');
       atualizarUISincronizacao();
       document.getElementById('gateAcesso').classList.toggle('aberto', !user);
       if(user){
