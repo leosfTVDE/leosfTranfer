@@ -369,7 +369,21 @@
     font-weight:bold;
     color:var(--texto);
     margin-bottom:4px;
+    cursor:pointer;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:8px;
   }
+  .ag-item .ag-trajeto .ag-seta{
+    font-size:11px;
+    color:var(--azulejo);
+    flex-shrink:0;
+    transition:transform .2s ease;
+  }
+  .ag-item.ag-aberto .ag-trajeto .ag-seta{transform:rotate(90deg);}
+  .ag-detalhes{display:none;}
+  .ag-item.ag-aberto .ag-detalhes{display:block;}
   .ag-item .ag-meta{
     font-family:'Helvetica Neue', Arial, sans-serif;
     font-size:12px;
@@ -1150,7 +1164,7 @@
     <p class="nota">Estes pedidos vêm do teu site de cotações. "Aceitar" cria logo um agendamento (ainda podes editar tudo depois); "Recusar" só remove daqui.<br><br>Precisas de estar com sessão iniciada (em "Minhas tarifas") para veres os pedidos novos.</p>
   </div>
 
-  <p style="text-align:center; font-family:'Helvetica Neue', Arial, sans-serif; font-size:11px; color:#8a7f66; margin-top:24px;">Trajeto · v7.6</p>
+  <p style="text-align:center; font-family:'Helvetica Neue', Arial, sans-serif; font-size:11px; color:#8a7f66; margin-top:24px;">Trajeto · v7.7</p>
 
 </main>
 
@@ -1885,7 +1899,8 @@
         ? `<button class="ag-btn-ok" data-acao="marcarRecebido">💰 Marcar como recebido</button>` : '';
       return `
       <div class="ag-item ${ag.realizado ? 'ag-item-realizado' : ''}" data-id="${ag.id}">
-        <div class="ag-trajeto">${ag.partida} → ${ag.chegada}${ag.realizado ? '<span class="ag-badge-ok">✔ Concluído</span>' : ''}${seloPagamento}</div>
+        <div class="ag-trajeto"><span>${ag.partida} → ${ag.chegada}${ag.realizado ? '<span class="ag-badge-ok">✔ Concluído</span>' : ''}${seloPagamento}</span><span class="ag-seta">▸</span></div>
+        <div class="ag-detalhes">
         <div class="ag-meta">
           📅 ${ag.data.split('-').reverse().join('/')} às ${ag.hora}<br>
           👤 ${ag.cliente} &nbsp;·&nbsp; <span class="ag-valor">€${ag.valor}</span>
@@ -1904,6 +1919,7 @@
           <button class="ag-btn-ok" data-acao="realizado">${ag.realizado ? '↩️ Desfazer' : '✅ Concluído'}</button>
           ${btnRecebido}
           <button class="ag-btn-del" data-acao="del">🗑 Remover</button>
+        </div>
         </div>
       </div>
     `;}).join('');
@@ -2110,6 +2126,11 @@
   }
 
   function handlerCliqueAgendamento(e){
+    const trajeto = e.target.closest('.ag-trajeto');
+    if(trajeto && !e.target.closest('button')){
+      trajeto.closest('.ag-item').classList.toggle('ag-aberto');
+      return;
+    }
     const btn = e.target.closest('button');
     if(!btn) return;
     const item = e.target.closest('.ag-item');
@@ -2153,6 +2174,12 @@
     }
   }
   document.getElementById('listaAgendamentos').addEventListener('click', handlerCliqueAgendamento);
+
+  document.getElementById('listaFaturamento').addEventListener('click', (e)=>{
+    const trajeto = e.target.closest('.ag-trajeto');
+    if(!trajeto) return;
+    trajeto.closest('.ag-item').classList.toggle('ag-aberto');
+  });
 
   // ---------- Faturamento ----------
   let fatModo = 'mes';
@@ -2349,11 +2376,13 @@
       const selo = ag.pagamento === 'recebido' ? '<span class="ag-badge-pago">💰 Recebido</span>' : '<span class="ag-badge-pendente">⏳ A receber</span>';
       return `
       <div class="ag-item">
-        <div class="ag-trajeto">${ag.partida} → ${ag.chegada}${selo}</div>
+        <div class="ag-trajeto"><span>${ag.partida} → ${ag.chegada}${selo}</span><span class="ag-seta">▸</span></div>
+        <div class="ag-detalhes">
         <div class="ag-meta">
           📅 ${ag.data.split('-').reverse().join('/')}<br>
           👤 ${ag.cliente} &nbsp;·&nbsp; <span class="ag-valor">€${ag.valor}</span>
           ${ag.fornecedor ? `<br>🏷 Fornecedor: ${ag.fornecedor}` : ''}
+        </div>
         </div>
       </div>
     `;
