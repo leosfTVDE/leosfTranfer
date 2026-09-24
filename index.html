@@ -755,7 +755,6 @@
 
   <div class="seg" id="segModo" style="margin-bottom:18px;">
     <button data-v="transfer" class="active">Transfer</button>
-    <button data-v="tours">🗺️ Tours</button>
     <button data-v="aeroporto">Aeroporto</button>
     <button data-v="faturamento">Faturamento</button>
     <button data-v="pedidos">📥 Pedidos<span class="selo-contagem" id="seloPedidos">0</span></button>
@@ -814,24 +813,6 @@
           <div id="blocoMsgCustom" style="display:none; margin-top:12px;">
             <label for="cfg_msg_custom">O teu texto — usa {origem} {destino} {km} {veiculo} {valor} {pagamento} {nome} onde quiseres, e o app substitui automaticamente</label>
             <textarea id="cfg_msg_custom" style="min-height:130px;" placeholder="Hi! Here's your transfer quote: {origem} to {destino}, {km} km. Price: €{valor}. Payment: {pagamento}. Best, {nome}"></textarea>
-          </div>
-        </div>
-      </div>
-
-      <div class="cfg-grupo">
-        <div class="cfg-titulo" data-acordeao="tours">🗺️ Tours <span class="seta">▸</span></div>
-        <div class="cfg-conteudo" data-conteudo="tours">
-          <div id="listaTours" style="margin-bottom:14px;"></div>
-          <div style="padding-top:14px; border-top:1px solid var(--linha);">
-            <label for="tour_novo_nome" style="margin-top:0;">Nome do passeio</label>
-            <input type="text" id="tour_novo_nome" placeholder="ex: Sintra & Cascais">
-            <label for="tour_novo_duracao">Duração</label>
-            <input type="text" id="tour_novo_duracao" placeholder="ex: Full Day (8–10h)">
-            <div class="cfg-row">
-              <div><label>Preço sedan (€)</label><input type="number" id="tour_novo_sedan"></div>
-              <div><label>Preço van (€)</label><input type="number" id="tour_novo_van"></div>
-            </div>
-            <button id="btnAdicionarTour" style="width:100%; margin-top:10px; padding:10px; border-radius:8px; border:1px solid var(--linha); background:#fdfbf6; font-family:'Helvetica Neue', Arial, sans-serif; font-size:13px; cursor:pointer;">+ Adicionar tour</button>
           </div>
         </div>
       </div>
@@ -1021,8 +1002,6 @@
       <button class="btn-agendar" id="btnAbrirAgendar">📅 Agendar esta corrida</button>
     </div>
 
-    <div id="slotAgendarTransfer"></div>
-
     <div class="card">
       <h2>Meus agendamentos</h2>
       <div class="seg" id="segFiltroAg" style="margin-bottom:14px;">
@@ -1033,26 +1012,16 @@
     </div>
 
     <p class="nota">Os botões "Ir buscar cliente" e "Iniciar viagem" abrem o Waze já com o destino certo — ele usa a tua localização atual como ponto de partida automaticamente (precisa do Waze instalado no telemóvel).<br><br>A calculadora não soma ida + volta automaticamente, a não ser que marques "Regresso vazio". Portagens não são calculadas automaticamente — confirma no Waze/Google Maps e insere aqui manualmente.<br><br>Os agendamentos ficam guardados só neste telemóvel/navegador. O lembrete 24h antes é feito pelo teu Calendário.</p>
-  </div>
 
-  <div id="painelAgendar">
+    <div id="painelAgendar">
       <div class="card">
         <h2>Agendar corrida</h2>
 
-        <div class="ag-secao" id="ag_secaoTrajeto">📍 Trajeto</div>
-
-        <div id="blocoTourInfo" style="display:none;">
-          <label for="ag_tour_titulo">Tour</label>
-          <input type="text" id="ag_tour_titulo" readonly style="background:#f0ece0; color:#4a5a60; font-weight:bold;">
-          <input type="hidden" id="ag_tour_nome">
-        </div>
-
-        <label for="ag_partida" id="ag_label_partida">Endereço de partida</label>
+        <div class="ag-secao">📍 Trajeto</div>
+        <label for="ag_partida">Endereço de partida</label>
         <input type="text" id="ag_partida" placeholder="ex: Aeroporto de Lisboa, T1">
-        <div id="blocoChegadaTransfer">
-          <label for="ag_chegada" style="margin-top:14px;">Endereço de chegada</label>
-          <input type="text" id="ag_chegada" placeholder="ex: Hotel Avenida Palace">
-        </div>
+        <label for="ag_chegada" style="margin-top:14px;">Endereço de chegada</label>
+        <input type="text" id="ag_chegada" placeholder="ex: Hotel Avenida Palace">
 
         <div class="ag-secao">👤 Cliente</div>
         <label for="ag_cliente">Nome do cliente</label>
@@ -1090,50 +1059,7 @@
 
         <button class="btn-guardar-agendamento" id="btnGuardarAgendamento">Guardar e adicionar ao calendário</button>
       </div>
-  </div>
-
-  <div id="viewTours" style="display:none;">
-    <div class="card">
-      <h2>Escolher tour</h2>
-      <label for="tr_pacote">Passeio</label>
-      <select id="tr_pacote" style="width:100%; padding:11px 13px; border:1px solid var(--linha); border-radius:8px; font-family:'Helvetica Neue', Arial, sans-serif; font-size:15px; background:#fdfbf6;"></select>
-      <p class="nota" id="tr_semTours" style="display:none; text-align:left; margin-top:10px;">Ainda não tens tours configurados — vai a "Minhas tarifas" → "🗺️ Tours" para adicionares o primeiro.</p>
-
-      <label style="margin-top:14px;">Veículo</label>
-      <div class="seg" id="segVeiculoTr">
-        <button data-v="sedan" class="active">Sedan (1–3 pax)</button>
-        <button data-v="van">Van / Executivo (4–6 pax)</button>
-      </div>
-
-      <div class="cfg-row" style="margin-top:14px;">
-        <div><label for="tr_data">Data</label><input type="date" id="tr_data"></div>
-        <div><label for="tr_passageiros">Nº de passageiros</label><input type="number" id="tr_passageiros" min="1" max="8"></div>
-      </div>
     </div>
-
-    <div class="resultado">
-      <p class="eyebrow">Valor do tour</p>
-      <div class="valor">€<span id="tr_valor">0</span></div>
-      <div class="faixa" id="tr_detalhe"></div>
-      <p class="eyebrow" style="margin-top:16px;">💰 Cobrar do cliente</p>
-      <input type="number" id="tr_cobrar" class="ct-cobrar-input" step="0.5">
-      <button class="btn-agendar" id="btnCopiarOrcamentoTour">📋 Copiar orçamento</button>
-      <button class="btn-agendar" id="tr_btnNovo" style="margin-top:14px;">🔄 Novo cálculo</button>
-      <button class="btn-agendar" id="btnAgendarTour">📅 Agendar este tour</button>
-    </div>
-
-    <div id="slotAgendarTour"></div>
-
-    <div class="card" style="margin-top:20px;">
-      <h2>Meus tours agendados</h2>
-      <div class="seg" id="segFiltroAgTour" style="margin-bottom:14px;">
-        <button data-v="ativos" class="active">Ativos</button>
-        <button data-v="concluidos">Concluídos</button>
-      </div>
-      <div class="lista-agendamentos" id="listaAgendamentosTour"></div>
-    </div>
-
-    <p class="nota">Configura os teus passeios e preços em "Minhas tarifas" → "🗺️ Tours".</p>
   </div>
 
   <div id="viewAeroporto" style="display:none;">
@@ -1221,7 +1147,7 @@
     <p class="nota">Estes pedidos vêm do teu site de cotações. "Aceitar" cria logo um agendamento (ainda podes editar tudo depois); "Recusar" só remove daqui.<br><br>Precisas de estar com sessão iniciada (em "Minhas tarifas") para veres os pedidos novos.</p>
   </div>
 
-  <p style="text-align:center; font-family:'Helvetica Neue', Arial, sans-serif; font-size:11px; color:#8a7f66; margin-top:24px;">Trajeto · v7.3</p>
+  <p style="text-align:center; font-family:'Helvetica Neue', Arial, sans-serif; font-size:11px; color:#8a7f66; margin-top:24px;">Trajeto · v7.4</p>
 
 </main>
 
@@ -1298,7 +1224,7 @@
 </div>
 
 <script>
-  const state = { veiculoT:'sedan', veiculoAp:'sedan', horarioAp:'dia', direcaoAp:'ida', veiculoTr:'sedan' };
+  const state = { veiculoT:'sedan', veiculoAp:'sedan', horarioAp:'dia', direcaoAp:'ida' };
 
   const DEFAULTS = {
     ap_sedan_ida: 25, ap_sedan_volta: 20,
@@ -1413,7 +1339,6 @@
       btn.classList.add('active');
       const t = btn.dataset.v;
       document.getElementById('viewTransfer').style.display = t === 'transfer' ? 'block' : 'none';
-      document.getElementById('viewTours').style.display = t === 'tours' ? 'block' : 'none';
       document.getElementById('viewAeroporto').style.display = t === 'aeroporto' ? 'block' : 'none';
       document.getElementById('viewFaturamento').style.display = t === 'faturamento' ? 'block' : 'none';
       document.getElementById('viewPedidos').style.display = t === 'pedidos' ? 'block' : 'none';
@@ -1436,7 +1361,6 @@
   setupSeg('segDirecaoAp', 'direcaoAp', calcularAeroporto);
   setupSeg('segVeiculoAp', 'veiculoAp', calcularAeroporto);
   setupSeg('segHorarioAp', 'horarioAp', calcularAeroporto);
-  setupSeg('segVeiculoTr', 'veiculoTr', calcularTour);
 
   document.getElementById('regressoVazio').addEventListener('change', (e)=>{
     const dupla = e.target.checked;
@@ -1590,197 +1514,6 @@
   }
   calcularAeroporto();
 
-  // ---------- Tours: configuração em "Minhas tarifas" ----------
-  function renderListaTours(){
-    const tours = lerTours();
-    const el = document.getElementById('listaTours');
-    if(!el) return;
-    if(tours.length === 0){
-      el.innerHTML = '<p class="nota" style="text-align:left; margin:0;">Ainda não tens nenhum tour configurado.</p>';
-      return;
-    }
-    el.innerHTML = tours.map(t => `
-      <div style="border:1px solid var(--linha); border-radius:8px; padding:10px 12px; margin-bottom:8px; font-family:'Helvetica Neue', Arial, sans-serif;">
-        <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:8px;">
-          <div>
-            <div style="font-weight:bold; font-size:13.5px; color:var(--texto);">${t.nome}</div>
-            <div style="font-size:12px; color:#6a7378; margin-top:2px;">${t.duracao || ''} · Sedan €${t.precoSedan} · Van ${(t.precoVan === '' || t.precoVan === undefined || t.precoVan === null) ? '<em>por definir</em>' : '€' + t.precoVan}</div>
-          </div>
-          <button data-remover-tour="${t.id}" style="border:none; background:none; color:var(--terracota); font-size:16px; cursor:pointer; padding:2px 4px;">✕</button>
-        </div>
-      </div>
-    `).join('');
-  }
-  document.getElementById('listaTours').addEventListener('click', (e)=>{
-    const id = e.target.dataset.removerTour;
-    if(!id) return;
-    if(confirm('Remover este tour?')){
-      const tours = lerTours().filter(t => t.id !== id);
-      gravarTours(tours);
-      renderListaTours();
-      preencherSelectTours();
-    }
-  });
-  document.getElementById('btnAdicionarTour').addEventListener('click', ()=>{
-    const nome = document.getElementById('tour_novo_nome').value.trim();
-    const duracao = document.getElementById('tour_novo_duracao').value.trim();
-    const precoSedan = parseFloat(document.getElementById('tour_novo_sedan').value);
-    const precoVanRaw = document.getElementById('tour_novo_van').value.trim();
-    const precoVan = precoVanRaw === '' ? '' : parseFloat(precoVanRaw);
-    if(!nome || isNaN(precoSedan) || (precoVan !== '' && isNaN(precoVan))){
-      alert('Preenche pelo menos o nome e o preço de sedan.');
-      return;
-    }
-    const tours = lerTours();
-    tours.push({
-      id: Date.now().toString(36) + Math.random().toString(36).slice(2,7),
-      nome, duracao, precoSedan, precoVan
-    });
-    gravarTours(tours);
-    renderListaTours();
-    preencherSelectTours();
-    document.getElementById('tour_novo_nome').value = '';
-    document.getElementById('tour_novo_duracao').value = '';
-    document.getElementById('tour_novo_sedan').value = '';
-    document.getElementById('tour_novo_van').value = '';
-  });
-  renderListaTours();
-
-  // ---------- Tours: aba de orçamento ----------
-  function preencherSelectTours(){
-    const sel = document.getElementById('tr_pacote');
-    const tours = lerTours();
-    const semTours = document.getElementById('tr_semTours');
-    if(tours.length === 0){
-      sel.innerHTML = '';
-      sel.style.display = 'none';
-      semTours.style.display = 'block';
-      return;
-    }
-    sel.style.display = 'block';
-    semTours.style.display = 'none';
-    const valorAtual = sel.value;
-    sel.innerHTML = tours.map(t => `<option value="${t.id}">${t.nome}</option>`).join('');
-    if(tours.some(t => t.id === valorAtual)) sel.value = valorAtual;
-  }
-  preencherSelectTours();
-
-  function calcularTour(){
-    const tours = lerTours();
-    const t = tours.find(x => x.id === document.getElementById('tr_pacote').value);
-    const campoCobrarTour = document.getElementById('tr_cobrar');
-    if(!t){
-      document.getElementById('tr_valor').textContent = '0';
-      document.getElementById('tr_detalhe').textContent = '';
-      if(!campoCobrarTour.dataset.editado) campoCobrarTour.value = '';
-      return;
-    }
-    const isVan = state.veiculoTr === 'van';
-    const valor = isVan ? t.precoVan : t.precoSedan;
-    if(valor === '' || valor === null || valor === undefined || isNaN(valor)){
-      document.getElementById('tr_valor').textContent = '—';
-      document.getElementById('tr_detalhe').textContent = (t.duracao ? t.duracao + ' · ' : '') + 'preço de van ainda por definir';
-      if(!campoCobrarTour.dataset.editado) campoCobrarTour.value = '';
-      return;
-    }
-    document.getElementById('tr_valor').textContent = Number(valor).toFixed(0);
-    document.getElementById('tr_detalhe').textContent = t.duracao || '';
-    if(!campoCobrarTour.dataset.editado) campoCobrarTour.value = Number(valor).toFixed(2);
-  }
-  document.getElementById('tr_cobrar').addEventListener('input', (e)=>{
-    e.target.dataset.editado = '1';
-  });
-  document.getElementById('tr_pacote').addEventListener('change', calcularTour);
-  calcularTour();
-
-  document.getElementById('tr_btnNovo').addEventListener('click', ()=>{
-    document.getElementById('tr_pacote').selectedIndex = 0;
-    document.getElementById('tr_data').value = '';
-    document.getElementById('tr_passageiros').value = '';
-    delete document.getElementById('tr_cobrar').dataset.editado;
-    state.veiculoTr = 'sedan';
-    document.getElementById('segVeiculoTr').querySelectorAll('button').forEach(b=>{
-      b.classList.toggle('active', b.dataset.v === 'sedan');
-    });
-    calcularTour();
-  });
-
-  function gerarMensagemOrcamentoTour(){
-    const tours = lerTours();
-    const t = tours.find(x => x.id === document.getElementById('tr_pacote').value);
-    if(!t) return '';
-    const veiculo = state.veiculoTr === 'van' ? 'Van' : 'Sedan';
-    const valor = document.getElementById('tr_cobrar').value || document.getElementById('tr_valor').textContent;
-    if(!valor || valor === '—') return '';
-    const nome = (localStorage.getItem('trajeto_nome') || '').trim();
-    const pag = JSON.parse(localStorage.getItem('trajeto_pagamentos') || 'null') || { mbway:true, dinheiro:true, cartao:true };
-    const metodos = [];
-    if(pag.mbway) metodos.push('MB WAY');
-    if(pag.dinheiro) metodos.push('Dinheiro');
-    if(pag.cartao) metodos.push('Cartão bancário');
-
-    let msg = 'Olá! 👋 Orçamento do seu tour:\n\n';
-    msg += `🗺️ ${t.nome}${t.duracao ? ' · ' + t.duracao : ''}\n`;
-    msg += `🚗 ${veiculo}\n\n`;
-    msg += `💶 €${valor} — valor final, sem surpresas\n`;
-    if(metodos.length > 0) msg += `💳 Pagamento: ${metodos.join(', ')}\n`;
-    msg += '\nTenho disponibilidade para esta data. Posso confirmar já a sua reserva — é só dizer! 😊\n\n';
-    msg += nome ? `${nome} · Motorista TVDE, Lisboa` : 'Motorista TVDE, Lisboa';
-    return msg;
-  }
-  document.getElementById('btnCopiarOrcamentoTour').addEventListener('click', ()=>{
-    const texto = gerarMensagemOrcamentoTour();
-    if(!texto){ alert('Escolhe um tour com o preço deste veículo já definido em "Minhas tarifas".'); return; }
-    const btn = document.getElementById('btnCopiarOrcamentoTour');
-    const original = btn.textContent;
-    const marcarCopiado = ()=>{
-      btn.textContent = '✅ Copiado!';
-      setTimeout(()=>{ btn.textContent = original; }, 1800);
-    };
-    if(navigator.clipboard){
-      navigator.clipboard.writeText(texto).then(marcarCopiado).catch(()=>{ alert(texto); });
-    } else {
-      alert(texto);
-    }
-  });
-
-  let proximoAgendamentoTipo = 'transfer';
-
-  function aplicarVisualTipoFormulario(tipo){
-    const ehTour = tipo === 'tour';
-    document.getElementById('ag_secaoTrajeto').textContent = ehTour ? '🗺️ Tour' : '📍 Trajeto';
-    document.getElementById('blocoTourInfo').style.display = ehTour ? 'block' : 'none';
-    document.getElementById('ag_label_partida').textContent = ehTour ? 'Local de recolha (hotel, casa, etc.)' : 'Endereço de partida';
-    document.getElementById('ag_partida').placeholder = ehTour ? 'ex: Hotel Avenida Palace' : 'ex: Aeroporto de Lisboa, T1';
-    document.getElementById('blocoChegadaTransfer').style.display = ehTour ? 'none' : 'block';
-
-    // Move o formulário de verdade para dentro da aba certa — assim o
-    // próprio sistema de abas (que já esconde/mostra cada view) trata
-    // de esconder o formulário sozinho quando saltas de aba.
-    const painel = document.getElementById('painelAgendar');
-    const slot = document.getElementById(ehTour ? 'slotAgendarTour' : 'slotAgendarTransfer');
-    slot.parentNode.insertBefore(painel, slot);
-  }
-  document.getElementById('btnAgendarTour').addEventListener('click', ()=>{
-    const tours = lerTours();
-    const t = tours.find(x => x.id === document.getElementById('tr_pacote').value);
-    if(!t){ alert('Escolhe primeiro um tour.'); return; }
-    proximoAgendamentoTipo = 'tour';
-    editandoId = null;
-    document.getElementById('btnGuardarAgendamento').textContent = 'Guardar e adicionar ao calendário';
-    aplicarVisualTipoFormulario('tour');
-    document.getElementById('ag_tour_nome').value = t.nome;
-    document.getElementById('ag_tour_titulo').value = t.nome + (t.duracao ? ' · ' + t.duracao : '');
-    document.getElementById('ag_partida').value = '';
-    document.getElementById('ag_chegada').value = t.duracao || '';
-    const valorTour = document.getElementById('tr_cobrar').value || document.getElementById('tr_valor').textContent;
-    document.getElementById('ag_valor').value = (valorTour === '—' || !valorTour) ? '' : valorTour;
-    document.getElementById('ag_data').value = document.getElementById('tr_data').value || '';
-    const p = document.getElementById('painelAgendar');
-    p.style.display = 'block';
-    p.scrollIntoView({behavior:'smooth', block:'start'});
-  });
-
   // ---------- Agendamento ----------
   //
   // SINCRONIZAÇÃO NA NUVEM (Firebase) — já ligada.
@@ -1808,47 +1541,11 @@
     sincronizarNuvem();
   }
 
-  // ---------- Tours ----------
-  const TOURS_KEY = 'trajeto_tours';
-  const TOURS_SEED_FLAG = 'trajeto_tours_seed_v1';
-  const TOURS_PADRAO = [
-    { nome: 'Lisboa + Cristo Rei', duracao: '6 Horas', precoSedan: 200, precoVan: '' },
-    { nome: 'Sintra & Cascais', duracao: 'Dia inteiro (8–10 horas)', precoSedan: 300, precoVan: '' },
-    { nome: 'Setúbal & Sesimbra', duracao: 'Dia inteiro (8 horas)', precoSedan: 350, precoVan: '' },
-    { nome: 'Fátima', duracao: 'Dia inteiro', precoSedan: 300, precoVan: '' },
-    { nome: 'Fátima, Santarém e Tomar', duracao: 'Dia inteiro', precoSedan: 350, precoVan: '' },
-    { nome: 'Fátima, Batalha e Óbidos', duracao: 'Dia inteiro', precoSedan: 350, precoVan: '' },
-    { nome: 'Nazaré, Batalha e Óbidos', duracao: 'Dia inteiro', precoSedan: 300, precoVan: '' },
-    { nome: 'Experiência Vinho (Bacalhôa & Adega de Palmela)', duracao: 'Meio dia', precoSedan: 150, precoVan: '' }
-  ];
-  function lerTours(){
-    try{ return JSON.parse(localStorage.getItem(TOURS_KEY)) || []; }
-    catch(e){ return []; }
-  }
-  function gravarTours(lista){
-    localStorage.setItem(TOURS_KEY, JSON.stringify(lista));
-    sincronizarNuvem();
-    if(window.TrajetoCloud && window.TrajetoCloud.utilizadorAtual){
-      window.TrajetoCloud.publicarToursPublicos(lista);
-    }
-  }
-  // Semeia os tours predefinidos uma única vez, se ainda não houver nenhum guardado.
-  // Depois disto, a lista passa a ser inteiramente gerida pelo utilizador (não volta a semear).
-  if(!localStorage.getItem(TOURS_SEED_FLAG) && lerTours().length === 0){
-    const semeados = TOURS_PADRAO.map(t => ({
-      id: Date.now().toString(36) + Math.random().toString(36).slice(2,7),
-      ...t
-    }));
-    localStorage.setItem(TOURS_KEY, JSON.stringify(semeados));
-    localStorage.setItem(TOURS_SEED_FLAG, '1');
-  }
-
   // ---------- Sincronização na nuvem ----------
   let sincronizacaoTimer = null;
   function montarDadosParaNuvem(){
     return {
       agendamentos: lerAgendamentos(),
-      tours: lerTours(),
       cfg: cfg,
       nome: localStorage.getItem('trajeto_nome') || '',
       pagamentos: JSON.parse(localStorage.getItem('trajeto_pagamentos') || 'null') || { mbway:true, dinheiro:true, cartao:true },
@@ -1866,11 +1563,6 @@
   function aplicarDadosDaNuvem(dados){
     if(Array.isArray(dados.agendamentos)){
       localStorage.setItem(AG_KEY, JSON.stringify(dados.agendamentos));
-    }
-    if(Array.isArray(dados.tours)){
-      localStorage.setItem(TOURS_KEY, JSON.stringify(dados.tours));
-      renderListaTours();
-      preencherSelectTours();
     }
     if(dados.cfg){
       cfg = { ...DEFAULTS, ...dados.cfg };
@@ -2088,8 +1780,6 @@
     p.style.display = abrir ? 'block' : 'none';
     if(abrir){
       editandoId = null;
-      proximoAgendamentoTipo = 'transfer';
-      aplicarVisualTipoFormulario('transfer');
       document.getElementById('btnGuardarAgendamento').textContent = 'Guardar e adicionar ao calendário';
       document.getElementById('ag_valor').value = document.getElementById('ct_cobrar').value;
       if(!document.getElementById('ag_partida').value) document.getElementById('ag_partida').value = document.getElementById('ct_origem').value;
@@ -2155,7 +1845,6 @@
   }
 
   let filtroAg = 'ativos';
-  let filtroAgTour = 'ativos';
   document.getElementById('segFiltroAg').querySelectorAll('button').forEach(btn=>{
     btn.addEventListener('click', ()=>{
       document.getElementById('segFiltroAg').querySelectorAll('button').forEach(b=>b.classList.remove('active'));
@@ -2164,26 +1853,17 @@
       renderLista();
     });
   });
-  document.getElementById('segFiltroAgTour').querySelectorAll('button').forEach(btn=>{
-    btn.addEventListener('click', ()=>{
-      document.getElementById('segFiltroAgTour').querySelectorAll('button').forEach(b=>b.classList.remove('active'));
-      btn.classList.add('active');
-      filtroAgTour = btn.dataset.v;
-      renderLista();
-    });
-  });
 
-  function renderListaGenerica(containerId, filtro, ehTourLista){
+  function renderLista(){
     const todos = lerAgendamentos();
     const lista = todos
-      .filter(ag => ehTourLista ? ag.tipo === 'tour' : ag.tipo !== 'tour')
-      .filter(ag => filtro === 'concluidos' ? ag.realizado : !ag.realizado)
+      .filter(ag => filtroAg === 'concluidos' ? ag.realizado : !ag.realizado)
       .sort((a,b)=> (a.data+a.hora).localeCompare(b.data+b.hora));
-    const el = document.getElementById(containerId);
+    const el = document.getElementById('listaAgendamentos');
     if(lista.length === 0){
-      el.innerHTML = filtro === 'concluidos'
+      el.innerHTML = filtroAg === 'concluidos'
         ? '<p class="ag-vazio">Ainda não tens agendamentos concluídos.</p>'
-        : (ehTourLista ? '<p class="ag-vazio">Nenhum tour ativo — tudo tratado! 🎉</p>' : '<p class="ag-vazio">Nenhum agendamento ativo — tudo tratado! 🎉</p>');
+        : '<p class="ag-vazio">Nenhum agendamento ativo — tudo tratado! 🎉</p>';
       return;
     }
     el.innerHTML = lista.map(ag => {
@@ -2192,31 +1872,19 @@
         '<span class="ag-badge-pendente">⏳ A receber</span>';
       const btnRecebido = (ag.realizado && ag.pagamento === 'pendente')
         ? `<button class="ag-btn-ok" data-acao="marcarRecebido">💰 Marcar como recebido</button>` : '';
-      const ehTour = ag.tipo === 'tour';
-      const linhaTrajeto = ehTour
-        ? `🗺️ ${ag.tourNome || ag.partida}${ag.chegada ? ' · ' + ag.chegada : ''}`
-        : `${ag.partida} → ${ag.chegada}`;
-      const navWaze = ehTour
-        ? (ag.partida ? `
-        <div class="ag-nav">
-          <button class="ag-btn-buscar" data-acao="buscar">🚗 Ir buscar cliente</button>
-        </div>` : '')
-        : `
-        <div class="ag-nav">
-          <button class="ag-btn-buscar" data-acao="buscar">🚗 Ir buscar cliente</button>
-          <button class="ag-btn-levar" data-acao="levar">🏁 Iniciar viagem</button>
-        </div>`;
       return `
       <div class="ag-item ${ag.realizado ? 'ag-item-realizado' : ''}" data-id="${ag.id}">
-        <div class="ag-trajeto">${linhaTrajeto}${ag.realizado ? '<span class="ag-badge-ok">✔ Concluído</span>' : ''}${seloPagamento}</div>
+        <div class="ag-trajeto">${ag.partida} → ${ag.chegada}${ag.realizado ? '<span class="ag-badge-ok">✔ Concluído</span>' : ''}${seloPagamento}</div>
         <div class="ag-meta">
           📅 ${ag.data.split('-').reverse().join('/')} às ${ag.hora}<br>
           👤 ${ag.cliente} &nbsp;·&nbsp; <span class="ag-valor">€${ag.valor}</span>
-          ${ehTour && ag.partida ? `<br>📍 Recolha: ${ag.partida}` : ''}
           ${ag.fornecedor ? `<br>🏷 Fornecedor: ${ag.fornecedor}` : ''}
           ${ag.observacoes ? `<br>📝 ${ag.observacoes}` : ''}
         </div>
-        ${navWaze}
+        <div class="ag-nav">
+          <button class="ag-btn-buscar" data-acao="buscar">🚗 Ir buscar cliente</button>
+          <button class="ag-btn-levar" data-acao="levar">🏁 Iniciar viagem</button>
+        </div>
         <div class="ag-acoes">
           <button class="ag-btn-cal" data-acao="editar">✏️ Editar</button>
           <button class="ag-btn-cal" data-acao="cal">📅 Calendário</button>
@@ -2228,11 +1896,6 @@
         </div>
       </div>
     `;}).join('');
-  }
-
-  function renderLista(){
-    renderListaGenerica('listaAgendamentos', filtroAg, false);
-    renderListaGenerica('listaAgendamentosTour', filtroAgTour, true);
   }
 
   function normalizarTelefone(tel){
@@ -2247,9 +1910,6 @@
     const dataFmt = ag.data.split('-').reverse().join('/');
     const nome = localStorage.getItem('trajeto_nome') || '';
     const assinatura = nome ? `Aqui é o ${nome}` : 'Aqui é o teu motorista';
-    if(ag.tipo === 'tour'){
-      return `Olá ${ag.cliente}! 👋\n\n${assinatura} — confirmo os dados do seu tour:\n\n🗺️ Tour: ${ag.tourNome || ''}${ag.chegada ? '\n⏱️ Duração: ' + ag.chegada : ''}${ag.partida ? '\n📍 Recolha: ' + ag.partida : ''}\n📅 Data: ${dataFmt}\n🕐 Horário: ${ag.hora}\n💰 Valor: €${ag.valor}\n\nPode confirmar este serviço, por favor? Fico a aguardar a sua resposta. Obrigado! 🚗`;
-    }
     return `Olá ${ag.cliente}! 👋\n\n${assinatura} — confirmo os dados do seu transfer:\n\n📍 De: ${ag.partida}\n📍 Para: ${ag.chegada}\n📅 Data: ${dataFmt}\n🕐 Horário: ${ag.hora}\n💰 Valor: €${ag.valor}\n\nPode confirmar este serviço, por favor? Fico a aguardar a sua resposta. Obrigado! 🚗`;
   }
 
@@ -2272,11 +1932,8 @@
   }
 
   function preencherFormAgendamento(ag){
-    aplicarVisualTipoFormulario(ag.tipo || 'transfer');
     document.getElementById('ag_partida').value = ag.partida;
     document.getElementById('ag_chegada').value = ag.chegada;
-    document.getElementById('ag_tour_nome').value = ag.tourNome || '';
-    document.getElementById('ag_tour_titulo').value = ag.tourNome ? (ag.tourNome + (ag.chegada ? ' · ' + ag.chegada : '')) : '';
     document.getElementById('ag_data').value = ag.data;
     document.getElementById('ag_hora').value = ag.hora;
     document.getElementById('ag_cliente').value = ag.cliente;
@@ -2306,9 +1963,6 @@
   function gerarMensagemRepasse(ag){
     const dataFmt = ag.data.split('-').reverse().join('/');
     const link = gerarLinkRepasse(ag);
-    if(ag.tipo === 'tour'){
-      return `🗺️ Tour para repassar\n\n🗺️ Tour: ${ag.tourNome || ''}${ag.chegada ? ' · ' + ag.chegada : ''}${ag.partida ? '\n📍 Recolha: ' + ag.partida : ''}\n📅 Data: ${dataFmt} às ${ag.hora}\n👤 Cliente: ${ag.cliente}${ag.telefone ? '\n📞 Telefone: ' + ag.telefone : ''}\n💶 Valor: €${ag.valor}\n\nSe tiveres a app Trajeto, abre este link para adicionar automaticamente aos teus agendamentos:\n${link}`;
-    }
     return `🚗 Transfer para repassar\n\n📍 De: ${ag.partida}\n📍 Para: ${ag.chegada}\n📅 Data: ${dataFmt} às ${ag.hora}\n👤 Cliente: ${ag.cliente}${ag.telefone ? '\n📞 Telefone: ' + ag.telefone : ''}\n💶 Valor: €${ag.valor}\n\nSe tiveres a app Trajeto, abre este link para adicionar automaticamente aos teus agendamentos:\n${link}`;
   }
 
@@ -2437,7 +2091,6 @@
 
   function abrirEdicao(ag){
     editandoId = ag.id;
-    proximoAgendamentoTipo = ag.tipo || 'transfer';
     preencherFormAgendamento(ag);
     document.getElementById('btnGuardarAgendamento').textContent = 'Guardar alterações';
     const p = document.getElementById('painelAgendar');
@@ -2489,7 +2142,6 @@
     }
   }
   document.getElementById('listaAgendamentos').addEventListener('click', handlerCliqueAgendamento);
-  document.getElementById('listaAgendamentosTour').addEventListener('click', handlerCliqueAgendamento);
 
   // ---------- Faturamento ----------
   let fatModo = 'mes';
@@ -2570,17 +2222,12 @@
     }
     const ordenados = [...pedidos].sort((a,b)=> (a.data+a.hora).localeCompare(b.data+b.hora));
     el.innerHTML = ordenados.map(p => {
-      const ehTour = p.tipo === 'tour';
-      const linha = ehTour
-        ? `🗺️ ${p.tourNome || 'Tour'} <span style="font-weight:normal; color:#6a7378;">(${p.veiculo === 'van' ? 'Van' : 'Sedan'})</span>`
-        : `${p.partida} → ${p.chegada}`;
       return `
       <div class="ag-item" data-id="${p.id}">
-        <div class="ag-trajeto">${linha}</div>
+        <div class="ag-trajeto">${p.partida} → ${p.chegada}</div>
         <div class="ag-meta">
           📅 ${p.data.split('-').reverse().join('/')} às ${p.hora}<br>
           👤 ${p.nome} &nbsp;·&nbsp; 📞 ${p.contacto}
-          ${ehTour && p.partida ? `<br>📍 Recolha: ${p.partida}` : ''}
           ${p.passageiros ? `<br>🧑‍🤝‍🧑 ${p.passageiros} passageiro(s)` : ''}
           ${p.observacoes ? `<br>📝 ${p.observacoes}` : ''}
         </div>
@@ -2611,36 +2258,15 @@
       let obs = p.observacoes || '';
       if(p.passageiros) obs = `${p.passageiros} passageiro(s)${obs ? ' — ' + obs : ''}`;
 
-      let ag;
-      if(p.tipo === 'tour'){
-        const tourCfg = lerTours().find(t => t.id === p.tourId);
-        let valorSugerido = '';
-        if(tourCfg) valorSugerido = p.veiculo === 'van' ? tourCfg.precoVan : tourCfg.precoSedan;
-        ag = {
-          id: Date.now().toString(36) + Math.random().toString(36).slice(2,7),
-          tipo: 'tour',
-          tourNome: p.tourNome || (tourCfg ? tourCfg.nome : 'Tour'),
-          partida: p.partida || '',
-          chegada: tourCfg ? (tourCfg.duracao || '') : '',
-          data: p.data, hora: p.hora,
-          cliente: p.nome, telefone: p.contacto, nomePlaca: '', voo: '',
-          fornecedor: 'Site — pedido online',
-          valor: valorSugerido,
-          observacoes: obs,
-          realizado: false
-        };
-      } else {
-        ag = {
-          id: Date.now().toString(36) + Math.random().toString(36).slice(2,7),
-          tipo: 'transfer',
-          partida: p.partida, chegada: p.chegada, data: p.data, hora: p.hora,
-          cliente: p.nome, telefone: p.contacto, nomePlaca: '', voo: '',
-          fornecedor: 'Site — pedido online',
-          valor: '',
-          observacoes: obs,
-          realizado: false
-        };
-      }
+      const ag = {
+        id: Date.now().toString(36) + Math.random().toString(36).slice(2,7),
+        partida: p.partida, chegada: p.chegada, data: p.data, hora: p.hora,
+        cliente: p.nome, telefone: p.contacto, nomePlaca: '', voo: '',
+        fornecedor: 'Site — pedido online',
+        valor: '',
+        observacoes: obs,
+        realizado: false
+      };
       const lista = lerAgendamentos();
       lista.push(ag);
       gravarAgendamentos(lista);
@@ -2735,13 +2361,9 @@
     const fornecedor = document.getElementById('ag_fornecedor').value.trim();
     const valor = document.getElementById('ag_valor').value;
     const observacoes = document.getElementById('ag_observacoes').value.trim();
-    const tourNome = document.getElementById('ag_tour_nome').value.trim();
 
-    const exigirChegada = proximoAgendamentoTipo !== 'tour';
-    if(!partida || (exigirChegada && !chegada) || !data || !hora || !cliente){
-      alert(exigirChegada
-        ? 'Preenche partida, chegada, data, horário e nome do cliente.'
-        : 'Preenche o local de recolha, a data, o horário e o nome do cliente.');
+    if(!partida || !chegada || !data || !hora || !cliente){
+      alert('Preenche partida, chegada, data, horário e nome do cliente.');
       return;
     }
 
@@ -2761,7 +2383,6 @@
         ag.fornecedor = fornecedor;
         ag.valor = valor || ag.valor;
         ag.observacoes = observacoes;
-        if(ag.tipo === 'tour') ag.tourNome = tourNome;
         gravarAgendamentos(lista);
         renderLista();
         renderFaturamento();
@@ -2772,21 +2393,16 @@
     } else {
       const ag = {
         id: Date.now().toString(36) + Math.random().toString(36).slice(2,7),
-        tipo: proximoAgendamentoTipo,
         partida, chegada, data, hora, cliente, telefone, nomePlaca, voo, fornecedor, observacoes,
         valor: valor || document.getElementById('ct_cobrar').value,
         realizado: false
       };
-      if(proximoAgendamentoTipo === 'tour') ag.tourNome = tourNome;
       lista.push(ag);
       gravarAgendamentos(lista);
       renderLista();
       abrirICS(ag);
     }
-    proximoAgendamentoTipo = 'transfer';
 
-    document.getElementById('ag_tour_nome').value = '';
-    document.getElementById('ag_tour_titulo').value = '';
     document.getElementById('ag_partida').value = '';
     document.getElementById('ag_chegada').value = '';
     document.getElementById('ag_cliente').value = '';
@@ -2909,7 +2525,6 @@
     document.getElementById('segModo').querySelectorAll('button').forEach(b=>b.classList.remove('active'));
     document.querySelector('#segModo button[data-v="transfer"]').classList.add('active');
     document.getElementById('viewTransfer').style.display = 'block';
-    document.getElementById('viewTours').style.display = 'none';
     document.getElementById('viewAeroporto').style.display = 'none';
     document.getElementById('viewFaturamento').style.display = 'none';
     document.getElementById('viewPedidos').style.display = 'none';
@@ -3037,11 +2652,6 @@ if ('serviceWorker' in navigator) {
   async function criarCodigoConvite(codigo){
     await setDoc(doc(db, 'trajeto_convites', codigo), { ativo: true, criadoEm: Date.now() });
   }
-  async function publicarToursPublicos(lista){
-    try{
-      await setDoc(doc(db, 'trajeto_publico', 'tours'), { tours: lista, atualizadoEm: Date.now() });
-    }catch(e){ /* falha silenciosa — o site de pedidos só não atualiza a lista, o app continua normal */ }
-  }
 
   window.TrajetoCloud = {
     entrar: (email, senha) => signInWithEmailAndPassword(auth, email, senha),
@@ -3049,7 +2659,6 @@ if ('serviceWorker' in navigator) {
     verificarCodigoConvite,
     marcarCodigoUsado,
     criarCodigoConvite,
-    publicarToursPublicos,
     sair: () => {
       if(cancelarOuvinte){ cancelarOuvinte(); cancelarOuvinte = null; }
       if(cancelarOuvintePedidos){ cancelarOuvintePedidos(); cancelarOuvintePedidos = null; }
