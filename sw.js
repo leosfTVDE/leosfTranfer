@@ -1,4 +1,4 @@
-const CACHE_NAME = 'trajeto-v50';
+const CACHE_NAME = 'trajeto-v51';
 const ASSETS = [
   './',
   './index.html',
