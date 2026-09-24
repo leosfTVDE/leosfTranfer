@@ -1058,6 +1058,7 @@
         <textarea id="ag_observacoes" placeholder="ex: bagagem extra, cadeirinha, alergias, pedidos especiais..." style="min-height:60px;"></textarea>
 
         <button class="btn-guardar-agendamento" id="btnGuardarAgendamento">Guardar e adicionar ao calendário</button>
+        <button id="btnCancelarAgendamento" style="width:100%; margin-top:10px; padding:11px; border-radius:8px; border:1px solid var(--linha); background:none; color:#8a7378; font-family:'Helvetica Neue', Arial, sans-serif; font-size:13.5px; cursor:pointer;">✖️ Cancelar</button>
       </div>
     </div>
   </div>
@@ -1147,7 +1148,7 @@
     <p class="nota">Estes pedidos vêm do teu site de cotações. "Aceitar" cria logo um agendamento (ainda podes editar tudo depois); "Recusar" só remove daqui.<br><br>Precisas de estar com sessão iniciada (em "Minhas tarifas") para veres os pedidos novos.</p>
   </div>
 
-  <p style="text-align:center; font-family:'Helvetica Neue', Arial, sans-serif; font-size:11px; color:#8a7f66; margin-top:24px;">Trajeto · v7.4</p>
+  <p style="text-align:center; font-family:'Helvetica Neue', Arial, sans-serif; font-size:11px; color:#8a7f66; margin-top:24px;">Trajeto · v7.5</p>
 
 </main>
 
@@ -2410,6 +2411,23 @@
     document.getElementById('ag_nomeplaca').value = '';
     document.getElementById('ag_voo').value = '';
     document.getElementById('ag_fornecedor').value = '';
+    document.getElementById('ag_observacoes').value = '';
+    document.getElementById('painelAgendar').style.display = 'none';
+  });
+
+  document.getElementById('btnCancelarAgendamento').addEventListener('click', ()=>{
+    editandoId = null;
+    document.getElementById('btnGuardarAgendamento').textContent = 'Guardar e adicionar ao calendário';
+    document.getElementById('ag_partida').value = '';
+    document.getElementById('ag_chegada').value = '';
+    document.getElementById('ag_cliente').value = '';
+    document.getElementById('ag_telefone').value = '';
+    document.getElementById('ag_nomeplaca').value = '';
+    document.getElementById('ag_voo').value = '';
+    document.getElementById('ag_fornecedor').value = '';
+    document.getElementById('ag_valor').value = '';
+    document.getElementById('ag_data').value = '';
+    document.getElementById('ag_hora').value = '';
     document.getElementById('ag_observacoes').value = '';
     document.getElementById('painelAgendar').style.display = 'none';
   });
