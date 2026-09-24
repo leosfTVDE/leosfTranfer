@@ -932,7 +932,8 @@
     </div>
 
     <div class="card">
-      <h2>📍 Calculadora de Transfer</h2>
+      <h2 id="ct_toggleCalc" style="cursor:pointer; display:flex; align-items:center; justify-content:space-between;">📍 Calculadora de Transfer <span class="seta" id="ct_setaCalc" style="font-size:14px; color:var(--azulejo); transition:transform .2s ease;">▸</span></h2>
+      <div id="ct_conteudoCalc" style="display:none;">
       <div class="row2">
         <div>
           <label for="ct_origem">Origem (opcional)</label>
@@ -987,6 +988,7 @@
         <label class="chk"><input type="checkbox" id="ct_bagagem"> Bagagem extra (+€7)</label>
         <label class="chk"><input type="checkbox" id="ct_cadeira"> Cadeirinha (+€8)</label>
         <label class="chk"><input type="checkbox" id="ct_recibo"> Emitir recibo (+IVA)</label>
+      </div>
       </div>
     </div>
 
@@ -1148,7 +1150,7 @@
     <p class="nota">Estes pedidos vêm do teu site de cotações. "Aceitar" cria logo um agendamento (ainda podes editar tudo depois); "Recusar" só remove daqui.<br><br>Precisas de estar com sessão iniciada (em "Minhas tarifas") para veres os pedidos novos.</p>
   </div>
 
-  <p style="text-align:center; font-family:'Helvetica Neue', Arial, sans-serif; font-size:11px; color:#8a7f66; margin-top:24px;">Trajeto · v7.5</p>
+  <p style="text-align:center; font-family:'Helvetica Neue', Arial, sans-serif; font-size:11px; color:#8a7f66; margin-top:24px;">Trajeto · v7.6</p>
 
 </main>
 
@@ -1267,6 +1269,14 @@
       const aberto = titulo.classList.toggle('aberto');
       conteudo.classList.toggle('aberto', aberto);
     });
+  });
+
+  document.getElementById('ct_toggleCalc').addEventListener('click', ()=>{
+    const conteudo = document.getElementById('ct_conteudoCalc');
+    const seta = document.getElementById('ct_setaCalc');
+    const aberto = conteudo.style.display !== 'block';
+    conteudo.style.display = aberto ? 'block' : 'none';
+    seta.style.transform = aberto ? 'rotate(90deg)' : 'rotate(0deg)';
   });
 
   function aplicarPagamentosUI(pag){
