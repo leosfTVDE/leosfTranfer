@@ -1021,7 +1021,19 @@
       <button class="btn-agendar" id="btnAbrirAgendar">📅 Agendar esta corrida</button>
     </div>
 
-    <div id="painelAgendar">
+    <div class="card">
+      <h2>Meus agendamentos</h2>
+      <div class="seg" id="segFiltroAg" style="margin-bottom:14px;">
+        <button data-v="ativos" class="active">Ativos</button>
+        <button data-v="concluidos">Concluídos</button>
+      </div>
+      <div class="lista-agendamentos" id="listaAgendamentos"></div>
+    </div>
+
+    <p class="nota">Os botões "Ir buscar cliente" e "Iniciar viagem" abrem o Waze já com o destino certo — ele usa a tua localização atual como ponto de partida automaticamente (precisa do Waze instalado no telemóvel).<br><br>A calculadora não soma ida + volta automaticamente, a não ser que marques "Regresso vazio". Portagens não são calculadas automaticamente — confirma no Waze/Google Maps e insere aqui manualmente.<br><br>Os agendamentos ficam guardados só neste telemóvel/navegador. O lembrete 24h antes é feito pelo teu Calendário.</p>
+  </div>
+
+  <div id="painelAgendar">
       <div class="card">
         <h2>Agendar corrida</h2>
 
@@ -1076,18 +1088,6 @@
 
         <button class="btn-guardar-agendamento" id="btnGuardarAgendamento">Guardar e adicionar ao calendário</button>
       </div>
-    </div>
-
-    <div class="card">
-      <h2>Meus agendamentos</h2>
-      <div class="seg" id="segFiltroAg" style="margin-bottom:14px;">
-        <button data-v="ativos" class="active">Ativos</button>
-        <button data-v="concluidos">Concluídos</button>
-      </div>
-      <div class="lista-agendamentos" id="listaAgendamentos"></div>
-    </div>
-
-    <p class="nota">Os botões "Ir buscar cliente" e "Iniciar viagem" abrem o Waze já com o destino certo — ele usa a tua localização atual como ponto de partida automaticamente (precisa do Waze instalado no telemóvel).<br><br>A calculadora não soma ida + volta automaticamente, a não ser que marques "Regresso vazio". Portagens não são calculadas automaticamente — confirma no Waze/Google Maps e insere aqui manualmente.<br><br>Os agendamentos ficam guardados só neste telemóvel/navegador. O lembrete 24h antes é feito pelo teu Calendário.</p>
   </div>
 
   <div id="viewTours" style="display:none;">
@@ -1217,7 +1217,7 @@
     <p class="nota">Estes pedidos vêm do teu site de cotações. "Aceitar" cria logo um agendamento (ainda podes editar tudo depois); "Recusar" só remove daqui.<br><br>Precisas de estar com sessão iniciada (em "Minhas tarifas") para veres os pedidos novos.</p>
   </div>
 
-  <p style="text-align:center; font-family:'Helvetica Neue', Arial, sans-serif; font-size:11px; color:#8a7f66; margin-top:24px;">Trajeto · v7.1</p>
+  <p style="text-align:center; font-family:'Helvetica Neue', Arial, sans-serif; font-size:11px; color:#8a7f66; margin-top:24px;">Trajeto · v7.2</p>
 
 </main>
 
