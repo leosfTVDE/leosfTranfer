@@ -1164,7 +1164,7 @@
     <p class="nota">Estes pedidos vêm do teu site de cotações. "Aceitar" cria logo um agendamento (ainda podes editar tudo depois); "Recusar" só remove daqui.<br><br>Precisas de estar com sessão iniciada (em "Minhas tarifas") para veres os pedidos novos.</p>
   </div>
 
-  <p style="text-align:center; font-family:'Helvetica Neue', Arial, sans-serif; font-size:11px; color:#8a7f66; margin-top:24px;">Trajeto · v7.8</p>
+  <p style="text-align:center; font-family:'Helvetica Neue', Arial, sans-serif; font-size:11px; color:#8a7f66; margin-top:24px;">Trajeto · v8.0</p>
 
 </main>
 
@@ -1916,6 +1916,7 @@
         <div class="ag-acoes">
           <button class="ag-btn-cal" data-acao="editar">✏️ Editar</button>
           <button class="ag-btn-cal" data-acao="cal">📅 Calendário</button>
+          ${ag.voo ? `<button class="ag-btn-cal" data-acao="voo">✈️ Ver voo</button>` : ''}
           <button class="ag-btn-wpp" data-acao="wpp">✉️ Mensagem</button>
           <button class="ag-btn-wpp" data-acao="repassar">↗️ Repassar</button>
           <button class="ag-btn-ok" data-acao="realizado">${ag.realizado ? '↩️ Desfazer' : '✅ Concluído'}</button>
@@ -2149,6 +2150,9 @@
       abrirEdicao(ag);
     } else if(btn.dataset.acao === 'cal'){
       abrirICS(ag);
+    } else if(btn.dataset.acao === 'voo'){
+      const codigo = ag.voo.replace(/\s+/g, '');
+      window.open(`https://flightaware.com/live/flight/${encodeURIComponent(codigo)}`, '_blank');
     } else if(btn.dataset.acao === 'wpp'){
       enviarMensagem(ag);
     } else if(btn.dataset.acao === 'repassar'){
