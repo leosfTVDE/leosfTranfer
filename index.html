@@ -1164,7 +1164,7 @@
     <p class="nota">Estes pedidos vêm do teu site de cotações. "Aceitar" cria logo um agendamento (ainda podes editar tudo depois); "Recusar" só remove daqui.<br><br>Precisas de estar com sessão iniciada (em "Minhas tarifas") para veres os pedidos novos.</p>
   </div>
 
-  <p style="text-align:center; font-family:'Helvetica Neue', Arial, sans-serif; font-size:11px; color:#8a7f66; margin-top:24px;">Trajeto · v7.7</p>
+  <p style="text-align:center; font-family:'Helvetica Neue', Arial, sans-serif; font-size:11px; color:#8a7f66; margin-top:24px;">Trajeto · v7.8</p>
 
 </main>
 
@@ -1883,7 +1883,9 @@
     const todos = lerAgendamentos();
     const lista = todos
       .filter(ag => filtroAg === 'concluidos' ? ag.realizado : !ag.realizado)
-      .sort((a,b)=> (a.data+a.hora).localeCompare(b.data+b.hora));
+      .sort((a,b)=> filtroAg === 'concluidos'
+        ? (b.data+b.hora).localeCompare(a.data+a.hora)
+        : (a.data+a.hora).localeCompare(b.data+b.hora));
     const el = document.getElementById('listaAgendamentos');
     if(lista.length === 0){
       el.innerHTML = filtroAg === 'concluidos'
