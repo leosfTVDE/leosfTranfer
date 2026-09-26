@@ -67,10 +67,27 @@
     color:#fff;
   }
   .logo-mark{
-    width:54px; height:54px;
-    margin:0 auto 14px;
+    width:46px; height:46px;
+    margin:0 auto 4px;
     position:relative;
     z-index:1;
+  }
+  .logo-nome{
+    font-family:'Georgia', 'Iowan Old Style', serif;
+    font-style:italic;
+    font-size:26px;
+    color:var(--branco);
+    margin:0;
+    position:relative; z-index:1;
+  }
+  .logo-sub{
+    font-family:'Helvetica Neue', Arial, sans-serif;
+    font-weight:bold;
+    letter-spacing:.12em;
+    font-size:12px;
+    color:#e8794e;
+    margin:0 0 14px;
+    position:relative; z-index:1;
   }
   .eyebrow{
     font-family:'Helvetica Neue', Arial, sans-serif;
@@ -339,10 +356,11 @@
   </div>
   <svg class="logo-mark" viewBox="0 0 60 76" xmlns="http://www.w3.org/2000/svg">
     <path d="M30 2C15.6 2 4 13.6 4 28c0 21 26 46 26 46s26-25 26-46C56 13.6 44.4 2 30 2z" fill="none" stroke="#e8c9a0" stroke-width="3.4"/>
-    <circle cx="30" cy="28" r="16" fill="none" stroke="#e8c9a0" stroke-width="3"/>
-    <path d="M25 20l9 8-9 8" fill="none" stroke="#e8c9a0" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"/>
+    <circle cx="30" cy="28" r="16" fill="none" stroke="#c1552c" stroke-width="3"/>
+    <path d="M25 20l9 8-9 8" fill="none" stroke="#c1552c" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"/>
   </svg>
-  <p class="eyebrow" data-i18n="eyebrow">Transfer privado · Lisboa e arredores</p>
+  <p class="logo-nome">Trajeto</p>
+  <p class="logo-sub">TRANSFER</p>
   <h1 id="titulo">Peça a sua <em>cotação</em></h1>
   <p class="sub" data-i18n="sub">Preencha os dados do seu trajeto e entramos em contacto consigo o mais rápido possível para confirmar o preço e a reserva.</p>
 </header>
@@ -382,6 +400,9 @@
 
       <label for="p_chegada" data-i18n="label_chegada">Local de chegada</label>
       <input type="text" id="p_chegada" data-i18n-placeholder="ph_chegada" placeholder="ex: Hotel Avenida Palace" required>
+
+      <label for="p_voo" data-i18n="label_voo">Número do voo (opcional)</label>
+      <input type="text" id="p_voo" data-i18n-placeholder="ph_voo" placeholder="ex: TP1234">
 
       <div class="row2">
         <div>
@@ -470,7 +491,6 @@
 
   const TEXTOS = {
     pt: {
-      eyebrow: 'Transfer privado · Lisboa e arredores',
       titulo_html: 'Peça a sua <em>cotação</em>',
       sub: 'Preencha os dados do seu trajeto e entramos em contacto consigo o mais rápido possível para confirmar o preço e a reserva.',
       valor1: 'Sempre pontual',
@@ -484,6 +504,8 @@
       ph_partida: 'ex: Aeroporto de Lisboa, T1',
       label_chegada: 'Local de chegada',
       ph_chegada: 'ex: Hotel Avenida Palace',
+      label_voo: 'Número do voo (opcional)',
+      ph_voo: 'ex: TP1234',
       label_data: 'Data',
       label_hora: 'Horário',
       label_passageiros: 'Número de passageiros',
@@ -503,7 +525,6 @@
       parceiros_titulo: 'Parceiros'
     },
     en: {
-      eyebrow: 'Private transfer · Lisbon and surroundings',
       titulo_html: 'Request your <em>quote</em>',
       sub: 'Fill in your trip details and we\u2019ll get back to you as quickly as possible to confirm the price and booking.',
       valor1: 'Always on time',
@@ -517,6 +538,8 @@
       ph_partida: 'e.g. Lisbon Airport, T1',
       label_chegada: 'Drop-off location',
       ph_chegada: 'e.g. Avenida Palace Hotel',
+      label_voo: 'Flight number (optional)',
+      ph_voo: 'e.g. TP1234',
       label_data: 'Date',
       label_hora: 'Time',
       label_passageiros: 'Number of passengers',
@@ -648,6 +671,7 @@
       contacto: document.getElementById('p_contacto').value.trim(),
       partida: document.getElementById('p_partida').value.trim(),
       chegada: document.getElementById('p_chegada').value.trim(),
+      voo: document.getElementById('p_voo').value.trim(),
       data: document.getElementById('p_data').value,
       hora: document.getElementById('p_hora').value,
       passageiros: document.getElementById('p_passageiros').value || '',
