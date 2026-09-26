@@ -1164,7 +1164,7 @@
     <p class="nota">Estes pedidos vêm do teu site de cotações. "Aceitar" cria logo um agendamento (ainda podes editar tudo depois); "Recusar" só remove daqui.<br><br>Precisas de estar com sessão iniciada (em "Minhas tarifas") para veres os pedidos novos.</p>
   </div>
 
-  <p style="text-align:center; font-family:'Helvetica Neue', Arial, sans-serif; font-size:11px; color:#8a7f66; margin-top:24px;">Trajeto · v8.0</p>
+  <p style="text-align:center; font-family:'Helvetica Neue', Arial, sans-serif; font-size:11px; color:#8a7f66; margin-top:24px;">Trajeto · v8.3</p>
 
 </main>
 
@@ -2272,6 +2272,7 @@
         <div class="ag-meta">
           📅 ${p.data.split('-').reverse().join('/')} às ${p.hora}<br>
           👤 ${p.nome} &nbsp;·&nbsp; 📞 ${p.contacto}
+          ${p.voo ? `<br>✈️ Voo: ${p.voo}` : ''}
           ${p.passageiros ? `<br>🧑‍🤝‍🧑 ${p.passageiros} passageiro(s)` : ''}
           ${p.observacoes ? `<br>📝 ${p.observacoes}` : ''}
         </div>
@@ -2305,7 +2306,7 @@
       const ag = {
         id: Date.now().toString(36) + Math.random().toString(36).slice(2,7),
         partida: p.partida, chegada: p.chegada, data: p.data, hora: p.hora,
-        cliente: p.nome, telefone: p.contacto, nomePlaca: '', voo: '',
+        cliente: p.nome, telefone: p.contacto, nomePlaca: '', voo: p.voo || '',
         fornecedor: 'Site — pedido online',
         valor: '',
         observacoes: obs,
