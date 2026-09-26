@@ -55,6 +55,15 @@
     color:#e8c9a0;
     margin:0 0 6px;
   }
+  .logo-sub{
+    font-family: 'Helvetica Neue', Arial, sans-serif;
+    font-weight:bold;
+    letter-spacing:.12em;
+    font-size:11px;
+    color:#e8794e;
+    margin:2px 0 16px;
+    position:relative; z-index:1;
+  }
   h1{
     margin:0;
     font-size:28px;
@@ -758,9 +767,13 @@
 <body>
 
 <header>
-  <p class="eyebrow">Motorista de Transfer · Lisboa</p>
+  <svg class="logo-mark" viewBox="0 0 60 76" xmlns="http://www.w3.org/2000/svg" style="width:40px; height:50px; display:block; margin-bottom:6px; position:relative; z-index:1;">
+    <path d="M30 2C15.6 2 4 13.6 4 28c0 21 26 46 26 46s26-25 26-46C56 13.6 44.4 2 30 2z" fill="none" stroke="#e8c9a0" stroke-width="3.4"/>
+    <circle cx="30" cy="28" r="16" fill="none" stroke="#c1552c" stroke-width="3"/>
+    <path d="M25 20l9 8-9 8" fill="none" stroke="#c1552c" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"/>
+  </svg>
   <h1><em>Trajeto</em></h1>
-  <p class="sub">Preenche os dados da corrida e vê na hora o valor sugerido. O cálculo não fica guardado; se agendares, o agendamento fica só neste navegador.</p>
+  <p class="logo-sub">TRANSFER</p>
   <button id="btnConfig" class="btn-config">⚙ Minhas tarifas</button>
   <button id="btnPlacar" class="btn-config" style="margin-left:10px;">🪧 Placar</button>
 </header>
@@ -1164,7 +1177,7 @@
     <p class="nota">Estes pedidos vêm do teu site de cotações. "Aceitar" cria logo um agendamento (ainda podes editar tudo depois); "Recusar" só remove daqui.<br><br>Precisas de estar com sessão iniciada (em "Minhas tarifas") para veres os pedidos novos.</p>
   </div>
 
-  <p style="text-align:center; font-family:'Helvetica Neue', Arial, sans-serif; font-size:11px; color:#8a7f66; margin-top:24px;">Trajeto · v8.3</p>
+  <p style="text-align:center; font-family:'Helvetica Neue', Arial, sans-serif; font-size:11px; color:#8a7f66; margin-top:24px;">Trajeto · v8.4</p>
 
 </main>
 
