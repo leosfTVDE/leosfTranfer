@@ -805,6 +805,22 @@
         </div>
       </div>
 
+      <div class="cfg-grupo" id="grupoLinkPedidos" style="display:none;">
+        <div class="cfg-titulo cfg-titulo-fixo">🔗 O meu link de pedidos</div>
+        <div style="padding-bottom:14px;">
+          <p style="font-family:'Helvetica Neue', Arial, sans-serif; font-size:12px; color:#6a7378; margin:0 0 10px;">
+            Partilha este link com os teus clientes — os pedidos feitos por aqui chegam só a ti.
+          </p>
+          <div id="linkPedidosTexto" style="font-family:'Courier New', monospace; font-size:12.5px; color:var(--texto); word-break:break-all; padding:10px; background:var(--areia); border-radius:8px; margin-bottom:10px;"></div>
+          <div class="btn-acoes">
+            <button id="btnCopiarLinkPedidos" style="flex:1;">📋 Copiar link</button>
+          </div>
+          <div style="text-align:center; margin-top:14px;">
+            <img id="qrLinkPedidos" alt="QR code do link de pedidos" style="width:160px; height:160px; border-radius:8px; border:1px solid var(--linha);">
+          </div>
+        </div>
+      </div>
+
       <div class="cfg-grupo" id="grupoCodigoConvite" style="display:none;">
         <div class="cfg-titulo cfg-titulo-fixo">🔑 Códigos de acesso</div>
         <div style="padding-bottom:14px;">
@@ -1177,7 +1193,7 @@
     <p class="nota">Estes pedidos vêm do teu site de cotações. "Aceitar" cria logo um agendamento (ainda podes editar tudo depois); "Recusar" só remove daqui.<br><br>Precisas de estar com sessão iniciada (em "Minhas tarifas") para veres os pedidos novos.</p>
   </div>
 
-  <p style="text-align:center; font-family:'Helvetica Neue', Arial, sans-serif; font-size:11px; color:#8a7f66; margin-top:24px;">Trajeto · v8.4</p>
+  <p style="text-align:center; font-family:'Helvetica Neue', Arial, sans-serif; font-size:11px; color:#8a7f66; margin-top:24px;">Trajeto · v9.0</p>
 
 </main>
 
@@ -1634,6 +1650,7 @@
     const btnEntrar = document.getElementById('btnAbrirAuth');
     const btnSair = document.getElementById('btnSairAuth');
     document.getElementById('grupoCodigoConvite').style.display = ehAdmin ? 'block' : 'none';
+    document.getElementById('grupoLinkPedidos').style.display = logado ? 'block' : 'none';
     if(logado){
       statusEl.textContent = `Sincronizado como ${window.TrajetoCloud.utilizadorAtual.email}`;
       btnEntrar.style.display = 'none';
@@ -1644,6 +1661,27 @@
       btnSair.style.display = 'none';
     }
   }
+
+  function atualizarUILinkPedidos(){
+    if(!window.TrajetoCloud || !window.TrajetoCloud.utilizadorAtual) return;
+    const uid = window.TrajetoCloud.utilizadorAtual.uid;
+    const link = `https://trajetotransfer.pt/pedido.html?m=${uid}`;
+    document.getElementById('linkPedidosTexto').textContent = link;
+    document.getElementById('qrLinkPedidos').src =
+      `https://api.qrserver.com/v1/create-qr-code/?size=320x320&data=${encodeURIComponent(link)}`;
+  }
+  document.getElementById('btnCopiarLinkPedidos').addEventListener('click', ()=>{
+    const link = document.getElementById('linkPedidosTexto').textContent;
+    if(!link) return;
+    const btn = document.getElementById('btnCopiarLinkPedidos');
+    const original = btn.textContent;
+    if(navigator.clipboard){
+      navigator.clipboard.writeText(link).then(()=>{
+        btn.textContent = '✅ Copiado!';
+        setTimeout(()=>{ btn.textContent = original; }, 1800);
+      });
+    }
+  });
 
   function perguntarConflito(){
     return new Promise((resolve)=>{
@@ -1693,7 +1731,11 @@
     window.TrajetoCloud.ligarOuvintePedidos((pedidos)=>{
       renderPedidos(pedidos);
     });
+    if(window.TrajetoCloud.utilizadorAtual.email === EMAIL_ADMIN){
+      window.TrajetoCloud.publicarMotoristaPadrao(uid);
+    }
     atualizarUISincronizacao();
+    atualizarUILinkPedidos();
   }
 
   function traduzirErroAuth(codigo){
@@ -2704,7 +2746,11 @@ if ('serviceWorker' in navigator) {
   function ligarOuvintePedidos(aoReceber){
     if(!auth.currentUser) return;
     if(cancelarOuvintePedidos) cancelarOuvintePedidos();
-    const q = query(collection(db, 'trajeto_pedidos'), where('status', '==', 'pendente'));
+    const q = query(
+      collection(db, 'trajeto_pedidos'),
+      where('status', '==', 'pendente'),
+      where('motoristaUid', '==', auth.currentUser.uid)
+    );
     cancelarOuvintePedidos = onSnapshot(q, (snap)=>{
       const pedidos = [];
       snap.forEach(d => pedidos.push({ id: d.id, ...d.data() }));
@@ -2713,6 +2759,15 @@ if ('serviceWorker' in navigator) {
   }
   async function atualizarStatusPedido(id, novoStatus){
     await updateDoc(doc(db, 'trajeto_pedidos', id), { status: novoStatus });
+  }
+
+  // Publica o UID do administrador como "motorista padrão" — assim, o link
+  // antigo (sem parâmetro ?m=) que já está no cartão/Google Ads/QR code
+  // continua a funcionar exatamente como antes, sem precisar de reimprimir nada.
+  async function publicarMotoristaPadrao(uid){
+    try{
+      await setDoc(doc(db, 'trajeto_publico', 'motorista_padrao'), { uid });
+    }catch(e){ /* falha silenciosa — só afeta o link antigo sem parâmetro */ }
   }
 
   async function verificarCodigoConvite(codigo){
@@ -2746,6 +2801,7 @@ if ('serviceWorker' in navigator) {
     ligarOuvinte,
     ligarOuvintePedidos,
     atualizarStatusPedido,
+    publicarMotoristaPadrao,
     onAuthChange: (cb) => onAuthStateChanged(auth, cb),
     get utilizadorAtual(){ return auth.currentUser; }
   };
