@@ -640,7 +640,7 @@
 
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js";
-  import { getFirestore, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
+  import { getFirestore, collection, addDoc, doc, getDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
 
   const firebaseConfig = {
     apiKey: "AIzaSyCqJBnzZh5MWP9G3ZP1nOThb4W2KCLf2a4",
@@ -654,6 +654,24 @@
   const app = initializeApp(firebaseConfig);
   const db = getFirestore(app);
 
+  // ---------- Resolver a que motorista pertence este link ----------
+  // Se o link tiver ?m=UID, é esse motorista. Se não tiver (o link antigo,
+  // já impresso no cartão/Google Ads/QR code), usamos o "motorista padrão"
+  // publicado pela app — que é sempre o administrador — para continuar a
+  // funcionar exatamente como antes, sem precisar de reimprimir nada.
+  // Usamos uma única Promise, guardada e reaproveitada, para o envio do
+  // formulário nunca arriscar disparar antes desta resolução terminar.
+  const paramMotorista = new URLSearchParams(window.location.search).get('m');
+  const resolucaoMotorista = paramMotorista
+    ? Promise.resolve(paramMotorista)
+    : (async ()=>{
+        try{
+          const snap = await getDoc(doc(db, 'trajeto_publico', 'motorista_padrao'));
+          if(snap.exists() && snap.data().uid) return snap.data().uid;
+        }catch(e){ /* fica por resolver — o envio fica bloqueado com aviso */ }
+        return null;
+      })();
+
   const form = document.getElementById('formPedido');
   const btnEnviar = document.getElementById('btnEnviar');
   const erroEl = document.getElementById('erroForm');
@@ -663,10 +681,18 @@
     erroEl.textContent = '';
 
     const lang = localStorage.getItem('pedido_idioma') || 'pt';
-    const textos = { pt: {campos:'Preenche todos os campos obrigatórios.', envio:'Não foi possível enviar o pedido. Tenta novamente ou contacta-nos diretamente.', enviar:'Pedir cotação', enviando:'A enviar...'},
-                      en: {campos:'Please fill in all required fields.', envio:'Could not send your request. Please try again or contact us directly.', enviar:'Request quote', enviando:'Sending...'} }[lang];
+    const textos = { pt: {campos:'Preenche todos os campos obrigatórios.', envio:'Não foi possível enviar o pedido. Tenta novamente ou contacta-nos diretamente.', enviar:'Pedir cotação', enviando:'A enviar...', semMotorista:'Este link não é válido. Confirma o link com o motorista ou contacta-nos diretamente.'},
+                      en: {campos:'Please fill in all required fields.', envio:'Could not send your request. Please try again or contact us directly.', enviar:'Request quote', enviando:'Sending...', semMotorista:'This link is not valid. Please confirm the link with the driver or contact us directly.'} }[lang];
+
+    const motoristaUidResolvido = await resolucaoMotorista;
+    const motoristaResolvido = !!motoristaUidResolvido;
+    if(!motoristaResolvido){
+      erroEl.textContent = textos.semMotorista;
+      return;
+    }
 
     const pedido = {
+      motoristaUid: motoristaUidResolvido,
       nome: document.getElementById('p_nome').value.trim(),
       contacto: document.getElementById('p_contacto').value.trim(),
       partida: document.getElementById('p_partida').value.trim(),
