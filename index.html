@@ -987,7 +987,11 @@
           <input type="text" id="ct_destino" placeholder="ex: Cascais">
         </div>
       </div>
-      <label for="ct_km">Distância (km)</label>
+
+      <div id="listaParagens" style="margin-top:10px;"></div>
+      <button type="button" id="btnAdicionarParagem" style="width:100%; margin-top:4px; padding:9px; border-radius:8px; border:1px dashed var(--linha); background:none; color:var(--azulejo); font-family:'Helvetica Neue', Arial, sans-serif; font-size:13px; cursor:pointer;">+ Adicionar paragem</button>
+
+      <label for="ct_km" style="margin-top:14px;">Distância (km)</label>
       <input type="number" id="ct_km" placeholder="ex: 34" min="0">
 
       <label class="chk" style="margin-top:14px;">
@@ -1193,7 +1197,7 @@
     <p class="nota">Estes pedidos vêm do teu site de cotações. "Aceitar" cria logo um agendamento (ainda podes editar tudo depois); "Recusar" só remove daqui.<br><br>Precisas de estar com sessão iniciada (em "Minhas tarifas") para veres os pedidos novos.</p>
   </div>
 
-  <p style="text-align:center; font-family:'Helvetica Neue', Arial, sans-serif; font-size:11px; color:#8a7f66; margin-top:24px;">Trajeto · v9.0</p>
+  <p style="text-align:center; font-family:'Helvetica Neue', Arial, sans-serif; font-size:11px; color:#8a7f66; margin-top:24px;">Trajeto · v9.1</p>
 
 </main>
 
@@ -1429,6 +1433,36 @@
     document.getElementById(id).addEventListener('change', calcularTransfer);
   });
 
+  // ---------- Paragens dinâmicas (calculadora de Transfer) ----------
+  let paragemSeq = 0;
+  function adicionarParagem(valorInicial){
+    paragemSeq++;
+    const id = `ct_paragem_${paragemSeq}`;
+    const linha = document.createElement('div');
+    linha.className = 'linha-paragem';
+    linha.style.cssText = 'display:flex; gap:8px; align-items:center; margin-top:8px;';
+    linha.innerHTML = `
+      <input type="text" class="ct-paragem-input" id="${id}" placeholder="ex: Rua das Flores, 12" style="flex:1;">
+      <button type="button" data-remover-paragem style="border:none; background:none; color:var(--terracota); font-size:18px; cursor:pointer; padding:4px 8px;">✕</button>
+    `;
+    document.getElementById('listaParagens').appendChild(linha);
+    if(valorInicial) document.getElementById(id).value = valorInicial;
+  }
+  document.getElementById('btnAdicionarParagem').addEventListener('click', ()=> adicionarParagem());
+  document.getElementById('listaParagens').addEventListener('click', (e)=>{
+    if(e.target.closest('[data-remover-paragem]')){
+      e.target.closest('.linha-paragem').remove();
+    }
+  });
+  function lerParagens(){
+    return Array.from(document.querySelectorAll('.ct-paragem-input'))
+      .map(inp => inp.value.trim())
+      .filter(v => v);
+  }
+  function limparParagens(){
+    document.getElementById('listaParagens').innerHTML = '';
+  }
+
   function calcularTransfer(){
     const km = parseFloat(document.getElementById('ct_km').value) || 0;
     const regressoVazio = document.getElementById('regressoVazio').checked;
@@ -1491,6 +1525,7 @@
     document.getElementById('blocoDuracaoDupla').style.display = 'none';
     document.getElementById('blocoEsperaDupla').style.display = 'none';
     delete document.getElementById('ct_cobrar').dataset.editado;
+    limparParagens();
     calcularTransfer();
   });
   calcularTransfer();
@@ -1499,6 +1534,7 @@
   function gerarMensagemOrcamento(){
     const origem = document.getElementById('ct_origem').value.trim();
     const destino = document.getElementById('ct_destino').value.trim();
+    const paragens = lerParagens();
     const km = document.getElementById('ct_km').value || '0';
     const veiculo = state.veiculoT === 'van' ? 'Van' : 'Sedan';
     const valor = document.getElementById('ct_cobrar').value || document.getElementById('ct_valorRecomendado').textContent.replace('€','');
@@ -1518,6 +1554,7 @@
       return textoCustom
         .replace(/\{origem\}/g, origem)
         .replace(/\{destino\}/g, destino)
+        .replace(/\{paragens\}/g, paragens.join(' → '))
         .replace(/\{km\}/g, km)
         .replace(/\{veiculo\}/g, veiculo)
         .replace(/\{valor\}/g, valor)
@@ -1527,7 +1564,8 @@
 
     let msg = 'Olá! 👋 Orçamento do seu transfer:\n\n';
     if(origem && destino){
-      msg += `📍 ${origem} → ${destino}\n`;
+      const pontos = [origem, ...paragens, destino];
+      msg += `📍 ${pontos.join(' → ')}\n`;
     }
     msg += `🚗 ${veiculo} · ${km} km\n\n`;
     msg += `💶 €${valor} — valor final, sem surpresas\n`;
@@ -1864,6 +1902,10 @@
       document.getElementById('ag_valor').value = document.getElementById('ct_cobrar').value;
       if(!document.getElementById('ag_partida').value) document.getElementById('ag_partida').value = document.getElementById('ct_origem').value;
       if(!document.getElementById('ag_chegada').value) document.getElementById('ag_chegada').value = document.getElementById('ct_destino').value;
+      const paragensAgendar = lerParagens();
+      if(paragensAgendar.length > 0 && !document.getElementById('ag_observacoes').value){
+        document.getElementById('ag_observacoes').value = `Paragens pelo meio: ${paragensAgendar.join(' → ')}`;
+      }
       if(!document.getElementById('ag_data').value){
         const amanha = new Date();
         amanha.setDate(amanha.getDate()+1);
