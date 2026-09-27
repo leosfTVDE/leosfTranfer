@@ -784,7 +784,6 @@
 
   <div class="seg" id="segModo" style="margin-bottom:18px;">
     <button data-v="transfer" class="active">Transfer</button>
-    <button data-v="aeroporto">Aeroporto</button>
     <button data-v="faturamento">Faturamento</button>
     <button data-v="pedidos">📥 Pedidos<span class="selo-contagem" id="seloPedidos">0</span></button>
   </div>
@@ -861,20 +860,6 @@
           <div id="blocoMsgCustom" style="display:none; margin-top:12px;">
             <label for="cfg_msg_custom">O teu texto — usa {origem} {destino} {km} {veiculo} {valor} {pagamento} {nome} onde quiseres, e o app substitui automaticamente</label>
             <textarea id="cfg_msg_custom" style="min-height:130px;" placeholder="Hi! Here's your transfer quote: {origem} to {destino}, {km} km. Price: €{valor}. Payment: {pagamento}. Best, {nome}"></textarea>
-          </div>
-        </div>
-      </div>
-
-      <div class="cfg-grupo">
-        <div class="cfg-titulo" data-acordeao="aeroporto">✈️ Aeroporto ⇄ Lisboa (valor fixo) <span class="seta">▸</span></div>
-        <div class="cfg-conteudo" data-conteudo="aeroporto">
-          <div class="cfg-row">
-            <div><label>Sedan: Aeroporto → Centro (€)</label><input type="number" id="cfg_ap_sedan_ida"></div>
-            <div><label>Sedan: Centro → Aeroporto (€)</label><input type="number" id="cfg_ap_sedan_volta"></div>
-          </div>
-          <div class="cfg-row">
-            <div><label>Van: Aeroporto → Centro (€)</label><input type="number" id="cfg_ap_van_ida"></div>
-            <div><label>Van: Centro → Aeroporto (€)</label><input type="number" id="cfg_ap_van_volta"></div>
           </div>
         </div>
       </div>
@@ -1122,38 +1107,6 @@
     </div>
   </div>
 
-  <div id="viewAeroporto" style="display:none;">
-    <div class="card">
-      <h2>Direção</h2>
-      <div class="seg" id="segDirecaoAp">
-        <button data-v="ida" class="active">Aeroporto → Centro</button>
-        <button data-v="volta">Centro → Aeroporto</button>
-      </div>
-    </div>
-
-    <div class="card">
-      <h2>Veículo e horário</h2>
-      <label>Veículo</label>
-      <div class="seg" id="segVeiculoAp">
-        <button data-v="sedan" class="active">Sedan (1–3 pax)</button>
-        <button data-v="van">Van / Executivo (4–6 pax)</button>
-      </div>
-      <label>Horário</label>
-      <div class="seg" id="segHorarioAp">
-        <button data-v="dia" class="active">Dia (6h–21h)</button>
-        <button data-v="noite">Noite (21h–6h)</button>
-      </div>
-    </div>
-
-    <div class="resultado">
-      <p class="eyebrow">Valor da corrida</p>
-      <div class="valor">€<span id="ap_valor">0</span></div>
-      <div class="faixa" id="ap_detalhe"></div>
-    </div>
-
-    <p class="nota">Tarifa fixa para trajetos entre o Aeroporto de Lisboa e hotéis no centro. Ajusta os valores em "Minhas tarifas".</p>
-  </div>
-
   <div id="viewFaturamento" style="display:none;">
     <div class="fat-resumo">
       <div class="fat-card">
@@ -1207,7 +1160,7 @@
     <p class="nota">Estes pedidos vêm do teu site de cotações. "Aceitar" cria logo um agendamento (ainda podes editar tudo depois); "Recusar" só remove daqui.<br><br>Precisas de estar com sessão iniciada (em "Minhas tarifas") para veres os pedidos novos.</p>
   </div>
 
-  <p style="text-align:center; font-family:'Helvetica Neue', Arial, sans-serif; font-size:11px; color:#8a7f66; margin-top:24px;">Trajeto · v9.4</p>
+  <p style="text-align:center; font-family:'Helvetica Neue', Arial, sans-serif; font-size:11px; color:#8a7f66; margin-top:24px;">Trajeto · v9.5</p>
 
 </main>
 
@@ -1284,11 +1237,9 @@
 </div>
 
 <script>
-  const state = { veiculoT:'sedan', veiculoAp:'sedan', horarioAp:'dia', direcaoAp:'ida' };
+  const state = { veiculoT:'sedan' };
 
   const DEFAULTS = {
-    ap_sedan_ida: 25, ap_sedan_volta: 20,
-    ap_van_ida: 40,   ap_van_volta: 32,
     ct_curto_min_sedan: 25, ct_curto_min_van: 35,
     ct_hora_sedan: 25, ct_hora_van: 30,
     ct_km_rate_sedan: 1.00, ct_km_rate_van: 1.30,
@@ -1361,15 +1312,31 @@
     });
   });
 
+  const VIEWS_POR_MODO = { transfer: 'viewTransfer', faturamento: 'viewFaturamento', pedidos: 'viewPedidos' };
+  let modoAntesDeConfig = 'transfer';
   document.getElementById('btnConfig').addEventListener('click', ()=>{
     const p = document.getElementById('painelConfig');
-    p.style.display = p.style.display === 'block' ? 'none' : 'block';
+    const abrir = p.style.display !== 'block';
+    if(abrir){
+      const ativo = document.querySelector('#segModo button.active');
+      modoAntesDeConfig = ativo ? ativo.dataset.v : 'transfer';
+      document.getElementById('segModo').querySelectorAll('button').forEach(b=>b.classList.remove('active'));
+      Object.values(VIEWS_POR_MODO).forEach(id=>{
+        document.getElementById(id).style.display = 'none';
+      });
+      p.style.display = 'block';
+    } else {
+      p.style.display = 'none';
+      const btnRestaurar = document.querySelector(`#segModo button[data-v="${modoAntesDeConfig}"]`);
+      if(btnRestaurar) btnRestaurar.classList.add('active');
+      document.getElementById(VIEWS_POR_MODO[modoAntesDeConfig]).style.display = 'block';
+      if(modoAntesDeConfig === 'faturamento') renderFaturamento();
+    }
   });
   document.getElementById('btnResetar').addEventListener('click', ()=>{
     cfg = { ...DEFAULTS };
     preencherPainel(cfg);
     calcularTransfer();
-    calcularAeroporto();
   });
   document.getElementById('btnAplicar').addEventListener('click', ()=>{
     cfg = lerPainel();
@@ -1389,7 +1356,6 @@
     localStorage.setItem('trajeto_msg_custom', document.getElementById('cfg_msg_custom').value);
     sincronizarNuvem();
     calcularTransfer();
-    calcularAeroporto();
     document.getElementById('painelConfig').style.display = 'none';
   });
   document.getElementById('btnCopiar').addEventListener('click', ()=>{
@@ -1401,7 +1367,6 @@
       cfg = { ...DEFAULTS, ...colado };
       preencherPainel(cfg);
       calcularTransfer();
-      calcularAeroporto();
     }catch(e){
       alert('Texto de configuração inválido.');
     }
@@ -1412,8 +1377,8 @@
       document.getElementById('segModo').querySelectorAll('button').forEach(b=>b.classList.remove('active'));
       btn.classList.add('active');
       const t = btn.dataset.v;
+      document.getElementById('painelConfig').style.display = 'none';
       document.getElementById('viewTransfer').style.display = t === 'transfer' ? 'block' : 'none';
-      document.getElementById('viewAeroporto').style.display = t === 'aeroporto' ? 'block' : 'none';
       document.getElementById('viewFaturamento').style.display = t === 'faturamento' ? 'block' : 'none';
       document.getElementById('viewPedidos').style.display = t === 'pedidos' ? 'block' : 'none';
       if(t === 'faturamento') renderFaturamento();
@@ -1432,9 +1397,6 @@
     });
   }
   setupSeg('segVeiculoT', 'veiculoT', calcularTransfer);
-  setupSeg('segDirecaoAp', 'direcaoAp', calcularAeroporto);
-  setupSeg('segVeiculoAp', 'veiculoAp', calcularAeroporto);
-  setupSeg('segHorarioAp', 'horarioAp', calcularAeroporto);
 
   document.getElementById('regressoVazio').addEventListener('change', (e)=>{
     const dupla = e.target.checked;
@@ -1644,20 +1606,6 @@
     }
   });
 
-  function calcularAeroporto(){
-    const isVan = state.veiculoAp === 'van';
-    const isNoite = state.horarioAp === 'noite';
-    let valor = state.direcaoAp === 'ida'
-      ? (isVan ? cfg.ap_van_ida : cfg.ap_sedan_ida)
-      : (isVan ? cfg.ap_van_volta : cfg.ap_sedan_volta);
-    if(isNoite) valor *= (1 + cfg.noite_pct/100);
-
-    document.getElementById('ap_valor').textContent = valor.toFixed(0);
-    document.getElementById('ap_detalhe').textContent =
-      isNoite ? `com acréscimo noturno de ${cfg.noite_pct}%` : 'tarifa de dia';
-  }
-  calcularAeroporto();
-
   // ---------- Agendamento ----------
   //
   // SINCRONIZAÇÃO NA NUVEM (Firebase) — já ligada.
@@ -1733,7 +1681,6 @@
     renderLista();
     renderFaturamento();
     calcularTransfer();
-    calcularAeroporto();
   }
 
   const EMAIL_ADMIN = 'leonardosf.tvde@gmail.com';
@@ -2726,7 +2673,6 @@
         renderLista();
         renderFaturamento();
         calcularTransfer();
-        calcularAeroporto();
         alert('Backup importado com sucesso!');
       }catch(err){
         alert('Ficheiro de backup inválido.');
@@ -2759,7 +2705,6 @@
     document.getElementById('segModo').querySelectorAll('button').forEach(b=>b.classList.remove('active'));
     document.querySelector('#segModo button[data-v="transfer"]').classList.add('active');
     document.getElementById('viewTransfer').style.display = 'block';
-    document.getElementById('viewAeroporto').style.display = 'none';
     document.getElementById('viewFaturamento').style.display = 'none';
     document.getElementById('viewPedidos').style.display = 'none';
 
