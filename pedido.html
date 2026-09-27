@@ -443,7 +443,7 @@
 
 <footer>
   <p class="rodape-titulo" data-i18n="footer_titulo">Prefere falar diretamente?</p>
-  <a class="btn-whatsapp" id="footerWhatsapp" href="#" target="_blank" rel="noopener">
+  <a class="btn-whatsapp" id="footerWhatsapp" href="#" target="_blank" rel="noopener" style="display:none;">
     <span>💬</span> <span data-i18n="footer_whatsapp">Falar no WhatsApp</span>
   </a>
 
@@ -483,9 +483,6 @@
   const PARCEIROS = [];
   // Exemplo de como adicionar (descomenta e edita):
   // const PARCEIROS = ['Hotel Cascais Mirage', 'Casa Alazul', 'Cascais Tours'];
-
-  // Número de WhatsApp para o botão do rodapé (formato internacional, só dígitos)
-  const WHATSAPP_NUMERO = '351969698927';
 
   // ============================================================
 
@@ -604,8 +601,6 @@
     row.classList.add('mostrar');
   }
 
-  document.getElementById('footerWhatsapp').href = `https://wa.me/${WHATSAPP_NUMERO}`;
-
   function aplicarIdioma(lang){
     idiomaAtual = lang;
     localStorage.setItem('pedido_idioma', lang);
@@ -671,6 +666,21 @@
         }catch(e){ /* fica por resolver — o envio fica bloqueado com aviso */ }
         return null;
       })();
+
+  // ---------- Botão de WhatsApp do rodapé — número certo por motorista ----------
+  (async ()=>{
+    try{
+      const uid = await resolucaoMotorista;
+      if(!uid) return;
+      const snap = await getDoc(doc(db, 'trajeto_publico', uid));
+      const numero = snap.exists() ? snap.data().whatsapp : '';
+      if(numero){
+        const btn = document.getElementById('footerWhatsapp');
+        btn.href = `https://wa.me/${numero}`;
+        btn.style.display = 'inline-flex';
+      }
+    }catch(e){ /* sem número disponível — o botão fica escondido, sem problema */ }
+  })();
 
   const form = document.getElementById('formPedido');
   const btnEnviar = document.getElementById('btnEnviar');
