@@ -405,11 +405,12 @@
   }
   .ag-nav{
     display:flex;
+    flex-wrap:wrap;
     gap:8px;
     margin-top:10px;
   }
   .ag-nav button{
-    flex:1;
+    flex:1 1 calc(50% - 4px);
     padding:11px 6px;
     border-radius:8px;
     border:none;
@@ -421,6 +422,7 @@
   }
   .ag-btn-buscar{background:var(--azulejo);}
   .ag-btn-levar{background:var(--terracota);}
+  .ag-btn-paragem{background:var(--azul-doca);}
   .ag-acoes{
     display:flex;
     flex-wrap:wrap;
@@ -794,6 +796,9 @@
       <label for="cfg_nome">O teu nome (para as mensagens ao cliente)</label>
       <input type="text" id="cfg_nome" placeholder="ex: Carlos">
 
+      <label for="cfg_whatsapp" style="margin-top:14px;">O teu número de WhatsApp (para o site de pedidos)</label>
+      <input type="text" id="cfg_whatsapp" placeholder="ex: 351969698927">
+
       <div class="cfg-grupo" style="margin-top:16px; border-top:1px solid var(--linha); padding-top:2px;">
         <div class="cfg-titulo cfg-titulo-fixo">☁️ Sincronização entre aparelhos</div>
         <div style="padding-bottom:14px;">
@@ -1069,6 +1074,11 @@
         <div class="ag-secao">📍 Trajeto</div>
         <label for="ag_partida">Endereço de partida</label>
         <input type="text" id="ag_partida" placeholder="ex: Aeroporto de Lisboa, T1">
+
+        <label style="margin-top:14px;">Paragens pelo meio (opcional)</label>
+        <div id="listaParagensAgendar"></div>
+        <button type="button" id="btnAdicionarParagemAgendar" style="width:100%; margin-top:4px; padding:9px; border-radius:8px; border:1px dashed var(--linha); background:none; color:var(--azulejo); font-family:'Helvetica Neue', Arial, sans-serif; font-size:13px; cursor:pointer;">+ Adicionar paragem</button>
+
         <label for="ag_chegada" style="margin-top:14px;">Endereço de chegada</label>
         <input type="text" id="ag_chegada" placeholder="ex: Hotel Avenida Palace">
 
@@ -1197,7 +1207,7 @@
     <p class="nota">Estes pedidos vêm do teu site de cotações. "Aceitar" cria logo um agendamento (ainda podes editar tudo depois); "Recusar" só remove daqui.<br><br>Precisas de estar com sessão iniciada (em "Minhas tarifas") para veres os pedidos novos.</p>
   </div>
 
-  <p style="text-align:center; font-family:'Helvetica Neue', Arial, sans-serif; font-size:11px; color:#8a7f66; margin-top:24px;">Trajeto · v9.1</p>
+  <p style="text-align:center; font-family:'Helvetica Neue', Arial, sans-serif; font-size:11px; color:#8a7f66; margin-top:24px;">Trajeto · v9.3</p>
 
 </main>
 
@@ -1308,6 +1318,7 @@
   }
   preencherPainel(cfg);
   document.getElementById('cfg_nome').value = localStorage.getItem('trajeto_nome') || '';
+  document.getElementById('cfg_whatsapp').value = localStorage.getItem('trajeto_whatsapp') || '';
 
   document.querySelectorAll('#painelConfig [data-acordeao]').forEach(titulo=>{
     titulo.addEventListener('click', ()=>{
@@ -1363,6 +1374,11 @@
   document.getElementById('btnAplicar').addEventListener('click', ()=>{
     cfg = lerPainel();
     localStorage.setItem('trajeto_nome', document.getElementById('cfg_nome').value.trim());
+    const numeroWhatsapp = document.getElementById('cfg_whatsapp').value.trim();
+    localStorage.setItem('trajeto_whatsapp', numeroWhatsapp);
+    if(window.TrajetoCloud && window.TrajetoCloud.utilizadorAtual){
+      window.TrajetoCloud.publicarWhatsapp(numeroWhatsapp);
+    }
     localStorage.setItem('trajeto_pagamentos', JSON.stringify({
       mbway: document.getElementById('cfg_pag_mbway').checked,
       dinheiro: document.getElementById('cfg_pag_dinheiro').checked,
@@ -1461,6 +1477,42 @@
   }
   function limparParagens(){
     document.getElementById('listaParagens').innerHTML = '';
+  }
+
+  // ---------- Paragens dinâmicas (formulário Agendar corrida) ----------
+  // Lista à parte da calculadora (classe de input diferente), para não
+  // se misturarem quando as duas listas existem ao mesmo tempo na página.
+  let paragemAgendarSeq = 0;
+  function adicionarParagemAgendar(valorInicial){
+    paragemAgendarSeq++;
+    const id = `ag_paragem_${paragemAgendarSeq}`;
+    const linha = document.createElement('div');
+    linha.className = 'linha-paragem-agendar';
+    linha.style.cssText = 'display:flex; gap:8px; align-items:center; margin-top:8px;';
+    linha.innerHTML = `
+      <input type="text" class="ag-paragem-input" id="${id}" placeholder="ex: Rua das Flores, 12" style="flex:1;">
+      <button type="button" data-remover-paragem-agendar style="border:none; background:none; color:var(--terracota); font-size:18px; cursor:pointer; padding:4px 8px;">✕</button>
+    `;
+    document.getElementById('listaParagensAgendar').appendChild(linha);
+    if(valorInicial) document.getElementById(id).value = valorInicial;
+  }
+  document.getElementById('btnAdicionarParagemAgendar').addEventListener('click', ()=> adicionarParagemAgendar());
+  document.getElementById('listaParagensAgendar').addEventListener('click', (e)=>{
+    if(e.target.closest('[data-remover-paragem-agendar]')){
+      e.target.closest('.linha-paragem-agendar').remove();
+    }
+  });
+  function lerParagensAgendar(){
+    return Array.from(document.querySelectorAll('.ag-paragem-input'))
+      .map(inp => inp.value.trim())
+      .filter(v => v);
+  }
+  function limparParagensAgendar(){
+    document.getElementById('listaParagensAgendar').innerHTML = '';
+  }
+  function preencherParagensAgendar(lista){
+    limparParagensAgendar();
+    (lista || []).forEach(p => adicionarParagemAgendar(p));
   }
 
   function calcularTransfer(){
@@ -1640,6 +1692,7 @@
       agendamentos: lerAgendamentos(),
       cfg: cfg,
       nome: localStorage.getItem('trajeto_nome') || '',
+      whatsapp: localStorage.getItem('trajeto_whatsapp') || '',
       pagamentos: JSON.parse(localStorage.getItem('trajeto_pagamentos') || 'null') || { mbway:true, dinheiro:true, cartao:true },
       msgTipo: localStorage.getItem('trajeto_msg_tipo') || 'auto',
       msgCustom: localStorage.getItem('trajeto_msg_custom') || ''
@@ -1663,6 +1716,10 @@
     if(typeof dados.nome === 'string'){
       localStorage.setItem('trajeto_nome', dados.nome);
       document.getElementById('cfg_nome').value = dados.nome;
+    }
+    if(typeof dados.whatsapp === 'string'){
+      localStorage.setItem('trajeto_whatsapp', dados.whatsapp);
+      document.getElementById('cfg_whatsapp').value = dados.whatsapp;
     }
     if(dados.pagamentos){
       localStorage.setItem('trajeto_pagamentos', JSON.stringify(dados.pagamentos));
@@ -1771,7 +1828,14 @@
     });
     if(window.TrajetoCloud.utilizadorAtual.email === EMAIL_ADMIN){
       window.TrajetoCloud.publicarMotoristaPadrao(uid);
+      if(!localStorage.getItem('trajeto_whatsapp')){
+        const numeroAtual = '351969698927';
+        localStorage.setItem('trajeto_whatsapp', numeroAtual);
+        document.getElementById('cfg_whatsapp').value = numeroAtual;
+        window.TrajetoCloud.publicarWhatsapp(numeroAtual);
+      }
     }
+    window.TrajetoCloud.publicarWhatsapp(localStorage.getItem('trajeto_whatsapp') || '');
     atualizarUISincronizacao();
     atualizarUILinkPedidos();
   }
@@ -1894,25 +1958,20 @@
 
   document.getElementById('btnAbrirAgendar').addEventListener('click', ()=>{
     const p = document.getElementById('painelAgendar');
-    const abrir = p.style.display !== 'block';
-    p.style.display = abrir ? 'block' : 'none';
-    if(abrir){
-      editandoId = null;
-      document.getElementById('btnGuardarAgendamento').textContent = 'Guardar e adicionar ao calendário';
-      document.getElementById('ag_valor').value = document.getElementById('ct_cobrar').value;
-      if(!document.getElementById('ag_partida').value) document.getElementById('ag_partida').value = document.getElementById('ct_origem').value;
-      if(!document.getElementById('ag_chegada').value) document.getElementById('ag_chegada').value = document.getElementById('ct_destino').value;
-      const paragensAgendar = lerParagens();
-      if(paragensAgendar.length > 0 && !document.getElementById('ag_observacoes').value){
-        document.getElementById('ag_observacoes').value = `Paragens pelo meio: ${paragensAgendar.join(' → ')}`;
-      }
-      if(!document.getElementById('ag_data').value){
-        const amanha = new Date();
-        amanha.setDate(amanha.getDate()+1);
-        document.getElementById('ag_data').value = amanha.toISOString().slice(0,10);
-      }
-      p.scrollIntoView({behavior:'smooth', block:'start'});
+    editandoId = null;
+    document.getElementById('btnGuardarAgendamento').textContent = 'Guardar e adicionar ao calendário';
+    document.getElementById('ag_valor').value = document.getElementById('ct_cobrar').value;
+    document.getElementById('ag_partida').value = document.getElementById('ct_origem').value;
+    document.getElementById('ag_chegada').value = document.getElementById('ct_destino').value;
+    preencherParagensAgendar(lerParagens());
+    document.getElementById('ag_observacoes').value = '';
+    if(!document.getElementById('ag_data').value){
+      const amanha = new Date();
+      amanha.setDate(amanha.getDate()+1);
+      document.getElementById('ag_data').value = amanha.toISOString().slice(0,10);
     }
+    p.style.display = 'block';
+    p.scrollIntoView({behavior:'smooth', block:'start'});
   });
 
   function pad(n){ return String(n).padStart(2,'0'); }
@@ -1996,6 +2055,9 @@
         '<span class="ag-badge-pendente">⏳ A receber</span>';
       const btnRecebido = (ag.realizado && ag.pagamento === 'pendente')
         ? `<button class="ag-btn-ok" data-acao="marcarRecebido">💰 Marcar como recebido</button>` : '';
+      const botoesParagens = (ag.paragens || []).map((p, i) =>
+        `<button class="ag-btn-paragem" data-acao="paragem" data-idx="${i}">📍 Paragem ${i+1}</button>`
+      ).join('');
       return `
       <div class="ag-item ${ag.realizado ? 'ag-item-realizado' : ''}" data-id="${ag.id}">
         <div class="ag-trajeto"><span>${ag.partida} → ${ag.chegada}${ag.realizado ? '<span class="ag-badge-ok">✔ Concluído</span>' : ''}${seloPagamento}</span><span class="ag-seta">▸</span></div>
@@ -2004,10 +2066,12 @@
           📅 ${ag.data.split('-').reverse().join('/')} às ${ag.hora}<br>
           👤 ${ag.cliente} &nbsp;·&nbsp; <span class="ag-valor">€${ag.valor}</span>
           ${ag.fornecedor ? `<br>🏷 Fornecedor: ${ag.fornecedor}` : ''}
+          ${(ag.paragens && ag.paragens.length) ? `<br>📍 Paragens: ${ag.paragens.join(' → ')}` : ''}
           ${ag.observacoes ? `<br>📝 ${ag.observacoes}` : ''}
         </div>
         <div class="ag-nav">
           <button class="ag-btn-buscar" data-acao="buscar">🚗 Ir buscar cliente</button>
+          ${botoesParagens}
           <button class="ag-btn-levar" data-acao="levar">🏁 Iniciar viagem</button>
         </div>
         <div class="ag-acoes">
@@ -2061,6 +2125,7 @@
   function preencherFormAgendamento(ag){
     document.getElementById('ag_partida').value = ag.partida;
     document.getElementById('ag_chegada').value = ag.chegada;
+    preencherParagensAgendar(ag.paragens || []);
     document.getElementById('ag_data').value = ag.data;
     document.getElementById('ag_hora').value = ag.hora;
     document.getElementById('ag_cliente').value = ag.cliente;
@@ -2243,6 +2308,9 @@
       abrirWaze(ag.partida);
     } else if(btn.dataset.acao === 'levar'){
       abrirWaze(ag.chegada);
+    } else if(btn.dataset.acao === 'paragem'){
+      const idx = parseInt(btn.dataset.idx, 10);
+      if(ag.paragens && ag.paragens[idx]) abrirWaze(ag.paragens[idx]);
     } else if(btn.dataset.acao === 'editar'){
       abrirEdicao(ag);
     } else if(btn.dataset.acao === 'cal'){
@@ -2505,6 +2573,7 @@
     const fornecedor = document.getElementById('ag_fornecedor').value.trim();
     const valor = document.getElementById('ag_valor').value;
     const observacoes = document.getElementById('ag_observacoes').value.trim();
+    const paragens = lerParagensAgendar();
 
     if(!partida || !chegada || !data || !hora || !cliente){
       alert('Preenche partida, chegada, data, horário e nome do cliente.');
@@ -2518,6 +2587,7 @@
       if(ag){
         ag.partida = partida;
         ag.chegada = chegada;
+        ag.paragens = paragens;
         ag.data = data;
         ag.hora = hora;
         ag.cliente = cliente;
@@ -2537,7 +2607,7 @@
     } else {
       const ag = {
         id: Date.now().toString(36) + Math.random().toString(36).slice(2,7),
-        partida, chegada, data, hora, cliente, telefone, nomePlaca, voo, fornecedor, observacoes,
+        partida, chegada, paragens, data, hora, cliente, telefone, nomePlaca, voo, fornecedor, observacoes,
         valor: valor || document.getElementById('ct_cobrar').value,
         realizado: false
       };
@@ -2549,6 +2619,7 @@
 
     document.getElementById('ag_partida').value = '';
     document.getElementById('ag_chegada').value = '';
+    limparParagensAgendar();
     document.getElementById('ag_cliente').value = '';
     document.getElementById('ag_telefone').value = '';
     document.getElementById('ag_nomeplaca').value = '';
@@ -2563,6 +2634,7 @@
     document.getElementById('btnGuardarAgendamento').textContent = 'Guardar e adicionar ao calendário';
     document.getElementById('ag_partida').value = '';
     document.getElementById('ag_chegada').value = '';
+    limparParagensAgendar();
     document.getElementById('ag_cliente').value = '';
     document.getElementById('ag_telefone').value = '';
     document.getElementById('ag_nomeplaca').value = '';
@@ -2812,6 +2884,16 @@ if ('serviceWorker' in navigator) {
     }catch(e){ /* falha silenciosa — só afeta o link antigo sem parâmetro */ }
   }
 
+  // Publica o número de WhatsApp do motorista no seu próprio documento
+  // público (identificado pelo UID) — é o que o site de pedidos lê para
+  // saber para onde mandar o botão "Falar no WhatsApp".
+  async function publicarWhatsapp(numero){
+    if(!auth.currentUser) return;
+    try{
+      await setDoc(doc(db, 'trajeto_publico', auth.currentUser.uid), { whatsapp: numero }, { merge: true });
+    }catch(e){ /* falha silenciosa — só afeta o botão de WhatsApp do site */ }
+  }
+
   async function verificarCodigoConvite(codigo){
     if(!codigo) return false;
     const ref = doc(db, 'trajeto_convites', codigo.trim());
@@ -2844,6 +2926,7 @@ if ('serviceWorker' in navigator) {
     ligarOuvintePedidos,
     atualizarStatusPedido,
     publicarMotoristaPadrao,
+    publicarWhatsapp,
     onAuthChange: (cb) => onAuthStateChanged(auth, cb),
     get utilizadorAtual(){ return auth.currentUser; }
   };
