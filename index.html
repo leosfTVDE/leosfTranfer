@@ -1160,7 +1160,7 @@
     <p class="nota">Estes pedidos vêm do teu site de cotações. "Aceitar" cria logo um agendamento (ainda podes editar tudo depois); "Recusar" só remove daqui.<br><br>Precisas de estar com sessão iniciada (em "Minhas tarifas") para veres os pedidos novos.</p>
   </div>
 
-  <p style="text-align:center; font-family:'Helvetica Neue', Arial, sans-serif; font-size:11px; color:#8a7f66; margin-top:24px;">Trajeto · v9.5</p>
+  <p style="text-align:center; font-family:'Helvetica Neue', Arial, sans-serif; font-size:11px; color:#8a7f66; margin-top:24px;">Trajeto · v9.6</p>
 
 </main>
 
@@ -2048,7 +2048,10 @@
     const dataFmt = ag.data.split('-').reverse().join('/');
     const nome = localStorage.getItem('trajeto_nome') || '';
     const assinatura = nome ? `Aqui é o ${nome}` : 'Aqui é o teu motorista';
-    return `Olá ${ag.cliente}! 👋\n\n${assinatura} — confirmo os dados do seu transfer:\n\n📍 De: ${ag.partida}\n📍 Para: ${ag.chegada}\n📅 Data: ${dataFmt}\n🕐 Horário: ${ag.hora}\n💰 Valor: €${ag.valor}\n\nPode confirmar este serviço, por favor? Fico a aguardar a sua resposta. Obrigado! 🚗`;
+    const linhaParagens = (ag.paragens && ag.paragens.length)
+      ? ag.paragens.map(p => `📍 Paragem: ${p}\n`).join('')
+      : '';
+    return `Olá ${ag.cliente}! 👋\n\n${assinatura} — confirmo os dados do seu transfer:\n\n📍 De: ${ag.partida}\n${linhaParagens}📍 Para: ${ag.chegada}\n📅 Data: ${dataFmt}\n🕐 Horário: ${ag.hora}\n💰 Valor: €${ag.valor}\n\nPode confirmar este serviço, por favor? Fico a aguardar a sua resposta. Obrigado! 🚗`;
   }
 
   function enviarMensagem(ag){
@@ -2102,7 +2105,10 @@
   function gerarMensagemRepasse(ag){
     const dataFmt = ag.data.split('-').reverse().join('/');
     const link = gerarLinkRepasse(ag);
-    return `🚗 Transfer para repassar\n\n📍 De: ${ag.partida}\n📍 Para: ${ag.chegada}\n📅 Data: ${dataFmt} às ${ag.hora}\n👤 Cliente: ${ag.cliente}${ag.telefone ? '\n📞 Telefone: ' + ag.telefone : ''}\n💶 Valor: €${ag.valor}\n\nSe tiveres a app Trajeto, abre este link para adicionar automaticamente aos teus agendamentos:\n${link}`;
+    const linhaParagens = (ag.paragens && ag.paragens.length)
+      ? ag.paragens.map(p => `📍 Paragem: ${p}\n`).join('')
+      : '';
+    return `🚗 Transfer para repassar\n\n📍 De: ${ag.partida}\n${linhaParagens}📍 Para: ${ag.chegada}\n📅 Data: ${dataFmt} às ${ag.hora}\n👤 Cliente: ${ag.cliente}${ag.telefone ? '\n📞 Telefone: ' + ag.telefone : ''}\n💶 Valor: €${ag.valor}\n\nSe tiveres a app Trajeto, abre este link para adicionar automaticamente aos teus agendamentos:\n${link}`;
   }
 
   function repassarAgendamento(ag){
