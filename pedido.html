@@ -398,7 +398,11 @@
       <label for="p_partida" data-i18n="label_partida">Local de partida</label>
       <input type="text" id="p_partida" data-i18n-placeholder="ph_partida" placeholder="ex: Aeroporto de Lisboa, T1" required>
 
-      <label for="p_chegada" data-i18n="label_chegada">Local de chegada</label>
+      <label id="p_labelParagens" data-i18n="label_paragens">Paragens pelo meio (opcional)</label>
+      <div id="listaParagensPedido"></div>
+      <button type="button" id="btnAdicionarParagemPedido" data-i18n="btn_add_paragem" style="width:100%; margin-top:4px; padding:9px; border-radius:8px; border:1px dashed var(--linha); background:none; color:var(--azulejo); font-family:'Helvetica Neue', Arial, sans-serif; font-size:13px; cursor:pointer;">+ Adicionar paragem</button>
+
+      <label for="p_chegada" data-i18n="label_chegada" style="margin-top:14px;">Local de chegada</label>
       <input type="text" id="p_chegada" data-i18n-placeholder="ph_chegada" placeholder="ex: Hotel Avenida Palace" required>
 
       <label for="p_voo" data-i18n="label_voo">Número do voo (opcional)</label>
@@ -501,6 +505,9 @@
       ph_partida: 'ex: Aeroporto de Lisboa, T1',
       label_chegada: 'Local de chegada',
       ph_chegada: 'ex: Hotel Avenida Palace',
+      label_paragens: 'Paragens pelo meio (opcional)',
+      btn_add_paragem: '+ Adicionar paragem',
+      ph_paragem: 'ex: Rua das Flores, 12',
       label_voo: 'Número do voo (opcional)',
       ph_voo: 'ex: TP1234',
       label_data: 'Data',
@@ -535,6 +542,9 @@
       ph_partida: 'e.g. Lisbon Airport, T1',
       label_chegada: 'Drop-off location',
       ph_chegada: 'e.g. Avenida Palace Hotel',
+      label_paragens: 'Stops along the way (optional)',
+      btn_add_paragem: '+ Add stop',
+      ph_paragem: 'e.g. 12 Flower Street',
       label_voo: 'Flight number (optional)',
       ph_voo: 'e.g. TP1234',
       label_data: 'Date',
@@ -631,6 +641,32 @@
 
   aplicarIdioma(idiomaAtual);
   renderParceiros();
+
+  // ---------- Paragens dinâmicas ----------
+  let paragemPedidoSeq = 0;
+  function adicionarParagemPedido(){
+    paragemPedidoSeq++;
+    const id = `p_paragem_${paragemPedidoSeq}`;
+    const linha = document.createElement('div');
+    linha.className = 'linha-paragem-pedido';
+    linha.style.cssText = 'display:flex; gap:8px; align-items:center; margin-top:8px;';
+    linha.innerHTML = `
+      <input type="text" class="p-paragem-input" id="${id}" placeholder="${TEXTOS[idiomaAtual].ph_paragem}" style="flex:1;">
+      <button type="button" data-remover-paragem-pedido style="border:none; background:none; color:var(--terracota); font-size:18px; cursor:pointer; padding:4px 8px;">✕</button>
+    `;
+    document.getElementById('listaParagensPedido').appendChild(linha);
+  }
+  document.getElementById('btnAdicionarParagemPedido').addEventListener('click', adicionarParagemPedido);
+  document.getElementById('listaParagensPedido').addEventListener('click', (e)=>{
+    if(e.target.closest('[data-remover-paragem-pedido]')){
+      e.target.closest('.linha-paragem-pedido').remove();
+    }
+  });
+  function lerParagensPedido(){
+    return Array.from(document.querySelectorAll('.p-paragem-input'))
+      .map(inp => inp.value.trim())
+      .filter(v => v);
+  }
 </script>
 
 <script type="module">
@@ -706,6 +742,7 @@
       nome: document.getElementById('p_nome').value.trim(),
       contacto: document.getElementById('p_contacto').value.trim(),
       partida: document.getElementById('p_partida').value.trim(),
+      paragens: lerParagensPedido(),
       chegada: document.getElementById('p_chegada').value.trim(),
       voo: document.getElementById('p_voo').value.trim(),
       data: document.getElementById('p_data').value,
