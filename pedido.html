@@ -263,6 +263,17 @@
     opacity:.45;
     cursor:not-allowed;
   }
+  .info-hora{
+    background:var(--areia);
+    border:1px solid var(--linha);
+    border-radius:8px;
+    padding:11px 13px;
+    margin-bottom:18px;
+    font-family:'Helvetica Neue', Arial, sans-serif;
+    font-size:12.5px;
+    color:#4a5a60;
+    line-height:1.55;
+  }
 
   /* ---------- Testemunhos (preparado para o futuro) ---------- */
   .testemunhos-secao{display:none; margin-top:30px;}
@@ -389,6 +400,12 @@
 
   <div class="card" id="cardForm">
     <form id="formPedido">
+      <div class="tipo-switch" id="tipoSwitch" style="display:none;">
+        <button type="button" data-tipo="transfer" class="active" data-i18n="tipo_transfer">Transfer</button>
+        <button type="button" data-tipo="hora" data-i18n="tipo_hora">Serviço por hora</button>
+      </div>
+      <div class="info-hora" id="infoHora" style="display:none;"></div>
+
       <label for="p_nome" data-i18n="label_nome">O seu nome</label>
       <input type="text" id="p_nome" data-i18n-placeholder="ph_nome" placeholder="ex: João Ferreira" required>
 
@@ -398,12 +415,16 @@
       <label for="p_partida" data-i18n="label_partida">Local de partida</label>
       <input type="text" id="p_partida" data-i18n-placeholder="ph_partida" placeholder="ex: Aeroporto de Lisboa, T1" required>
 
-      <label id="p_labelParagens" data-i18n="label_paragens">Paragens pelo meio (opcional)</label>
+      <div id="blocoParagensPedido">
+      <label id="p_labelParagens" data-i18n="label_paragens" style="margin-top:16px;">Paragens pelo meio (opcional)</label>
       <div id="listaParagensPedido"></div>
       <button type="button" id="btnAdicionarParagemPedido" data-i18n="btn_add_paragem" style="width:100%; margin-top:4px; padding:9px; border-radius:8px; border:1px dashed var(--linha); background:none; color:var(--azulejo); font-family:'Helvetica Neue', Arial, sans-serif; font-size:13px; cursor:pointer;">+ Adicionar paragem</button>
+      </div>
 
+      <div id="blocoChegadaPedido">
       <label for="p_chegada" data-i18n="label_chegada" style="margin-top:14px;">Local de chegada</label>
       <input type="text" id="p_chegada" data-i18n-placeholder="ph_chegada" placeholder="ex: Hotel Avenida Palace" required>
+      </div>
 
       <label for="p_voo" data-i18n="label_voo">Número do voo (opcional)</label>
       <input type="text" id="p_voo" data-i18n-placeholder="ph_voo" placeholder="ex: TP1234">
@@ -421,6 +442,11 @@
 
       <label for="p_passageiros" data-i18n="label_passageiros">Número de passageiros</label>
       <input type="number" id="p_passageiros" min="1" max="8" data-i18n-placeholder="ph_passageiros" placeholder="ex: 2">
+
+      <div id="blocoHoras" style="display:none;">
+        <label for="p_horas" data-i18n="label_horas" style="margin-top:16px;">Duração estimada em horas (opcional)</label>
+        <input type="number" id="p_horas" min="1" max="24" step="0.5" data-i18n-placeholder="ph_horas" placeholder="ex: 3">
+      </div>
 
       <label for="p_obs" data-i18n="label_obs">Observações (opcional)</label>
       <textarea id="p_obs" data-i18n-placeholder="ph_obs" placeholder="ex: bagagem extra, cadeirinha para criança, número de voo..."></textarea>
@@ -490,6 +516,9 @@
 
   // ============================================================
 
+  var servicoHora = null;      // configuração publicada pelo motorista (null = não oferece)
+  var tipoPedido = 'transfer'; // 'transfer' | 'hora'
+
   const TEXTOS = {
     pt: {
       titulo_html: 'Peça a sua <em>cotação</em>',
@@ -508,6 +537,10 @@
       label_paragens: 'Paragens pelo meio (opcional)',
       btn_add_paragem: '+ Adicionar paragem',
       ph_paragem: 'ex: Rua das Flores, 12',
+      tipo_transfer: 'Transfer',
+      tipo_hora: 'Serviço por hora',
+      label_horas: 'Duração estimada em horas (opcional)',
+      ph_horas: 'ex: 3',
       label_voo: 'Número do voo (opcional)',
       ph_voo: 'ex: TP1234',
       label_data: 'Data',
@@ -545,6 +578,10 @@
       label_paragens: 'Stops along the way (optional)',
       btn_add_paragem: '+ Add stop',
       ph_paragem: 'e.g. 12 Flower Street',
+      tipo_transfer: 'Transfer',
+      tipo_hora: 'Hourly service',
+      label_horas: 'Estimated duration in hours (optional)',
+      ph_horas: 'e.g. 3',
       label_voo: 'Flight number (optional)',
       ph_voo: 'e.g. TP1234',
       label_data: 'Date',
@@ -633,6 +670,7 @@
 
     renderPromocao(lang);
     renderTestemunhos(lang);
+    renderInfoHora();
   }
 
   document.getElementById('langSwitch').querySelectorAll('button').forEach(btn=>{
@@ -667,6 +705,60 @@
       .map(inp => inp.value.trim())
       .filter(v => v);
   }
+
+  // ---------- Serviço por hora ----------
+  function fmtEuroPub(v){
+    const n = Math.round(Number(v) * 100) / 100;
+    return '€' + (Number.isInteger(n) ? String(n) : n.toFixed(2));
+  }
+  function fmtDurPub(min){
+    const m = Math.round(min), h = Math.floor(m / 60), r = m % 60;
+    if(h === 0) return `${r} min`;
+    if(r === 0) return `${h}h`;
+    return `${h}h${String(r).padStart(2, '0')}`;
+  }
+  function renderInfoHora(){
+    const box = document.getElementById('infoHora');
+    if(!box) return;
+    if(!servicoHora || tipoPedido !== 'hora'){ box.style.display = 'none'; return; }
+    const s = servicoHora, pt = idiomaAtual === 'pt';
+    const dur = fmtDurPub(s.minimoMin);
+    let texto;
+    if(pt){
+      const primeira = s.minimoMin === 60 ? 'A primeira hora é sempre cobrada por inteiro' : `Os primeiros ${dur} são sempre cobrados por inteiro`;
+      texto = `<strong>${fmtEuroPub(s.valor)} por hora.</strong> ${primeira}; a partir daí, contamos por blocos de ${s.blocoMin} minutos. O tempo começa a contar quando entrar no carro e pode parar onde quiser durante o serviço.`;
+    } else {
+      const primeira = s.minimoMin === 60 ? 'The first hour is always charged in full' : `The first ${dur} are always charged in full`;
+      texto = `<strong>${fmtEuroPub(s.valor)} per hour.</strong> ${primeira}; after that, we count in ${s.blocoMin}-minute blocks. The clock starts when you get in the car, and you can stop wherever you like during the service.`;
+    }
+    box.innerHTML = texto;
+    box.style.display = 'block';
+  }
+  function definirTipoPedido(tipo){
+    tipoPedido = tipo === 'hora' && servicoHora ? 'hora' : 'transfer';
+    const hora = tipoPedido === 'hora';
+    document.getElementById('tipoSwitch').querySelectorAll('button').forEach(b=>{
+      b.classList.toggle('active', b.dataset.tipo === tipoPedido);
+    });
+    document.getElementById('blocoParagensPedido').style.display = hora ? 'none' : 'block';
+    document.getElementById('blocoChegadaPedido').style.display = hora ? 'none' : 'block';
+    document.getElementById('blocoHoras').style.display = hora ? 'block' : 'none';
+    document.getElementById('p_chegada').required = !hora;
+    renderInfoHora();
+  }
+  document.getElementById('tipoSwitch').addEventListener('click', (e)=>{
+    const b = e.target.closest('button[data-tipo]');
+    if(b) definirTipoPedido(b.dataset.tipo);
+  });
+  // Chamado pelo módulo Firebase quando o documento público do motorista traz a configuração
+  window.aplicarServicoHora = function(c){
+    const valor = Number(c && c.valor), minimoMin = Number(c && c.minimoMin), blocoMin = Number(c && c.blocoMin);
+    if(!c || c.ativo !== true || !(valor > 0) || !(minimoMin > 0) || !(blocoMin > 0)) return;
+    servicoHora = { valor, minimoMin, blocoMin };
+    document.getElementById('tipoSwitch').style.display = 'flex';
+    renderInfoHora();
+  };
+  window.obterTipoPedido = function(){ return tipoPedido; };
 </script>
 
 <script type="module">
@@ -709,11 +801,15 @@
       const uid = await resolucaoMotorista;
       if(!uid) return;
       const snap = await getDoc(doc(db, 'trajeto_publico', uid));
-      const numero = snap.exists() ? snap.data().whatsapp : '';
+      const dadosPublicos = snap.exists() ? snap.data() : {};
+      const numero = dadosPublicos.whatsapp || '';
       if(numero){
         const btn = document.getElementById('footerWhatsapp');
         btn.href = `https://wa.me/${numero}`;
         btn.style.display = 'inline-flex';
+      }
+      if(dadosPublicos.hora && typeof window.aplicarServicoHora === 'function'){
+        window.aplicarServicoHora(dadosPublicos.hora);
       }
     }catch(e){ /* sem número disponível — o botão fica escondido, sem problema */ }
   })();
@@ -727,8 +823,8 @@
     erroEl.textContent = '';
 
     const lang = localStorage.getItem('pedido_idioma') || 'pt';
-    const textos = { pt: {campos:'Preenche todos os campos obrigatórios.', envio:'Não foi possível enviar o pedido. Tenta novamente ou contacta-nos diretamente.', enviar:'Pedir cotação', enviando:'A enviar...', semMotorista:'Este link não é válido. Confirma o link com o motorista ou contacta-nos diretamente.'},
-                      en: {campos:'Please fill in all required fields.', envio:'Could not send your request. Please try again or contact us directly.', enviar:'Request quote', enviando:'Sending...', semMotorista:'This link is not valid. Please confirm the link with the driver or contact us directly.'} }[lang];
+    const textos = { pt: {campos:'Preenche todos os campos obrigatórios.', envio:'Não foi possível enviar o pedido. Tenta novamente ou contacta-nos diretamente.', enviar:'Pedir cotação', enviando:'A enviar...', semMotorista:'Este link não é válido. Confirma o link com o motorista ou contacta-nos diretamente.', confHora:'Recebemos o seu pedido de serviço por hora. Vamos analisar e entrar em contacto consigo em breve para confirmar a disponibilidade e a reserva.'},
+                      en: {campos:'Please fill in all required fields.', envio:'Could not send your request. Please try again or contact us directly.', enviar:'Request quote', enviando:'Sending...', semMotorista:'This link is not valid. Please confirm the link with the driver or contact us directly.', confHora:'We\u2019ve received your hourly service request. We\u2019ll review it and get back to you shortly to confirm availability and booking.'} }[lang];
 
     const motoristaUidResolvido = await resolucaoMotorista;
     const motoristaResolvido = !!motoristaUidResolvido;
@@ -737,13 +833,15 @@
       return;
     }
 
+    const ehHora = (typeof window.obterTipoPedido === 'function') && window.obterTipoPedido() === 'hora';
+
     const pedido = {
       motoristaUid: motoristaUidResolvido,
       nome: document.getElementById('p_nome').value.trim(),
       contacto: document.getElementById('p_contacto').value.trim(),
       partida: document.getElementById('p_partida').value.trim(),
-      paragens: lerParagensPedido(),
-      chegada: document.getElementById('p_chegada').value.trim(),
+      paragens: ehHora ? [] : lerParagensPedido(),
+      chegada: ehHora ? '' : document.getElementById('p_chegada').value.trim(),
       voo: document.getElementById('p_voo').value.trim(),
       data: document.getElementById('p_data').value,
       hora: document.getElementById('p_hora').value,
@@ -754,7 +852,12 @@
       criadoEm: serverTimestamp()
     };
 
-    if(!pedido.nome || !pedido.contacto || !pedido.partida || !pedido.chegada || !pedido.data || !pedido.hora){
+    if(ehHora){
+      pedido.tipo = 'hora';
+      pedido.horasEstimadas = document.getElementById('p_horas').value.trim();
+    }
+
+    if(!pedido.nome || !pedido.contacto || !pedido.partida || (!ehHora && !pedido.chegada) || !pedido.data || !pedido.hora){
       erroEl.textContent = textos.campos;
       return;
     }
@@ -764,6 +867,7 @@
 
     try{
       await addDoc(collection(db, 'trajeto_pedidos'), pedido);
+      if(ehHora) document.querySelector('#confirmacao p').textContent = textos.confHora;
       document.getElementById('cardForm').querySelector('form').style.display = 'none';
       document.getElementById('confirmacao').style.display = 'block';
     }catch(err){
