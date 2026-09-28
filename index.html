@@ -1169,7 +1169,7 @@
       <div class="card">
         <h2>Agendar corrida</h2>
 
-        <div class="ag-secao">🧭 Tipo de serviço</div>
+        <div class="ag-secao" id="agSecaoTipo">🧭 Tipo de serviço</div>
         <div class="seg" id="segTipoAg">
           <button type="button" data-v="transfer" class="active">Transfer</button>
           <button type="button" data-v="hora">⏱ Por hora</button>
@@ -1285,6 +1285,7 @@
   <div id="viewHora" style="display:none;">
     <div class="card">
       <h2>⏱ Serviços por hora</h2>
+      <div id="avisoHoraAgendado" style="display:none; background:var(--areia); border:1px solid var(--azulejo); border-radius:8px; padding:11px 13px; margin-bottom:14px; font-family:'Helvetica Neue', Arial, sans-serif; font-size:13px; line-height:1.55; color:var(--texto);"></div>
       <button class="btn-agendar" id="btnNovoAgendamentoHora" style="margin-top:0; margin-bottom:14px;">➕ Agendar serviço por hora</button>
       <div class="lista-agendamentos" id="listaHora"></div>
     </div>
@@ -1527,6 +1528,7 @@
       document.getElementById('viewFaturamento').style.display = t === 'faturamento' ? 'block' : 'none';
       document.getElementById('viewPedidos').style.display = t === 'pedidos' ? 'block' : 'none';
       document.getElementById('viewHora').style.display = t === 'hora' ? 'block' : 'none';
+      document.getElementById('avisoHoraAgendado').style.display = 'none';
       if(t === 'faturamento') renderFaturamento();
       if(t === 'hora') renderHora();
     });
@@ -2055,6 +2057,7 @@
 
   document.getElementById('btnAbrirAgendar').addEventListener('click', ()=>{
     const p = document.getElementById('painelAgendar');
+    hospedarPainelAgendar('transfer');
     editandoId = null;
     aplicarTipoAgendar('transfer');
     document.getElementById('btnGuardarAgendamento').textContent = 'Guardar e adicionar ao calendário';
@@ -2427,13 +2430,38 @@
       aplicarTipoAgendar(btn.dataset.v, { definirValor: !editandoId });
     });
   });
+  // O painel "Agendar corrida" vive por defeito no fim da aba Transfer. Ao agendar a partir
+  // da aba "Por hora", passa a aparecer no topo dessa aba (e volta ao sítio de origem depois).
+  const painelAg = document.getElementById('painelAgendar');
+  const painelOrigemPai = painelAg.parentNode;
+  const painelOrigemProximo = painelAg.nextSibling;
+  let painelHospedadoEm = 'transfer';
+  function hospedarPainelAgendar(onde){
+    painelHospedadoEm = onde === 'hora' ? 'hora' : 'transfer';
+    if(painelHospedadoEm === 'hora'){
+      const v = document.getElementById('viewHora');
+      v.insertBefore(painelAg, v.firstChild);
+    } else if(painelAg.parentNode !== painelOrigemPai){
+      painelOrigemPai.insertBefore(painelAg, painelOrigemProximo && painelOrigemProximo.parentNode === painelOrigemPai ? painelOrigemProximo : null);
+    }
+    const hora = painelHospedadoEm === 'hora';
+    document.getElementById('agSecaoTipo').style.display = hora ? 'none' : '';
+    document.getElementById('segTipoAg').style.display = hora ? 'none' : '';
+  }
   document.getElementById('btnNovoAgendamentoHora').addEventListener('click', ()=>{
-    document.querySelector('#segModo button[data-v="transfer"]').click();
-    document.getElementById('btnAbrirAgendar').click();
-    document.getElementById('ag_partida').value = '';
-    document.getElementById('ag_chegada').value = '';
+    document.getElementById('avisoHoraAgendado').style.display = 'none';
+    editandoId = null;
+    hospedarPainelAgendar('hora');
+    document.getElementById('btnGuardarAgendamento').textContent = 'Guardar e adicionar ao calendário';
+    ['ag_partida','ag_chegada','ag_cliente','ag_telefone','ag_nomeplaca','ag_voo','ag_fornecedor','ag_observacoes'].forEach(id=>{ document.getElementById(id).value = ''; });
     limparParagensAgendar();
+    if(!document.getElementById('ag_data').value){
+      const amanha = new Date(); amanha.setDate(amanha.getDate() + 1);
+      document.getElementById('ag_data').value = `${amanha.getFullYear()}-${pad(amanha.getMonth()+1)}-${pad(amanha.getDate())}`;
+    }
     aplicarTipoAgendar('hora', { definirValor: true });
+    painelAg.style.display = 'block';
+    painelAg.scrollIntoView({behavior:'smooth', block:'start'});
   });
 
   // ---- Ações sobre o serviço por hora ----
@@ -2737,6 +2765,7 @@
 
   function abrirEdicao(ag){
     editandoId = ag.id;
+    hospedarPainelAgendar('transfer');
     preencherFormAgendamento(ag);
     document.getElementById('btnGuardarAgendamento').textContent = 'Guardar alterações';
     const p = document.getElementById('painelAgendar');
@@ -3099,6 +3128,11 @@
       gravarAgendamentos(lista);
       renderLista();
       abrirICS(ag);
+      if(tipo === 'hora' && painelHospedadoEm === 'hora'){
+        const av = document.getElementById('avisoHoraAgendado');
+        av.textContent = `✅ Agendado: ${ag.cliente}, ${ag.data.split('-').reverse().join('/')} às ${ag.hora}. Fica em Transfer → Meus agendamentos; quando fores buscar o cliente, toca em "🚗 Ir buscar cliente" lá e ele passa a aparecer aqui.`;
+        av.style.display = 'block';
+      }
     }
 
     document.getElementById('ag_partida').value = '';
@@ -3228,6 +3262,7 @@
     if(!params.has('partida') && !params.has('cliente')) return;
 
     editandoId = null;
+    hospedarPainelAgendar('transfer');
     preencherFormAgendamento({
       partida: params.get('partida') || '',
       chegada: params.get('chegada') || '',
