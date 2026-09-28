@@ -423,6 +423,98 @@
   .ag-btn-buscar{background:var(--azulejo);}
   .ag-btn-levar{background:var(--terracota);}
   .ag-btn-paragem{background:var(--azul-doca);}
+  .ag-btn-hora{background:var(--azul-doca);}
+  #segModo.seg-4 button{ font-size:12.5px; padding:11px 3px; }
+  #segModo.seg-4 button[data-v="hora"], #segModo.seg-4 button[data-v="pedidos"]{ padding-right:10px; }
+  #segModo.seg-4 .selo-contagem{ top:1px; right:2px; min-width:14px; height:14px; line-height:14px; font-size:9px; padding:0 3px; }
+  @media (min-width: 700px){ #segModo.seg-4 button{ font-size:14px; padding:12px 8px; } }
+  .ag-badge-hora{
+    display:inline-block;
+    font-family:'Helvetica Neue', Arial, sans-serif;
+    font-size:10.5px;
+    font-weight:bold;
+    color:#fff;
+    background:var(--azul-doca);
+    padding:2px 8px;
+    border-radius:10px;
+    margin-left:6px;
+    vertical-align:middle;
+  }
+  .hora-card{
+    border:1px solid var(--azulejo);
+    border-radius:10px;
+    padding:16px 14px;
+    background:#fdfbf6;
+  }
+  .hora-topo{
+    font-family:'Helvetica Neue', Arial, sans-serif;
+    font-size:16px;
+    font-weight:bold;
+    color:var(--texto);
+    margin-bottom:4px;
+  }
+  .hora-linhas{
+    font-family:'Helvetica Neue', Arial, sans-serif;
+    font-size:13px;
+    line-height:1.7;
+    color:#4a5a60;
+  }
+  .hora-timer{
+    font-family:'Courier New', monospace;
+    font-size:44px;
+    font-weight:bold;
+    text-align:center;
+    color:var(--azul-noite);
+    letter-spacing:.02em;
+    margin:14px 0 2px;
+  }
+  .hora-valor-atual{
+    font-family:'Georgia', 'Iowan Old Style', serif;
+    font-size:32px;
+    font-weight:bold;
+    text-align:center;
+    color:var(--terracota);
+  }
+  .hora-dica{
+    font-family:'Helvetica Neue', Arial, sans-serif;
+    font-size:12px;
+    text-align:center;
+    color:#6a7378;
+    margin:4px 0 14px;
+    line-height:1.5;
+  }
+  .hora-resumo{
+    background:var(--areia);
+    border-radius:8px;
+    padding:10px 12px;
+    margin:12px 0 4px;
+    font-family:'Helvetica Neue', Arial, sans-serif;
+    font-size:13.5px;
+    line-height:1.9;
+    color:var(--texto);
+  }
+  .hora-total{
+    font-family:'Georgia', 'Iowan Old Style', serif;
+    font-size:34px;
+    font-weight:bold;
+    text-align:center;
+    color:var(--terracota);
+    margin:10px 0 0;
+  }
+  .hora-btn-grande{
+    width:100%;
+    padding:15px;
+    border:none;
+    border-radius:10px;
+    color:#fff;
+    font-family:'Helvetica Neue', Arial, sans-serif;
+    font-size:16px;
+    font-weight:bold;
+    cursor:pointer;
+    margin-top:8px;
+  }
+  .hora-btn-iniciar{background:var(--azulejo);}
+  .hora-btn-finalizar{background:var(--terracota);}
   .ag-acoes{
     display:flex;
     flex-wrap:wrap;
@@ -782,8 +874,9 @@
 
 <main>
 
-  <div class="seg" id="segModo" style="margin-bottom:18px;">
+  <div class="seg seg-4" id="segModo" style="margin-bottom:18px;">
     <button data-v="transfer" class="active">Transfer</button>
+    <button data-v="hora">⏱ Por hora<span class="selo-contagem" id="seloHora">0</span></button>
     <button data-v="faturamento">Faturamento</button>
     <button data-v="pedidos">📥 Pedidos<span class="selo-contagem" id="seloPedidos">0</span></button>
   </div>
@@ -899,6 +992,26 @@
           <div class="cfg-row">
             <div><label>Acréscimo noturno (%)</label><input type="number" id="cfg_noite_pct"></div>
           </div>
+        </div>
+      </div>
+
+      <div class="cfg-grupo">
+        <div class="cfg-titulo" data-acordeao="hora">⏱️ Serviço por hora <span class="seta">▸</span></div>
+        <div class="cfg-conteudo" data-conteudo="hora">
+          <div class="checks">
+            <label class="chk"><input type="checkbox" id="cfg_hora_ativo"> Oferecer no site de pedidos</label>
+          </div>
+          <div class="cfg-row">
+            <div><label>Valor por hora (€)</label><input type="number" step="0.5" min="0" id="cfg_hora_valor"></div>
+            <div><label>Mínimo cobrado (min)</label><input type="number" min="1" id="cfg_hora_minimo_min"></div>
+          </div>
+          <div class="cfg-row">
+            <div><label>Depois, blocos de (min)</label><input type="number" min="1" id="cfg_hora_bloco_min"></div>
+          </div>
+          <p style="font-family:'Helvetica Neue', Arial, sans-serif; font-size:11.5px; color:#6a7378; margin:12px 0 0; line-height:1.6;">
+            Regra: o tempo mínimo (normalmente a primeira hora) é sempre cobrado por inteiro. A partir daí, qualquer minuto a mais conta o bloco seguinte — ex: com 60 min e blocos de 30, 1h10 cobra 1h30 e 1h45 cobra 2h.<br>
+            "Oferecer no site de pedidos" mostra ao cliente a opção "Serviço por hora" (toca em Aplicar para publicar).
+          </p>
         </div>
       </div>
 
@@ -1056,15 +1169,24 @@
       <div class="card">
         <h2>Agendar corrida</h2>
 
+        <div class="ag-secao">🧭 Tipo de serviço</div>
+        <div class="seg" id="segTipoAg">
+          <button type="button" data-v="transfer" class="active">Transfer</button>
+          <button type="button" data-v="hora">⏱ Por hora</button>
+        </div>
+        <p id="agDicaHora" style="display:none; font-family:'Helvetica Neue', Arial, sans-serif; font-size:12px; color:#6a7378; line-height:1.5; margin:8px 0 0;"></p>
+
         <div class="ag-secao">📍 Trajeto</div>
         <label for="ag_partida">Endereço de partida</label>
         <input type="text" id="ag_partida" placeholder="ex: Aeroporto de Lisboa, T1">
 
+        <div id="blocoParagensAg">
         <label style="margin-top:14px;">Paragens pelo meio (opcional)</label>
         <div id="listaParagensAgendar"></div>
         <button type="button" id="btnAdicionarParagemAgendar" style="width:100%; margin-top:4px; padding:9px; border-radius:8px; border:1px dashed var(--linha); background:none; color:var(--azulejo); font-family:'Helvetica Neue', Arial, sans-serif; font-size:13px; cursor:pointer;">+ Adicionar paragem</button>
+        </div>
 
-        <label for="ag_chegada" style="margin-top:14px;">Endereço de chegada</label>
+        <label for="ag_chegada" id="ag_labelChegada" style="margin-top:14px;">Endereço de chegada</label>
         <input type="text" id="ag_chegada" placeholder="ex: Hotel Avenida Palace">
 
         <div class="ag-secao">👤 Cliente</div>
@@ -1096,7 +1218,7 @@
         </div>
         <label for="ag_fornecedor">Fornecedor do serviço</label>
         <input type="text" id="ag_fornecedor" placeholder="ex: particular / nome da empresa">
-        <label for="ag_valor">Valor (€)</label>
+        <label for="ag_valor" id="ag_labelValor">Valor (€)</label>
         <input type="number" id="ag_valor" min="0">
         <label for="ag_observacoes">Observações</label>
         <textarea id="ag_observacoes" placeholder="ex: bagagem extra, cadeirinha, alergias, pedidos especiais..." style="min-height:60px;"></textarea>
@@ -1160,7 +1282,16 @@
     <p class="nota">Estes pedidos vêm do teu site de cotações. "Aceitar" cria logo um agendamento (ainda podes editar tudo depois); "Recusar" só remove daqui.<br><br>Precisas de estar com sessão iniciada (em "Minhas tarifas") para veres os pedidos novos.</p>
   </div>
 
-  <p style="text-align:center; font-family:'Helvetica Neue', Arial, sans-serif; font-size:11px; color:#8a7f66; margin-top:24px;">Trajeto · v9.6</p>
+  <div id="viewHora" style="display:none;">
+    <div class="card">
+      <h2>⏱ Serviços por hora</h2>
+      <button class="btn-agendar" id="btnNovoAgendamentoHora" style="margin-top:0; margin-bottom:14px;">➕ Agendar serviço por hora</button>
+      <div class="lista-agendamentos" id="listaHora"></div>
+    </div>
+    <p class="nota">Aqui aparecem os serviços por hora a partir do momento em que tocas em "🚗 Ir buscar cliente" no agendamento. O tempo só começa a contar quando tocas em "▶️ Iniciar" (cliente no carro). Ao finalizar, o valor é calculado pela regra definida em "Minhas tarifas" e podes enviar o resumo ao cliente. O agendamento só sai da lista quando o marcares como "Concluído".</p>
+  </div>
+
+  <p style="text-align:center; font-family:'Helvetica Neue', Arial, sans-serif; font-size:11px; color:#8a7f66; margin-top:24px;">Trajeto · v9.7</p>
 
 </main>
 
@@ -1248,22 +1379,29 @@
     espera_sedan: 13, espera_van: 18,
     noite_pct: 15,
     bagagem: 7, cadeira: 8,
-    iva_pct: 6
+    iva_pct: 6,
+    hora_ativo: 0, hora_valor: 25, hora_minimo_min: 60, hora_bloco_min: 30
   };
   let cfg = { ...DEFAULTS };
 
   function preencherPainel(c){
     Object.keys(DEFAULTS).forEach(k=>{
       const el = document.getElementById('cfg_'+k);
-      if(el) el.value = c[k];
+      if(!el) return;
+      if(el.type === 'checkbox') el.checked = Number(c[k]) === 1;
+      else el.value = c[k];
     });
   }
   function lerPainel(){
     const novo = {};
     Object.keys(DEFAULTS).forEach(k=>{
       const el = document.getElementById('cfg_'+k);
+      if(el.type === 'checkbox'){ novo[k] = el.checked ? 1 : 0; return; }
       const v = parseFloat(el.value);
       novo[k] = isNaN(v) ? DEFAULTS[k] : v;
+    });
+    ['hora_valor','hora_minimo_min','hora_bloco_min'].forEach(k=>{
+      if(!(novo[k] > 0)) novo[k] = DEFAULTS[k];
     });
     return novo;
   }
@@ -1312,8 +1450,18 @@
     });
   });
 
-  const VIEWS_POR_MODO = { transfer: 'viewTransfer', faturamento: 'viewFaturamento', pedidos: 'viewPedidos' };
+  const VIEWS_POR_MODO = { transfer: 'viewTransfer', hora: 'viewHora', faturamento: 'viewFaturamento', pedidos: 'viewPedidos' };
   let modoAntesDeConfig = 'transfer';
+  function fecharPainelConfig(){
+    const p = document.getElementById('painelConfig');
+    if(p.style.display !== 'block') return;
+    p.style.display = 'none';
+    const btnRestaurar = document.querySelector(`#segModo button[data-v="${modoAntesDeConfig}"]`);
+    if(btnRestaurar) btnRestaurar.classList.add('active');
+    document.getElementById(VIEWS_POR_MODO[modoAntesDeConfig]).style.display = 'block';
+    if(modoAntesDeConfig === 'faturamento') renderFaturamento();
+    if(modoAntesDeConfig === 'hora') renderHora();
+  }
   document.getElementById('btnConfig').addEventListener('click', ()=>{
     const p = document.getElementById('painelConfig');
     const abrir = p.style.display !== 'block';
@@ -1326,11 +1474,7 @@
       });
       p.style.display = 'block';
     } else {
-      p.style.display = 'none';
-      const btnRestaurar = document.querySelector(`#segModo button[data-v="${modoAntesDeConfig}"]`);
-      if(btnRestaurar) btnRestaurar.classList.add('active');
-      document.getElementById(VIEWS_POR_MODO[modoAntesDeConfig]).style.display = 'block';
-      if(modoAntesDeConfig === 'faturamento') renderFaturamento();
+      fecharPainelConfig();
     }
   });
   document.getElementById('btnResetar').addEventListener('click', ()=>{
@@ -1355,8 +1499,9 @@
     localStorage.setItem('trajeto_msg_tipo', tipoMsg);
     localStorage.setItem('trajeto_msg_custom', document.getElementById('cfg_msg_custom').value);
     sincronizarNuvem();
+    publicarServicoHora(true);
     calcularTransfer();
-    document.getElementById('painelConfig').style.display = 'none';
+    fecharPainelConfig();
   });
   document.getElementById('btnCopiar').addEventListener('click', ()=>{
     document.getElementById('cfgTexto').value = JSON.stringify(cfg);
@@ -1381,7 +1526,9 @@
       document.getElementById('viewTransfer').style.display = t === 'transfer' ? 'block' : 'none';
       document.getElementById('viewFaturamento').style.display = t === 'faturamento' ? 'block' : 'none';
       document.getElementById('viewPedidos').style.display = t === 'pedidos' ? 'block' : 'none';
+      document.getElementById('viewHora').style.display = t === 'hora' ? 'block' : 'none';
       if(t === 'faturamento') renderFaturamento();
+      if(t === 'hora') renderHora();
     });
   });
 
@@ -1623,6 +1770,8 @@
 
   const AG_KEY = 'trajeto_agendamentos';
   let editandoId = null;
+  let tipoAgendar = 'transfer';      // 'transfer' | 'hora' (formulário Agendar corrida)
+  let ultimaPubHora = null;          // última configuração de "serviço por hora" publicada nesta sessão
 
   function lerAgendamentos(){
     try{ return JSON.parse(localStorage.getItem(AG_KEY)) || []; }
@@ -1681,6 +1830,7 @@
     renderLista();
     renderFaturamento();
     calcularTransfer();
+    if(dados.cfg) publicarServicoHora();
   }
 
   const EMAIL_ADMIN = 'leonardosf.tvde@gmail.com';
@@ -1906,6 +2056,7 @@
   document.getElementById('btnAbrirAgendar').addEventListener('click', ()=>{
     const p = document.getElementById('painelAgendar');
     editandoId = null;
+    aplicarTipoAgendar('transfer');
     document.getElementById('btnGuardarAgendamento').textContent = 'Guardar e adicionar ao calendário';
     document.getElementById('ag_valor').value = document.getElementById('ct_cobrar').value;
     document.getElementById('ag_partida').value = document.getElementById('ct_origem').value;
@@ -1935,7 +2086,9 @@
     const fmt = (d)=> `${d.getFullYear()}${pad(d.getMonth()+1)}${pad(d.getDate())}T${pad(d.getHours())}${pad(d.getMinutes())}00`;
     const agora = new Date();
     const dtstamp = `${agora.getUTCFullYear()}${pad(agora.getUTCMonth()+1)}${pad(agora.getUTCDate())}T${pad(agora.getUTCHours())}${pad(agora.getUTCMinutes())}${pad(agora.getUTCSeconds())}Z`;
-    const desc = `Partida: ${ag.partida}\nChegada: ${ag.chegada}\nValor: €${ag.valor}${ag.fornecedor ? '\nFornecedor: ' + ag.fornecedor : ''}`;
+    const desc = ag.tipo === 'hora'
+      ? `Serviço por hora\nPartida: ${ag.partida}\nTarifa: ${fmtEuro((ag.hParams || horaParams()).valor)}/hora${ag.fornecedor ? '\nFornecedor: ' + ag.fornecedor : ''}`
+      : `Partida: ${ag.partida}\nChegada: ${ag.chegada}\nValor: €${ag.valor}${ag.fornecedor ? '\nFornecedor: ' + ag.fornecedor : ''}`;
 
     return [
       'BEGIN:VCALENDAR',
@@ -1946,12 +2099,12 @@
       `DTSTAMP:${dtstamp}`,
       `DTSTART:${fmt(inicio)}`,
       `DTEND:${fmt(fim)}`,
-      `SUMMARY:${escapeICS('Transfer: ' + ag.cliente)}`,
+      `SUMMARY:${escapeICS((ag.tipo === 'hora' ? 'Serviço por hora: ' : 'Transfer: ') + ag.cliente)}`,
       `DESCRIPTION:${escapeICS(desc)}`,
       `LOCATION:${escapeICS(ag.partida)}`,
       'BEGIN:VALARM',
       'ACTION:DISPLAY',
-      `DESCRIPTION:${escapeICS('Lembrete: transfer de ' + ag.cliente + ' amanhã')}`,
+      `DESCRIPTION:${escapeICS('Lembrete: ' + (ag.tipo === 'hora' ? 'serviço por hora de ' : 'transfer de ') + ag.cliente + ' amanhã')}`,
       'TRIGGER:-P1D',
       'END:VALARM',
       'END:VEVENT',
@@ -1983,6 +2136,7 @@
   });
 
   function renderLista(){
+    renderHora();
     const todos = lerAgendamentos();
     const lista = todos
       .filter(ag => filtroAg === 'concluidos' ? ag.realizado : !ag.realizado)
@@ -2005,28 +2159,37 @@
       const botoesParagens = (ag.paragens || []).map((p, i) =>
         `<button class="ag-btn-paragem" data-acao="paragem" data-idx="${i}">📍 Paragem ${i+1}</button>`
       ).join('');
+      const eHora = ag.tipo === 'hora';
+      const estadoHora = (eHora && !ag.realizado)
+        ? ({ a_caminho: '🚗 A caminho', em_curso: '⏱ Em curso', finalizado: '🏁 Finalizado' }[ag.hEstado] || '') : '';
+      const seloEstadoHora = estadoHora ? `<span class="ag-badge-hora">${estadoHora}</span>` : '';
+      let navHtml;
+      if(eHora){
+        if(ag.realizado) navHtml = '';
+        else if(!ag.hEstado || ag.hEstado === 'agendado') navHtml = `<button class="ag-btn-buscar" data-acao="horaBuscar">🚗 Ir buscar cliente</button>`;
+        else navHtml = `<button class="ag-btn-hora" data-acao="horaAbrirAba">⏱ Abrir em "Por hora"</button>`;
+      } else {
+        navHtml = `<button class="ag-btn-buscar" data-acao="buscar">🚗 Ir buscar cliente</button>${botoesParagens}<button class="ag-btn-levar" data-acao="levar">🏁 Iniciar viagem</button>`;
+      }
       return `
       <div class="ag-item ${ag.realizado ? 'ag-item-realizado' : ''}" data-id="${ag.id}">
-        <div class="ag-trajeto"><span>${ag.partida} → ${ag.chegada}${ag.realizado ? '<span class="ag-badge-ok">✔ Concluído</span>' : ''}${seloPagamento}</span><span class="ag-seta">▸</span></div>
+        <div class="ag-trajeto"><span>${tituloAg(ag)}${ag.realizado ? '<span class="ag-badge-ok">✔ Concluído</span>' : ''}${seloPagamento}${seloEstadoHora}</span><span class="ag-seta">▸</span></div>
         <div class="ag-detalhes">
         <div class="ag-meta">
-          📅 ${ag.data.split('-').reverse().join('/')} às ${ag.hora}<br>
-          👤 ${ag.cliente} &nbsp;·&nbsp; <span class="ag-valor">€${ag.valor}</span>
-          ${ag.fornecedor ? `<br>🏷 Fornecedor: ${ag.fornecedor}` : ''}
-          ${(ag.paragens && ag.paragens.length) ? `<br>📍 Paragens: ${ag.paragens.join(' → ')}` : ''}
-          ${ag.observacoes ? `<br>📝 ${ag.observacoes}` : ''}
+          📅 ${escHtml(ag.data.split('-').reverse().join('/'))} às ${escHtml(ag.hora)}<br>
+          👤 ${escHtml(ag.cliente)} &nbsp;·&nbsp; <span class="ag-valor">€${ag.valor}</span>${(eHora && !ag.hFim) ? ' <small>(mínimo)</small>' : ''}
+          ${linhaHoraMeta(ag)}
+          ${ag.fornecedor ? `<br>🏷 Fornecedor: ${escHtml(ag.fornecedor)}` : ''}
+          ${(ag.paragens && ag.paragens.length) ? `<br>📍 Paragens: ${ag.paragens.map(escHtml).join(' → ')}` : ''}
+          ${ag.observacoes ? `<br>📝 ${escHtml(ag.observacoes)}` : ''}
         </div>
-        <div class="ag-nav">
-          <button class="ag-btn-buscar" data-acao="buscar">🚗 Ir buscar cliente</button>
-          ${botoesParagens}
-          <button class="ag-btn-levar" data-acao="levar">🏁 Iniciar viagem</button>
-        </div>
+        ${navHtml ? `<div class="ag-nav">${navHtml}</div>` : ''}
         <div class="ag-acoes">
           <button class="ag-btn-cal" data-acao="editar">✏️ Editar</button>
           <button class="ag-btn-cal" data-acao="cal">📅 Calendário</button>
           ${ag.voo ? `<button class="ag-btn-cal" data-acao="voo">✈️ Ver voo</button>` : ''}
           <button class="ag-btn-wpp" data-acao="wpp">✉️ Mensagem</button>
-          <button class="ag-btn-wpp" data-acao="repassar">↗️ Repassar</button>
+          ${eHora ? (ag.hFim ? '<button class="ag-btn-wpp" data-acao="horaResumo">🧾 Enviar resumo</button>' : '') : '<button class="ag-btn-wpp" data-acao="repassar">↗️ Repassar</button>'}
           <button class="ag-btn-ok" data-acao="realizado">${ag.realizado ? '↩️ Desfazer' : '✅ Concluído'}</button>
           ${btnRecebido}
           <button class="ag-btn-del" data-acao="del">🗑 Remover</button>
@@ -2045,6 +2208,7 @@
   }
 
   function gerarMensagem(ag){
+    if(ag.tipo === 'hora') return gerarMensagemHora(ag);
     const dataFmt = ag.data.split('-').reverse().join('/');
     const nome = localStorage.getItem('trajeto_nome') || '';
     const assinatura = nome ? `Aqui é o ${nome}` : 'Aqui é o teu motorista';
@@ -2073,6 +2237,7 @@
   }
 
   function preencherFormAgendamento(ag){
+    aplicarTipoAgendar(ag.tipo === 'hora' ? 'hora' : 'transfer');
     document.getElementById('ag_partida').value = ag.partida;
     document.getElementById('ag_chegada').value = ag.chegada;
     preencherParagensAgendar(ag.paragens || []);
@@ -2124,6 +2289,342 @@
     }, 800);
   }
 
+  // ---------- Serviço por hora ----------
+  function escHtml(t){
+    return String(t == null ? '' : t)
+      .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+      .replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+  }
+  function arred2(n){ return Math.round(n * 100) / 100; }
+  function fmtEuro(v){
+    const n = arred2(Number(v) || 0);
+    return '€' + (Number.isInteger(n) ? String(n) : n.toFixed(2));
+  }
+  function fmtDur(min){
+    const m = Math.max(0, Math.round(min));
+    const h = Math.floor(m / 60), r = m % 60;
+    if(h === 0) return `${r} min`;
+    if(r === 0) return `${h}h`;
+    return `${h}h${pad(r)}`;
+  }
+  function fmtRelogio(ms){
+    const seg = Math.max(0, Math.floor(ms / 1000));
+    return `${pad(Math.floor(seg / 3600))}:${pad(Math.floor((seg % 3600) / 60))}:${pad(seg % 60)}`;
+  }
+  function fmtHoraLocal(ms){
+    const d = new Date(ms);
+    return `${pad(d.getHours())}:${pad(d.getMinutes())}`;
+  }
+  function fmtDataLocal(ms){
+    const d = new Date(ms);
+    return `${pad(d.getDate())}/${pad(d.getMonth() + 1)}/${d.getFullYear()}`;
+  }
+
+  // Parâmetros de cobrança atuais (vindos de "Minhas tarifas")
+  function horaParams(){
+    const v = Number(cfg.hora_valor), mi = Number(cfg.hora_minimo_min), bl = Number(cfg.hora_bloco_min);
+    return {
+      valor: v > 0 ? v : DEFAULTS.hora_valor,
+      minimo: mi > 0 ? mi : DEFAULTS.hora_minimo_min,
+      bloco: bl > 0 ? bl : DEFAULTS.hora_bloco_min
+    };
+  }
+  function valorMinimoHora(){
+    const p = horaParams();
+    return arred2(p.valor * p.minimo / 60);
+  }
+  // Regra: o mínimo (1ª hora) é sempre cobrado inteiro; depois, qualquer minuto a mais conta o bloco seguinte.
+  function calcularCobrancaHora(minutosReais, p){
+    const m = Math.max(0, Math.floor(minutosReais));
+    let cobrados = p.minimo;
+    if(m > p.minimo){
+      cobrados = p.minimo + Math.ceil((m - p.minimo) / p.bloco) * p.bloco;
+    }
+    return { minutosReais: m, minutosCobrados: cobrados, valor: arred2(p.valor * cobrados / 60) };
+  }
+  function fraseRegraHora(p){
+    const primeira = p.minimo === 60
+      ? 'A primeira hora é sempre cobrada por inteiro'
+      : `Os primeiros ${fmtDur(p.minimo)} são sempre cobrados por inteiro`;
+    return `${primeira}; a partir daí, contamos por blocos de ${p.bloco} minutos (qualquer minuto a mais conta o bloco seguinte).`;
+  }
+
+  function tituloAg(ag){
+    if(ag.tipo === 'hora'){
+      const fim = (ag.chegada && ag.chegada !== ag.partida) ? ` → ${escHtml(ag.chegada)}` : '';
+      return `⏱ ${escHtml(ag.partida)}${fim}`;
+    }
+    return `${escHtml(ag.partida)} → ${escHtml(ag.chegada)}`;
+  }
+  function linhaHoraMeta(ag){
+    if(ag.tipo !== 'hora') return '';
+    if(ag.hFim && ag.hMinCobrados){
+      return `<br>⏱ ${fmtDur(ag.hMinCobrados)} cobradas (tempo real ${fmtDur(ag.hMinReais)})`;
+    }
+    const p = ag.hParams || horaParams();
+    return `<br>⏱ Serviço por hora · ${fmtEuro(p.valor)}/h`;
+  }
+
+  // ---- Mensagens ao cliente ----
+  function gerarMensagemHora(ag){
+    const dataFmt = ag.data.split('-').reverse().join('/');
+    const nome = localStorage.getItem('trajeto_nome') || '';
+    const assinatura = nome ? `Aqui é o ${nome}` : 'Aqui é o teu motorista';
+    const p = ag.hParams || horaParams();
+    const linhaFinal = (ag.chegada && ag.chegada !== ag.partida) ? `📍 Local final: ${ag.chegada}\n` : '';
+    return `Olá ${ag.cliente}! 👋\n\n${assinatura} — confirmo os dados do seu serviço por hora:\n\n📍 Local de partida: ${ag.partida}\n${linhaFinal}📅 Data: ${dataFmt}\n🕐 Horário: ${ag.hora}\n💰 Tarifa: ${fmtEuro(p.valor)} por hora\n\n${fraseRegraHora(p)} O tempo começa a contar quando entrar no carro e pode parar onde quiser durante o serviço.\n\nPode confirmar este serviço, por favor? Fico a aguardar a sua resposta. Obrigado! 🚗`;
+  }
+  function gerarResumoHora(ag){
+    const nome = localStorage.getItem('trajeto_nome') || '';
+    const assinatura = nome ? `Aqui é o ${nome}` : 'Aqui é o teu motorista';
+    const p = ag.hParams || horaParams();
+    const linhaFinal = (ag.chegada && ag.chegada !== ag.partida) ? `📍 Local final: ${ag.chegada}\n` : '';
+    return `Olá ${ag.cliente}! 👋\n\n${assinatura} — segue o resumo do seu serviço por hora:\n\n📅 Data: ${fmtDataLocal(ag.hInicio)}\n📍 Local de partida: ${ag.partida}\n${linhaFinal}🕐 Início: ${fmtHoraLocal(ag.hInicio)}\n🏁 Fim: ${fmtHoraLocal(ag.hFim)}\n⏱ Tempo total: ${fmtDur(ag.hMinReais)}\n💶 Tempo cobrado: ${fmtDur(ag.hMinCobrados)} (${fmtEuro(p.valor)} por hora)\n💰 Valor a pagar: ${fmtEuro(ag.valor)}\n\nObrigado pela preferência! 🚗`;
+  }
+  function enviarResumoHora(ag){
+    if(!ag.hFim){ alert('Finaliza o serviço primeiro para gerar o resumo.'); return; }
+    const texto = gerarResumoHora(ag);
+    if(ag.telefone){
+      const tel = normalizarTelefone(ag.telefone);
+      window.open(`https://wa.me/${tel}?text=${encodeURIComponent(texto)}`, '_blank');
+    } else if(navigator.clipboard){
+      navigator.clipboard.writeText(texto);
+      alert('Não há telefone guardado — resumo copiado! Cola no WhatsApp. (Adiciona o telefone em "Editar" para abrir direto.)');
+    } else {
+      alert(texto);
+    }
+  }
+
+  // ---- Tipo de serviço no formulário "Agendar corrida" ----
+  function aplicarTipoAgendar(tipo, opcoes){
+    opcoes = opcoes || {};
+    tipoAgendar = tipo === 'hora' ? 'hora' : 'transfer';
+    const hora = tipoAgendar === 'hora';
+    document.getElementById('segTipoAg').querySelectorAll('button').forEach(b=>{
+      b.classList.toggle('active', b.dataset.v === tipoAgendar);
+    });
+    document.getElementById('blocoParagensAg').style.display = hora ? 'none' : 'block';
+    document.getElementById('ag_labelChegada').textContent = hora
+      ? 'Endereço final (opcional — se vazio, é o mesmo da partida)'
+      : 'Endereço de chegada';
+    document.getElementById('ag_labelValor').textContent = hora
+      ? 'Valor mínimo (€) — o valor final é calculado ao finalizar'
+      : 'Valor (€)';
+    const dica = document.getElementById('agDicaHora');
+    dica.style.display = hora ? 'block' : 'none';
+    if(hora){
+      const p = horaParams();
+      dica.textContent = `Tarifa atual: ${fmtEuro(p.valor)} por hora. ${fraseRegraHora(p)}`;
+    }
+    if(opcoes.definirValor){
+      document.getElementById('ag_valor').value = hora
+        ? valorMinimoHora()
+        : document.getElementById('ct_cobrar').value;
+    }
+  }
+  document.getElementById('segTipoAg').querySelectorAll('button').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      aplicarTipoAgendar(btn.dataset.v, { definirValor: !editandoId });
+    });
+  });
+  document.getElementById('btnNovoAgendamentoHora').addEventListener('click', ()=>{
+    document.querySelector('#segModo button[data-v="transfer"]').click();
+    document.getElementById('btnAbrirAgendar').click();
+    document.getElementById('ag_partida').value = '';
+    document.getElementById('ag_chegada').value = '';
+    limparParagensAgendar();
+    aplicarTipoAgendar('hora', { definirValor: true });
+  });
+
+  // ---- Ações sobre o serviço por hora ----
+  function pedirHora(titulo, refMs){
+    const txt = prompt(titulo, fmtHoraLocal(refMs));
+    if(txt === null) return null;
+    const m = /^\s*(\d{1,2})\s*[:h.]\s*(\d{2})\s*$/.exec(txt);
+    if(!m || parseInt(m[1], 10) > 23 || parseInt(m[2], 10) > 59){
+      alert('Hora inválida. Usa o formato HH:MM (ex: 14:30).');
+      return null;
+    }
+    const d = new Date(refMs);
+    d.setHours(parseInt(m[1], 10), parseInt(m[2], 10), 0, 0);
+    return d.getTime();
+  }
+  function aplicarFimHora(ag, fimMs){
+    const p = ag.hParams || horaParams();
+    const c = calcularCobrancaHora((fimMs - ag.hInicio) / 60000, p);
+    ag.hFim = fimMs;
+    ag.hMinReais = c.minutosReais;
+    ag.hMinCobrados = c.minutosCobrados;
+    ag.valor = String(c.valor);
+  }
+
+  function handlerCliqueHora(e){
+    const btn = e.target.closest('button');
+    if(!btn) return;
+    const card = e.target.closest('.hora-card');
+    if(!card) return;
+    const lista = lerAgendamentos();
+    const ag = lista.find(a => a.id === card.dataset.id);
+    if(!ag) return;
+    const acao = btn.dataset.acao;
+
+    if(acao === 'horaWaze'){
+      abrirWaze(ag.partida);
+      return;
+    } else if(acao === 'horaResumo'){
+      enviarResumoHora(ag);
+      return;
+    } else if(acao === 'horaConcluir'){
+      abrirModalPagamento(ag.id);
+      return;
+    } else if(acao === 'horaIniciar'){
+      ag.hEstado = 'em_curso';
+      ag.hInicio = Date.now();
+      ag.hParams = horaParams();
+      delete ag.hFim; delete ag.hMinReais; delete ag.hMinCobrados;
+    } else if(acao === 'horaCancelar'){
+      ag.hEstado = 'agendado';
+      delete ag.hBuscarEm;
+    } else if(acao === 'horaDesfazerInicio'){
+      if(!confirm('Desfazer o início? O contador é apagado e o serviço volta ao estado "a caminho".')) return;
+      ag.hEstado = 'a_caminho';
+      delete ag.hInicio; delete ag.hParams;
+    } else if(acao === 'horaAjustarInicio'){
+      const novo = pedirHora('Hora de início (HH:MM):', ag.hInicio);
+      if(novo === null) return;
+      if(novo > Date.now()){ alert('A hora de início não pode ser no futuro.'); return; }
+      ag.hInicio = novo;
+    } else if(acao === 'horaFinalizar'){
+      if(!confirm('Finalizar o serviço agora? O tempo deixa de contar e o valor é calculado.')) return;
+      ag.hValorAntes = ag.valor;
+      aplicarFimHora(ag, Date.now());
+      ag.hEstado = 'finalizado';
+    } else if(acao === 'horaAjustarFim'){
+      const novo = pedirHora('Hora de fim (HH:MM):', ag.hFim);
+      if(novo === null) return;
+      if(novo <= ag.hInicio){ alert('A hora de fim tem de ser depois da hora de início.'); return; }
+      if(novo > Date.now() + 60000){ alert('A hora de fim não pode ser no futuro.'); return; }
+      aplicarFimHora(ag, novo);
+    } else if(acao === 'horaRetomar'){
+      if(!confirm('Retomar o serviço? O contador volta a correr desde a hora de início original (o tempo desde a finalização também conta).')) return;
+      ag.hEstado = 'em_curso';
+      delete ag.hFim; delete ag.hMinReais; delete ag.hMinCobrados;
+      if(ag.hValorAntes !== undefined){ ag.valor = ag.hValorAntes; delete ag.hValorAntes; }
+    } else {
+      return;
+    }
+    gravarAgendamentos(lista);
+    renderLista();
+  }
+  document.getElementById('listaHora').addEventListener('click', handlerCliqueHora);
+
+  function renderHora(){
+    const ativos = lerAgendamentos()
+      .filter(a => a.tipo === 'hora' && !a.realizado &&
+        (a.hEstado === 'a_caminho' || a.hEstado === 'em_curso' || a.hEstado === 'finalizado'))
+      .sort((a,b)=> (a.hBuscarEm || 0) - (b.hBuscarEm || 0));
+
+    const selo = document.getElementById('seloHora');
+    if(selo){
+      selo.textContent = ativos.length > 9 ? '9+' : String(ativos.length);
+      selo.classList.toggle('mostrar', ativos.length > 0);
+    }
+    const el = document.getElementById('listaHora');
+    if(!el) return;
+    if(ativos.length === 0){
+      el.innerHTML = '<p class="ag-vazio">Nenhum serviço por hora em andamento. Agenda um serviço por hora e toca em "🚗 Ir buscar cliente" no agendamento.</p>';
+      return;
+    }
+    el.innerHTML = ativos.map(ag => {
+      const linhaFinal = (ag.chegada && ag.chegada !== ag.partida) ? `<br>🏁 ${escHtml(ag.chegada)}` : '';
+      const topo = `
+        <div class="hora-topo">👤 ${escHtml(ag.cliente)}</div>
+        <div class="hora-linhas">📍 ${escHtml(ag.partida)}${linhaFinal}<br>📅 ${escHtml(ag.data.split('-').reverse().join('/'))} às ${escHtml(ag.hora)}${ag.telefone ? '<br>📞 ' + escHtml(ag.telefone) : ''}${ag.observacoes ? '<br>📝 ' + escHtml(ag.observacoes) : ''}</div>`;
+      const id = escHtml(ag.id);
+
+      if(ag.hEstado === 'a_caminho'){
+        return `
+        <div class="hora-card" data-id="${id}">${topo}
+          <button class="hora-btn-grande hora-btn-iniciar" data-acao="horaIniciar">▶️ Iniciar — cliente entrou no carro</button>
+          <div class="ag-acoes">
+            <button data-acao="horaWaze">🚗 Waze até ao cliente</button>
+            <button data-acao="horaCancelar">↩ Voltar a agendado</button>
+          </div>
+        </div>`;
+      }
+      const p = ag.hParams || horaParams();
+      if(ag.hEstado === 'em_curso'){
+        return `
+        <div class="hora-card" data-id="${id}" data-inicio="${ag.hInicio}" data-valor="${p.valor}" data-minimo="${p.minimo}" data-bloco="${p.bloco}">${topo}
+          <div class="hora-linhas">🕐 Início: <strong>${fmtHoraLocal(ag.hInicio)}</strong> · ${fmtEuro(p.valor)}/hora</div>
+          <div class="hora-timer" data-live="timer">00:00:00</div>
+          <div class="hora-valor-atual" data-live="valor">€0</div>
+          <div class="hora-dica" data-live="dica"></div>
+          <button class="hora-btn-grande hora-btn-finalizar" data-acao="horaFinalizar">⏹ Finalizar serviço</button>
+          <div class="ag-acoes">
+            <button data-acao="horaAjustarInicio">✏️ Ajustar hora de início</button>
+            <button data-acao="horaDesfazerInicio">↩ Desfazer início</button>
+          </div>
+        </div>`;
+      }
+      return `
+        <div class="hora-card" data-id="${id}">${topo}
+          <div class="hora-resumo">
+            🕐 Início: <strong>${fmtHoraLocal(ag.hInicio)}</strong> (${fmtDataLocal(ag.hInicio)})<br>
+            🏁 Fim: <strong>${fmtHoraLocal(ag.hFim)}</strong><br>
+            ⏱ Tempo real: <strong>${fmtDur(ag.hMinReais)}</strong><br>
+            💶 Tempo cobrado: <strong>${fmtDur(ag.hMinCobrados)}</strong>
+          </div>
+          <div class="hora-total">${fmtEuro(ag.valor)}</div>
+          <div class="hora-dica">Valor a receber</div>
+          <button class="hora-btn-grande ag-btn-wpp" data-acao="horaResumo">✉️ Enviar resumo ao cliente</button>
+          <button class="hora-btn-grande hora-btn-finalizar" data-acao="horaConcluir">✅ Concluir e faturar</button>
+          <div class="ag-acoes">
+            <button data-acao="horaAjustarFim">✏️ Ajustar hora de fim</button>
+            <button data-acao="horaRetomar">↩ Retomar serviço</button>
+          </div>
+        </div>`;
+    }).join('');
+    atualizarRelogiosHora();
+  }
+
+  // Relógio ao vivo: só mexe no texto (não recria os botões)
+  function atualizarRelogiosHora(){
+    const view = document.getElementById('viewHora');
+    if(!view || view.style.display === 'none') return;
+    const agora = Date.now();
+    document.querySelectorAll('#listaHora .hora-card[data-inicio]').forEach(card=>{
+      const inicio = Number(card.dataset.inicio);
+      const p = { valor: Number(card.dataset.valor), minimo: Number(card.dataset.minimo), bloco: Number(card.dataset.bloco) };
+      const decorrido = agora - inicio;
+      const c = calcularCobrancaHora(decorrido / 60000, p);
+      const elT = card.querySelector('[data-live="timer"]');
+      const elV = card.querySelector('[data-live="valor"]');
+      const elD = card.querySelector('[data-live="dica"]');
+      if(elT) elT.textContent = fmtRelogio(decorrido);
+      if(elV) elV.textContent = fmtEuro(c.valor);
+      if(elD){
+        const proximo = calcularCobrancaHora(c.minutosCobrados + 1, p);
+        const faltamSeg = (c.minutosCobrados + 1) * 60 - decorrido / 1000;
+        const faltamMin = Math.max(1, Math.ceil(faltamSeg / 60));
+        elD.textContent = `A cobrar ${fmtDur(c.minutosCobrados)} · sobe para ${fmtEuro(proximo.valor)} dentro de ${faltamMin} min`;
+      }
+    });
+  }
+  setInterval(atualizarRelogiosHora, 1000);
+  document.addEventListener('visibilitychange', ()=>{ if(!document.hidden) atualizarRelogiosHora(); });
+
+  // Publica no documento público do motorista a configuração do serviço por hora (site de pedidos)
+  function publicarServicoHora(forcar){
+    if(!window.TrajetoCloud || !window.TrajetoCloud.utilizadorAtual || !window.TrajetoCloud.publicarServicoHora) return;
+    const p = horaParams();
+    const dados = { ativo: Number(cfg.hora_ativo) === 1, valor: p.valor, minimoMin: p.minimo, blocoMin: p.bloco };
+    const chave = JSON.stringify(dados);
+    if(!forcar && chave === ultimaPubHora) return;
+    ultimaPubHora = chave;
+    window.TrajetoCloud.publicarServicoHora(dados);
+  }
+
   // ---------- Placar digital ----------
   let wakeLock = null;
   async function pedirWakeLock(){
@@ -2152,7 +2653,7 @@
       return;
     }
     el.innerHTML = doDia.map(ag => `
-      <button class="placar-opcao" data-id="${ag.id}">${ag.hora} · ${ag.nomePlaca || ag.cliente}</button>
+      <button class="placar-opcao" data-id="${ag.id}">${escHtml(ag.hora)} · ${escHtml(ag.nomePlaca || ag.cliente)}</button>
     `).join('');
   }
 
@@ -2264,6 +2765,16 @@
     } else if(btn.dataset.acao === 'paragem'){
       const idx = parseInt(btn.dataset.idx, 10);
       if(ag.paragens && ag.paragens[idx]) abrirWaze(ag.paragens[idx]);
+    } else if(btn.dataset.acao === 'horaBuscar'){
+      ag.hEstado = 'a_caminho';
+      ag.hBuscarEm = Date.now();
+      gravarAgendamentos(lista);
+      renderLista();
+      abrirWaze(ag.partida);
+    } else if(btn.dataset.acao === 'horaAbrirAba'){
+      document.querySelector('#segModo button[data-v="hora"]').click();
+    } else if(btn.dataset.acao === 'horaResumo'){
+      enviarResumoHora(ag);
     } else if(btn.dataset.acao === 'editar'){
       abrirEdicao(ag);
     } else if(btn.dataset.acao === 'cal'){
@@ -2277,6 +2788,10 @@
       repassarAgendamento(ag);
     } else if(btn.dataset.acao === 'realizado'){
       if(!ag.realizado){
+        if(ag.tipo === 'hora' && ag.hEstado === 'em_curso'){
+          alert('Este serviço por hora ainda está em curso. Finaliza-o primeiro na aba "Por hora".');
+          return;
+        }
         abrirModalPagamento(id);
       } else {
         ag.realizado = false;
@@ -2386,14 +2901,15 @@
     el.innerHTML = ordenados.map(p => {
       return `
       <div class="ag-item" data-id="${p.id}">
-        <div class="ag-trajeto">${p.partida} → ${p.chegada}</div>
+        <div class="ag-trajeto">${p.tipo === 'hora' ? '⏱ ' + escHtml(p.partida) : escHtml(p.partida) + ' → ' + escHtml(p.chegada)}</div>
         <div class="ag-meta">
-          📅 ${p.data.split('-').reverse().join('/')} às ${p.hora}<br>
-          👤 ${p.nome} &nbsp;·&nbsp; 📞 ${p.contacto}
-          ${(p.paragens && p.paragens.length) ? `<br>📍 Paragens: ${p.paragens.join(' → ')}` : ''}
-          ${p.voo ? `<br>✈️ Voo: ${p.voo}` : ''}
-          ${p.passageiros ? `<br>🧑‍🤝‍🧑 ${p.passageiros} passageiro(s)` : ''}
-          ${p.observacoes ? `<br>📝 ${p.observacoes}` : ''}
+          📅 ${escHtml(String(p.data).split('-').reverse().join('/'))} às ${escHtml(p.hora)}<br>
+          👤 ${escHtml(p.nome)} &nbsp;·&nbsp; 📞 ${escHtml(p.contacto)}
+          ${p.tipo === 'hora' ? `<br>⏱ <strong>Serviço por hora</strong>${p.horasEstimadas ? ` · duração estimada: ${escHtml(p.horasEstimadas)}h` : ''}` : ''}
+          ${(p.paragens && p.paragens.length) ? `<br>📍 Paragens: ${p.paragens.map(escHtml).join(' → ')}` : ''}
+          ${p.voo ? `<br>✈️ Voo: ${escHtml(p.voo)}` : ''}
+          ${p.passageiros ? `<br>🧑‍🤝‍🧑 ${escHtml(p.passageiros)} passageiro(s)` : ''}
+          ${p.observacoes ? `<br>📝 ${escHtml(p.observacoes)}` : ''}
         </div>
         <div class="ag-acoes">
           <button class="ag-btn-ok" data-acao="aceitarPedido">✅ Aceitar</button>
@@ -2419,25 +2935,30 @@
       const p = pedidos.find(x => x.id === id);
       if(!p) return;
 
+      const ehHora = p.tipo === 'hora';
       let obs = p.observacoes || '';
       if(p.passageiros) obs = `${p.passageiros} passageiro(s)${obs ? ' — ' + obs : ''}`;
+      if(ehHora && p.horasEstimadas) obs = `Duração estimada: ${p.horasEstimadas}h${obs ? ' — ' + obs : ''}`;
 
       const ag = {
         id: Date.now().toString(36) + Math.random().toString(36).slice(2,7),
-        partida: p.partida, chegada: p.chegada, paragens: p.paragens || [], data: p.data, hora: p.hora,
+        partida: p.partida, chegada: p.chegada || p.partida, paragens: p.paragens || [], data: p.data, hora: p.hora,
         cliente: p.nome, telefone: p.contacto, nomePlaca: '', voo: p.voo || '',
         fornecedor: 'Site — pedido online',
-        valor: '',
+        valor: ehHora ? String(valorMinimoHora()) : '',
         observacoes: obs,
         realizado: false
       };
+      if(ehHora){ ag.tipo = 'hora'; ag.hEstado = 'agendado'; }
       const lista = lerAgendamentos();
       lista.push(ag);
       gravarAgendamentos(lista);
       renderLista();
 
       await window.TrajetoCloud.atualizarStatusPedido(id, 'aceite');
-      alert('Pedido aceite! Já ficou guardado em "Meus agendamentos" — abre-o para ajustares o valor e confirmar.');
+      alert(ehHora
+        ? 'Pedido aceite! O serviço por hora ficou guardado em "Meus agendamentos" — o valor final é calculado quando finalizares o serviço.'
+        : 'Pedido aceite! Já ficou guardado em "Meus agendamentos" — abre-o para ajustares o valor e confirmar.');
     }
   });
 
@@ -2471,11 +2992,12 @@
       const pendentesOrd = [...pendentes].sort((a,b)=> (a.data+a.hora).localeCompare(b.data+b.hora));
       elReceber.innerHTML = pendentesOrd.map(ag => `
         <div class="ag-item" data-id="${ag.id}">
-          <div class="ag-trajeto">${ag.partida} → ${ag.chegada}</div>
+          <div class="ag-trajeto">${tituloAg(ag)}</div>
           <div class="ag-meta">
-            📅 ${ag.data.split('-').reverse().join('/')}<br>
-            👤 ${ag.cliente} &nbsp;·&nbsp; <span class="ag-valor">€${ag.valor}</span>
-            ${ag.fornecedor ? `<br>🏷 Fornecedor: ${ag.fornecedor}` : ''}
+            📅 ${escHtml(ag.data.split('-').reverse().join('/'))}<br>
+            👤 ${escHtml(ag.cliente)} &nbsp;·&nbsp; <span class="ag-valor">€${ag.valor}</span>
+            ${linhaHoraMeta(ag)}
+            ${ag.fornecedor ? `<br>🏷 Fornecedor: ${escHtml(ag.fornecedor)}` : ''}
           </div>
           <div class="ag-acoes">
             <button class="ag-btn-ok" data-acao="marcarRecebido">💰 Marcar como recebido</button>
@@ -2502,12 +3024,13 @@
       const selo = ag.pagamento === 'recebido' ? '<span class="ag-badge-pago">💰 Recebido</span>' : '<span class="ag-badge-pendente">⏳ A receber</span>';
       return `
       <div class="ag-item">
-        <div class="ag-trajeto"><span>${ag.partida} → ${ag.chegada}${selo}</span><span class="ag-seta">▸</span></div>
+        <div class="ag-trajeto"><span>${tituloAg(ag)}${selo}</span><span class="ag-seta">▸</span></div>
         <div class="ag-detalhes">
         <div class="ag-meta">
-          📅 ${ag.data.split('-').reverse().join('/')}<br>
-          👤 ${ag.cliente} &nbsp;·&nbsp; <span class="ag-valor">€${ag.valor}</span>
-          ${ag.fornecedor ? `<br>🏷 Fornecedor: ${ag.fornecedor}` : ''}
+          📅 ${escHtml(ag.data.split('-').reverse().join('/'))}<br>
+          👤 ${escHtml(ag.cliente)} &nbsp;·&nbsp; <span class="ag-valor">€${ag.valor}</span>
+          ${linhaHoraMeta(ag)}
+          ${ag.fornecedor ? `<br>🏷 Fornecedor: ${escHtml(ag.fornecedor)}` : ''}
         </div>
         </div>
       </div>
@@ -2527,12 +3050,16 @@
     const fornecedor = document.getElementById('ag_fornecedor').value.trim();
     const valor = document.getElementById('ag_valor').value;
     const observacoes = document.getElementById('ag_observacoes').value.trim();
-    const paragens = lerParagensAgendar();
+    const tipo = tipoAgendar;
+    const paragens = tipo === 'hora' ? [] : lerParagensAgendar();
 
-    if(!partida || !chegada || !data || !hora || !cliente){
-      alert('Preenche partida, chegada, data, horário e nome do cliente.');
+    if(!partida || (tipo !== 'hora' && !chegada) || !data || !hora || !cliente){
+      alert(tipo === 'hora'
+        ? 'Preenche partida, data, horário e nome do cliente.'
+        : 'Preenche partida, chegada, data, horário e nome do cliente.');
       return;
     }
+    const chegadaFinal = chegada || partida;
 
     const lista = lerAgendamentos();
 
@@ -2540,7 +3067,7 @@
       const ag = lista.find(a => a.id === editandoId);
       if(ag){
         ag.partida = partida;
-        ag.chegada = chegada;
+        ag.chegada = chegadaFinal;
         ag.paragens = paragens;
         ag.data = data;
         ag.hora = hora;
@@ -2551,6 +3078,8 @@
         ag.fornecedor = fornecedor;
         ag.valor = valor || ag.valor;
         ag.observacoes = observacoes;
+        if(tipo === 'hora'){ ag.tipo = 'hora'; if(!ag.hEstado) ag.hEstado = 'agendado'; }
+        else { delete ag.tipo; }
         gravarAgendamentos(lista);
         renderLista();
         renderFaturamento();
@@ -2561,10 +3090,11 @@
     } else {
       const ag = {
         id: Date.now().toString(36) + Math.random().toString(36).slice(2,7),
-        partida, chegada, paragens, data, hora, cliente, telefone, nomePlaca, voo, fornecedor, observacoes,
-        valor: valor || document.getElementById('ct_cobrar').value,
+        partida, chegada: chegadaFinal, paragens, data, hora, cliente, telefone, nomePlaca, voo, fornecedor, observacoes,
+        valor: valor || (tipo === 'hora' ? String(valorMinimoHora()) : document.getElementById('ct_cobrar').value),
         realizado: false
       };
+      if(tipo === 'hora'){ ag.tipo = 'hora'; ag.hEstado = 'agendado'; }
       lista.push(ag);
       gravarAgendamentos(lista);
       renderLista();
@@ -2581,6 +3111,7 @@
     document.getElementById('ag_fornecedor').value = '';
     document.getElementById('ag_observacoes').value = '';
     document.getElementById('painelAgendar').style.display = 'none';
+    aplicarTipoAgendar('transfer');
   });
 
   document.getElementById('btnCancelarAgendamento').addEventListener('click', ()=>{
@@ -2599,6 +3130,7 @@
     document.getElementById('ag_hora').value = '';
     document.getElementById('ag_observacoes').value = '';
     document.getElementById('painelAgendar').style.display = 'none';
+    aplicarTipoAgendar('transfer');
   });
 
   document.getElementById('listaAReceber').addEventListener('click', (e)=>{
@@ -2713,6 +3245,7 @@
     document.getElementById('viewTransfer').style.display = 'block';
     document.getElementById('viewFaturamento').style.display = 'none';
     document.getElementById('viewPedidos').style.display = 'none';
+    document.getElementById('viewHora').style.display = 'none';
 
     document.getElementById('painelAgendar').style.display = 'block';
     setTimeout(()=>{
@@ -2846,6 +3379,15 @@ if ('serviceWorker' in navigator) {
     }catch(e){ /* falha silenciosa — só afeta o botão de WhatsApp do site */ }
   }
 
+  // Publica a configuração do serviço por hora (ativo, tarifa, regra) no documento
+  // público do motorista — é o que o site de pedidos lê para mostrar a opção ao cliente.
+  async function publicarServicoHora(dados){
+    if(!auth.currentUser) return;
+    try{
+      await setDoc(doc(db, 'trajeto_publico', auth.currentUser.uid), { hora: dados }, { merge: true });
+    }catch(e){ /* falha silenciosa — só afeta a opção "Serviço por hora" do site */ }
+  }
+
   async function verificarCodigoConvite(codigo){
     if(!codigo) return false;
     const ref = doc(db, 'trajeto_convites', codigo.trim());
@@ -2879,6 +3421,7 @@ if ('serviceWorker' in navigator) {
     atualizarStatusPedido,
     publicarMotoristaPadrao,
     publicarWhatsapp,
+    publicarServicoHora,
     onAuthChange: (cb) => onAuthStateChanged(auth, cb),
     get utilizadorAtual(){ return auth.currentUser; }
   };
