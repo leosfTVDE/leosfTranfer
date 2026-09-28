@@ -1169,6 +1169,7 @@
     <div id="painelAgendar">
       <div class="card">
         <h2>Agendar corrida</h2>
+        <div id="agAvisoRefazer" style="display:none; background:rgba(42,111,119,.10); border:1px solid var(--azulejo); border-radius:8px; padding:10px 12px; margin:0 0 14px; font-family:'Helvetica Neue', Arial, sans-serif; font-size:13px; line-height:1.5; color:var(--texto);"></div>
 
         <div class="ag-secao" id="agSecaoTipo">🧭 Tipo de serviço</div>
         <div class="seg" id="segTipoAg">
@@ -1293,7 +1294,7 @@
     <p class="nota">Aqui aparecem os serviços por hora a partir do momento em que tocas em "🚗 Ir buscar cliente" no agendamento. O tempo só começa a contar quando tocas em "▶️ Iniciar" (cliente no carro). Ao finalizar, o valor é calculado pela regra definida em "Minhas tarifas" e podes enviar o resumo ao cliente. O agendamento só sai da lista quando o marcares como "Concluído".</p>
   </div>
 
-  <p style="text-align:center; font-family:'Helvetica Neue', Arial, sans-serif; font-size:11px; color:#8a7f66; margin-top:24px;">Trajeto · v9.8.1</p>
+  <p style="text-align:center; font-family:'Helvetica Neue', Arial, sans-serif; font-size:11px; color:#8a7f66; margin-top:24px;">Trajeto · v9.8.2</p>
 
 </main>
 
@@ -2058,7 +2059,12 @@
 
   document.getElementById('btnAbrirAgendar').addEventListener('click', ()=>{
     const p = document.getElementById('painelAgendar');
+    // Se o formulário estava aberto para editar ou refazer uma corrida, não deixar os dados desse cliente na corrida nova
+    const vinhaDeEdicaoOuRefazer = editandoId !== null || document.getElementById('agAvisoRefazer').style.display === 'block';
     hospedarPainelAgendar('transfer');
+    if(vinhaDeEdicaoOuRefazer){
+      ['ag_cliente','ag_telefone','ag_nomeplaca','ag_voo','ag_fornecedor','ag_data','ag_hora'].forEach(id => { document.getElementById(id).value = ''; });
+    }
     editandoId = null;
     aplicarTipoAgendar('transfer');
     document.getElementById('btnGuardarAgendamento').textContent = 'Guardar e adicionar ao calendário';
@@ -2190,6 +2196,7 @@
         ${navHtml ? `<div class="ag-nav">${navHtml}</div>` : ''}
         <div class="ag-acoes">
           <button class="ag-btn-cal" data-acao="editar">✏️ Editar</button>
+          ${ag.realizado ? '<button class="ag-btn-cal" data-acao="refazer">🔁 Refazer</button>' : ''}
           <button class="ag-btn-cal" data-acao="cal">📅 Calendário</button>
           ${ag.voo ? `<button class="ag-btn-cal" data-acao="voo">✈️ Ver voo</button>` : ''}
           <button class="ag-btn-wpp" data-acao="wpp">✉️ Mensagem</button>
@@ -2438,6 +2445,8 @@
   const painelOrigemProximo = painelAg.nextSibling;
   let painelHospedadoEm = 'transfer';
   function hospedarPainelAgendar(onde){
+    const avisoRefazer = document.getElementById('agAvisoRefazer');
+    if(avisoRefazer) avisoRefazer.style.display = 'none';
     painelHospedadoEm = onde === 'hora' ? 'hora' : 'transfer';
     if(painelHospedadoEm === 'hora'){
       const v = document.getElementById('viewHora');
@@ -2764,6 +2773,33 @@
     if(e.target.id === 'modalPagamento') fecharModalPagamento();
   });
 
+  // Refazer: abre o formulário com os dados de uma corrida concluída (cliente recorrente).
+  // Data, hora e nº do voo ficam vazios (mudam de vez para vez). Ao guardar cria um agendamento NOVO;
+  // o original continua concluído e faturado, sem alterações.
+  function refazerAgendamento(id){
+    const ag = lerAgendamentos().find(a => a.id === id);
+    if(!ag) return;
+    const eHora = ag.tipo === 'hora';
+    document.querySelector('#segModo button[data-v="transfer"]').click();   // o formulário vive na aba Transfer
+    editandoId = null;
+    hospedarPainelAgendar('transfer');
+    preencherFormAgendamento({
+      tipo: eHora ? 'hora' : undefined,
+      partida: ag.partida, chegada: ag.chegada, paragens: (ag.paragens || []).slice(),
+      data: '', hora: '',
+      cliente: ag.cliente, telefone: ag.telefone || '', nomePlaca: ag.nomePlaca || '', voo: '',
+      fornecedor: ag.fornecedor || '', observacoes: ag.observacoes || '',
+      valor: eHora ? String(valorMinimoHora()) : ag.valor
+    });
+    document.getElementById('btnGuardarAgendamento').textContent = 'Guardar e adicionar ao calendário';
+    const av = document.getElementById('agAvisoRefazer');
+    av.textContent = `🔁 A refazer a corrida de ${ag.cliente}. Escolhe a nova data e o novo horário (podes editar o resto). A corrida anterior não é alterada.`;
+    av.style.display = 'block';
+    const p = document.getElementById('painelAgendar');
+    p.style.display = 'block';
+    p.scrollIntoView({behavior:'smooth', block:'start'});
+  }
+
   function abrirEdicao(ag){
     editandoId = ag.id;
     hospedarPainelAgendar('transfer');
@@ -2805,6 +2841,8 @@
       document.querySelector('#segModo button[data-v="hora"]').click();
     } else if(btn.dataset.acao === 'horaResumo'){
       enviarResumoHora(ag);
+    } else if(btn.dataset.acao === 'refazer'){
+      refazerAgendamento(ag.id);
     } else if(btn.dataset.acao === 'editar'){
       abrirEdicao(ag);
     } else if(btn.dataset.acao === 'cal'){
@@ -2845,6 +2883,8 @@
   document.getElementById('listaAgendamentos').addEventListener('click', handlerCliqueAgendamento);
 
   document.getElementById('listaFaturamento').addEventListener('click', (e)=>{
+    const btnRefazer = e.target.closest('button[data-acao="refazer"]');
+    if(btnRefazer){ refazerAgendamento(btnRefazer.closest('.ag-item').dataset.id); return; }
     const trajeto = e.target.closest('.ag-trajeto');
     if(!trajeto) return;
     trajeto.closest('.ag-item').classList.toggle('ag-aberto');
@@ -3053,7 +3093,7 @@
     el.innerHTML = ordenada.map(ag => {
       const selo = ag.pagamento === 'recebido' ? '<span class="ag-badge-pago">💰 Recebido</span>' : '<span class="ag-badge-pendente">⏳ A receber</span>';
       return `
-      <div class="ag-item">
+      <div class="ag-item" data-id="${escHtml(ag.id)}">
         <div class="ag-trajeto"><span>${tituloAg(ag)}${selo}</span><span class="ag-seta">▸</span></div>
         <div class="ag-detalhes">
         <div class="ag-meta">
@@ -3061,6 +3101,9 @@
           👤 ${escHtml(ag.cliente)} &nbsp;·&nbsp; <span class="ag-valor">€${ag.valor}</span>
           ${linhaHoraMeta(ag)}
           ${ag.fornecedor ? `<br>🏷 Fornecedor: ${escHtml(ag.fornecedor)}` : ''}
+        </div>
+        <div class="ag-acoes">
+          <button class="ag-btn-cal" data-acao="refazer">🔁 Refazer</button>
         </div>
         </div>
       </div>
