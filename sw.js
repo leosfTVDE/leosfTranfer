@@ -1,12 +1,12 @@
-const CACHE_NAME = 'trajeto-v98';
+const CACHE_NAME = 'trajeto-v981';
 const ASSETS = [
   './',
   './index.html',
   './manifest.json',
-  './icon-192-v2.png',
-  './icon-512-v2.png',
-  './apple-touch-icon-v2.png',
-  './favicon-v2.png'
+  './icon-192-v5.png',
+  './icon-512-v5.png',
+  './apple-touch-icon-v5.png',
+  './favicon-v5.png'
 ];
 
 self.addEventListener('install', (event) => {
