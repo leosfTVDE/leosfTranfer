@@ -726,10 +726,10 @@
     let texto;
     if(pt){
       const primeira = s.minimoMin === 60 ? 'A primeira hora é sempre cobrada por inteiro' : `Os primeiros ${dur} são sempre cobrados por inteiro`;
-      texto = `<strong>${fmtEuroPub(s.valor)} por hora.</strong> ${primeira}; a partir daí, contamos por blocos de ${s.blocoMin} minutos. O tempo começa a contar quando entrar no carro e pode parar onde quiser durante o serviço.`;
+      texto = `<strong>A partir de ${fmtEuroPub(s.valor)} por hora.</strong> ${primeira}; a partir daí, contamos por blocos de ${s.blocoMin} minutos. O tempo começa a contar quando entrar no carro e pode parar onde quiser durante o serviço.`;
     } else {
       const primeira = s.minimoMin === 60 ? 'The first hour is always charged in full' : `The first ${dur} are always charged in full`;
-      texto = `<strong>${fmtEuroPub(s.valor)} per hour.</strong> ${primeira}; after that, we count in ${s.blocoMin}-minute blocks. The clock starts when you get in the car, and you can stop wherever you like during the service.`;
+      texto = `<strong>From ${fmtEuroPub(s.valor)} per hour.</strong> ${primeira}; after that, we count in ${s.blocoMin}-minute blocks. The clock starts when you get in the car, and you can stop wherever you like during the service.`;
     }
     box.innerHTML = texto;
     box.style.display = 'block';
