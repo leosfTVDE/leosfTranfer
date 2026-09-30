@@ -1160,18 +1160,7 @@
       <button class="btn-agendar" id="btnAbrirAgendar">📅 Agendar esta corrida</button>
     </div>
 
-    <div class="card">
-      <h2>Meus agendamentos</h2>
-      <div class="seg" id="segFiltroAg" style="margin-bottom:14px;">
-        <button data-v="ativos" class="active">Ativos</button>
-        <button data-v="concluidos">Concluídos</button>
-      </div>
-      <div class="lista-agendamentos" id="listaAgendamentos"></div>
-    </div>
-
-    <p class="nota">Os botões "Ir buscar cliente" e "Iniciar viagem" abrem o Waze já com o destino certo — ele usa a tua localização atual como ponto de partida automaticamente (precisa do Waze instalado no telemóvel).<br><br>A calculadora não soma ida + volta automaticamente, a não ser que marques "Regresso vazio". Portagens não são calculadas automaticamente — confirma no Waze/Google Maps e insere aqui manualmente.<br><br>Os agendamentos ficam guardados só neste telemóvel/navegador. O lembrete 24h antes é feito pelo teu Calendário.</p>
-
-    <div id="painelAgendar">
+<div id="painelAgendar">
       <div class="card">
         <h2>Agendar corrida</h2>
         <div id="agAvisoRefazer" style="display:none; background:rgba(42,111,119,.10); border:1px solid var(--azulejo); border-radius:8px; padding:10px 12px; margin:0 0 14px; font-family:'Helvetica Neue', Arial, sans-serif; font-size:13px; line-height:1.5; color:var(--texto);"></div>
@@ -1234,6 +1223,19 @@
         <button id="btnCancelarAgendamento" style="width:100%; margin-top:10px; padding:11px; border-radius:8px; border:1px solid var(--linha); background:none; color:#8a7378; font-family:'Helvetica Neue', Arial, sans-serif; font-size:13.5px; cursor:pointer;">✖️ Cancelar</button>
       </div>
     </div>
+
+    <div class="card">
+      <h2>Meus agendamentos</h2>
+      <div class="seg" id="segFiltroAg" style="margin-bottom:14px;">
+        <button data-v="ativos" class="active">Ativos</button>
+        <button data-v="concluidos">Concluídos</button>
+      </div>
+      <div class="lista-agendamentos" id="listaAgendamentos"></div>
+    </div>
+
+    <p class="nota">Os botões "Ir buscar cliente" e "Iniciar viagem" abrem o Waze já com o destino certo — ele usa a tua localização atual como ponto de partida automaticamente (precisa do Waze instalado no telemóvel).<br><br>A calculadora não soma ida + volta automaticamente, a não ser que marques "Regresso vazio". Portagens não são calculadas automaticamente — confirma no Waze/Google Maps e insere aqui manualmente.<br><br>Os agendamentos ficam guardados só neste telemóvel/navegador. O lembrete 24h antes é feito pelo teu Calendário.</p>
+
+    
   </div>
 
   <div id="viewFaturamento" style="display:none;">
@@ -1299,7 +1301,7 @@
     <p class="nota">Aqui aparecem os serviços por hora a partir do momento em que tocas em "🚗 Ir buscar cliente" no agendamento. O tempo só começa a contar quando tocas em "▶️ Iniciar" (cliente no carro). Ao finalizar, o valor é calculado pela regra definida em "Minhas tarifas" e podes enviar o resumo ao cliente. O agendamento só sai da lista quando o marcares como "Concluído".</p>
   </div>
 
-  <p style="text-align:center; font-family:'Helvetica Neue', Arial, sans-serif; font-size:11px; color:#8a7f66; margin-top:24px;">Trajeto · v9.8.4</p>
+  <p style="text-align:center; font-family:'Helvetica Neue', Arial, sans-serif; font-size:11px; color:#8a7f66; margin-top:24px;">Trajeto · v9.8.5</p>
 
 </main>
 
@@ -3307,6 +3309,7 @@
     document.getElementById('ag_observacoes').value = '';
     document.getElementById('painelAgendar').style.display = 'none';
     aplicarTipoAgendar('transfer');
+    hospedarPainelAgendar('transfer');
   });
 
   document.getElementById('listaAReceber').addEventListener('click', (e)=>{
