@@ -1151,11 +1151,7 @@
       <div class="ct-rec" id="ct_valorRecomendado">€0</div>
       <p class="eyebrow" style="margin-top:16px;">💰 Cobrar do cliente</p>
       <input type="number" id="ct_cobrar" class="ct-cobrar-input" step="0.5">
-      <div class="seg" id="segIdiomaOrcamento" style="margin-top:14px;">
-        <button type="button" data-v="pt" class="active">🇵🇹 Português</button>
-        <button type="button" data-v="en">🇬🇧 English</button>
-      </div>
-      <button class="btn-agendar" id="btnCopiarOrcamento" style="margin-top:8px;">📋 Copiar orçamento</button>
+      <button class="btn-agendar" id="btnCopiarOrcamento" style="margin-top:14px;">📋 Copiar orçamento</button>
       <button class="btn-agendar" id="ct_btnNovo" style="margin-top:14px;">🔄 Novo cálculo</button>
       <button class="btn-agendar" id="btnAbrirAgendar">📅 Agendar esta corrida</button>
     </div>
@@ -1301,7 +1297,7 @@
     <p class="nota">Aqui aparecem os serviços por hora a partir do momento em que tocas em "🚗 Ir buscar cliente" no agendamento. O tempo só começa a contar quando tocas em "▶️ Iniciar" (cliente no carro). Ao finalizar, o valor é calculado pela regra definida em "Minhas tarifas" e podes enviar o resumo ao cliente. O agendamento só sai da lista quando o marcares como "Concluído".</p>
   </div>
 
-  <p style="text-align:center; font-family:'Helvetica Neue', Arial, sans-serif; font-size:11px; color:#8a7f66; margin-top:24px;">Trajeto · v9.8.5</p>
+  <p style="text-align:center; font-family:'Helvetica Neue', Arial, sans-serif; font-size:11px; color:#8a7f66; margin-top:24px;">Trajeto · v9.8.7</p>
 
 </main>
 
@@ -1374,6 +1370,16 @@
     <p>O pagamento desta corrida já foi recebido?</p>
     <button class="modal-btn modal-btn-recebido" id="btnModalRecebido">💰 Sim, já recebi</button>
     <button class="modal-btn modal-btn-pendente" id="btnModalPendente">⏳ Ainda não recebi</button>
+  </div>
+</div>
+
+<div class="modal-overlay" id="popupIdioma">
+  <div class="modal-card">
+    <h2>🌐 Em que idioma?</h2>
+    <p>Escolhe o idioma da mensagem.</p>
+    <button class="modal-btn modal-btn-recebido" id="btnIdiomaPT">🇵🇹 Português</button>
+    <button class="modal-btn modal-btn-recebido" id="btnIdiomaEN" style="margin-top:10px;">🇬🇧 English</button>
+    <button class="modal-btn modal-btn-secundario" id="btnIdiomaCancelar" style="margin-top:10px;">Cancelar</button>
   </div>
 </div>
 
@@ -1713,14 +1719,26 @@
   calcularTransfer();
 
   // ---------- Orçamento (mensagem pronta a copiar) ----------
+  // Idioma da mensagem: pergunta-se numa caixinha, só na hora de copiar/enviar — não fica nenhum seletor fixo no ecrã.
   let idiomaOrcamento = localStorage.getItem('trajeto_orcamento_idioma') || 'pt';
-  document.getElementById('segIdiomaOrcamento').querySelectorAll('button').forEach(btn=>{
-    if(btn.dataset.v === idiomaOrcamento) btn.classList.add('active'); else btn.classList.remove('active');
-    btn.addEventListener('click', ()=>{
-      idiomaOrcamento = btn.dataset.v;
-      localStorage.setItem('trajeto_orcamento_idioma', idiomaOrcamento);
-      document.getElementById('segIdiomaOrcamento').querySelectorAll('button').forEach(b=>b.classList.toggle('active', b===btn));
-    });
+  let acaoIdiomaPendente = null;
+  function pedirIdiomaEExecutar(acao){
+    acaoIdiomaPendente = acao;
+    document.getElementById('popupIdioma').classList.add('aberto');
+  }
+  function escolherIdioma(idioma){
+    idiomaOrcamento = idioma;
+    localStorage.setItem('trajeto_orcamento_idioma', idioma);
+    document.getElementById('popupIdioma').classList.remove('aberto');
+    const acao = acaoIdiomaPendente;
+    acaoIdiomaPendente = null;
+    if(acao) acao();
+  }
+  document.getElementById('btnIdiomaPT').addEventListener('click', ()=> escolherIdioma('pt'));
+  document.getElementById('btnIdiomaEN').addEventListener('click', ()=> escolherIdioma('en'));
+  document.getElementById('btnIdiomaCancelar').addEventListener('click', ()=>{
+    acaoIdiomaPendente = null;
+    document.getElementById('popupIdioma').classList.remove('aberto');
   });
   function gerarMensagemOrcamento(idioma){
     idioma = idioma || 'pt';
@@ -1791,18 +1809,20 @@
   }
 
   document.getElementById('btnCopiarOrcamento').addEventListener('click', ()=>{
-    const texto = gerarMensagemOrcamento(idiomaOrcamento);
-    const btn = document.getElementById('btnCopiarOrcamento');
-    const original = btn.textContent;
-    const marcarCopiado = ()=>{
-      btn.textContent = '✅ Copiado!';
-      setTimeout(()=>{ btn.textContent = original; }, 1800);
-    };
-    if(navigator.clipboard){
-      navigator.clipboard.writeText(texto).then(marcarCopiado).catch(()=>{ alert(texto); });
-    } else {
-      alert(texto);
-    }
+    pedirIdiomaEExecutar(()=>{
+      const texto = gerarMensagemOrcamento(idiomaOrcamento);
+      const btn = document.getElementById('btnCopiarOrcamento');
+      const original = btn.textContent;
+      const marcarCopiado = ()=>{
+        btn.textContent = '✅ Copiado!';
+        setTimeout(()=>{ btn.textContent = original; }, 1800);
+      };
+      if(navigator.clipboard){
+        navigator.clipboard.writeText(texto).then(marcarCopiado).catch(()=>{ alert(texto); });
+      } else {
+        alert(texto);
+      }
+    });
   });
 
   // ---------- Agendamento ----------
@@ -2270,6 +2290,13 @@
     if(ag.tipo === 'hora') return gerarMensagemHora(ag);
     const dataFmt = ag.data.split('-').reverse().join('/');
     const nome = localStorage.getItem('trajeto_nome') || '';
+    if(idiomaOrcamento === 'en'){
+      const assinaturaEN = nome ? `This is ${nome}` : 'This is your driver';
+      const linhaParagensEN = (ag.paragens && ag.paragens.length)
+        ? ag.paragens.map(p => `📍 Stop: ${p}\n`).join('')
+        : '';
+      return `Hello ${ag.cliente}! 👋\n\n${assinaturaEN} — confirming the details of your transfer:\n\n📍 From: ${ag.partida}\n${linhaParagensEN}📍 To: ${ag.chegada}\n📅 Date: ${dataFmt}\n🕐 Time: ${ag.hora}\n💰 Price: €${ag.valor}\n\nCould you please confirm this service? Looking forward to your reply. Thank you! 🚗`;
+    }
     const assinatura = nome ? `Aqui é o ${nome}` : 'Aqui é o teu motorista';
     const linhaParagens = (ag.paragens && ag.paragens.length)
       ? ag.paragens.map(p => `📍 Paragem: ${p}\n`).join('')
@@ -2407,6 +2434,12 @@
       : `Os primeiros ${fmtDur(p.minimo)} são sempre cobrados por inteiro`;
     return `${primeira}; a partir daí, contamos por blocos de ${p.bloco} minutos (qualquer minuto a mais conta o bloco seguinte).`;
   }
+  function fraseRegraHoraEN(p){
+    const primeira = p.minimo === 60
+      ? 'The first hour is always charged in full'
+      : `The first ${fmtDur(p.minimo)} are always charged in full`;
+    return `${primeira}; after that, we count in ${p.bloco}-minute blocks (any extra minute counts the next block).`;
+  }
 
   function tituloAg(ag){
     if(ag.tipo === 'hora'){
@@ -2428,15 +2461,25 @@
   function gerarMensagemHora(ag){
     const dataFmt = ag.data.split('-').reverse().join('/');
     const nome = localStorage.getItem('trajeto_nome') || '';
-    const assinatura = nome ? `Aqui é o ${nome}` : 'Aqui é o teu motorista';
     const p = ag.hParams || horaParams();
+    if(idiomaOrcamento === 'en'){
+      const assinaturaEN = nome ? `This is ${nome}` : 'This is your driver';
+      const linhaFinalEN = (ag.chegada && ag.chegada !== ag.partida) ? `📍 Final stop: ${ag.chegada}\n` : '';
+      return `Hello ${ag.cliente}! 👋\n\n${assinaturaEN} — confirming the details of your hourly service:\n\n📍 Pick-up location: ${ag.partida}\n${linhaFinalEN}📅 Date: ${dataFmt}\n🕐 Time: ${ag.hora}\n💰 Rate: ${fmtEuro(p.valor)} per hour\n\n${fraseRegraHoraEN(p)} The clock starts when you get in the car, and you can stop wherever you like during the service.\n\nCould you please confirm this service? Looking forward to your reply. Thank you! 🚗`;
+    }
+    const assinatura = nome ? `Aqui é o ${nome}` : 'Aqui é o teu motorista';
     const linhaFinal = (ag.chegada && ag.chegada !== ag.partida) ? `📍 Local final: ${ag.chegada}\n` : '';
     return `Olá ${ag.cliente}! 👋\n\n${assinatura} — confirmo os dados do seu serviço por hora:\n\n📍 Local de partida: ${ag.partida}\n${linhaFinal}📅 Data: ${dataFmt}\n🕐 Horário: ${ag.hora}\n💰 Tarifa: ${fmtEuro(p.valor)} por hora\n\n${fraseRegraHora(p)} O tempo começa a contar quando entrar no carro e pode parar onde quiser durante o serviço.\n\nPode confirmar este serviço, por favor? Fico a aguardar a sua resposta. Obrigado! 🚗`;
   }
   function gerarResumoHora(ag){
     const nome = localStorage.getItem('trajeto_nome') || '';
-    const assinatura = nome ? `Aqui é o ${nome}` : 'Aqui é o teu motorista';
     const p = ag.hParams || horaParams();
+    if(idiomaOrcamento === 'en'){
+      const assinaturaEN = nome ? `This is ${nome}` : 'This is your driver';
+      const linhaFinalEN = (ag.chegada && ag.chegada !== ag.partida) ? `📍 Final stop: ${ag.chegada}\n` : '';
+      return `Hello ${ag.cliente}! 👋\n\n${assinaturaEN} — here's the summary of your hourly service:\n\n📅 Date: ${fmtDataLocal(ag.hInicio)}\n📍 Pick-up location: ${ag.partida}\n${linhaFinalEN}🕐 Start: ${fmtHoraLocal(ag.hInicio)}\n🏁 End: ${fmtHoraLocal(ag.hFim)}\n⏱ Total time: ${fmtDur(ag.hMinReais)}\n💶 Time charged: ${fmtDur(ag.hMinCobrados)} (${fmtEuro(p.valor)} per hour)\n💰 Amount due: ${fmtEuro(ag.valor)}\n\nThank you for choosing us! 🚗`;
+    }
+    const assinatura = nome ? `Aqui é o ${nome}` : 'Aqui é o teu motorista';
     const linhaFinal = (ag.chegada && ag.chegada !== ag.partida) ? `📍 Local final: ${ag.chegada}\n` : '';
     return `Olá ${ag.cliente}! 👋\n\n${assinatura} — segue o resumo do seu serviço por hora:\n\n📅 Data: ${fmtDataLocal(ag.hInicio)}\n📍 Local de partida: ${ag.partida}\n${linhaFinal}🕐 Início: ${fmtHoraLocal(ag.hInicio)}\n🏁 Fim: ${fmtHoraLocal(ag.hFim)}\n⏱ Tempo total: ${fmtDur(ag.hMinReais)}\n💶 Tempo cobrado: ${fmtDur(ag.hMinCobrados)} (${fmtEuro(p.valor)} por hora)\n💰 Valor a pagar: ${fmtEuro(ag.valor)}\n\nObrigado pela preferência! 🚗`;
   }
@@ -2558,7 +2601,7 @@
       abrirWaze(ag.partida);
       return;
     } else if(acao === 'horaResumo'){
-      enviarResumoHora(ag);
+      pedirIdiomaEExecutar(()=> enviarResumoHora(ag));
       return;
     } else if(acao === 'horaConcluir'){
       abrirModalPagamento(ag.id);
@@ -2888,7 +2931,7 @@
     } else if(btn.dataset.acao === 'horaAbrirAba'){
       document.querySelector('#segModo button[data-v="hora"]').click();
     } else if(btn.dataset.acao === 'horaResumo'){
-      enviarResumoHora(ag);
+      pedirIdiomaEExecutar(()=> enviarResumoHora(ag));
     } else if(btn.dataset.acao === 'refazer'){
       refazerAgendamento(ag.id);
     } else if(btn.dataset.acao === 'editar'){
@@ -2899,7 +2942,7 @@
       const codigo = ag.voo.replace(/\s+/g, '');
       window.open(`https://flightaware.com/live/flight/${encodeURIComponent(codigo)}`, '_blank');
     } else if(btn.dataset.acao === 'wpp'){
-      enviarMensagem(ag);
+      pedirIdiomaEExecutar(()=> enviarMensagem(ag));
     } else if(btn.dataset.acao === 'repassar'){
       repassarAgendamento(ag);
     } else if(btn.dataset.acao === 'realizado'){
