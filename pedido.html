@@ -219,6 +219,7 @@
     text-align:center;
     margin-bottom:14px;
   }
+  .motorista-secao{margin-bottom:26px;}
   .servicos-secao{margin-bottom:26px;}
   .tours-secao{margin-bottom:26px;}
   .btn-pedir-cotacao{
@@ -693,12 +694,21 @@
   </div>
 
   <nav class="links-internos" id="linksInternos" aria-label="Navegação da página">
+    <a href="#motoristaSecao" id="navMotorista" style="display:none;" data-i18n="nav_motorista">O motorista</a>
     <a href="#servicosSecao" data-i18n="nav_servicos">Serviços</a>
     <a href="#toursSecao" data-i18n="nav_tours">Tours</a>
     <a href="#destinosSecao" data-i18n="nav_destinos">Destinos</a>
     <a href="#faqSecao" data-i18n="nav_faq">FAQ</a>
     <a href="#cardForm" class="destaque" data-i18n="nav_cotacao">Pedir cotação</a>
   </nav>
+
+  <section class="motorista-secao" id="motoristaSecao" aria-labelledby="motoristaTitulo" style="display:none;">
+    <p class="eyebrow" id="motoristaTitulo" data-i18n="motorista_eyebrow">O motorista</p>
+    <div class="motorista-card" id="motoristaCard">
+      <img id="motoristaFoto" class="motorista-foto" alt="" style="display:none;">
+      <p id="motoristaBio" class="motorista-bio"></p>
+    </div>
+  </section>
 
   <section class="servicos-secao" id="servicosSecao" aria-labelledby="servicosTitulo">
     <p class="eyebrow" data-i18n="servicos_eyebrow">Os nossos serviços</p>
@@ -732,10 +742,6 @@
   </section>
 
   <section class="sobre-bloco" id="sobreBloco" aria-labelledby="sobreTitulo">
-    <div class="motorista-card" id="motoristaCard" style="display:none;">
-      <img id="motoristaFoto" class="motorista-foto" alt="" style="display:none;">
-      <p id="motoristaBio" class="motorista-bio"></p>
-    </div>
     <h2 id="sobreTitulo" data-i18n="sobre_titulo">Transfer privado em Lisboa, com motorista próprio</h2>
     <p data-i18n="sobre_texto">O Trajeto Transfer é um serviço de transfer privado em Lisboa e arredores — Cascais, Sintra, Oeiras e aeroporto — com motorista fixo, não uma plataforma com motoristas diferentes a cada viagem. Fala sempre com a mesma pessoa, combine os detalhes diretamente e viaje com pontualidade e conforto. Disponível também por hora, para quem precisa do carro à disposição durante o dia.</p>
   </section>
@@ -935,6 +941,8 @@
       tours_titulo: 'Tours privados em Lisboa e Portugal',
       tours_texto: 'Descubra Portugal com mais liberdade e conforto. A Trajeto oferece tours privados e personalizados para quem deseja conhecer Lisboa, Sintra, Cascais e outros destinos de Portugal, acompanhado por motorista particular.',
       tours_botao: 'Pedir cotação para um tour',
+      nav_motorista: 'O motorista',
+      motorista_eyebrow: 'O motorista',
       destinos_eyebrow: 'Destinos',
       destinos_titulo: 'Explore Portugal com a Trajeto',
       destinos_nota: 'Transfers e viagens privadas mediante cotação.',
@@ -1016,6 +1024,8 @@
       tours_titulo: 'Private Tours in Lisbon & Portugal',
       tours_texto: 'Discover Portugal with more freedom and comfort. Trajeto offers private, personalized tours for those who want to explore Lisbon, Sintra, Cascais and other destinations in Portugal, with a private driver.',
       tours_botao: 'Request a tour quote',
+      nav_motorista: 'The driver',
+      motorista_eyebrow: 'The driver',
       destinos_eyebrow: 'Destinations',
       destinos_titulo: 'Explore Portugal with Trajeto',
       destinos_nota: 'Private transfers and trips, subject to quote.',
@@ -1301,7 +1311,8 @@
         if(dadosPublicos.perfil.bio){
           document.getElementById('motoristaBio').textContent = dadosPublicos.perfil.bio;
         }
-        document.getElementById('motoristaCard').style.display = 'flex';
+        document.getElementById('motoristaSecao').style.display = 'block';
+        document.getElementById('navMotorista').style.display = '';
       }
     }catch(e){ /* sem número disponível — o botão fica escondido, sem problema */ }
   })();
