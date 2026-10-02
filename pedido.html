@@ -3,7 +3,74 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Pedir Transfer — Cotação Rápida</title>
+<title>Trajeto Transfer | Transfers Privados em Lisboa e Portugal</title>
+<meta name="description" content="Transfer privado em Lisboa e do Aeroporto de Lisboa. Tours personalizados, motorista particular e viagens privadas para Sintra, Cascais e outros destinos em Portugal.">
+<link rel="canonical" href="https://trajetotransfer.pt/">
+<meta property="og:type" content="website">
+<meta property="og:locale" content="pt_PT">
+<meta property="og:site_name" content="Trajeto Transfer">
+<meta property="og:title" content="Trajeto Transfer | Transfers Privados em Lisboa e Portugal">
+<meta property="og:description" content="Transfer privado em Lisboa e do Aeroporto de Lisboa. Tours personalizados, motorista particular e viagens privadas para Sintra, Cascais e outros destinos em Portugal.">
+<meta property="og:url" content="https://trajetotransfer.pt/">
+<meta property="og:image" content="https://trajetotransfer.pt/apple-touch-icon-v5.png">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "WebSite",
+      "@id": "https://trajetotransfer.pt/#website",
+      "url": "https://trajetotransfer.pt/",
+      "name": "Trajeto Transfer",
+      "inLanguage": "pt-PT"
+    },
+    {
+      "@type": ["LocalBusiness", "Organization"],
+      "@id": "https://trajetotransfer.pt/#business",
+      "name": "Trajeto Transfer",
+      "url": "https://trajetotransfer.pt/",
+      "image": "https://trajetotransfer.pt/apple-touch-icon-v5.png",
+      "areaServed": [
+        {"@type": "City", "name": "Lisboa"},
+        {"@type": "City", "name": "Cascais"},
+        {"@type": "City", "name": "Sintra"},
+        {"@type": "City", "name": "Oeiras"},
+        {"@type": "Country", "name": "Portugal"}
+      ],
+      "priceRange": "€€",
+      "sameAs": ["https://instagram.com/trajeto.transfer"]
+    },
+    {
+      "@type": "Service",
+      "@id": "https://trajetotransfer.pt/#servico-aeroporto",
+      "name": "Transfer Aeroporto de Lisboa",
+      "serviceType": "Transfer privado",
+      "areaServed": {"@type": "City", "name": "Lisboa"},
+      "provider": {"@id": "https://trajetotransfer.pt/#business"}
+    },
+    {
+      "@type": "Service",
+      "@id": "https://trajetotransfer.pt/#servico-tours",
+      "name": "Tours privados em Lisboa e Portugal",
+      "serviceType": "Tour privado",
+      "areaServed": {"@type": "Country", "name": "Portugal"},
+      "provider": {"@id": "https://trajetotransfer.pt/#business"}
+    },
+    {
+      "@type": "FAQPage",
+      "@id": "https://trajetotransfer.pt/#faq",
+      "mainEntity": [
+        {"@type": "Question", "name": "Fazem transfer do Aeroporto de Lisboa para hotéis?", "acceptedAnswer": {"@type": "Answer", "text": "Sim. Faço transfers privados de e para o Aeroporto de Lisboa, para hotéis, alojamentos locais e outros destinos na cidade."}},
+        {"@type": "Question", "name": "Fazem transfers fora de Lisboa?", "acceptedAnswer": {"@type": "Answer", "text": "Sim. Além de Lisboa, atendo Cascais, Sintra, Oeiras e outras regiões de Portugal, mediante cotação."}},
+        {"@type": "Question", "name": "Vocês fazem tours privados?", "acceptedAnswer": {"@type": "Answer", "text": "Sim. Organizo tours privados e personalizados em Lisboa e noutros destinos de Portugal, com roteiro ajustado ao que pretende visitar."}},
+        {"@type": "Question", "name": "Posso contratar o carro com motorista por algumas horas?", "acceptedAnswer": {"@type": "Answer", "text": "Sim. O serviço por hora está disponível mediante disponibilidade — o carro e o motorista ficam à sua disposição pelo tempo combinado."}},
+        {"@type": "Question", "name": "Posso solicitar uma viagem para outra cidade de Portugal?", "acceptedAnswer": {"@type": "Answer", "text": "Sim. Envie o percurso que pretende fazer através do formulário e recebe uma cotação personalizada."}},
+        {"@type": "Question", "name": "Como posso pedir uma cotação?", "acceptedAnswer": {"@type": "Answer", "text": "Preenche o formulário nesta página com os detalhes do seu trajeto — entro em contacto o mais rápido possível para confirmar o preço e a reserva."}}
+      ]
+    }
+  ]
+}
+</script>
 <meta name="theme-color" content="#0d1b2a">
 <link rel="icon" type="image/png" sizes="32x32" href="favicon-v5.png">
 <link rel="apple-touch-icon" href="apple-touch-icon-v5.png">
@@ -125,6 +192,198 @@
   }
 
   /* ---------- Porquê viajar connosco ---------- */
+  .links-internos{
+    display:flex;
+    flex-wrap:wrap;
+    gap:8px 14px;
+    justify-content:center;
+    margin:0 0 24px;
+    padding-bottom:16px;
+    border-bottom:1px solid var(--linha);
+  }
+  .links-internos a{
+    font-family:'Helvetica Neue', Arial, sans-serif;
+    font-size:12.5px;
+    color:var(--azulejo);
+    text-decoration:none;
+    font-weight:600;
+  }
+  .links-internos a:hover{text-decoration:underline;}
+  .links-internos a.destaque{color:var(--terracota);}
+  .eyebrow{
+    font-family:'Helvetica Neue', Arial, sans-serif;
+    font-size:11px;
+    text-transform:uppercase;
+    letter-spacing:.12em;
+    color:var(--azulejo);
+    text-align:center;
+    margin-bottom:14px;
+  }
+  .servicos-secao{margin-bottom:26px;}
+  .tours-secao{margin-bottom:26px;}
+  .btn-pedir-cotacao{
+    display:block;
+    width:100%;
+    margin-bottom:26px;
+    padding:18px;
+    border:none;
+    border-radius:12px;
+    background:linear-gradient(135deg, var(--terracota), #a8451f);
+    color:#fff;
+    font-family:'Helvetica Neue', Arial, sans-serif;
+    font-size:17px;
+    font-weight:bold;
+    letter-spacing:.01em;
+    cursor:pointer;
+    box-shadow:0 6px 18px rgba(193,85,44,.3);
+    transition:transform .12s, box-shadow .15s;
+  }
+  .btn-pedir-cotacao:hover{box-shadow:0 8px 22px rgba(193,85,44,.4);}
+  .btn-pedir-cotacao:active{transform:scale(.98);}
+  .destinos-secao{margin:30px 0 26px; text-align:center;}
+  .destinos-secao h2{
+    font-family:'Georgia', 'Iowan Old Style', serif;
+    font-size:19px;
+    font-weight:700;
+    color:var(--azul-noite);
+    margin-bottom:16px;
+  }
+  .destinos-grid{
+    display:flex;
+    flex-wrap:wrap;
+    gap:8px;
+    justify-content:center;
+    margin-bottom:10px;
+  }
+  .destino-chip{
+    background:var(--areia);
+    border:1px solid var(--linha);
+    border-radius:999px;
+    padding:7px 14px;
+    font-family:'Helvetica Neue', Arial, sans-serif;
+    font-size:12.5px;
+    font-weight:600;
+    color:var(--azul-doca);
+  }
+  .destinos-nota{
+    font-family:'Helvetica Neue', Arial, sans-serif;
+    font-size:11.5px;
+    color:#8a7f66;
+    font-style:italic;
+  }
+  .faq-secao{margin-bottom:10px;}
+  .faq-titulo-visually-hidden{
+    position:absolute; width:1px; height:1px; padding:0; margin:-1px;
+    overflow:hidden; clip:rect(0,0,0,0); white-space:nowrap; border:0;
+  }
+  .faq-item{
+    background:var(--branco);
+    border:1px solid var(--linha);
+    border-radius:10px;
+    padding:4px 16px;
+    margin-bottom:8px;
+  }
+  .faq-item summary{
+    font-family:'Helvetica Neue', Arial, sans-serif;
+    font-size:13.5px;
+    font-weight:bold;
+    color:var(--azul-noite);
+    padding:12px 0;
+    cursor:pointer;
+    list-style:none;
+  }
+  .faq-item summary::-webkit-details-marker{display:none;}
+  .faq-item summary::after{content:'+'; float:right; color:var(--terracota); font-size:16px;}
+  .faq-item[open] summary::after{content:'\2212';}
+  .faq-item p{
+    font-family:'Helvetica Neue', Arial, sans-serif;
+    font-size:13px;
+    line-height:1.6;
+    color:var(--texto);
+    opacity:.88;
+    padding:0 0 14px;
+  }
+  .tours-card{
+    background:linear-gradient(135deg, var(--azul-noite), var(--azul-doca));
+    border-radius:12px;
+    padding:24px 20px;
+    text-align:center;
+  }
+  .tours-card h2{
+    font-family:'Georgia', 'Iowan Old Style', serif;
+    font-size:19px;
+    font-weight:700;
+    color:var(--areia);
+    margin-bottom:10px;
+    line-height:1.35;
+  }
+  .tours-card p{
+    font-family:'Helvetica Neue', Arial, sans-serif;
+    font-size:13.5px;
+    line-height:1.6;
+    color:#d9e3e6;
+    margin-bottom:16px;
+  }
+  .tours-btn{
+    display:inline-block;
+    background:var(--terracota);
+    color:#fff;
+    font-family:'Helvetica Neue', Arial, sans-serif;
+    font-size:13.5px;
+    font-weight:bold;
+    text-decoration:none;
+    padding:12px 22px;
+    border-radius:8px;
+  }
+  .servicos-grid{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:10px;
+  }
+  .servico-card{
+    background:var(--branco);
+    border:1px solid var(--linha);
+    border-radius:10px;
+    padding:16px 14px;
+    text-align:center;
+  }
+  .servico-card .icone{font-size:24px; margin-bottom:8px;}
+  .servico-card h3{
+    font-family:'Helvetica Neue', Arial, sans-serif;
+    font-size:13px;
+    font-weight:bold;
+    color:var(--azul-noite);
+    margin-bottom:6px;
+    line-height:1.3;
+  }
+  .servico-card p{
+    font-family:'Helvetica Neue', Arial, sans-serif;
+    font-size:12px;
+    color:var(--texto);
+    opacity:.85;
+    line-height:1.5;
+  }
+  .sobre-bloco{
+    max-width:640px;
+    margin:0 auto 20px;
+    padding:0 4px;
+    text-align:center;
+  }
+  .sobre-bloco h2{
+    font-family:'Georgia', 'Iowan Old Style', serif;
+    font-size:21px;
+    font-weight:700;
+    color:var(--azul-noite);
+    margin-bottom:10px;
+    line-height:1.3;
+  }
+  .sobre-bloco p{
+    font-family:'Helvetica Neue', Arial, sans-serif;
+    font-size:14px;
+    line-height:1.65;
+    color:var(--texto);
+    opacity:.88;
+  }
   .valores{
     display:flex;
     gap:10px;
@@ -397,7 +656,61 @@
     </div>
   </div>
 
-  <div class="card" id="cardForm">
+  <nav class="links-internos" id="linksInternos" aria-label="Navegação da página">
+    <a href="#servicosSecao" data-i18n="nav_servicos">Serviços</a>
+    <a href="#toursSecao" data-i18n="nav_tours">Tours</a>
+    <a href="#destinosSecao" data-i18n="nav_destinos">Destinos</a>
+    <a href="#faqSecao" data-i18n="nav_faq">FAQ</a>
+    <a href="#cardForm" class="destaque" data-i18n="nav_cotacao">Pedir cotação</a>
+  </nav>
+
+  <section class="servicos-secao" id="servicosSecao" aria-labelledby="servicosTitulo">
+    <p class="eyebrow" data-i18n="servicos_eyebrow">Os nossos serviços</p>
+    <div class="servicos-grid">
+      <div class="servico-card">
+        <div class="icone">🛬</div>
+        <h3 data-i18n="servico1_titulo">Transfer Aeroporto de Lisboa</h3>
+        <p data-i18n="servico1_texto">Transfer privado de e para o Aeroporto de Lisboa, hotéis, alojamentos e outros destinos.</p>
+      </div>
+      <div class="servico-card">
+        <div class="icone">🚗</div>
+        <h3 data-i18n="servico2_titulo">Transfer Privado</h3>
+        <p data-i18n="servico2_texto">Deslocações privadas em Lisboa e para diferentes regiões de Portugal.</p>
+      </div>
+      <div class="servico-card">
+        <div class="icone">🗺️</div>
+        <h3 data-i18n="servico3_titulo">Tours Privados</h3>
+        <p data-i18n="servico3_texto">Conheça Lisboa e outros destinos de Portugal com motorista particular e roteiro personalizado.</p>
+      </div>
+      <div class="servico-card">
+        <div class="icone">⏱️</div>
+        <h3 data-i18n="servico4_titulo">Motorista por Hora</h3>
+        <p data-i18n="servico4_texto">Tenha o carro com motorista à sua disposição durante algumas horas ou ao longo do dia, mediante disponibilidade.</p>
+      </div>
+      <div class="servico-card">
+        <div class="icone">✈️</div>
+        <h3 data-i18n="servico5_titulo">Viagens Personalizadas</h3>
+        <p data-i18n="servico5_texto">Precisa viajar para outra cidade ou região? Envie o seu percurso e peça uma cotação personalizada.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="sobre-bloco" id="sobreBloco" aria-labelledby="sobreTitulo">
+    <h2 id="sobreTitulo" data-i18n="sobre_titulo">Transfer privado em Lisboa, com motorista próprio</h2>
+    <p data-i18n="sobre_texto">O Trajeto Transfer é um serviço de transfer privado em Lisboa e arredores — Cascais, Sintra, Oeiras e aeroporto — com motorista fixo, não uma plataforma com motoristas diferentes a cada viagem. Fala sempre com a mesma pessoa, combine os detalhes diretamente e viaje com pontualidade e conforto. Disponível também por hora, para quem precisa do carro à disposição durante o dia.</p>
+  </section>
+
+  <section class="tours-secao" id="toursSecao" aria-labelledby="toursTitulo">
+    <div class="tours-card">
+      <h2 id="toursTitulo" data-i18n="tours_titulo">Tours privados em Lisboa e Portugal</h2>
+      <p data-i18n="tours_texto">Descubra Portugal com mais liberdade e conforto. A Trajeto oferece tours privados e personalizados para quem deseja conhecer Lisboa, Sintra, Cascais e outros destinos de Portugal, acompanhado por motorista particular.</p>
+      <a href="#cardForm" class="tours-btn" data-i18n="tours_botao">Pedir cotação para um tour</a>
+    </div>
+  </section>
+
+  <button type="button" id="btnAbrirForm" class="btn-pedir-cotacao" data-i18n="cta_abrir_form">📋 Pedir cotação</button>
+
+  <div class="card" id="cardForm" style="display:none;">
     <form id="formPedido">
       <div class="tipo-switch" id="tipoSwitch" style="display:none;">
         <button type="button" data-tipo="transfer" class="active" data-i18n="tipo_transfer">Transfer</button>
@@ -463,6 +776,53 @@
 
   <p class="nota" data-i18n="nota">Este pedido é só um orçamento — a reserva fica confirmada depois de recebermos a sua resposta.</p>
 
+  <section class="destinos-secao" id="destinosSecao" aria-labelledby="destinosTitulo">
+    <p class="eyebrow" data-i18n="destinos_eyebrow">Destinos</p>
+    <h2 id="destinosTitulo" data-i18n="destinos_titulo">Explore Portugal com a Trajeto</h2>
+    <div class="destinos-grid">
+      <span class="destino-chip">Lisboa</span>
+      <span class="destino-chip">Sintra</span>
+      <span class="destino-chip">Cascais</span>
+      <span class="destino-chip">Oeiras</span>
+      <span class="destino-chip">Setúbal</span>
+      <span class="destino-chip">Arrábida</span>
+      <span class="destino-chip">Fátima</span>
+      <span class="destino-chip">Óbidos</span>
+      <span class="destino-chip">Nazaré</span>
+      <span class="destino-chip">Algarve</span>
+    </div>
+    <p class="destinos-nota" data-i18n="destinos_nota">Transfers e viagens privadas mediante cotação.</p>
+  </section>
+
+  <section class="faq-secao" id="faqSecao" aria-labelledby="faqTitulo">
+    <p class="eyebrow" data-i18n="faq_eyebrow">Perguntas frequentes</p>
+    <h2 id="faqTitulo" class="faq-titulo-visually-hidden" data-i18n="faq_titulo">Perguntas frequentes</h2>
+    <details class="faq-item">
+      <summary data-i18n="faq1_p">Fazem transfer do Aeroporto de Lisboa para hotéis?</summary>
+      <p data-i18n="faq1_r">Sim. Faço transfers privados de e para o Aeroporto de Lisboa, para hotéis, alojamentos locais e outros destinos na cidade.</p>
+    </details>
+    <details class="faq-item">
+      <summary data-i18n="faq2_p">Fazem transfers fora de Lisboa?</summary>
+      <p data-i18n="faq2_r">Sim. Além de Lisboa, atendo Cascais, Sintra, Oeiras e outras regiões de Portugal, mediante cotação.</p>
+    </details>
+    <details class="faq-item">
+      <summary data-i18n="faq3_p">Vocês fazem tours privados?</summary>
+      <p data-i18n="faq3_r">Sim. Organizo tours privados e personalizados em Lisboa e noutros destinos de Portugal, com roteiro ajustado ao que pretende visitar.</p>
+    </details>
+    <details class="faq-item">
+      <summary data-i18n="faq4_p">Posso contratar o carro com motorista por algumas horas?</summary>
+      <p data-i18n="faq4_r">Sim. O serviço por hora está disponível mediante disponibilidade — o carro e o motorista ficam à sua disposição pelo tempo combinado.</p>
+    </details>
+    <details class="faq-item">
+      <summary data-i18n="faq5_p">Posso solicitar uma viagem para outra cidade de Portugal?</summary>
+      <p data-i18n="faq5_r">Sim. Envie o percurso que pretende fazer através do formulário e recebe uma cotação personalizada.</p>
+    </details>
+    <details class="faq-item">
+      <summary data-i18n="faq6_p">Como posso pedir uma cotação?</summary>
+      <p data-i18n="faq6_r">Preenche o formulário nesta página com os detalhes do seu trajeto — entro em contacto o mais rápido possível para confirmar o preço e a reserva.</p>
+    </details>
+  </section>
+
   <div class="testemunhos-secao" id="testemunhosSecao">
     <p class="testemunhos-titulo" data-i18n="testemunhos_titulo">O que dizem os nossos clientes</p>
     <div id="testemunhosLista"></div>
@@ -521,8 +881,47 @@
 
   const TEXTOS = {
     pt: {
-      titulo_html: 'Peça a sua <em>cotação</em>',
-      sub: 'Preencha os dados do seu trajeto e entramos em contacto consigo o mais rápido possível para confirmar o preço e a reserva.',
+      titulo_html: 'Transfer Privado em Lisboa <em>e Tours em Portugal</em>',
+      sub: 'Transfers de e para o Aeroporto de Lisboa, deslocações privadas e tours personalizados em Lisboa e em qualquer destino de Portugal. Viaje com motorista particular, conforto e pontualidade.',
+      nav_servicos: 'Serviços',
+      nav_tours: 'Tours',
+      nav_destinos: 'Destinos',
+      nav_faq: 'FAQ',
+      nav_cotacao: 'Pedir cotação',
+      servicos_eyebrow: 'Os nossos serviços',
+      cta_abrir_form: '📋 Pedir cotação',
+      tours_titulo: 'Tours privados em Lisboa e Portugal',
+      tours_texto: 'Descubra Portugal com mais liberdade e conforto. A Trajeto oferece tours privados e personalizados para quem deseja conhecer Lisboa, Sintra, Cascais e outros destinos de Portugal, acompanhado por motorista particular.',
+      tours_botao: 'Pedir cotação para um tour',
+      destinos_eyebrow: 'Destinos',
+      destinos_titulo: 'Explore Portugal com a Trajeto',
+      destinos_nota: 'Transfers e viagens privadas mediante cotação.',
+      faq_eyebrow: 'Perguntas frequentes',
+      faq_titulo: 'Perguntas frequentes',
+      faq1_p: 'Fazem transfer do Aeroporto de Lisboa para hotéis?',
+      faq1_r: 'Sim. Faço transfers privados de e para o Aeroporto de Lisboa, para hotéis, alojamentos locais e outros destinos na cidade.',
+      faq2_p: 'Fazem transfers fora de Lisboa?',
+      faq2_r: 'Sim. Além de Lisboa, atendo Cascais, Sintra, Oeiras e outras regiões de Portugal, mediante cotação.',
+      faq3_p: 'Vocês fazem tours privados?',
+      faq3_r: 'Sim. Organizo tours privados e personalizados em Lisboa e noutros destinos de Portugal, com roteiro ajustado ao que pretende visitar.',
+      faq4_p: 'Posso contratar o carro com motorista por algumas horas?',
+      faq4_r: 'Sim. O serviço por hora está disponível mediante disponibilidade — o carro e o motorista ficam à sua disposição pelo tempo combinado.',
+      faq5_p: 'Posso solicitar uma viagem para outra cidade de Portugal?',
+      faq5_r: 'Sim. Envie o percurso que pretende fazer através do formulário e recebe uma cotação personalizada.',
+      faq6_p: 'Como posso pedir uma cotação?',
+      faq6_r: 'Preenche o formulário nesta página com os detalhes do seu trajeto — entro em contacto o mais rápido possível para confirmar o preço e a reserva.',
+      servico1_titulo: 'Transfer Aeroporto de Lisboa',
+      servico1_texto: 'Transfer privado de e para o Aeroporto de Lisboa, hotéis, alojamentos e outros destinos.',
+      servico2_titulo: 'Transfer Privado',
+      servico2_texto: 'Deslocações privadas em Lisboa e para diferentes regiões de Portugal.',
+      servico3_titulo: 'Tours Privados',
+      servico3_texto: 'Conheça Lisboa e outros destinos de Portugal com motorista particular e roteiro personalizado.',
+      servico4_titulo: 'Motorista por Hora',
+      servico4_texto: 'Tenha o carro com motorista à sua disposição durante algumas horas ou ao longo do dia, mediante disponibilidade.',
+      servico5_titulo: 'Viagens Personalizadas',
+      servico5_texto: 'Precisa viajar para outra cidade ou região? Envie o seu percurso e peça uma cotação personalizada.',
+      sobre_titulo: 'Fala diretamente com quem vai conduzir',
+      sobre_texto: 'A Trajeto Transfer não é uma plataforma — é um serviço de transfer privado com motorista próprio. Fala diretamente comigo, combinamos os detalhes do seu trajeto e viaja sempre com a mesma pessoa responsável pelo serviço, do início ao fim. Atendo Lisboa e arredores — Cascais, Sintra, Oeiras — e também outras regiões de Portugal, mediante cotação. O foco é simples: pontualidade, conforto e um serviço personalizado para cada cliente.',
       valor1: 'Sempre pontual',
       valor2: 'Viagem confortável',
       valor3: 'Serviço personalizado',
@@ -562,8 +961,47 @@
       parceiros_titulo: 'Parceiros'
     },
     en: {
-      titulo_html: 'Request your <em>quote</em>',
-      sub: 'Fill in your trip details and we\u2019ll get back to you as quickly as possible to confirm the price and booking.',
+      titulo_html: 'Private Transfers in Lisbon <em>&amp; Tours in Portugal</em>',
+      sub: 'Private transfers to and from Lisbon Airport, personal rides and customized tours in Lisbon and anywhere in Portugal. Travel with a private driver, comfort and punctuality.',
+      nav_servicos: 'Services',
+      nav_tours: 'Tours',
+      nav_destinos: 'Destinations',
+      nav_faq: 'FAQ',
+      nav_cotacao: 'Request a quote',
+      servicos_eyebrow: 'Our services',
+      cta_abrir_form: '📋 Request a quote',
+      tours_titulo: 'Private Tours in Lisbon & Portugal',
+      tours_texto: 'Discover Portugal with more freedom and comfort. Trajeto offers private, personalized tours for those who want to explore Lisbon, Sintra, Cascais and other destinations in Portugal, with a private driver.',
+      tours_botao: 'Request a tour quote',
+      destinos_eyebrow: 'Destinations',
+      destinos_titulo: 'Explore Portugal with Trajeto',
+      destinos_nota: 'Private transfers and trips, subject to quote.',
+      faq_eyebrow: 'Frequently asked questions',
+      faq_titulo: 'Frequently asked questions',
+      faq1_p: 'Do you offer transfers from Lisbon Airport to hotels?',
+      faq1_r: 'Yes. I offer private transfers to and from Lisbon Airport, to hotels, local accommodation and other destinations in the city.',
+      faq2_p: 'Do you do transfers outside Lisbon?',
+      faq2_r: 'Yes. Besides Lisbon, I also cover Cascais, Sintra, Oeiras and other regions of Portugal, subject to quote.',
+      faq3_p: 'Do you offer private tours?',
+      faq3_r: 'Yes. I organize private, personalized tours in Lisbon and other destinations in Portugal, with a route tailored to what you\u2019d like to see.',
+      faq4_p: 'Can I hire the car with a driver for a few hours?',
+      faq4_r: 'Yes. The hourly service is available subject to availability \u2014 the car and driver are at your disposal for the agreed time.',
+      faq5_p: 'Can I request a trip to another city in Portugal?',
+      faq5_r: 'Yes. Send the route you\u2019d like through the form and you\u2019ll receive a personalized quote.',
+      faq6_p: 'How can I request a quote?',
+      faq6_r: 'Fill in the form on this page with your trip details \u2014 I\u2019ll get back to you as quickly as possible to confirm the price and booking.',
+      servico1_titulo: 'Lisbon Airport Transfer',
+      servico1_texto: 'Private transfer to and from Lisbon Airport, hotels, accommodation and other destinations.',
+      servico2_titulo: 'Private Transfer',
+      servico2_texto: 'Private rides in Lisbon and to different regions of Portugal.',
+      servico3_titulo: 'Private Tours',
+      servico3_texto: 'Explore Lisbon and other destinations in Portugal with a private driver and a personalized route.',
+      servico4_titulo: 'Driver by the Hour',
+      servico4_texto: 'Have the car and driver at your disposal for a few hours or the whole day, subject to availability.',
+      servico5_titulo: 'Custom Trips',
+      servico5_texto: "Need to travel to another city or region? Send your route and request a personalized quote.",
+      sobre_titulo: 'You speak directly with your driver',
+      sobre_texto: "Trajeto Transfer isn\u2019t a platform \u2014 it\u2019s a private transfer service with your own driver. You speak to me directly, we arrange the details of your trip together, and you always travel with the same person responsible for your service, from start to finish. I cover Lisbon and the surrounding area \u2014 Cascais, Sintra, Oeiras \u2014 as well as other regions of Portugal, upon request. The focus is simple: punctuality, comfort and a personal service for every client.",
       valor1: 'Always on time',
       valor2: 'Comfortable ride',
       valor3: 'Personalized service',
@@ -813,6 +1251,19 @@
       }
     }catch(e){ /* sem número disponível — o botão fica escondido, sem problema */ }
   })();
+
+  function abrirFormularioCotacao(){
+    const cardForm = document.getElementById('cardForm');
+    const btnAbrir = document.getElementById('btnAbrirForm');
+    cardForm.style.display = 'block';
+    btnAbrir.style.display = 'none';
+    cardForm.scrollIntoView({behavior:'smooth', block:'start'});
+    setTimeout(()=>{ const primeiro = document.getElementById('p_nome'); if(primeiro) primeiro.focus({preventScroll:true}); }, 400);
+  }
+  document.getElementById('btnAbrirForm').addEventListener('click', abrirFormularioCotacao);
+  document.querySelectorAll('a[href="#cardForm"]').forEach(link=>{
+    link.addEventListener('click', (e)=>{ e.preventDefault(); abrirFormularioCotacao(); });
+  });
 
   const form = document.getElementById('formPedido');
   const btnEnviar = document.getElementById('btnEnviar');
