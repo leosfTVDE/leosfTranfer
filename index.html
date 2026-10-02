@@ -920,6 +920,26 @@
         </div>
       </div>
 
+      <div class="cfg-grupo">
+        <div class="cfg-titulo" data-acordeao="perfil">👤 Sobre mim (foto e bio) <span class="seta">▸</span></div>
+        <div class="cfg-conteudo" data-conteudo="perfil">
+          <div style="display:flex; align-items:center; gap:14px; margin-bottom:14px;">
+            <div id="perfilFotoPreview" style="width:72px; height:72px; border-radius:50%; background:var(--areia); border:1px solid var(--linha); flex-shrink:0; display:flex; align-items:center; justify-content:center; overflow:hidden; font-size:28px; color:#8a7378;">👤</div>
+            <div style="flex:1;">
+              <input type="file" id="perfilFotoInput" accept="image/*" style="display:none;">
+              <button type="button" id="btnEscolherFoto" style="width:100%; margin-top:0;">🖼️ Escolher foto</button>
+              <button type="button" id="btnRemoverFoto" class="btn-resetar" style="width:100%; margin-top:6px; display:none;">Remover foto</button>
+            </div>
+          </div>
+          <label for="cfg_bio">Sobre mim (aparece no site de pedidos)</label>
+          <textarea id="cfg_bio" maxlength="300" rows="4" placeholder="ex: Sou motorista TVDE em Lisboa há 5 anos, apaixonado por oferecer um serviço pontual e confortável a cada cliente."></textarea>
+          <div id="bioContador" style="text-align:right; font-family:'Helvetica Neue', Arial, sans-serif; font-size:11px; color:#8a7378; margin-top:4px;">0 / 300</div>
+          <p style="font-family:'Helvetica Neue', Arial, sans-serif; font-size:11.5px; color:#6a7378; margin:12px 0 0; line-height:1.6;">
+            A foto é redimensionada automaticamente para 300×300 — escolhe uma onde o teu rosto apareça bem. Tudo isto é opcional: se deixares em branco, o site de pedidos continua igual, sem essa secção.
+          </p>
+        </div>
+      </div>
+
       <div class="cfg-grupo" id="grupoCodigoConvite" style="display:none;">
         <div class="cfg-titulo cfg-titulo-fixo">🔑 Códigos de acesso</div>
         <div style="padding-bottom:14px;">
@@ -1297,7 +1317,7 @@
     <p class="nota">Aqui aparecem os serviços por hora a partir do momento em que tocas em "🚗 Ir buscar cliente" no agendamento. O tempo só começa a contar quando tocas em "▶️ Iniciar" (cliente no carro). Ao finalizar, o valor é calculado pela regra definida em "Minhas tarifas" e podes enviar o resumo ao cliente. O agendamento só sai da lista quando o marcares como "Concluído".</p>
   </div>
 
-  <p style="text-align:center; font-family:'Helvetica Neue', Arial, sans-serif; font-size:11px; color:#8a7f66; margin-top:24px;">Trajeto · v9.8.7</p>
+  <p style="text-align:center; font-family:'Helvetica Neue', Arial, sans-serif; font-size:11px; color:#8a7f66; margin-top:24px;">Trajeto · v9.8.8</p>
 
 </main>
 
@@ -1433,6 +1453,15 @@
   preencherPainel(cfg);
   document.getElementById('cfg_nome').value = localStorage.getItem('trajeto_nome') || '';
   document.getElementById('cfg_whatsapp').value = localStorage.getItem('trajeto_whatsapp') || '';
+  document.getElementById('cfg_bio').value = localStorage.getItem('trajeto_bio') || '';
+  document.getElementById('bioContador').textContent = document.getElementById('cfg_bio').value.length + ' / 300';
+  {
+    const fotoSalva = localStorage.getItem('trajeto_foto');
+    if(fotoSalva){
+      document.getElementById('perfilFotoPreview').innerHTML = `<img src="${fotoSalva}" style="width:100%; height:100%; object-fit:cover;">`;
+      document.getElementById('btnRemoverFoto').style.display = 'block';
+    }
+  }
 
   document.querySelectorAll('#painelConfig [data-acordeao]').forEach(titulo=>{
     titulo.addEventListener('click', ()=>{
@@ -1502,6 +1531,62 @@
       fecharPainelConfig();
     }
   });
+  // ---------- Foto e bio do motorista (perfil público) ----------
+  let fotoBase64Atual; // undefined = não foi tocada nesta sessão; '' = removida; string = nova foto
+  function comprimirFoto(file){
+    return new Promise((resolve, reject)=>{
+      const leitor = new FileReader();
+      leitor.onload = (e)=>{
+        const img = new Image();
+        img.onload = ()=>{
+          const lado = 300;
+          const canvas = document.createElement('canvas');
+          canvas.width = lado; canvas.height = lado;
+          const ctx = canvas.getContext('2d');
+          const menorLado = Math.min(img.width, img.height);
+          const sx = (img.width - menorLado) / 2;
+          const sy = (img.height - menorLado) / 2;
+          ctx.drawImage(img, sx, sy, menorLado, menorLado, 0, 0, lado, lado);
+          let qualidade = 0.8;
+          let dataUrl = canvas.toDataURL('image/jpeg', qualidade);
+          while(dataUrl.length > 220000 && qualidade > 0.3){
+            qualidade -= 0.1;
+            dataUrl = canvas.toDataURL('image/jpeg', qualidade);
+          }
+          resolve(dataUrl);
+        };
+        img.onerror = ()=> reject(new Error('imagem inválida'));
+        img.src = e.target.result;
+      };
+      leitor.onerror = ()=> reject(new Error('não foi possível ler o ficheiro'));
+      leitor.readAsDataURL(file);
+    });
+  }
+  document.getElementById('btnEscolherFoto').addEventListener('click', ()=>{
+    document.getElementById('perfilFotoInput').click();
+  });
+  document.getElementById('perfilFotoInput').addEventListener('change', async (e)=>{
+    const file = e.target.files[0];
+    e.target.value = '';
+    if(!file) return;
+    try{
+      const dataUrl = await comprimirFoto(file);
+      fotoBase64Atual = dataUrl;
+      document.getElementById('perfilFotoPreview').innerHTML = `<img src="${dataUrl}" style="width:100%; height:100%; object-fit:cover;">`;
+      document.getElementById('btnRemoverFoto').style.display = 'block';
+    }catch(err){
+      alert('Não foi possível usar essa imagem. Tenta outra foto.');
+    }
+  });
+  document.getElementById('btnRemoverFoto').addEventListener('click', ()=>{
+    fotoBase64Atual = '';
+    document.getElementById('perfilFotoPreview').innerHTML = '👤';
+    document.getElementById('btnRemoverFoto').style.display = 'none';
+  });
+  document.getElementById('cfg_bio').addEventListener('input', ()=>{
+    document.getElementById('bioContador').textContent = document.getElementById('cfg_bio').value.length + ' / 300';
+  });
+
   document.getElementById('btnResetar').addEventListener('click', ()=>{
     cfg = { ...DEFAULTS };
     preencherPainel(cfg);
@@ -1523,6 +1608,18 @@
     const tipoMsg = document.querySelector('#segMsgTipo button.active').dataset.v;
     localStorage.setItem('trajeto_msg_tipo', tipoMsg);
     localStorage.setItem('trajeto_msg_custom', document.getElementById('cfg_msg_custom').value);
+    localStorage.setItem('trajeto_bio', document.getElementById('cfg_bio').value.trim());
+    if(fotoBase64Atual !== undefined){
+      if(fotoBase64Atual) localStorage.setItem('trajeto_foto', fotoBase64Atual);
+      else localStorage.removeItem('trajeto_foto');
+      fotoBase64Atual = undefined;
+    }
+    if(window.TrajetoCloud && window.TrajetoCloud.utilizadorAtual){
+      window.TrajetoCloud.publicarPerfilMotorista({
+        bio: localStorage.getItem('trajeto_bio') || '',
+        foto: localStorage.getItem('trajeto_foto') || ''
+      });
+    }
     sincronizarNuvem();
     publicarServicoHora(true);
     calcularTransfer();
@@ -1864,7 +1961,9 @@
       whatsapp: localStorage.getItem('trajeto_whatsapp') || '',
       pagamentos: JSON.parse(localStorage.getItem('trajeto_pagamentos') || 'null') || { mbway:true, dinheiro:true, cartao:true },
       msgTipo: localStorage.getItem('trajeto_msg_tipo') || 'auto',
-      msgCustom: localStorage.getItem('trajeto_msg_custom') || ''
+      msgCustom: localStorage.getItem('trajeto_msg_custom') || '',
+      bio: localStorage.getItem('trajeto_bio') || '',
+      foto: localStorage.getItem('trajeto_foto') || ''
     };
   }
   function sincronizarNuvem(){
@@ -1899,10 +1998,32 @@
       if(typeof dados.msgCustom === 'string') localStorage.setItem('trajeto_msg_custom', dados.msgCustom);
       aplicarMsgTipoUI(dados.msgTipo || 'auto', dados.msgCustom || '');
     }
+    if(typeof dados.bio === 'string'){
+      localStorage.setItem('trajeto_bio', dados.bio);
+      document.getElementById('cfg_bio').value = dados.bio;
+      document.getElementById('bioContador').textContent = dados.bio.length + ' / 300';
+    }
+    if(typeof dados.foto === 'string'){
+      if(dados.foto){
+        localStorage.setItem('trajeto_foto', dados.foto);
+        document.getElementById('perfilFotoPreview').innerHTML = `<img src="${dados.foto}" style="width:100%; height:100%; object-fit:cover;">`;
+        document.getElementById('btnRemoverFoto').style.display = 'block';
+      } else {
+        localStorage.removeItem('trajeto_foto');
+        document.getElementById('perfilFotoPreview').innerHTML = '👤';
+        document.getElementById('btnRemoverFoto').style.display = 'none';
+      }
+    }
     renderLista();
     renderFaturamento();
     calcularTransfer();
     if(dados.cfg) publicarServicoHora();
+    if(typeof dados.bio === 'string' || typeof dados.foto === 'string'){
+      window.TrajetoCloud && window.TrajetoCloud.utilizadorAtual && window.TrajetoCloud.publicarPerfilMotorista({
+        bio: localStorage.getItem('trajeto_bio') || '',
+        foto: localStorage.getItem('trajeto_foto') || ''
+      });
+    }
   }
 
   const EMAIL_ADMIN = 'leonardosf.tvde@gmail.com';
@@ -3382,7 +3503,9 @@
       nome: localStorage.getItem('trajeto_nome') || '',
       pagamentos: JSON.parse(localStorage.getItem('trajeto_pagamentos') || 'null') || { mbway:true, dinheiro:true, cartao:true },
       msgTipo: localStorage.getItem('trajeto_msg_tipo') || 'auto',
-      msgCustom: localStorage.getItem('trajeto_msg_custom') || ''
+      msgCustom: localStorage.getItem('trajeto_msg_custom') || '',
+      bio: localStorage.getItem('trajeto_bio') || '',
+      foto: localStorage.getItem('trajeto_foto') || ''
     };
     const blob = new Blob([JSON.stringify(dados, null, 2)], {type:'application/json'});
     const url = URL.createObjectURL(blob);
@@ -3428,6 +3551,16 @@
           localStorage.setItem('trajeto_msg_custom', dados.msgCustom);
         }
         aplicarMsgTipoUI(dados.msgTipo || 'auto', dados.msgCustom || '');
+        if(typeof dados.bio === 'string'){
+          localStorage.setItem('trajeto_bio', dados.bio);
+          document.getElementById('cfg_bio').value = dados.bio;
+          document.getElementById('bioContador').textContent = dados.bio.length + ' / 300';
+        }
+        if(typeof dados.foto === 'string' && dados.foto){
+          localStorage.setItem('trajeto_foto', dados.foto);
+          document.getElementById('perfilFotoPreview').innerHTML = `<img src="${dados.foto}" style="width:100%; height:100%; object-fit:cover;">`;
+          document.getElementById('btnRemoverFoto').style.display = 'block';
+        }
         sincronizarNuvem();
 
         renderLista();
@@ -3611,6 +3744,15 @@ if ('serviceWorker' in navigator) {
     }catch(e){ /* falha silenciosa — só afeta a opção "Serviço por hora" do site */ }
   }
 
+  // Publica a foto e a bio do motorista no seu documento público — é o que o
+  // site de pedidos lê para mostrar "sobre o motorista" ao cliente.
+  async function publicarPerfilMotorista(dados){
+    if(!auth.currentUser) return;
+    try{
+      await setDoc(doc(db, 'trajeto_publico', auth.currentUser.uid), { perfil: dados }, { merge: true });
+    }catch(e){ /* falha silenciosa — só afeta o cartão "sobre o motorista" do site */ }
+  }
+
   async function verificarCodigoConvite(codigo){
     if(!codigo) return false;
     const ref = doc(db, 'trajeto_convites', codigo.trim());
@@ -3645,6 +3787,7 @@ if ('serviceWorker' in navigator) {
     publicarMotoristaPadrao,
     publicarWhatsapp,
     publicarServicoHora,
+    publicarPerfilMotorista,
     onAuthChange: (cb) => onAuthStateChanged(auth, cb),
     get utilizadorAtual(){ return auth.currentUser; }
   };
