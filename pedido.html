@@ -240,6 +240,19 @@
   }
   .btn-pedir-cotacao:hover{box-shadow:0 8px 22px rgba(193,85,44,.4);}
   .btn-pedir-cotacao:active{transform:scale(.98);}
+  .btn-cancelar{
+    display:block;
+    width:100%;
+    margin-top:10px;
+    padding:12px;
+    border:none;
+    background:none;
+    color:#8a7f66;
+    font-family:'Helvetica Neue', Arial, sans-serif;
+    font-size:13.5px;
+    cursor:pointer;
+    text-decoration:underline;
+  }
   .destinos-secao{margin:30px 0 26px; text-align:center;}
   .destinos-secao h2{
     font-family:'Georgia', 'Iowan Old Style', serif;
@@ -765,6 +778,7 @@
 
       <button type="submit" class="btn-enviar" id="btnEnviar" data-i18n="btn_enviar">Pedir cotação</button>
       <p class="erro" id="erroForm"></p>
+      <button type="button" class="btn-cancelar" id="btnCancelarForm" data-i18n="btn_cancelar">Cancelar</button>
     </form>
 
     <div class="confirmacao" id="confirmacao">
@@ -890,6 +904,7 @@
       nav_cotacao: 'Pedir cotação',
       servicos_eyebrow: 'Os nossos serviços',
       cta_abrir_form: '📋 Pedir cotação',
+      btn_cancelar: 'Cancelar',
       tours_titulo: 'Tours privados em Lisboa e Portugal',
       tours_texto: 'Descubra Portugal com mais liberdade e conforto. A Trajeto oferece tours privados e personalizados para quem deseja conhecer Lisboa, Sintra, Cascais e outros destinos de Portugal, acompanhado por motorista particular.',
       tours_botao: 'Pedir cotação para um tour',
@@ -970,6 +985,7 @@
       nav_cotacao: 'Request a quote',
       servicos_eyebrow: 'Our services',
       cta_abrir_form: '📋 Request a quote',
+      btn_cancelar: 'Cancel',
       tours_titulo: 'Private Tours in Lisbon & Portugal',
       tours_texto: 'Discover Portugal with more freedom and comfort. Trajeto offers private, personalized tours for those who want to explore Lisbon, Sintra, Cascais and other destinations in Portugal, with a private driver.',
       tours_botao: 'Request a tour quote',
@@ -1260,6 +1276,14 @@
     cardForm.scrollIntoView({behavior:'smooth', block:'start'});
     setTimeout(()=>{ const primeiro = document.getElementById('p_nome'); if(primeiro) primeiro.focus({preventScroll:true}); }, 400);
   }
+  function fecharFormularioCotacao(){
+    const cardForm = document.getElementById('cardForm');
+    const btnAbrir = document.getElementById('btnAbrirForm');
+    cardForm.style.display = 'none';
+    btnAbrir.style.display = 'block';
+    btnAbrir.scrollIntoView({behavior:'smooth', block:'center'});
+  }
+  document.getElementById('btnCancelarForm').addEventListener('click', fecharFormularioCotacao);
   document.getElementById('btnAbrirForm').addEventListener('click', abrirFormularioCotacao);
   document.querySelectorAll('a[href="#cardForm"]').forEach(link=>{
     link.addEventListener('click', (e)=>{ e.preventDefault(); abrirFormularioCotacao(); });
