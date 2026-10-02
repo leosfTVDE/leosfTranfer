@@ -376,6 +376,29 @@
     opacity:.85;
     line-height:1.5;
   }
+  .motorista-card{
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    gap:10px;
+    margin-bottom:18px;
+  }
+  .motorista-foto{
+    width:84px;
+    height:84px;
+    border-radius:50%;
+    object-fit:cover;
+    border:2px solid var(--linha);
+  }
+  .motorista-bio{
+    font-family:'Helvetica Neue', Arial, sans-serif;
+    font-size:13.5px;
+    line-height:1.6;
+    color:var(--texto);
+    text-align:center;
+    max-width:460px;
+    margin:0 auto;
+  }
   .sobre-bloco{
     max-width:640px;
     margin:0 auto 20px;
@@ -709,6 +732,10 @@
   </section>
 
   <section class="sobre-bloco" id="sobreBloco" aria-labelledby="sobreTitulo">
+    <div class="motorista-card" id="motoristaCard" style="display:none;">
+      <img id="motoristaFoto" class="motorista-foto" alt="" style="display:none;">
+      <p id="motoristaBio" class="motorista-bio"></p>
+    </div>
     <h2 id="sobreTitulo" data-i18n="sobre_titulo">Transfer privado em Lisboa, com motorista próprio</h2>
     <p data-i18n="sobre_texto">O Trajeto Transfer é um serviço de transfer privado em Lisboa e arredores — Cascais, Sintra, Oeiras e aeroporto — com motorista fixo, não uma plataforma com motoristas diferentes a cada viagem. Fala sempre com a mesma pessoa, combine os detalhes diretamente e viaje com pontualidade e conforto. Disponível também por hora, para quem precisa do carro à disposição durante o dia.</p>
   </section>
@@ -856,7 +883,7 @@
   </div>
 
   <p class="copy">Trajeto Transfer · Lisboa</p>
-  <p class="versao">v9.8.1</p>
+  <p class="versao">v9.8.8</p>
 </footer>
 
 <script>
@@ -1264,6 +1291,17 @@
       }
       if(dadosPublicos.hora && typeof window.aplicarServicoHora === 'function'){
         window.aplicarServicoHora(dadosPublicos.hora);
+      }
+      if(dadosPublicos.perfil && (dadosPublicos.perfil.foto || dadosPublicos.perfil.bio)){
+        if(dadosPublicos.perfil.foto){
+          const img = document.getElementById('motoristaFoto');
+          img.src = dadosPublicos.perfil.foto;
+          img.style.display = 'block';
+        }
+        if(dadosPublicos.perfil.bio){
+          document.getElementById('motoristaBio').textContent = dadosPublicos.perfil.bio;
+        }
+        document.getElementById('motoristaCard').style.display = 'flex';
       }
     }catch(e){ /* sem número disponível — o botão fica escondido, sem problema */ }
   })();
