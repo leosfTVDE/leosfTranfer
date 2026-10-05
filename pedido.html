@@ -245,7 +245,7 @@
     background:#04090f;
   }
   .galeria-foto{
-    width:100%; height:100%; object-fit:cover; display:block;
+    width:100%; height:100%; object-fit:contain; display:block;
     transition:opacity .28s ease;
   }
   .galeria-seta{
@@ -270,7 +270,7 @@
     display:none; align-items:center; gap:10px; text-decoration:none;
     padding:6px 20px calc(16px + env(safe-area-inset-bottom, 0px)); flex-shrink:0;
   }
-  .galeria-qr img{ width:52px; height:52px; border-radius:6px; background:#fff; padding:4px; display:block; }
+  .galeria-qr img{ width:78px; height:78px; border-radius:8px; background:#fff; padding:6px; display:block; }
   .galeria-qr span{ color:var(--areia); font-family:'Helvetica Neue', Arial, sans-serif; font-size:12px; max-width:130px; line-height:1.4; }
   .servicos-secao{margin-bottom:26px;}
   .tours-secao{margin-bottom:26px;}
@@ -942,7 +942,7 @@
   </div>
 
   <p class="copy">Trajeto Transfer · Lisboa</p>
-  <p class="versao">v9.8.9</p>
+  <p class="versao">v9.8.10</p>
 </footer>
 
 <script>
@@ -1454,7 +1454,7 @@
           const qrLink = document.getElementById('galeriaQrLink');
           const qrImg = document.getElementById('galeriaQrImg');
           qrImg.onerror = ()=>{ qrLink.style.display = 'none'; };
-          qrImg.src = `https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=${encodeURIComponent(linkPedido)}`;
+          qrImg.src = `https://api.qrserver.com/v1/create-qr-code/?size=260x260&data=${encodeURIComponent(linkPedido)}`;
           qrLink.href = linkPedido;
           qrLink.style.display = 'flex';
         }
