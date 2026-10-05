@@ -940,6 +940,56 @@
         </div>
       </div>
 
+      <div class="cfg-grupo">
+        <div class="cfg-titulo" data-acordeao="galeria">📸 Galeria de fotos (apresentação no ecrã) <span class="seta">▸</span></div>
+        <div class="cfg-conteudo" data-conteudo="galeria">
+          <p style="font-family:'Helvetica Neue', Arial, sans-serif; font-size:11.5px; color:#6a7378; margin:0 0 16px; line-height:1.6;">
+            Até 4 fotos que aparecem num modo de apresentação em ecrã inteiro no site de pedidos — a trocar sozinhas, ótimo para deixar ligado no ecrã do carro enquanto o cliente viaja. Cada foto pode ter uma legenda curta.
+          </p>
+          <div style="display:flex; align-items:center; gap:12px; margin-bottom:10px;">
+            <div id="galeriaFotoPreview1" style="width:56px; height:56px; border-radius:8px; background:var(--areia); border:1px solid var(--linha); flex-shrink:0; display:flex; align-items:center; justify-content:center; overflow:hidden; font-size:22px; color:#8a7378;">🖼️</div>
+            <div style="flex:1;">
+              <input type="file" id="galeriaFotoInput1" accept="image/*" style="display:none;">
+              <button type="button" id="btnEscolherGaleria1" style="width:100%; margin-top:0;">Escolher foto 1</button>
+            </div>
+            <button type="button" id="btnRemoverGaleria1" class="btn-resetar" style="display:none; flex-shrink:0; margin-top:0; padding:10px 12px;">✕</button>
+          </div>
+          <input type="text" id="cfg_legenda1" maxlength="100" placeholder="Legenda curta desta foto (opcional)" style="margin-bottom:4px;">
+          <div id="legendaContador1" style="text-align:right; font-family:'Helvetica Neue', Arial, sans-serif; font-size:10.5px; color:#8a7378; margin-bottom:18px;">0 / 100</div>
+          <div style="display:flex; align-items:center; gap:12px; margin-bottom:10px;">
+            <div id="galeriaFotoPreview2" style="width:56px; height:56px; border-radius:8px; background:var(--areia); border:1px solid var(--linha); flex-shrink:0; display:flex; align-items:center; justify-content:center; overflow:hidden; font-size:22px; color:#8a7378;">🖼️</div>
+            <div style="flex:1;">
+              <input type="file" id="galeriaFotoInput2" accept="image/*" style="display:none;">
+              <button type="button" id="btnEscolherGaleria2" style="width:100%; margin-top:0;">Escolher foto 2</button>
+            </div>
+            <button type="button" id="btnRemoverGaleria2" class="btn-resetar" style="display:none; flex-shrink:0; margin-top:0; padding:10px 12px;">✕</button>
+          </div>
+          <input type="text" id="cfg_legenda2" maxlength="100" placeholder="Legenda curta desta foto (opcional)" style="margin-bottom:4px;">
+          <div id="legendaContador2" style="text-align:right; font-family:'Helvetica Neue', Arial, sans-serif; font-size:10.5px; color:#8a7378; margin-bottom:18px;">0 / 100</div>
+          <div style="display:flex; align-items:center; gap:12px; margin-bottom:10px;">
+            <div id="galeriaFotoPreview3" style="width:56px; height:56px; border-radius:8px; background:var(--areia); border:1px solid var(--linha); flex-shrink:0; display:flex; align-items:center; justify-content:center; overflow:hidden; font-size:22px; color:#8a7378;">🖼️</div>
+            <div style="flex:1;">
+              <input type="file" id="galeriaFotoInput3" accept="image/*" style="display:none;">
+              <button type="button" id="btnEscolherGaleria3" style="width:100%; margin-top:0;">Escolher foto 3</button>
+            </div>
+            <button type="button" id="btnRemoverGaleria3" class="btn-resetar" style="display:none; flex-shrink:0; margin-top:0; padding:10px 12px;">✕</button>
+          </div>
+          <input type="text" id="cfg_legenda3" maxlength="100" placeholder="Legenda curta desta foto (opcional)" style="margin-bottom:4px;">
+          <div id="legendaContador3" style="text-align:right; font-family:'Helvetica Neue', Arial, sans-serif; font-size:10.5px; color:#8a7378; margin-bottom:18px;">0 / 100</div>
+          <div style="display:flex; align-items:center; gap:12px; margin-bottom:10px;">
+            <div id="galeriaFotoPreview4" style="width:56px; height:56px; border-radius:8px; background:var(--areia); border:1px solid var(--linha); flex-shrink:0; display:flex; align-items:center; justify-content:center; overflow:hidden; font-size:22px; color:#8a7378;">🖼️</div>
+            <div style="flex:1;">
+              <input type="file" id="galeriaFotoInput4" accept="image/*" style="display:none;">
+              <button type="button" id="btnEscolherGaleria4" style="width:100%; margin-top:0;">Escolher foto 4</button>
+            </div>
+            <button type="button" id="btnRemoverGaleria4" class="btn-resetar" style="display:none; flex-shrink:0; margin-top:0; padding:10px 12px;">✕</button>
+          </div>
+          <input type="text" id="cfg_legenda4" maxlength="100" placeholder="Legenda curta desta foto (opcional)" style="margin-bottom:4px;">
+          <div id="legendaContador4" style="text-align:right; font-family:'Helvetica Neue', Arial, sans-serif; font-size:10.5px; color:#8a7378; margin-bottom:18px;">0 / 100</div>
+          <div id="galeriaAvisoTamanho" style="display:none; margin-top:4px; padding:10px 12px; border-radius:8px; background:rgba(193,85,44,.08); border:1px solid rgba(193,85,44,.3); font-family:'Helvetica Neue', Arial, sans-serif; font-size:12px; color:var(--terracota); line-height:1.5;"></div>
+        </div>
+      </div>
+
       <div class="cfg-grupo" id="grupoCodigoConvite" style="display:none;">
         <div class="cfg-titulo cfg-titulo-fixo">🔑 Códigos de acesso</div>
         <div style="padding-bottom:14px;">
@@ -1317,7 +1367,7 @@
     <p class="nota">Aqui aparecem os serviços por hora a partir do momento em que tocas em "🚗 Ir buscar cliente" no agendamento. O tempo só começa a contar quando tocas em "▶️ Iniciar" (cliente no carro). Ao finalizar, o valor é calculado pela regra definida em "Minhas tarifas" e podes enviar o resumo ao cliente. O agendamento só sai da lista quando o marcares como "Concluído".</p>
   </div>
 
-  <p style="text-align:center; font-family:'Helvetica Neue', Arial, sans-serif; font-size:11px; color:#8a7f66; margin-top:24px;">Trajeto · v9.8.8</p>
+  <p style="text-align:center; font-family:'Helvetica Neue', Arial, sans-serif; font-size:11px; color:#8a7f66; margin-top:24px;">Trajeto · v9.8.9</p>
 
 </main>
 
@@ -1462,6 +1512,18 @@
       document.getElementById('btnRemoverFoto').style.display = 'block';
     }
   }
+  {
+    const galeriaSalva = JSON.parse(localStorage.getItem('trajeto_galeria') || '[]');
+    for(let i=1; i<=4; i++){
+      const item = galeriaSalva[i-1];
+      if(item && item.foto){
+        document.getElementById('galeriaFotoPreview'+i).innerHTML = `<img src="${item.foto}" style="width:100%; height:100%; object-fit:cover;">`;
+        document.getElementById('btnRemoverGaleria'+i).style.display = 'block';
+      }
+      document.getElementById('cfg_legenda'+i).value = (item && item.legenda) || '';
+      document.getElementById('legendaContador'+i).textContent = ((item && item.legenda) || '').length + ' / 100';
+    }
+  }
 
   document.querySelectorAll('#painelConfig [data-acordeao]').forEach(titulo=>{
     titulo.addEventListener('click', ()=>{
@@ -1587,6 +1649,64 @@
     document.getElementById('bioContador').textContent = document.getElementById('cfg_bio').value.length + ' / 300';
   });
 
+  // ---------- Galeria de fotos (apresentação em ecrã, até 4 fotos) ----------
+  let galeriaAtual = [undefined, undefined, undefined, undefined]; // undefined = não tocada nesta sessão; '' = removida; string = nova foto
+  function comprimirFotoGaleria(file){
+    return new Promise((resolve, reject)=>{
+      const leitor = new FileReader();
+      leitor.onload = (e)=>{
+        const img = new Image();
+        img.onload = ()=>{
+          const maior = Math.max(img.width, img.height);
+          const escala = Math.min(1, 1280 / maior);
+          const lw = Math.round(img.width * escala), lh = Math.round(img.height * escala);
+          const canvas = document.createElement('canvas');
+          canvas.width = lw; canvas.height = lh;
+          const ctx = canvas.getContext('2d');
+          ctx.drawImage(img, 0, 0, lw, lh);
+          let qualidade = 0.78;
+          let dataUrl = canvas.toDataURL('image/jpeg', qualidade);
+          while(dataUrl.length > 230000 && qualidade > 0.35){
+            qualidade -= 0.08;
+            dataUrl = canvas.toDataURL('image/jpeg', qualidade);
+          }
+          resolve(dataUrl);
+        };
+        img.onerror = ()=> reject(new Error('imagem inválida'));
+        img.src = e.target.result;
+      };
+      leitor.onerror = ()=> reject(new Error('não foi possível ler o ficheiro'));
+      leitor.readAsDataURL(file);
+    });
+  }
+  for(let i=1; i<=4; i++){
+    const idx = i;
+    document.getElementById('btnEscolherGaleria'+idx).addEventListener('click', ()=>{
+      document.getElementById('galeriaFotoInput'+idx).click();
+    });
+    document.getElementById('galeriaFotoInput'+idx).addEventListener('change', async (e)=>{
+      const file = e.target.files[0];
+      e.target.value = '';
+      if(!file) return;
+      try{
+        const dataUrl = await comprimirFotoGaleria(file);
+        galeriaAtual[idx-1] = dataUrl;
+        document.getElementById('galeriaFotoPreview'+idx).innerHTML = `<img src="${dataUrl}" style="width:100%; height:100%; object-fit:cover;">`;
+        document.getElementById('btnRemoverGaleria'+idx).style.display = 'block';
+      }catch(err){
+        alert('Não foi possível usar essa imagem. Tenta outra foto.');
+      }
+    });
+    document.getElementById('btnRemoverGaleria'+idx).addEventListener('click', ()=>{
+      galeriaAtual[idx-1] = '';
+      document.getElementById('galeriaFotoPreview'+idx).innerHTML = '🖼️';
+      document.getElementById('btnRemoverGaleria'+idx).style.display = 'none';
+    });
+    document.getElementById('cfg_legenda'+idx).addEventListener('input', ()=>{
+      document.getElementById('legendaContador'+idx).textContent = document.getElementById('cfg_legenda'+idx).value.length + ' / 100';
+    });
+  }
+
   document.getElementById('btnResetar').addEventListener('click', ()=>{
     cfg = { ...DEFAULTS };
     preencherPainel(cfg);
@@ -1620,10 +1740,40 @@
         foto: localStorage.getItem('trajeto_foto') || ''
       });
     }
+    let galeriaGrandeDemais = false;
+    {
+      const legendas = [1,2,3,4].map(i => document.getElementById('cfg_legenda'+i).value.trim());
+      const galeriaExistente = JSON.parse(localStorage.getItem('trajeto_galeria') || '[]');
+      const novaGaleria = [];
+      for(let i=0; i<4; i++){
+        const fotoFinal = galeriaAtual[i] !== undefined ? galeriaAtual[i] : ((galeriaExistente[i] && galeriaExistente[i].foto) || '');
+        if(fotoFinal) novaGaleria.push({ foto: fotoFinal, legenda: legendas[i] });
+      }
+      const tamanhoTotal = (localStorage.getItem('trajeto_bio')||'').length
+        + (localStorage.getItem('trajeto_foto')||'').length
+        + JSON.stringify(novaGaleria).length;
+      const avisoEl = document.getElementById('galeriaAvisoTamanho');
+      if(tamanhoTotal > 900000){
+        galeriaGrandeDemais = true;
+        avisoEl.style.display = 'block';
+        avisoEl.textContent = '⚠️ As fotos e textos deste perfil, juntos, ficaram grandes demais para guardar. Remove uma foto da galeria (ou encurta uma legenda) e toca em Aplicar de novo. As restantes alterações desta tela já foram guardadas normalmente.';
+      } else {
+        avisoEl.style.display = 'none';
+        localStorage.setItem('trajeto_galeria', JSON.stringify(novaGaleria));
+        galeriaAtual = [undefined, undefined, undefined, undefined];
+        if(window.TrajetoCloud && window.TrajetoCloud.utilizadorAtual){
+          window.TrajetoCloud.publicarGaleria(novaGaleria);
+        }
+      }
+    }
     sincronizarNuvem();
     publicarServicoHora(true);
     calcularTransfer();
-    fecharPainelConfig();
+    if(galeriaGrandeDemais){
+      document.querySelector('[data-acordeao="galeria"]').scrollIntoView({behavior:'smooth', block:'start'});
+    } else {
+      fecharPainelConfig();
+    }
   });
   document.getElementById('btnCopiar').addEventListener('click', ()=>{
     document.getElementById('cfgTexto').value = JSON.stringify(cfg);
@@ -3752,6 +3902,14 @@ if ('serviceWorker' in navigator) {
       await setDoc(doc(db, 'trajeto_publico', auth.currentUser.uid), { perfil: dados }, { merge: true });
     }catch(e){ /* falha silenciosa — só afeta o cartão "sobre o motorista" do site */ }
   }
+  // Publica a galeria de fotos (até 4, com legenda) usada na apresentação em
+  // ecrã inteiro do site de pedidos.
+  async function publicarGaleria(lista){
+    if(!auth.currentUser) return;
+    try{
+      await setDoc(doc(db, 'trajeto_publico', auth.currentUser.uid), { galeria: lista }, { merge: true });
+    }catch(e){ /* falha silenciosa — só afeta a apresentação de fotos do site */ }
+  }
 
   async function verificarCodigoConvite(codigo){
     if(!codigo) return false;
@@ -3788,6 +3946,7 @@ if ('serviceWorker' in navigator) {
     publicarWhatsapp,
     publicarServicoHora,
     publicarPerfilMotorista,
+    publicarGaleria,
     onAuthChange: (cb) => onAuthStateChanged(auth, cb),
     get utilizadorAtual(){ return auth.currentUser; }
   };
