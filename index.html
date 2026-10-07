@@ -24,9 +24,9 @@
   }
   *{box-sizing:border-box;}
   .ag-check-galeria{ background:var(--areia); border:1px solid var(--linha); border-radius:10px; padding:11px 13px; margin:14px 0 0; }
-  .ag-check-galeria label{ display:flex; align-items:flex-start; gap:9px; font-family:'Helvetica Neue', Arial, sans-serif; font-size:13px; color:var(--texto); cursor:pointer; line-height:1.45; }
-  .ag-check-galeria input[type=checkbox]{ width:18px; height:18px; margin-top:1px; accent-color:var(--terracota); flex-shrink:0; }
+  .ag-check-galeria label{ display:block; font-family:'Helvetica Neue', Arial, sans-serif; font-size:13px; color:var(--texto); line-height:1.45; margin-bottom:8px; }
   .ag-check-galeria span{ display:block; font-size:11.5px; color:#6a7378; margin-top:2px; }
+  .ag-check-galeria select{ width:100%; padding:11px 12px; border:1.5px solid var(--linha); border-radius:9px; background:var(--branco); color:var(--texto); font-family:'Helvetica Neue', Arial, sans-serif; font-size:14px; }
   body{
     margin:0;
     font-family: 'Georgia', 'Iowan Old Style', serif;
@@ -1291,10 +1291,12 @@
         <textarea id="ag_observacoes" placeholder="ex: bagagem extra, cadeirinha, alergias, pedidos especiais..." style="min-height:60px;"></textarea>
 
         <div class="ag-check-galeria" id="agCheckGaleriaWrap">
-          <label for="ag_mostrarGaleria">
-            <input type="checkbox" id="ag_mostrarGaleria">
-            📸 Mostrar na galeria de apresentação <span>(a info deste cliente fica disponível para preparares fotos — sem o valor)</span>
-          </label>
+          <label for="ag_apresentacao">📸 Apresentação no ecrã do carro <span>(a info deste cliente fica disponível na galeria para preparar as fotos — sem o valor)</span></label>
+          <select id="ag_apresentacao">
+            <option value="">Não mostrar</option>
+            <option value="chegada">Chegada (busco no aeroporto)</option>
+            <option value="partida">Partida (levo ao aeroporto)</option>
+          </select>
         </div>
         <button class="btn-guardar-agendamento" id="btnGuardarAgendamento">Guardar e adicionar ao calendário</button>
         <button id="btnCancelarAgendamento" style="width:100%; margin-top:10px; padding:11px; border-radius:8px; border:1px solid var(--linha); background:none; color:#8a7378; font-family:'Helvetica Neue', Arial, sans-serif; font-size:13.5px; cursor:pointer;">✖️ Cancelar</button>
@@ -1378,7 +1380,7 @@
     <p class="nota">Aqui aparecem os serviços por hora a partir do momento em que tocas em "🚗 Ir buscar cliente" no agendamento. O tempo só começa a contar quando tocas em "▶️ Iniciar" (cliente no carro). Ao finalizar, o valor é calculado pela regra definida em "Minhas tarifas" e podes enviar o resumo ao cliente. O agendamento só sai da lista quando o marcares como "Concluído".</p>
   </div>
 
-  <p style="text-align:center; font-family:'Helvetica Neue', Arial, sans-serif; font-size:11px; color:#8a7f66; margin-top:24px;">Trajeto · v9.9.0</p>
+  <p style="text-align:center; font-family:'Helvetica Neue', Arial, sans-serif; font-size:11px; color:#8a7f66; margin-top:24px;">Trajeto · v9.9.1</p>
 
 </main>
 
@@ -2113,11 +2115,11 @@
   }
   // Publica (ou remove) a apresentação própria de um agendamento, conforme o
   // checkbox "Mostrar na galeria" do formulário — só afeta esse recurso.
-  function sincronizarApresentacao(ag, mostrar){
+  function sincronizarApresentacao(ag, tipoApresentacao){
     if(!window.TrajetoCloud || !window.TrajetoCloud.utilizadorAtual) return;
-    if(mostrar){
+    if(tipoApresentacao){
       window.TrajetoCloud.publicarApresentacao({
-        id: ag.id, cliente: ag.cliente, data: ag.data, hora: ag.hora,
+        id: ag.id, tipo: tipoApresentacao, cliente: ag.cliente, data: ag.data, hora: ag.hora,
         partida: ag.partida, chegada: ag.chegada, voo: ag.voo, observacoes: ag.observacoes
       });
     } else {
@@ -2631,7 +2633,7 @@
     document.getElementById('ag_fornecedor').value = ag.fornecedor || '';
     document.getElementById('ag_valor').value = ag.valor;
     document.getElementById('ag_observacoes').value = ag.observacoes || '';
-    document.getElementById('ag_mostrarGaleria').checked = !!ag.mostrarGaleria;
+    document.getElementById('ag_apresentacao').value = ag.apresentacao || '';
   }
 
   function gerarLinkRepasse(ag){
@@ -2803,7 +2805,7 @@
     });
     document.getElementById('blocoParagensAg').style.display = hora ? 'none' : 'block';
     document.getElementById('agCheckGaleriaWrap').style.display = hora ? 'none' : 'block';
-    if(hora) document.getElementById('ag_mostrarGaleria').checked = false;
+    if(hora) document.getElementById('ag_apresentacao').value = '';
     document.getElementById('ag_labelChegada').textContent = hora
       ? 'Endereço final (opcional — se vazio, é o mesmo da partida)'
       : 'Endereço de chegada';
@@ -3565,7 +3567,7 @@
     const valor = document.getElementById('ag_valor').value;
     const observacoes = document.getElementById('ag_observacoes').value.trim();
     const tipo = tipoAgendar;
-    const mostrarGaleria = tipo === 'transfer' && document.getElementById('ag_mostrarGaleria').checked;
+    const apresentacao = tipo === 'transfer' ? document.getElementById('ag_apresentacao').value : '';
     const paragens = tipo === 'hora' ? [] : lerParagensAgendar();
 
     if(!partida || (tipo !== 'hora' && !chegada) || !data || !hora || !cliente){
@@ -3593,14 +3595,15 @@
         ag.fornecedor = fornecedor;
         ag.valor = valor || ag.valor;
         ag.observacoes = observacoes;
-        ag.mostrarGaleria = mostrarGaleria;
+        ag.apresentacao = apresentacao;
+        ag.mostrarGaleria = !!apresentacao;
         if(tipo === 'hora'){ ag.tipo = 'hora'; if(!ag.hEstado) ag.hEstado = 'agendado'; }
         else { delete ag.tipo; }
         gravarAgendamentos(lista);
         renderLista();
         renderFaturamento();
         abrirICS(ag);
-        sincronizarApresentacao(ag, mostrarGaleria);
+        sincronizarApresentacao(ag, apresentacao);
       }
       editandoId = null;
       document.getElementById('btnGuardarAgendamento').textContent = 'Guardar e adicionar ao calendário';
@@ -3609,14 +3612,14 @@
         id: Date.now().toString(36) + Math.random().toString(36).slice(2,7),
         partida, chegada: chegadaFinal, paragens, data, hora, cliente, telefone, nomePlaca, voo, fornecedor, observacoes,
         valor: valor || (tipo === 'hora' ? String(valorMinimoHora()) : document.getElementById('ct_cobrar').value),
-        realizado: false, mostrarGaleria
+        realizado: false, apresentacao, mostrarGaleria: !!apresentacao
       };
       if(tipo === 'hora'){ ag.tipo = 'hora'; ag.hEstado = 'agendado'; }
       lista.push(ag);
       gravarAgendamentos(lista);
       renderLista();
       abrirICS(ag);
-      sincronizarApresentacao(ag, mostrarGaleria);
+      sincronizarApresentacao(ag, apresentacao);
       if(tipo === 'hora' && painelHospedadoEm === 'hora'){
         const av = document.getElementById('avisoHoraAgendado');
         av.textContent = `✅ Agendado: ${ag.cliente}, ${ag.data.split('-').reverse().join('/')} às ${ag.hora}. Fica em Transfer → Meus agendamentos; quando fores buscar o cliente, toca em "🚗 Ir buscar cliente" lá e ele passa a aparecer aqui.`;
@@ -3633,7 +3636,7 @@
     document.getElementById('ag_voo').value = '';
     document.getElementById('ag_fornecedor').value = '';
     document.getElementById('ag_observacoes').value = '';
-    document.getElementById('ag_mostrarGaleria').checked = false;
+    document.getElementById('ag_apresentacao').value = '';
     document.getElementById('painelAgendar').style.display = 'none';
     aplicarTipoAgendar('transfer');
   });
@@ -3653,7 +3656,7 @@
     document.getElementById('ag_data').value = '';
     document.getElementById('ag_hora').value = '';
     document.getElementById('ag_observacoes').value = '';
-    document.getElementById('ag_mostrarGaleria').checked = false;
+    document.getElementById('ag_apresentacao').value = '';
     document.getElementById('painelAgendar').style.display = 'none';
     aplicarTipoAgendar('transfer');
     hospedarPainelAgendar('transfer');
@@ -3950,6 +3953,7 @@ if ('serviceWorker' in navigator) {
     try{
       await setDoc(doc(db, 'trajeto_apresentacoes', dados.id), {
         motoristaUid: auth.currentUser.uid,
+        tipo: dados.tipo === 'partida' ? 'partida' : 'chegada',
         cliente: dados.cliente || '', data: dados.data || '', hora: dados.hora || '',
         partida: dados.partida || '', chegada: dados.chegada || '',
         voo: dados.voo || '', observacoes: dados.observacoes || ''
