@@ -83,13 +83,15 @@
   .escolher-btn{ width:100%; padding:13px; border:none; border-radius:10px; background:var(--terracota); color:#fff; font-family:inherit; font-size:15px; font-weight:bold; cursor:pointer; margin-top:4px; }
   .escolher-erro{ color:#ff8a70; font-size:12.5px; margin:8px 0 0; min-height:1.3em; }
   .escolher-lista{ width:100%; max-width:480px; }
-  .escolher-lista h1{ text-align:left; margin-bottom:18px; }
+  body{ background:#070f17; }
+  .escolher-lista h1{ text-align:left; margin-bottom:18px; color:var(--areia); font-family:'Georgia','Iowan Old Style',serif; font-size:24px; }
   .escolher-item{ display:flex; align-items:center; gap:12px; background:#0e1b28; border:1px solid rgba(255,255,255,.12); border-radius:12px; padding:14px 16px; margin-bottom:10px; }
   .escolher-item-info{ flex:1; min-width:0; }
   .escolher-item-titulo{ font-family:'Georgia','Iowan Old Style',serif; font-size:15px; color:var(--areia); }
   .escolher-item-sub{ font-size:12px; color:#9aa7b0; margin-top:2px; }
   .escolher-item a.escolher-ver{ background:var(--terracota); color:#fff; text-decoration:none; padding:9px 14px; border-radius:8px; font-size:13px; font-weight:bold; flex-shrink:0; }
   .escolher-item button.escolher-apagar{ background:none; border:1px solid rgba(255,255,255,.2); color:#9aa7b0; padding:9px 11px; border-radius:8px; font-size:13px; cursor:pointer; flex-shrink:0; }
+  .escolher-grupo-titulo{ font-family:'Georgia','Iowan Old Style',serif; font-size:13px; letter-spacing:.12em; text-transform:uppercase; color:#9aa7b0; margin:22px 0 10px; }
   .escolher-vazio{ color:#9aa7b0; font-size:14px; text-align:center; padding:30px 0; }
 </style>
 </head>
@@ -287,66 +289,79 @@
     return mapa[codigo] || 'Não foi possível entrar. Confirma o email e a palavra-passe.';
   }
 
+  function renderItemEscolher(item, container){
+    const div = document.createElement('div');
+    div.className = 'escolher-item';
+    div.innerHTML = `
+      <div class="escolher-item-info">
+        <div class="escolher-item-titulo"></div>
+        <div class="escolher-item-sub"></div>
+      </div>
+      <a class="escolher-ver" href="${item.link}">Ver</a>
+      ${item.apagavel ? '<button type="button" class="escolher-apagar">Apagar</button>' : ''}
+    `;
+    div.querySelector('.escolher-item-titulo').textContent = item.titulo;
+    div.querySelector('.escolher-item-sub').textContent = item.sub || '';
+    if(item.apagavel){
+      div.querySelector('.escolher-apagar').addEventListener('click', async ()=>{
+        if(!confirm(`Apagar a apresentação de "${item.titulo}"?`)) return;
+        try{
+          await deleteDoc(doc(db, 'trajeto_apresentacoes', item.idApagar));
+          div.remove();
+        }catch(e){ alert('Não foi possível apagar agora. Tenta de novo.'); }
+      });
+    }
+    container.appendChild(div);
+  }
+
   async function carregarListaEscolher(uid){
     const itensEl = document.getElementById('escolherItens');
     itensEl.innerHTML = '';
-    const itens = [];
+    const sufixoM = paramMotorista ? `&m=${encodeURIComponent(paramMotorista)}` : '';
 
     const snap = await getDoc(doc(db, 'trajeto_publico', uid));
     const dadosPublicos = snap.exists() ? snap.data() : {};
-    if(Array.isArray(dadosPublicos.galeria) && dadosPublicos.galeria.some(i=>i&&i.foto)){
-      itens.push({ titulo:'Geral', sub:'Apresentação padrão', link:'fotos.html' + (paramMotorista?`?m=${encodeURIComponent(paramMotorista)}`:''), apagavel:false });
-    }
-    if(Array.isArray(dadosPublicos.galeriaChegadas) && dadosPublicos.galeriaChegadas.some(i=>i&&i.foto)){
-      itens.push({ titulo:'Chegadas', sub:'Boas-vindas no aeroporto', link:'fotos.html?tipo=chegada' + (paramMotorista?`&m=${encodeURIComponent(paramMotorista)}`:''), apagavel:false });
-    }
-    if(Array.isArray(dadosPublicos.galeriaPartidas) && dadosPublicos.galeriaPartidas.some(i=>i&&i.foto)){
-      itens.push({ titulo:'Partidas', sub:'Rumo ao aeroporto', link:'fotos.html?tipo=partida' + (paramMotorista?`&m=${encodeURIComponent(paramMotorista)}`:''), apagavel:false });
-    }
+    const temFotos = campo => Array.isArray(dadosPublicos[campo]) && dadosPublicos[campo].some(i => i && i.foto);
+    const fixo = (campo, link) => ({
+      titulo: 'Trajeto Transfer',
+      sub: temFotos(campo) ? 'Apresentação fixa' : 'Apresentação fixa · ainda sem fotos',
+      link, apagavel: false
+    });
+
+    const grupos = {
+      geral:   { titulo: 'Geral',    itens: [ fixo('galeria', 'fotos.html' + (paramMotorista ? `?m=${encodeURIComponent(paramMotorista)}` : '')) ] },
+      chegada: { titulo: 'Chegadas', itens: [ fixo('galeriaChegadas', 'fotos.html?tipo=chegada' + sufixoM) ] },
+      partida: { titulo: 'Partidas', itens: [ fixo('galeriaPartidas', 'fotos.html?tipo=partida' + sufixoM) ] },
+      outros:  { titulo: 'Outros',   itens: [] }
+    };
 
     try{
       const q = query(collection(db, 'trajeto_apresentacoes'), where('motoristaUid', '==', uid));
       const resultado = await getDocs(q);
-      resultado.forEach(docSnap=>{
-        const d = docSnap.data();
-        if(!Array.isArray(d.galeria) || !d.galeria.some(i=>i&&i.foto)) return;
-        itens.push({
+      const docs = [];
+      resultado.forEach(docSnap => docs.push({ id: docSnap.id, d: docSnap.data() }));
+      docs.sort((a, b)=> ((a.d.data||'') + (a.d.hora||'')).localeCompare((b.d.data||'') + (b.d.hora||'')));
+      docs.forEach(({id, d})=>{
+        const chave = d.tipo === 'chegada' ? 'chegada' : d.tipo === 'partida' ? 'partida' : 'outros';
+        const semFotos = !Array.isArray(d.galeria) || !d.galeria.some(i => i && i.foto);
+        grupos[chave].itens.push({
           titulo: d.cliente || 'Cliente',
-          sub: [d.data, d.hora].filter(Boolean).join(' · '),
-          link: `fotos.html?agendamento=${encodeURIComponent(docSnap.id)}`,
+          sub: [d.data, d.hora].filter(Boolean).join(' · ') + (semFotos ? ' · sem fotos ainda' : ''),
+          link: `fotos.html?agendamento=${encodeURIComponent(id)}`,
           apagavel: true,
-          idApagar: docSnap.id
+          idApagar: id
         });
       });
-    }catch(e){ /* a lista de agendamentos fica incompleta, mas a página não quebra */ }
+    }catch(e){ /* a lista fica só com as apresentações fixas, mas a página não quebra */ }
 
-    if(!itens.length){
-      itensEl.innerHTML = '<p class="escolher-vazio">Ainda não há nenhuma apresentação pronta.</p>';
-      return;
-    }
-    itens.forEach(item=>{
-      const div = document.createElement('div');
-      div.className = 'escolher-item';
-      div.innerHTML = `
-        <div class="escolher-item-info">
-          <div class="escolher-item-titulo"></div>
-          <div class="escolher-item-sub"></div>
-        </div>
-        <a class="escolher-ver" href="${item.link}">Ver</a>
-        ${item.apagavel ? '<button type="button" class="escolher-apagar">Apagar</button>' : ''}
-      `;
-      div.querySelector('.escolher-item-titulo').textContent = item.titulo;
-      div.querySelector('.escolher-item-sub').textContent = item.sub || '';
-      if(item.apagavel){
-        div.querySelector('.escolher-apagar').addEventListener('click', async ()=>{
-          if(!confirm(`Apagar a apresentação de "${item.titulo}"?`)) return;
-          try{
-            await deleteDoc(doc(db, 'trajeto_apresentacoes', item.idApagar));
-            div.remove();
-          }catch(e){ alert('Não foi possível apagar agora. Tenta de novo.'); }
-        });
-      }
-      itensEl.appendChild(div);
+    ['geral', 'chegada', 'partida', 'outros'].forEach(chave=>{
+      const g = grupos[chave];
+      if(!g.itens.length) return;
+      const titulo = document.createElement('h2');
+      titulo.className = 'escolher-grupo-titulo';
+      titulo.textContent = g.titulo;
+      itensEl.appendChild(titulo);
+      g.itens.forEach(item => renderItemEscolher(item, itensEl));
     });
   }
 
