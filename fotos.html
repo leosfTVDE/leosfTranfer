@@ -343,10 +343,13 @@
       docs.sort((a, b)=> ((a.d.data||'') + (a.d.hora||'')).localeCompare((b.d.data||'') + (b.d.hora||'')));
       docs.forEach(({id, d})=>{
         const chave = d.tipo === 'chegada' ? 'chegada' : d.tipo === 'partida' ? 'partida' : 'outros';
-        const semFotos = !Array.isArray(d.galeria) || !d.galeria.some(i => i && i.foto);
+        // Só entra na lista depois de a galeria guardar pelo menos uma foto:
+        // enquanto estiver só marcado no app, a apresentação ainda está a ser preparada.
+        const temFotosCliente = Array.isArray(d.galeria) && d.galeria.some(i => i && i.foto);
+        if(!temFotosCliente) return;
         grupos[chave].itens.push({
           titulo: d.cliente || 'Cliente',
-          sub: [d.data, d.hora].filter(Boolean).join(' · ') + (semFotos ? ' · sem fotos ainda' : ''),
+          sub: [d.data, d.hora].filter(Boolean).join(' · '),
           link: `fotos.html?agendamento=${encodeURIComponent(id)}`,
           apagavel: true,
           idApagar: id
