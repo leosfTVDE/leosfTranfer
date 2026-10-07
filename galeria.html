@@ -108,6 +108,9 @@
   .aba-btn{ background:none; border:none; padding:10px 4px; margin-right:16px; font-family:inherit; font-size:13.5px; color:#6a7378; cursor:pointer; white-space:nowrap; border-bottom:2px solid transparent; }
   .aba-btn.ativa{ color:var(--terracota); border-bottom-color:var(--terracota); font-weight:bold; }
   .painel-aba{ display:block; }
+  .subabas{ display:flex; flex-wrap:wrap; gap:8px; margin-bottom:18px; }
+  .subaba-btn{ background:var(--branco); border:1px solid var(--linha); border-radius:999px; padding:8px 14px; font-family:inherit; font-size:12.5px; color:#6a7378; cursor:pointer; }
+  .subaba-btn.ativa{ background:var(--terracota); border-color:var(--terracota); color:#fff; font-weight:bold; }
   .apresentacao-card{ background:var(--branco); border:1px solid var(--linha); border-radius:12px; padding:16px; margin-bottom:14px; }
   .apresentacao-card-topo{ display:flex; justify-content:space-between; align-items:flex-start; gap:10px; margin-bottom:10px; }
   .apresentacao-card h3{ font-family:'Georgia','Iowan Old Style',serif; font-size:16px; color:var(--azul-noite); margin-bottom:4px; }
@@ -149,7 +152,6 @@
       <button type="button" class="aba-btn ativa" data-aba="geral">Geral</button>
       <button type="button" class="aba-btn" data-aba="chegadas">Chegadas</button>
       <button type="button" class="aba-btn" data-aba="partidas">Partidas</button>
-      <button type="button" class="aba-btn" data-aba="apresentacao">Apresentação</button>
     </div>
 
     <div class="mensagem-ok" id="mensagemOk">✅ Guardado! As fotos já estão atualizadas no site.</div>
@@ -209,6 +211,8 @@
     </div>
 
     <div class="painel-aba" id="painelChegadas" style="display:none;">
+      <div class="subabas" id="subabasChegadas"><button type="button" class="subaba-btn ativa" data-sub="fixo">Trajeto Transfer</button></div>
+      <div id="fixoChegadas">
       <p class="sub">Fotos de boas-vindas para clientes que vais buscar ao aeroporto.</p>
       <div class="slot">
         <div class="slot-topo">
@@ -259,9 +263,13 @@
         <div class="contador" id="cContador4">0 / 100</div>
       </div>
       <button type="button" class="btn-principal" id="btnGuardarChegadas">Guardar</button>
+      </div>
+      <div id="clientesChegadas"></div>
     </div>
 
     <div class="painel-aba" id="painelPartidas" style="display:none;">
+      <div class="subabas" id="subabasPartidas"><button type="button" class="subaba-btn ativa" data-sub="fixo">Trajeto Transfer</button></div>
+      <div id="fixoPartidas">
       <p class="sub">Fotos para clientes que estás a levar ao aeroporto.</p>
       <div class="slot">
         <div class="slot-topo">
@@ -312,11 +320,8 @@
         <div class="contador" id="pContador4">0 / 100</div>
       </div>
       <button type="button" class="btn-principal" id="btnGuardarPartidas">Guardar</button>
-    </div>
-
-    <div class="painel-aba" id="painelApresentacao" style="display:none;">
-      <p class="sub">Agendamentos que o Leonardo marcou como "Mostrar na galeria" — cada um com a sua própria apresentação.</p>
-      <div id="apresentacaoLista"></div>
+      </div>
+      <div id="clientesPartidas"></div>
     </div>
 
     <a href="fotos.html" target="_blank" class="ver-apresentacao" id="verApresentacaoLink">Ver a apresentação →</a>
@@ -479,7 +484,7 @@
   const painelPartidas = criarPainelSimples('p', 'galeriaPartidas', 'btnGuardarPartidas');
 
   // ---------- Abas ----------
-  const LINKS_POR_ABA = { geral:'fotos.html', chegadas:'fotos.html?tipo=chegada', partidas:'fotos.html?tipo=partida', apresentacao:null };
+  const LINKS_POR_ABA = { geral:'fotos.html', chegadas:'fotos.html?tipo=chegada', partidas:'fotos.html?tipo=partida' };
   document.querySelectorAll('.aba-btn').forEach(btn=>{
     btn.addEventListener('click', ()=>{
       document.querySelectorAll('.aba-btn').forEach(b=> b.classList.remove('ativa'));
@@ -488,35 +493,78 @@
       document.getElementById('painelGeral').style.display = aba==='geral' ? 'block' : 'none';
       document.getElementById('painelChegadas').style.display = aba==='chegadas' ? 'block' : 'none';
       document.getElementById('painelPartidas').style.display = aba==='partidas' ? 'block' : 'none';
-      document.getElementById('painelApresentacao').style.display = aba==='apresentacao' ? 'block' : 'none';
-      const link = LINKS_POR_ABA[aba];
-      const verLink = document.getElementById('verApresentacaoLink');
-      verLink.style.display = link ? 'block' : 'none';
-      if(link) verLink.href = link;
+      atualizarLinkVer();
       document.getElementById('mensagemOk').style.display = 'none';
       document.getElementById('avisoTamanho').style.display = 'none';
     });
   });
 
-  // ---------- Aba "Apresentação" — um painel de 4 fotos por agendamento marcado ----------
+  // ---------- Clientes dentro de Chegadas e Partidas (uma sub-aba por cliente) ----------
+  const GRUPOS_CLIENTES = {
+    chegada: { aba:'chegadas', subabas:'subabasChegadas', fixo:'fixoChegadas', clientes:'clientesChegadas' },
+    partida: { aba:'partidas', subabas:'subabasPartidas', fixo:'fixoPartidas', clientes:'clientesPartidas' }
+  };
+  function formatarDataCurta(d){
+    if(!d) return '';
+    const p = d.split('-');
+    return p.length === 3 ? `${p[2]}/${p[1]}` : d;
+  }
+  function atualizarLinkVer(){
+    const abaAtiva = document.querySelector('.aba-btn.ativa').dataset.aba;
+    let link = LINKS_POR_ABA[abaAtiva];
+    const grupo = abaAtiva === 'chegadas' ? 'chegada' : abaAtiva === 'partidas' ? 'partida' : null;
+    if(grupo){
+      const subAtiva = document.querySelector('#' + GRUPOS_CLIENTES[grupo].subabas + ' .subaba-btn.ativa');
+      if(subAtiva && subAtiva.dataset.sub !== 'fixo') link = 'fotos.html?agendamento=' + encodeURIComponent(subAtiva.dataset.sub);
+    }
+    const verLink = document.getElementById('verApresentacaoLink');
+    verLink.style.display = 'block';
+    verLink.href = link;
+  }
+  function selecionarSubaba(grupo, idSub){
+    const g = GRUPOS_CLIENTES[grupo];
+    document.querySelectorAll('#' + g.subabas + ' .subaba-btn').forEach(b=> b.classList.toggle('ativa', b.dataset.sub === idSub));
+    document.getElementById(g.fixo).style.display = idSub === 'fixo' ? 'block' : 'none';
+    document.querySelectorAll('#' + g.clientes + ' .apresentacao-card').forEach(c=>{ c.style.display = c.dataset.id === idSub ? 'block' : 'none'; });
+    document.getElementById('mensagemOk').style.display = 'none';
+    document.getElementById('avisoTamanho').style.display = 'none';
+    atualizarLinkVer();
+  }
+  Object.keys(GRUPOS_CLIENTES).forEach(grupo=>{
+    document.querySelector('#' + GRUPOS_CLIENTES[grupo].subabas + ' .subaba-btn[data-sub="fixo"]')
+      .addEventListener('click', ()=> selecionarSubaba(grupo, 'fixo'));
+  });
+
   async function carregarApresentacoes(uid){
-    const listaEl = document.getElementById('apresentacaoLista');
-    listaEl.innerHTML = '';
+    Object.values(GRUPOS_CLIENTES).forEach(g=>{
+      document.querySelectorAll('#' + g.subabas + ' .subaba-btn:not([data-sub="fixo"])').forEach(b=> b.remove());
+      document.getElementById(g.clientes).innerHTML = '';
+    });
     let docs = [];
     try{
       const q = query(collection(db, 'trajeto_apresentacoes'), where('motoristaUid', '==', uid));
       const resultado = await getDocs(q);
       resultado.forEach(d => docs.push({ id: d.id, dados: d.data() }));
-    }catch(e){ /* lista fica vazia, mas a página não quebra */ }
-
-    if(!docs.length){
-      listaEl.innerHTML = '<p class="apresentacao-vazio">Ainda não há nenhum agendamento marcado para apresentação.</p>';
-      return;
-    }
+    }catch(e){ /* a lista fica só com a apresentação fixa, mas a página não quebra */ }
+    docs.sort((a, b)=> ((a.dados.data||'') + (a.dados.hora||'')).localeCompare((b.dados.data||'') + (b.dados.hora||'')));
 
     docs.forEach(({id, dados})=>{
+      const grupo = dados.tipo === 'chegada' ? 'chegada' : dados.tipo === 'partida' ? 'partida' : null;
+      if(!grupo) return;
+      const g = GRUPOS_CLIENTES[grupo];
+
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'subaba-btn';
+      btn.dataset.sub = id;
+      btn.textContent = [dados.cliente || 'Cliente', formatarDataCurta(dados.data)].filter(Boolean).join(' · ');
+      btn.addEventListener('click', ()=> selecionarSubaba(grupo, id));
+      document.getElementById(g.subabas).appendChild(btn);
+
       const card = document.createElement('div');
       card.className = 'apresentacao-card';
+      card.dataset.id = id;
+      card.style.display = 'none';
       const prefixo = 'a' + id.replace(/[^a-zA-Z0-9]/g, '');
       const infoLinhas = [dados.cliente, [dados.data, dados.hora].filter(Boolean).join(' · '),
         [dados.partida, dados.chegada].filter(Boolean).join(' → '), dados.voo ? `Voo ${dados.voo}` : '', dados.observacoes || ''].filter(Boolean);
@@ -548,18 +596,17 @@
         <button type="button" class="btn-principal" id="btnGuardar${prefixo}">Guardar</button>
       `;
       card.querySelector('h3').textContent = dados.cliente || 'Cliente';
-      card.querySelector('.info').innerHTML = infoLinhas.map(l=>{ const s=document.createElement('span'); s.textContent=l; return s.innerHTML; }).join('<br>');
-      listaEl.appendChild(card);
+      card.querySelector('.info').innerHTML = infoLinhas.map(l=>{ const sp = document.createElement('span'); sp.textContent = l; return sp.innerHTML; }).join('<br>');
+      document.getElementById(g.clientes).appendChild(card);
 
-      const painel = criarPainelApresentacao(prefixo, id, dados);
+      criarPainelApresentacao(prefixo, id, dados);
       card.querySelector('.btn-apagar-agendamento').addEventListener('click', async ()=>{
         if(!confirm(`Apagar a apresentação de "${dados.cliente || 'este cliente'}"?`)) return;
         try{
           await deleteDoc(doc(db, 'trajeto_apresentacoes', id));
           card.remove();
-          if(!listaEl.querySelector('.apresentacao-card')){
-            listaEl.innerHTML = '<p class="apresentacao-vazio">Ainda não há nenhum agendamento marcado para apresentação.</p>';
-          }
+          btn.remove();
+          selecionarSubaba(grupo, 'fixo');
         }catch(e){ alert('Não foi possível apagar agora. Tenta de novo.'); }
       });
     });
