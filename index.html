@@ -23,6 +23,10 @@
     --linha:#d9cdb2;
   }
   *{box-sizing:border-box;}
+  .ag-check-galeria{ background:var(--areia); border:1px solid var(--linha); border-radius:10px; padding:11px 13px; margin:14px 0 0; }
+  .ag-check-galeria label{ display:flex; align-items:flex-start; gap:9px; font-family:'Helvetica Neue', Arial, sans-serif; font-size:13px; color:var(--texto); cursor:pointer; line-height:1.45; }
+  .ag-check-galeria input[type=checkbox]{ width:18px; height:18px; margin-top:1px; accent-color:var(--terracota); flex-shrink:0; }
+  .ag-check-galeria span{ display:block; font-size:11.5px; color:#6a7378; margin-top:2px; }
   body{
     margin:0;
     font-family: 'Georgia', 'Iowan Old Style', serif;
@@ -1286,6 +1290,12 @@
         <label for="ag_observacoes">Observações</label>
         <textarea id="ag_observacoes" placeholder="ex: bagagem extra, cadeirinha, alergias, pedidos especiais..." style="min-height:60px;"></textarea>
 
+        <div class="ag-check-galeria" id="agCheckGaleriaWrap">
+          <label for="ag_mostrarGaleria">
+            <input type="checkbox" id="ag_mostrarGaleria">
+            📸 Mostrar na galeria de apresentação <span>(a info deste cliente fica disponível para preparares fotos — sem o valor)</span>
+          </label>
+        </div>
         <button class="btn-guardar-agendamento" id="btnGuardarAgendamento">Guardar e adicionar ao calendário</button>
         <button id="btnCancelarAgendamento" style="width:100%; margin-top:10px; padding:11px; border-radius:8px; border:1px solid var(--linha); background:none; color:#8a7378; font-family:'Helvetica Neue', Arial, sans-serif; font-size:13.5px; cursor:pointer;">✖️ Cancelar</button>
       </div>
@@ -1368,7 +1378,7 @@
     <p class="nota">Aqui aparecem os serviços por hora a partir do momento em que tocas em "🚗 Ir buscar cliente" no agendamento. O tempo só começa a contar quando tocas em "▶️ Iniciar" (cliente no carro). Ao finalizar, o valor é calculado pela regra definida em "Minhas tarifas" e podes enviar o resumo ao cliente. O agendamento só sai da lista quando o marcares como "Concluído".</p>
   </div>
 
-  <p style="text-align:center; font-family:'Helvetica Neue', Arial, sans-serif; font-size:11px; color:#8a7f66; margin-top:24px;">Trajeto · v9.8.10</p>
+  <p style="text-align:center; font-family:'Helvetica Neue', Arial, sans-serif; font-size:11px; color:#8a7f66; margin-top:24px;">Trajeto · v9.9.0</p>
 
 </main>
 
@@ -2101,6 +2111,19 @@
     localStorage.setItem(AG_KEY, JSON.stringify(lista));
     sincronizarNuvem();
   }
+  // Publica (ou remove) a apresentação própria de um agendamento, conforme o
+  // checkbox "Mostrar na galeria" do formulário — só afeta esse recurso.
+  function sincronizarApresentacao(ag, mostrar){
+    if(!window.TrajetoCloud || !window.TrajetoCloud.utilizadorAtual) return;
+    if(mostrar){
+      window.TrajetoCloud.publicarApresentacao({
+        id: ag.id, cliente: ag.cliente, data: ag.data, hora: ag.hora,
+        partida: ag.partida, chegada: ag.chegada, voo: ag.voo, observacoes: ag.observacoes
+      });
+    } else {
+      window.TrajetoCloud.removerApresentacao(ag.id);
+    }
+  }
 
   // ---------- Sincronização na nuvem ----------
   let sincronizacaoTimer = null;
@@ -2608,6 +2631,7 @@
     document.getElementById('ag_fornecedor').value = ag.fornecedor || '';
     document.getElementById('ag_valor').value = ag.valor;
     document.getElementById('ag_observacoes').value = ag.observacoes || '';
+    document.getElementById('ag_mostrarGaleria').checked = !!ag.mostrarGaleria;
   }
 
   function gerarLinkRepasse(ag){
@@ -2778,6 +2802,8 @@
       b.classList.toggle('active', b.dataset.v === tipoAgendar);
     });
     document.getElementById('blocoParagensAg').style.display = hora ? 'none' : 'block';
+    document.getElementById('agCheckGaleriaWrap').style.display = hora ? 'none' : 'block';
+    if(hora) document.getElementById('ag_mostrarGaleria').checked = false;
     document.getElementById('ag_labelChegada').textContent = hora
       ? 'Endereço final (opcional — se vazio, é o mesmo da partida)'
       : 'Endereço de chegada';
@@ -3539,6 +3565,7 @@
     const valor = document.getElementById('ag_valor').value;
     const observacoes = document.getElementById('ag_observacoes').value.trim();
     const tipo = tipoAgendar;
+    const mostrarGaleria = tipo === 'transfer' && document.getElementById('ag_mostrarGaleria').checked;
     const paragens = tipo === 'hora' ? [] : lerParagensAgendar();
 
     if(!partida || (tipo !== 'hora' && !chegada) || !data || !hora || !cliente){
@@ -3566,12 +3593,14 @@
         ag.fornecedor = fornecedor;
         ag.valor = valor || ag.valor;
         ag.observacoes = observacoes;
+        ag.mostrarGaleria = mostrarGaleria;
         if(tipo === 'hora'){ ag.tipo = 'hora'; if(!ag.hEstado) ag.hEstado = 'agendado'; }
         else { delete ag.tipo; }
         gravarAgendamentos(lista);
         renderLista();
         renderFaturamento();
         abrirICS(ag);
+        sincronizarApresentacao(ag, mostrarGaleria);
       }
       editandoId = null;
       document.getElementById('btnGuardarAgendamento').textContent = 'Guardar e adicionar ao calendário';
@@ -3580,13 +3609,14 @@
         id: Date.now().toString(36) + Math.random().toString(36).slice(2,7),
         partida, chegada: chegadaFinal, paragens, data, hora, cliente, telefone, nomePlaca, voo, fornecedor, observacoes,
         valor: valor || (tipo === 'hora' ? String(valorMinimoHora()) : document.getElementById('ct_cobrar').value),
-        realizado: false
+        realizado: false, mostrarGaleria
       };
       if(tipo === 'hora'){ ag.tipo = 'hora'; ag.hEstado = 'agendado'; }
       lista.push(ag);
       gravarAgendamentos(lista);
       renderLista();
       abrirICS(ag);
+      sincronizarApresentacao(ag, mostrarGaleria);
       if(tipo === 'hora' && painelHospedadoEm === 'hora'){
         const av = document.getElementById('avisoHoraAgendado');
         av.textContent = `✅ Agendado: ${ag.cliente}, ${ag.data.split('-').reverse().join('/')} às ${ag.hora}. Fica em Transfer → Meus agendamentos; quando fores buscar o cliente, toca em "🚗 Ir buscar cliente" lá e ele passa a aparecer aqui.`;
@@ -3603,6 +3633,7 @@
     document.getElementById('ag_voo').value = '';
     document.getElementById('ag_fornecedor').value = '';
     document.getElementById('ag_observacoes').value = '';
+    document.getElementById('ag_mostrarGaleria').checked = false;
     document.getElementById('painelAgendar').style.display = 'none';
     aplicarTipoAgendar('transfer');
   });
@@ -3622,6 +3653,7 @@
     document.getElementById('ag_data').value = '';
     document.getElementById('ag_hora').value = '';
     document.getElementById('ag_observacoes').value = '';
+    document.getElementById('ag_mostrarGaleria').checked = false;
     document.getElementById('painelAgendar').style.display = 'none';
     aplicarTipoAgendar('transfer');
     hospedarPainelAgendar('transfer');
@@ -3796,7 +3828,7 @@ if ('serviceWorker' in navigator) {
   } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js";
   import {
     getFirestore, doc, setDoc, getDoc, onSnapshot,
-    collection, query, where, updateDoc
+    collection, query, where, updateDoc, deleteDoc
   } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
 
   const firebaseConfig = {
@@ -3911,6 +3943,25 @@ if ('serviceWorker' in navigator) {
       await setDoc(doc(db, 'trajeto_publico', auth.currentUser.uid), { galeria: lista }, { merge: true });
     }catch(e){ /* falha silenciosa — só afeta a apresentação de fotos do site */ }
   }
+  // Publica/atualiza os dados (sem valor) de um agendamento marcado para ter
+  // apresentação própria — a esposa prepara fotos para esse registo em galeria.html.
+  async function publicarApresentacao(dados){
+    if(!auth.currentUser || !dados.id) return;
+    try{
+      await setDoc(doc(db, 'trajeto_apresentacoes', dados.id), {
+        motoristaUid: auth.currentUser.uid,
+        cliente: dados.cliente || '', data: dados.data || '', hora: dados.hora || '',
+        partida: dados.partida || '', chegada: dados.chegada || '',
+        voo: dados.voo || '', observacoes: dados.observacoes || ''
+      }, { merge: true });
+    }catch(e){ /* falha silenciosa — a pessoa pode tentar marcar de novo */ }
+  }
+  // Remove a apresentação de um agendamento (quando a marcação é desmarcada).
+  async function removerApresentacao(id){
+    if(!auth.currentUser || !id) return;
+    try{ await deleteDoc(doc(db, 'trajeto_apresentacoes', id)); }
+    catch(e){ /* falha silenciosa — não há nada crítico aqui */ }
+  }
 
   async function verificarCodigoConvite(codigo){
     if(!codigo) return false;
@@ -3948,6 +3999,8 @@ if ('serviceWorker' in navigator) {
     publicarServicoHora,
     publicarPerfilMotorista,
     publicarGaleria,
+    publicarApresentacao,
+    removerApresentacao,
     onAuthChange: (cb) => onAuthStateChanged(auth, cb),
     get utilizadorAtual(){ return auth.currentUser; }
   };
