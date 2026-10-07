@@ -104,6 +104,16 @@
     background:rgba(46,139,87,.1); border:1px solid rgba(46,139,87,.3);
     font-size:13px; color:#2e8b57; line-height:1.5;
   }
+  .abas{ display:flex; gap:6px; margin-bottom:20px; border-bottom:1px solid var(--linha); overflow-x:auto; }
+  .aba-btn{ background:none; border:none; padding:10px 4px; margin-right:16px; font-family:inherit; font-size:13.5px; color:#6a7378; cursor:pointer; white-space:nowrap; border-bottom:2px solid transparent; }
+  .aba-btn.ativa{ color:var(--terracota); border-bottom-color:var(--terracota); font-weight:bold; }
+  .painel-aba{ display:block; }
+  .apresentacao-card{ background:var(--branco); border:1px solid var(--linha); border-radius:12px; padding:16px; margin-bottom:14px; }
+  .apresentacao-card-topo{ display:flex; justify-content:space-between; align-items:flex-start; gap:10px; margin-bottom:10px; }
+  .apresentacao-card h3{ font-family:'Georgia','Iowan Old Style',serif; font-size:16px; color:var(--azul-noite); margin-bottom:4px; }
+  .apresentacao-card .info{ font-size:12px; color:#6a7378; line-height:1.6; }
+  .apresentacao-card .btn-apagar-agendamento{ background:none; border:1px solid var(--linha); color:#6a7378; border-radius:8px; padding:7px 11px; font-size:12px; cursor:pointer; flex-shrink:0; }
+  .apresentacao-vazio{ color:#6a7378; font-size:13.5px; text-align:center; padding:24px 0; }
   .ver-apresentacao{
     display:block; text-align:center; margin-top:22px; font-size:13.5px; color:var(--azulejo); text-decoration:none; font-weight:600;
   }
@@ -135,73 +145,188 @@
     <button type="button" class="btn-sair" id="btnSair">Sair</button>
   </header>
   <main>
-    <h1>As tuas fotos</h1>
-    <p class="sub">Até 4 fotos que aparecem na apresentação em ecrã inteiro (<strong>fotos.html</strong>, ótimo para deixar ligado no ecrã do carro) e no site de pedidos. Prefere fotos tiradas na horizontal — a foto preenche sempre o ecrã todo.</p>
+    <div class="abas">
+      <button type="button" class="aba-btn ativa" data-aba="geral">Geral</button>
+      <button type="button" class="aba-btn" data-aba="chegadas">Chegadas</button>
+      <button type="button" class="aba-btn" data-aba="partidas">Partidas</button>
+      <button type="button" class="aba-btn" data-aba="apresentacao">Apresentação</button>
+    </div>
 
     <div class="mensagem-ok" id="mensagemOk">✅ Guardado! As fotos já estão atualizadas no site.</div>
     <div class="aviso-tamanho" id="avisoTamanho"></div>
 
-    <div class="slot">
-      <div class="slot-topo">
-        <div class="slot-preview" id="galeriaFotoPreview1">🖼️</div>
-        <div class="slot-botoes">
-          <input type="file" id="galeriaFotoInput1" accept="image/*" style="display:none;">
-          <button type="button" class="btn-escolher" id="btnEscolherGaleria1">Escolher foto 1</button>
-          <button type="button" class="btn-remover" id="btnRemoverGaleria1">✕</button>
+    <div class="painel-aba" id="painelGeral">
+      <p class="sub">Até 4 fotos que aparecem na apresentação em ecrã inteiro (<strong>fotos.html</strong>) e no site de pedidos. Prefere fotos tiradas na horizontal — a foto preenche sempre o ecrã todo.</p>
+      <div class="slot">
+        <div class="slot-topo">
+          <div class="slot-preview" id="gFotoPreview1">🖼️</div>
+          <div class="slot-botoes">
+            <input type="file" id="gFotoInput1" accept="image/*" style="display:none;">
+            <button type="button" class="btn-escolher" id="btnEscolherG1">Escolher foto 1</button>
+            <button type="button" class="btn-remover" id="btnRemoverG1">✕</button>
+          </div>
         </div>
+        <input type="text" id="gLegenda1" maxlength="100" placeholder="Legenda curta (opcional)">
+        <div class="contador" id="gContador1">0 / 100</div>
       </div>
-      <input type="text" id="cfg_legenda1" maxlength="100" placeholder="Legenda curta (opcional)">
-      <div class="contador" id="legendaContador1">0 / 100</div>
+      <div class="slot">
+        <div class="slot-topo">
+          <div class="slot-preview" id="gFotoPreview2">🖼️</div>
+          <div class="slot-botoes">
+            <input type="file" id="gFotoInput2" accept="image/*" style="display:none;">
+            <button type="button" class="btn-escolher" id="btnEscolherG2">Escolher foto 2</button>
+            <button type="button" class="btn-remover" id="btnRemoverG2">✕</button>
+          </div>
+        </div>
+        <input type="text" id="gLegenda2" maxlength="100" placeholder="Legenda curta (opcional)">
+        <div class="contador" id="gContador2">0 / 100</div>
+      </div>
+      <div class="slot">
+        <div class="slot-topo">
+          <div class="slot-preview" id="gFotoPreview3">🖼️</div>
+          <div class="slot-botoes">
+            <input type="file" id="gFotoInput3" accept="image/*" style="display:none;">
+            <button type="button" class="btn-escolher" id="btnEscolherG3">Escolher foto 3</button>
+            <button type="button" class="btn-remover" id="btnRemoverG3">✕</button>
+          </div>
+        </div>
+        <input type="text" id="gLegenda3" maxlength="100" placeholder="Legenda curta (opcional)">
+        <div class="contador" id="gContador3">0 / 100</div>
+      </div>
+      <div class="slot">
+        <div class="slot-topo">
+          <div class="slot-preview" id="gFotoPreview4">🖼️</div>
+          <div class="slot-botoes">
+            <input type="file" id="gFotoInput4" accept="image/*" style="display:none;">
+            <button type="button" class="btn-escolher" id="btnEscolherG4">Escolher foto 4</button>
+            <button type="button" class="btn-remover" id="btnRemoverG4">✕</button>
+          </div>
+        </div>
+        <input type="text" id="gLegenda4" maxlength="100" placeholder="Legenda curta (opcional)">
+        <div class="contador" id="gContador4">0 / 100</div>
+      </div>
+      <button type="button" class="btn-principal" id="btnGuardarGeral">Guardar</button>
     </div>
 
-    <div class="slot">
-      <div class="slot-topo">
-        <div class="slot-preview" id="galeriaFotoPreview2">🖼️</div>
-        <div class="slot-botoes">
-          <input type="file" id="galeriaFotoInput2" accept="image/*" style="display:none;">
-          <button type="button" class="btn-escolher" id="btnEscolherGaleria2">Escolher foto 2</button>
-          <button type="button" class="btn-remover" id="btnRemoverGaleria2">✕</button>
+    <div class="painel-aba" id="painelChegadas" style="display:none;">
+      <p class="sub">Fotos de boas-vindas para clientes que vais buscar ao aeroporto.</p>
+      <div class="slot">
+        <div class="slot-topo">
+          <div class="slot-preview" id="cFotoPreview1">🖼️</div>
+          <div class="slot-botoes">
+            <input type="file" id="cFotoInput1" accept="image/*" style="display:none;">
+            <button type="button" class="btn-escolher" id="btnEscolherC1">Escolher foto 1</button>
+            <button type="button" class="btn-remover" id="btnRemoverC1">✕</button>
+          </div>
         </div>
+        <input type="text" id="cLegenda1" maxlength="100" placeholder="Legenda curta (opcional)">
+        <div class="contador" id="cContador1">0 / 100</div>
       </div>
-      <input type="text" id="cfg_legenda2" maxlength="100" placeholder="Legenda curta (opcional)">
-      <div class="contador" id="legendaContador2">0 / 100</div>
+      <div class="slot">
+        <div class="slot-topo">
+          <div class="slot-preview" id="cFotoPreview2">🖼️</div>
+          <div class="slot-botoes">
+            <input type="file" id="cFotoInput2" accept="image/*" style="display:none;">
+            <button type="button" class="btn-escolher" id="btnEscolherC2">Escolher foto 2</button>
+            <button type="button" class="btn-remover" id="btnRemoverC2">✕</button>
+          </div>
+        </div>
+        <input type="text" id="cLegenda2" maxlength="100" placeholder="Legenda curta (opcional)">
+        <div class="contador" id="cContador2">0 / 100</div>
+      </div>
+      <div class="slot">
+        <div class="slot-topo">
+          <div class="slot-preview" id="cFotoPreview3">🖼️</div>
+          <div class="slot-botoes">
+            <input type="file" id="cFotoInput3" accept="image/*" style="display:none;">
+            <button type="button" class="btn-escolher" id="btnEscolherC3">Escolher foto 3</button>
+            <button type="button" class="btn-remover" id="btnRemoverC3">✕</button>
+          </div>
+        </div>
+        <input type="text" id="cLegenda3" maxlength="100" placeholder="Legenda curta (opcional)">
+        <div class="contador" id="cContador3">0 / 100</div>
+      </div>
+      <div class="slot">
+        <div class="slot-topo">
+          <div class="slot-preview" id="cFotoPreview4">🖼️</div>
+          <div class="slot-botoes">
+            <input type="file" id="cFotoInput4" accept="image/*" style="display:none;">
+            <button type="button" class="btn-escolher" id="btnEscolherC4">Escolher foto 4</button>
+            <button type="button" class="btn-remover" id="btnRemoverC4">✕</button>
+          </div>
+        </div>
+        <input type="text" id="cLegenda4" maxlength="100" placeholder="Legenda curta (opcional)">
+        <div class="contador" id="cContador4">0 / 100</div>
+      </div>
+      <button type="button" class="btn-principal" id="btnGuardarChegadas">Guardar</button>
     </div>
 
-    <div class="slot">
-      <div class="slot-topo">
-        <div class="slot-preview" id="galeriaFotoPreview3">🖼️</div>
-        <div class="slot-botoes">
-          <input type="file" id="galeriaFotoInput3" accept="image/*" style="display:none;">
-          <button type="button" class="btn-escolher" id="btnEscolherGaleria3">Escolher foto 3</button>
-          <button type="button" class="btn-remover" id="btnRemoverGaleria3">✕</button>
+    <div class="painel-aba" id="painelPartidas" style="display:none;">
+      <p class="sub">Fotos para clientes que estás a levar ao aeroporto.</p>
+      <div class="slot">
+        <div class="slot-topo">
+          <div class="slot-preview" id="pFotoPreview1">🖼️</div>
+          <div class="slot-botoes">
+            <input type="file" id="pFotoInput1" accept="image/*" style="display:none;">
+            <button type="button" class="btn-escolher" id="btnEscolherP1">Escolher foto 1</button>
+            <button type="button" class="btn-remover" id="btnRemoverP1">✕</button>
+          </div>
         </div>
+        <input type="text" id="pLegenda1" maxlength="100" placeholder="Legenda curta (opcional)">
+        <div class="contador" id="pContador1">0 / 100</div>
       </div>
-      <input type="text" id="cfg_legenda3" maxlength="100" placeholder="Legenda curta (opcional)">
-      <div class="contador" id="legendaContador3">0 / 100</div>
+      <div class="slot">
+        <div class="slot-topo">
+          <div class="slot-preview" id="pFotoPreview2">🖼️</div>
+          <div class="slot-botoes">
+            <input type="file" id="pFotoInput2" accept="image/*" style="display:none;">
+            <button type="button" class="btn-escolher" id="btnEscolherP2">Escolher foto 2</button>
+            <button type="button" class="btn-remover" id="btnRemoverP2">✕</button>
+          </div>
+        </div>
+        <input type="text" id="pLegenda2" maxlength="100" placeholder="Legenda curta (opcional)">
+        <div class="contador" id="pContador2">0 / 100</div>
+      </div>
+      <div class="slot">
+        <div class="slot-topo">
+          <div class="slot-preview" id="pFotoPreview3">🖼️</div>
+          <div class="slot-botoes">
+            <input type="file" id="pFotoInput3" accept="image/*" style="display:none;">
+            <button type="button" class="btn-escolher" id="btnEscolherP3">Escolher foto 3</button>
+            <button type="button" class="btn-remover" id="btnRemoverP3">✕</button>
+          </div>
+        </div>
+        <input type="text" id="pLegenda3" maxlength="100" placeholder="Legenda curta (opcional)">
+        <div class="contador" id="pContador3">0 / 100</div>
+      </div>
+      <div class="slot">
+        <div class="slot-topo">
+          <div class="slot-preview" id="pFotoPreview4">🖼️</div>
+          <div class="slot-botoes">
+            <input type="file" id="pFotoInput4" accept="image/*" style="display:none;">
+            <button type="button" class="btn-escolher" id="btnEscolherP4">Escolher foto 4</button>
+            <button type="button" class="btn-remover" id="btnRemoverP4">✕</button>
+          </div>
+        </div>
+        <input type="text" id="pLegenda4" maxlength="100" placeholder="Legenda curta (opcional)">
+        <div class="contador" id="pContador4">0 / 100</div>
+      </div>
+      <button type="button" class="btn-principal" id="btnGuardarPartidas">Guardar</button>
     </div>
 
-    <div class="slot">
-      <div class="slot-topo">
-        <div class="slot-preview" id="galeriaFotoPreview4">🖼️</div>
-        <div class="slot-botoes">
-          <input type="file" id="galeriaFotoInput4" accept="image/*" style="display:none;">
-          <button type="button" class="btn-escolher" id="btnEscolherGaleria4">Escolher foto 4</button>
-          <button type="button" class="btn-remover" id="btnRemoverGaleria4">✕</button>
-        </div>
-      </div>
-      <input type="text" id="cfg_legenda4" maxlength="100" placeholder="Legenda curta (opcional)">
-      <div class="contador" id="legendaContador4">0 / 100</div>
+    <div class="painel-aba" id="painelApresentacao" style="display:none;">
+      <p class="sub">Agendamentos que o Leonardo marcou como "Mostrar na galeria" — cada um com a sua própria apresentação.</p>
+      <div id="apresentacaoLista"></div>
     </div>
 
-    <button type="button" class="btn-principal" id="btnGuardar">Guardar</button>
-    <a href="fotos.html" target="_blank" class="ver-apresentacao">Ver a apresentação →</a>
+    <a href="fotos.html" target="_blank" class="ver-apresentacao" id="verApresentacaoLink">Ver a apresentação →</a>
   </main>
 </div>
 
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js";
   import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js";
-  import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
+  import { getFirestore, doc, getDoc, setDoc, collection, query, where, getDocs, deleteDoc } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
 
   const firebaseConfig = {
     apiKey: "AIzaSyCqJBnzZh5MWP9G3ZP1nOThb4W2KCLf2a4",
@@ -270,89 +395,253 @@
     });
   }
 
-  let galeriaAtual = [undefined, undefined, undefined, undefined];
-  let galeriaOriginal = [];
-  for(let i=1; i<=4; i++){
-    const idx = i;
-    document.getElementById('btnEscolherGaleria'+idx).addEventListener('click', ()=>{
-      document.getElementById('galeriaFotoInput'+idx).click();
-    });
-    document.getElementById('galeriaFotoInput'+idx).addEventListener('change', async (e)=>{
-      const file = e.target.files[0];
-      e.target.value = '';
-      if(!file) return;
-      try{
-        const dataUrl = await comprimirFotoGaleria(file);
-        galeriaAtual[idx-1] = dataUrl;
-        document.getElementById('galeriaFotoPreview'+idx).innerHTML = `<img src="${dataUrl}">`;
-        document.getElementById('btnRemoverGaleria'+idx).style.display = 'block';
-      }catch(err){
-        alert('Não foi possível usar essa imagem. Tenta outra foto.');
+  // ---------- Painel genérico de 4 fotos + legendas (usado em Geral, Chegadas, Partidas) ----------
+  function criarPainelSimples(prefixo, nomeCampo, nomeBotao){
+    let atual = [undefined, undefined, undefined, undefined];
+    let original = [];
+    const Cap = prefixo.toUpperCase();
+    for(let i=1; i<=4; i++){
+      const idx = i;
+      document.getElementById('btnEscolher'+Cap+idx).addEventListener('click', ()=>{
+        document.getElementById(prefixo+'FotoInput'+idx).click();
+      });
+      document.getElementById(prefixo+'FotoInput'+idx).addEventListener('change', async (e)=>{
+        const file = e.target.files[0];
+        e.target.value = '';
+        if(!file) return;
+        try{
+          const dataUrl = await comprimirFotoGaleria(file);
+          atual[idx-1] = dataUrl;
+          document.getElementById(prefixo+'FotoPreview'+idx).innerHTML = `<img src="${dataUrl}">`;
+          document.getElementById('btnRemover'+Cap+idx).style.display = 'block';
+        }catch(err){
+          alert('Não foi possível usar essa imagem. Tenta outra foto.');
+        }
+      });
+      document.getElementById('btnRemover'+Cap+idx).addEventListener('click', ()=>{
+        atual[idx-1] = '';
+        document.getElementById(prefixo+'FotoPreview'+idx).innerHTML = '🖼️';
+        document.getElementById('btnRemover'+Cap+idx).style.display = 'none';
+      });
+      document.getElementById(prefixo+'Legenda'+idx).addEventListener('input', ()=>{
+        document.getElementById(prefixo+'Contador'+idx).textContent = document.getElementById(prefixo+'Legenda'+idx).value.length + ' / 100';
+      });
+    }
+
+    document.getElementById(nomeBotao).addEventListener('click', async ()=>{
+      const legendas = [1,2,3,4].map(i => document.getElementById(prefixo+'Legenda'+i).value.trim());
+      const nova = [];
+      for(let i=0; i<4; i++){
+        const fotoFinal = atual[i] !== undefined ? atual[i] : ((original[i] && original[i].foto) || '');
+        if(fotoFinal) nova.push({ foto: fotoFinal, legenda: legendas[i] });
       }
+      const avisoEl = document.getElementById('avisoTamanho');
+      const okEl = document.getElementById('mensagemOk');
+      okEl.style.display = 'none';
+      if(JSON.stringify(nova).length > 850000){
+        avisoEl.style.display = 'block';
+        avisoEl.textContent = '⚠️ As fotos, juntas, ficaram grandes demais para guardar. Remove uma foto (ou encurta uma legenda) e tenta guardar de novo.';
+        return;
+      }
+      avisoEl.style.display = 'none';
+      const btn = document.getElementById(nomeBotao);
+      btn.disabled = true; btn.textContent = 'A guardar...';
+      try{
+        await setDoc(doc(db, 'trajeto_publico', auth.currentUser.uid), { [nomeCampo]: nova }, { merge: true });
+        original = nova;
+        atual = [undefined, undefined, undefined, undefined];
+        okEl.style.display = 'block';
+      }catch(err){
+        avisoEl.style.display = 'block';
+        avisoEl.textContent = 'Não foi possível guardar agora. Confirma a ligação à internet e tenta de novo.';
+      }
+      btn.disabled = false; btn.textContent = 'Guardar';
     });
-    document.getElementById('btnRemoverGaleria'+idx).addEventListener('click', ()=>{
-      galeriaAtual[idx-1] = '';
-      document.getElementById('galeriaFotoPreview'+idx).innerHTML = '🖼️';
-      document.getElementById('btnRemoverGaleria'+idx).style.display = 'none';
+
+    return {
+      carregar(dados){
+        original = Array.isArray(dados[nomeCampo]) ? dados[nomeCampo] : [];
+        for(let i=1; i<=4; i++){
+          const item = original[i-1];
+          if(item && item.foto){
+            document.getElementById(prefixo+'FotoPreview'+i).innerHTML = `<img src="${item.foto}">`;
+            document.getElementById('btnRemover'+Cap+i).style.display = 'block';
+          }
+          document.getElementById(prefixo+'Legenda'+i).value = (item && item.legenda) || '';
+          document.getElementById(prefixo+'Contador'+i).textContent = ((item && item.legenda) || '').length + ' / 100';
+        }
+      }
+    };
+  }
+
+  const painelGeral = criarPainelSimples('g', 'galeria', 'btnGuardarGeral');
+  const painelChegadas = criarPainelSimples('c', 'galeriaChegadas', 'btnGuardarChegadas');
+  const painelPartidas = criarPainelSimples('p', 'galeriaPartidas', 'btnGuardarPartidas');
+
+  // ---------- Abas ----------
+  const LINKS_POR_ABA = { geral:'fotos.html', chegadas:'fotos.html?tipo=chegada', partidas:'fotos.html?tipo=partida', apresentacao:null };
+  document.querySelectorAll('.aba-btn').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      document.querySelectorAll('.aba-btn').forEach(b=> b.classList.remove('ativa'));
+      btn.classList.add('ativa');
+      const aba = btn.dataset.aba;
+      document.getElementById('painelGeral').style.display = aba==='geral' ? 'block' : 'none';
+      document.getElementById('painelChegadas').style.display = aba==='chegadas' ? 'block' : 'none';
+      document.getElementById('painelPartidas').style.display = aba==='partidas' ? 'block' : 'none';
+      document.getElementById('painelApresentacao').style.display = aba==='apresentacao' ? 'block' : 'none';
+      const link = LINKS_POR_ABA[aba];
+      const verLink = document.getElementById('verApresentacaoLink');
+      verLink.style.display = link ? 'block' : 'none';
+      if(link) verLink.href = link;
+      document.getElementById('mensagemOk').style.display = 'none';
+      document.getElementById('avisoTamanho').style.display = 'none';
     });
-    document.getElementById('cfg_legenda'+idx).addEventListener('input', ()=>{
-      document.getElementById('legendaContador'+idx).textContent = document.getElementById('cfg_legenda'+idx).value.length + ' / 100';
+  });
+
+  // ---------- Aba "Apresentação" — um painel de 4 fotos por agendamento marcado ----------
+  async function carregarApresentacoes(uid){
+    const listaEl = document.getElementById('apresentacaoLista');
+    listaEl.innerHTML = '';
+    let docs = [];
+    try{
+      const q = query(collection(db, 'trajeto_apresentacoes'), where('motoristaUid', '==', uid));
+      const resultado = await getDocs(q);
+      resultado.forEach(d => docs.push({ id: d.id, dados: d.data() }));
+    }catch(e){ /* lista fica vazia, mas a página não quebra */ }
+
+    if(!docs.length){
+      listaEl.innerHTML = '<p class="apresentacao-vazio">Ainda não há nenhum agendamento marcado para apresentação.</p>';
+      return;
+    }
+
+    docs.forEach(({id, dados})=>{
+      const card = document.createElement('div');
+      card.className = 'apresentacao-card';
+      const prefixo = 'a' + id.replace(/[^a-zA-Z0-9]/g, '');
+      const infoLinhas = [dados.cliente, [dados.data, dados.hora].filter(Boolean).join(' · '),
+        [dados.partida, dados.chegada].filter(Boolean).join(' → '), dados.voo ? `Voo ${dados.voo}` : '', dados.observacoes || ''].filter(Boolean);
+      let slotsHtml = '';
+      for(let i=1; i<=4; i++){
+        slotsHtml += `
+          <div class="slot">
+            <div class="slot-topo">
+              <div class="slot-preview" id="${prefixo}FotoPreview${i}">🖼️</div>
+              <div class="slot-botoes">
+                <input type="file" id="${prefixo}FotoInput${i}" accept="image/*" style="display:none;">
+                <button type="button" class="btn-escolher" id="btnEscolher${prefixo}${i}">Escolher foto ${i}</button>
+                <button type="button" class="btn-remover" id="btnRemover${prefixo}${i}">✕</button>
+              </div>
+            </div>
+            <input type="text" id="${prefixo}Legenda${i}" maxlength="100" placeholder="Legenda curta (opcional)">
+            <div class="contador" id="${prefixo}Contador${i}">0 / 100</div>
+          </div>`;
+      }
+      card.innerHTML = `
+        <div class="apresentacao-card-topo">
+          <div>
+            <h3></h3>
+            <div class="info"></div>
+          </div>
+          <button type="button" class="btn-apagar-agendamento">Apagar</button>
+        </div>
+        ${slotsHtml}
+        <button type="button" class="btn-principal" id="btnGuardar${prefixo}">Guardar</button>
+      `;
+      card.querySelector('h3').textContent = dados.cliente || 'Cliente';
+      card.querySelector('.info').innerHTML = infoLinhas.map(l=>{ const s=document.createElement('span'); s.textContent=l; return s.innerHTML; }).join('<br>');
+      listaEl.appendChild(card);
+
+      const painel = criarPainelApresentacao(prefixo, id, dados);
+      card.querySelector('.btn-apagar-agendamento').addEventListener('click', async ()=>{
+        if(!confirm(`Apagar a apresentação de "${dados.cliente || 'este cliente'}"?`)) return;
+        try{
+          await deleteDoc(doc(db, 'trajeto_apresentacoes', id));
+          card.remove();
+          if(!listaEl.querySelector('.apresentacao-card')){
+            listaEl.innerHTML = '<p class="apresentacao-vazio">Ainda não há nenhum agendamento marcado para apresentação.</p>';
+          }
+        }catch(e){ alert('Não foi possível apagar agora. Tenta de novo.'); }
+      });
     });
   }
 
-  document.getElementById('btnGuardar').addEventListener('click', async ()=>{
-    const legendas = [1,2,3,4].map(i => document.getElementById('cfg_legenda'+i).value.trim());
-    const novaGaleria = [];
-    for(let i=0; i<4; i++){
-      const fotoFinal = galeriaAtual[i] !== undefined ? galeriaAtual[i] : ((galeriaOriginal[i] && galeriaOriginal[i].foto) || '');
-      if(fotoFinal) novaGaleria.push({ foto: fotoFinal, legenda: legendas[i] });
-    }
-    const tamanhoTotal = JSON.stringify(novaGaleria).length;
-    const avisoEl = document.getElementById('avisoTamanho');
-    const okEl = document.getElementById('mensagemOk');
-    okEl.style.display = 'none';
-    if(tamanhoTotal > 850000){
-      avisoEl.style.display = 'block';
-      avisoEl.textContent = '⚠️ As fotos, juntas, ficaram grandes demais para guardar. Remove uma foto (ou encurta uma legenda) e tenta guardar de novo.';
-      return;
-    }
-    avisoEl.style.display = 'none';
-    const btn = document.getElementById('btnGuardar');
-    btn.disabled = true; btn.textContent = 'A guardar...';
-    try{
-      await setDoc(doc(db, 'trajeto_publico', auth.currentUser.uid), { galeria: novaGaleria }, { merge: true });
-      galeriaOriginal = novaGaleria;
-      galeriaAtual = [undefined, undefined, undefined, undefined];
-      okEl.style.display = 'block';
-    }catch(err){
-      avisoEl.style.display = 'block';
-      avisoEl.textContent = 'Não foi possível guardar agora. Confirma a ligação à internet e tenta de novo.';
-    }
-    btn.disabled = false; btn.textContent = 'Guardar';
-  });
-
-  async function carregarGaleriaAtual(uid){
-    try{
-      const snap = await getDoc(doc(db, 'trajeto_publico', uid));
-      const dados = snap.exists() ? snap.data() : {};
-      galeriaOriginal = Array.isArray(dados.galeria) ? dados.galeria : [];
-      for(let i=1; i<=4; i++){
-        const item = galeriaOriginal[i-1];
-        if(item && item.foto){
-          document.getElementById('galeriaFotoPreview'+i).innerHTML = `<img src="${item.foto}">`;
-          document.getElementById('btnRemoverGaleria'+i).style.display = 'block';
-        }
-        document.getElementById('cfg_legenda'+i).value = (item && item.legenda) || '';
-        document.getElementById('legendaContador'+i).textContent = ((item && item.legenda) || '').length + ' / 100';
+  function criarPainelApresentacao(prefixo, agendamentoId, dadosOriginais){
+    let atual = [undefined, undefined, undefined, undefined];
+    let original = Array.isArray(dadosOriginais.galeria) ? dadosOriginais.galeria : [];
+    for(let i=1; i<=4; i++){
+      const item = original[i-1];
+      if(item && item.foto){
+        document.getElementById(prefixo+'FotoPreview'+i).innerHTML = `<img src="${item.foto}">`;
+        document.getElementById('btnRemover'+prefixo+i).style.display = 'block';
       }
-    }catch(e){ /* a pessoa pode sempre escolher fotos novas e guardar */ }
+      document.getElementById(prefixo+'Legenda'+i).value = (item && item.legenda) || '';
+      document.getElementById(prefixo+'Contador'+i).textContent = ((item && item.legenda) || '').length + ' / 100';
+
+      const idx = i;
+      document.getElementById('btnEscolher'+prefixo+idx).addEventListener('click', ()=>{
+        document.getElementById(prefixo+'FotoInput'+idx).click();
+      });
+      document.getElementById(prefixo+'FotoInput'+idx).addEventListener('change', async (e)=>{
+        const file = e.target.files[0];
+        e.target.value = '';
+        if(!file) return;
+        try{
+          const dataUrl = await comprimirFotoGaleria(file);
+          atual[idx-1] = dataUrl;
+          document.getElementById(prefixo+'FotoPreview'+idx).innerHTML = `<img src="${dataUrl}">`;
+          document.getElementById('btnRemover'+prefixo+idx).style.display = 'block';
+        }catch(err){ alert('Não foi possível usar essa imagem. Tenta outra foto.'); }
+      });
+      document.getElementById('btnRemover'+prefixo+idx).addEventListener('click', ()=>{
+        atual[idx-1] = '';
+        document.getElementById(prefixo+'FotoPreview'+idx).innerHTML = '🖼️';
+        document.getElementById('btnRemover'+prefixo+idx).style.display = 'none';
+      });
+      document.getElementById(prefixo+'Legenda'+idx).addEventListener('input', ()=>{
+        document.getElementById(prefixo+'Contador'+idx).textContent = document.getElementById(prefixo+'Legenda'+idx).value.length + ' / 100';
+      });
+    }
+    document.getElementById('btnGuardar'+prefixo).addEventListener('click', async ()=>{
+      const legendas = [1,2,3,4].map(i => document.getElementById(prefixo+'Legenda'+i).value.trim());
+      const nova = [];
+      for(let i=0; i<4; i++){
+        const fotoFinal = atual[i] !== undefined ? atual[i] : ((original[i] && original[i].foto) || '');
+        if(fotoFinal) nova.push({ foto: fotoFinal, legenda: legendas[i] });
+      }
+      const avisoEl = document.getElementById('avisoTamanho');
+      if(JSON.stringify(nova).length > 850000){
+        avisoEl.style.display = 'block';
+        avisoEl.textContent = '⚠️ As fotos, juntas, ficaram grandes demais para guardar. Remove uma foto (ou encurta uma legenda) e tenta guardar de novo.';
+        return;
+      }
+      avisoEl.style.display = 'none';
+      const btn = document.getElementById('btnGuardar'+prefixo);
+      btn.disabled = true; btn.textContent = 'A guardar...';
+      try{
+        await setDoc(doc(db, 'trajeto_apresentacoes', agendamentoId), { galeria: nova }, { merge: true });
+        original = nova;
+        atual = [undefined, undefined, undefined, undefined];
+        document.getElementById('mensagemOk').style.display = 'block';
+      }catch(err){
+        avisoEl.style.display = 'block';
+        avisoEl.textContent = 'Não foi possível guardar agora. Confirma a ligação à internet e tenta de novo.';
+      }
+      btn.disabled = false; btn.textContent = 'Guardar';
+    });
   }
 
   onAuthStateChanged(auth, async (user)=>{
     if(user){
       document.getElementById('telaLogin').style.display = 'none';
       document.getElementById('telaGaleria').style.display = 'block';
-      await carregarGaleriaAtual(user.uid);
+      try{
+        const snap = await getDoc(doc(db, 'trajeto_publico', user.uid));
+        const dados = snap.exists() ? snap.data() : {};
+        painelGeral.carregar(dados);
+        painelChegadas.carregar(dados);
+        painelPartidas.carregar(dados);
+      }catch(e){ /* a pessoa pode sempre escolher fotos novas e guardar */ }
+      await carregarApresentacoes(user.uid);
     } else {
       document.getElementById('telaLogin').style.display = 'flex';
       document.getElementById('telaGaleria').style.display = 'none';
