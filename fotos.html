@@ -84,7 +84,9 @@
   .escolher-erro{ color:#ff8a70; font-size:12.5px; margin:8px 0 0; min-height:1.3em; }
   .escolher-lista{ width:100%; max-width:480px; }
   body{ background:#070f17; }
-  .escolher-lista h1{ text-align:left; margin-bottom:18px; color:var(--areia); font-family:'Georgia','Iowan Old Style',serif; font-size:24px; }
+  .escolher-topo{ display:flex; align-items:center; justify-content:space-between; gap:12px; margin-bottom:18px; }
+  .escolher-sair{ background:none; border:1px solid rgba(255,255,255,.2); color:#9aa7b0; padding:8px 14px; border-radius:8px; font-family:inherit; font-size:13px; cursor:pointer; flex-shrink:0; }
+  .escolher-lista h1{ text-align:left; margin-bottom:0; color:var(--areia); font-family:'Georgia','Iowan Old Style',serif; font-size:24px; }
   .escolher-item{ display:flex; align-items:center; gap:12px; background:#0e1b28; border:1px solid rgba(255,255,255,.12); border-radius:12px; padding:14px 16px; margin-bottom:10px; }
   .escolher-item-info{ flex:1; min-width:0; }
   .escolher-item-titulo{ font-family:'Georgia','Iowan Old Style',serif; font-size:15px; color:var(--areia); }
@@ -97,7 +99,7 @@
 </head>
 <body>
 <div class="escolher-tela" id="escolherTela">
-  <div class="escolher-cartao" id="escolherLogin">
+  <div class="escolher-cartao" id="escolherLogin" style="display:none;">
     <h1>Entrar</h1>
     <div class="escolher-campo">
       <label for="esc_email">Email</label>
@@ -111,7 +113,10 @@
     <button type="button" class="escolher-btn" id="btnEscolherEntrar">Entrar</button>
   </div>
   <div class="escolher-lista" id="escolherLista" style="display:none;">
-    <h1>Escolher apresentação</h1>
+    <div class="escolher-topo">
+      <h1>Escolher apresentação</h1>
+      <button type="button" class="escolher-sair" id="btnEscolherSair">Sair</button>
+    </div>
     <div id="escolherItens"></div>
   </div>
 </div>
@@ -137,7 +142,7 @@
 
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js";
-  import { getAuth, signInWithEmailAndPassword, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js";
+  import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js";
   import { getFirestore, doc, getDoc, collection, query, where, getDocs, deleteDoc } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
 
   const firebaseConfig = {
@@ -383,6 +388,7 @@
         erroEl.textContent = traduzirErroAuthEscolher(err.code);
       }
     });
+    document.getElementById('btnEscolherSair').addEventListener('click', ()=> signOut(auth));
     onAuthStateChanged(auth, async (user)=>{
       if(user){
         document.getElementById('escolherLogin').style.display = 'none';
