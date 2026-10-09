@@ -891,7 +891,7 @@
   </div>
 
   <p class="copy">Trajeto Transfer · Lisboa</p>
-  <p class="versao">v9.9.0</p>
+  <p class="versao">v9.9.1</p>
 </footer>
 
 <script>
@@ -1274,6 +1274,23 @@
   const app = initializeApp(firebaseConfig);
   const db = getFirestore(app);
 
+  // ---------- Aviso no telemóvel do motorista (app gratuito "ntfy") ----------
+  // Cada pedido novo manda um aviso GENÉRICO (sem nome nem contacto do cliente, porque
+  // o nome do tópico fica visível no código público do site). Se o tópico estiver vazio,
+  // não envia nada. O aviso corre por fora do envio do pedido e ignora qualquer erro:
+  // o pedido já está guardado no Firebase quando isto é chamado.
+  const NTFY_TOPICO = 'trajeto-pedidos-ed312216538e7162588e';
+  function avisarMotoristaNovoPedido(){
+    if(!NTFY_TOPICO) return;
+    try{
+      const url = 'https://ntfy.sh/' + NTFY_TOPICO
+        + '?title=' + encodeURIComponent('Trajeto Transfer')
+        + '&tags=car&priority=high'
+        + '&click=' + encodeURIComponent('https://trajetotransfer.pt/app/');
+      fetch(url, { method: 'POST', body: 'Novo pedido de cotação no site.', mode: 'no-cors', keepalive: true }).catch(()=>{});
+    }catch(e){ /* o aviso é um extra: se falhar, o pedido continua guardado */ }
+  }
+
   // ---------- Resolver a que motorista pertence este link ----------
   // Se o link tiver ?m=UID, é esse motorista. Se não tiver (o link antigo,
   // já impresso no cartão/Google Ads/QR code), usamos o "motorista padrão"
@@ -1402,6 +1419,7 @@
 
     try{
       await addDoc(collection(db, 'trajeto_pedidos'), pedido);
+      avisarMotoristaNovoPedido();
       if(ehHora) document.querySelector('#confirmacao p').textContent = textos.confHora;
       document.getElementById('cardForm').querySelector('form').style.display = 'none';
       document.getElementById('confirmacao').style.display = 'block';
