@@ -1393,7 +1393,7 @@
     <p class="nota">Os serviços por hora agendados ficam em "📅 Agendados". Os que estão em andamento aparecem a partir do momento em que tocas em "🚗 Ir buscar cliente" no agendamento. O tempo só começa a contar quando tocas em "▶️ Iniciar" (cliente no carro). Ao finalizar, o valor é calculado pela regra definida em "Minhas tarifas" e podes enviar o resumo ao cliente. O agendamento só sai da lista quando o marcares como "Concluído".</p>
   </div>
 
-  <p style="text-align:center; font-family:'Helvetica Neue', Arial, sans-serif; font-size:11px; color:#8a7f66; margin-top:24px;">Trajeto · v9.9.5</p>
+  <p style="text-align:center; font-family:'Helvetica Neue', Arial, sans-serif; font-size:11px; color:#8a7f66; margin-top:24px;">Trajeto · v9.9.6</p>
 
 </main>
 
@@ -2614,8 +2614,51 @@
     return d;
   }
 
+  // Fornecedor "próprio" (mensagem de sempre): vazio, o site, o próprio Trajeto ou particular.
+  // Qualquer outro nome é um parceiro (Martinez, Gabriel, uma empresa...) e leva a mensagem de parceiro.
+  function ehFornecedorParceiro(fornecedor){
+    const f = (fornecedor || '').trim();
+    if(!f) return false;
+    return !/site|trajeto|particular/i.test(f);
+  }
+
+  // Mensagem para o cliente de um parceiro: apresenta-te como motorista da equipa dele,
+  // sem valor e sem pedir confirmação (quem combinou o serviço foi o parceiro).
+  function gerarMensagemParceiro(ag){
+    const en = idiomaOrcamento === 'en';
+    const nome = (localStorage.getItem('trajeto_nome') || '').trim();
+    const forn = (ag.fornecedor || '').trim();
+    const dataFmt = ag.data.split('-').reverse().join('/');
+    const agora = new Date();
+    const strDe = (d) => `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
+    const quando = ag.data === strDe(agora) ? 'hoje'
+      : ag.data === strDe(new Date(agora.getFullYear(), agora.getMonth(), agora.getDate() + 1)) ? 'amanha' : 'outro';
+    const aeroDestino = /aeroporto|airport/i.test(ag.chegada || '');
+    const aeroOrigem = /aeroporto|airport/i.test(ag.partida || '');
+
+    if(en){
+      const equipaEN = forn.replace(/^d[oae]s?\s+/i, '');   // tira o "do/da" se o nome vier escrito em português
+      const intro = nome ? `This is ${nome}, I'm a driver on the ${equipaEN} team.` : `I'm a driver on the ${equipaEN} team.`;
+      const dia = quando === 'hoje' ? 'Today' : quando === 'amanha' ? 'Tomorrow' : `On ${dataFmt}`;
+      const trajeto = aeroDestino ? ' to the Airport' : aeroOrigem ? ' from the Airport' : '';
+      const paragensEN = (ag.paragens && ag.paragens.length) ? ag.paragens.map(p => `📍 Stop: ${p}\n`).join('') : '';
+      const fechoEN = quando === 'hoje' ? 'See you soon.' : quando === 'amanha' ? 'See you tomorrow.' : 'See you then.';
+      return `Hello ${ag.cliente}! 👋\n\n${intro}\n\n${dia} I will be your driver for your transfer${trajeto}.\n\nDetails 👇🏻\n\n📍 From: ${ag.partida}\n${paragensEN}📍 To: ${ag.chegada}\n📅 Date: ${dataFmt}\n🕐 Time: ${ag.hora}\n\nPlease let me know if you have any questions.\n\n${fechoEN}`;
+    }
+
+    // "da equipe do Martinez"; se o nome já vier com artigo ("da Cascais Tours"), usa-o como está
+    const equipa = /^d[oae]s?\s/i.test(forn) ? forn : `do ${forn}`;
+    const intro = nome ? `Aqui é o ${nome}, sou motorista da equipe ${equipa}.` : `Sou motorista da equipe ${equipa}.`;
+    const dia = quando === 'hoje' ? 'Hoje' : quando === 'amanha' ? 'Amanhã' : `No dia ${dataFmt}`;
+    const trajeto = aeroDestino ? 'para o transfer até ao Aeroporto' : aeroOrigem ? 'para o transfer a partir do Aeroporto' : 'para o seu transfer';
+    const paragens = (ag.paragens && ag.paragens.length) ? ag.paragens.map(p => `📍 Paragem: ${p}\n`).join('') : '';
+    const fecho = quando === 'hoje' ? 'Até já.' : quando === 'amanha' ? 'Até amanhã.' : 'Até breve.';
+    return `Olá ${ag.cliente}! 👋\n\n${intro}\n\n${dia} serei seu motorista ${trajeto}.\n\nInformações 👇🏻\n\n📍 De: ${ag.partida}\n${paragens}📍 Para: ${ag.chegada}\n📅 Data: ${dataFmt}\n🕐 Horário: ${ag.hora}\n\nQualquer questão estou à disposição.\n\n${fecho}`;
+  }
+
   function gerarMensagem(ag){
     if(ag.tipo === 'hora') return gerarMensagemHora(ag);
+    if(ehFornecedorParceiro(ag.fornecedor)) return gerarMensagemParceiro(ag);
     const dataFmt = ag.data.split('-').reverse().join('/');
     const nome = localStorage.getItem('trajeto_nome') || '';
     if(idiomaOrcamento === 'en'){
