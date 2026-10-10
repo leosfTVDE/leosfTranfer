@@ -816,7 +816,7 @@
       <input type="number" id="p_passageiros" min="1" max="8" data-i18n-placeholder="ph_passageiros" placeholder="ex: 2">
 
       <div id="blocoHoras" style="display:none;">
-        <label for="p_horas" data-i18n="label_horas" style="margin-top:16px;">Duração estimada em horas (opcional)</label>
+        <label for="p_horas" data-i18n="label_horas" style="margin-top:16px;">Duração estimada em horas</label>
         <input type="number" id="p_horas" min="1" max="24" step="0.5" data-i18n-placeholder="ph_horas" placeholder="ex: 3">
       </div>
 
@@ -903,7 +903,7 @@
   </div>
 
   <p class="copy">Trajeto Transfer · Lisboa</p>
-  <p class="versao">v9.9.3</p>
+  <p class="versao">v9.9.4</p>
 </footer>
 
 <script>
@@ -1007,7 +1007,7 @@
       ph_paragem: 'ex: Rua das Flores, 12',
       tipo_transfer: 'Transfer',
       tipo_hora: 'Serviço por hora',
-      label_horas: 'Duração estimada em horas (opcional)',
+      label_horas: 'Duração estimada em horas',
       ph_horas: 'ex: 3',
       label_voo: 'Número do voo (opcional)',
       ph_voo: 'ex: TP1234',
@@ -1095,7 +1095,7 @@
       ph_paragem: 'e.g. 12 Flower Street',
       tipo_transfer: 'Transfer',
       tipo_hora: 'Hourly service',
-      label_horas: 'Estimated duration in hours (optional)',
+      label_horas: 'Estimated duration in hours',
       ph_horas: 'e.g. 3',
       label_voo: 'Flight number (optional)',
       ph_voo: 'e.g. TP1234',
@@ -1259,6 +1259,7 @@
     document.getElementById('blocoChegadaPedido').style.display = hora ? 'none' : 'block';
     document.getElementById('blocoHoras').style.display = hora ? 'block' : 'none';
     document.getElementById('p_chegada').required = !hora;
+    document.getElementById('p_horas').required = hora;
     renderInfoHora();
   }
   document.getElementById('tipoSwitch').addEventListener('click', (e)=>{
@@ -1456,7 +1457,7 @@
       pedido.horasEstimadas = document.getElementById('p_horas').value.trim();
     }
 
-    if(!pedido.nome || !pedido.contacto || !pedido.partida || (!ehHora && !pedido.chegada) || !pedido.data || !pedido.hora){
+    if(!pedido.nome || !pedido.contacto || !pedido.partida || (!ehHora && !pedido.chegada) || (ehHora && !pedido.horasEstimadas) || !pedido.data || !pedido.hora){
       erroEl.textContent = textos.campos;
       return;
     }
