@@ -210,6 +210,11 @@
   }
   .links-internos a:hover{text-decoration:underline;}
   .links-internos a.destaque{color:var(--terracota);}
+  .atalhos-servicos{ display:grid; grid-template-columns:repeat(3,1fr); gap:10px; margin:0 0 26px; }
+  .atalho{ display:flex; flex-direction:column; align-items:center; justify-content:center; gap:6px; padding:14px 6px; background:var(--azul-noite); border:1px solid var(--azul-noite); border-radius:12px; color:var(--branco); text-decoration:none; box-shadow:0 2px 6px rgba(13,27,42,.25); font-family:'Helvetica Neue', Arial, sans-serif; font-size:13px; font-weight:bold; line-height:1.3; text-align:center; }
+  button.atalho{ cursor:pointer; -webkit-appearance:none; appearance:none; }
+  .atalho:active{ opacity:.8; }
+  .atalho-icone{ font-size:22px; line-height:1; }
   .eyebrow{
     font-family:'Helvetica Neue', Arial, sans-serif;
     font-size:11px;
@@ -704,6 +709,13 @@
     <a href="#cardForm" class="destaque" data-i18n="nav_cotacao">Pedir cotação</a>
   </nav>
 
+  <div class="atalhos-servicos" id="atalhosServicos">
+    <button type="button" class="atalho" data-atalho="hora"><span class="atalho-icone">⏱️</span><span data-i18n="atalho_hora">Serviço por hora</span></button>
+    <button type="button" class="atalho" data-atalho="transfer"><span class="atalho-icone">🚗</span><span data-i18n="atalho_transfer">Transfer</span></button>
+    <button type="button" class="atalho" data-atalho="tour"><span class="atalho-icone">🗺️</span><span data-i18n="atalho_tour">Tour</span></button>
+  </div>
+  <div id="formSlotTopo"></div>
+
   <section class="motorista-secao" id="motoristaSecao" aria-labelledby="motoristaTitulo" style="display:none;">
     <p class="eyebrow" id="motoristaTitulo" data-i18n="motorista_eyebrow">O motorista</p>
     <div class="motorista-card" id="motoristaCard">
@@ -891,7 +903,7 @@
   </div>
 
   <p class="copy">Trajeto Transfer · Lisboa</p>
-  <p class="versao">v9.9.1</p>
+  <p class="versao">v9.9.3</p>
 </footer>
 
 <script>
@@ -934,6 +946,9 @@
       sub: 'Transfers de e para o Aeroporto de Lisboa, deslocações privadas e tours personalizados em Lisboa e em qualquer destino de Portugal. Viaje com motorista particular, conforto e pontualidade.',
       nav_servicos: 'Serviços',
       nav_tours: 'Tours',
+      atalho_hora: 'Serviço por hora',
+      atalho_transfer: 'Transfer',
+      atalho_tour: 'Tour',
       nav_destinos: 'Destinos',
       nav_faq: 'FAQ',
       nav_cotacao: 'Pedir cotação',
@@ -1019,6 +1034,9 @@
       sub: 'Private transfers to and from Lisbon Airport, personal rides and customized tours in Lisbon and anywhere in Portugal. Travel with a private driver, comfort and punctuality.',
       nav_servicos: 'Services',
       nav_tours: 'Tours',
+      atalho_hora: 'Hourly service',
+      atalho_transfer: 'Transfer',
+      atalho_tour: 'Tour',
       nav_destinos: 'Destinations',
       nav_faq: 'FAQ',
       nav_cotacao: 'Request a quote',
@@ -1256,6 +1274,23 @@
     renderInfoHora();
   };
   window.obterTipoPedido = function(){ return tipoPedido; };
+  // Botões do topo (Serviço por hora / Transfer / Tour): o formulário abre logo ali, já no
+  // tipo certo. Tour não é um tipo do formulário, e o serviço por hora pode não estar ativo:
+  // nesses casos o pedido segue como transfer e a observação já diz o que o cliente quer.
+  const PREFIXOS_ATALHO = { hora: { pt: 'Serviço por hora: ', en: 'Hourly service: ' }, tour: { pt: 'Tour privado: ', en: 'Private tour: ' } };
+  window.prepararFormularioPorAtalho = function(atalho){
+    let tipo = 'transfer', prefixo = '';
+    if(atalho === 'hora'){ if(servicoHora) tipo = 'hora'; else prefixo = 'hora'; }
+    else if(atalho === 'tour'){ prefixo = 'tour'; }
+    definirTipoPedido(tipo);
+    const obs = document.getElementById('p_obs');
+    if(!obs) return;
+    const conhecidos = [PREFIXOS_ATALHO.hora.pt, PREFIXOS_ATALHO.hora.en, PREFIXOS_ATALHO.tour.pt, PREFIXOS_ATALHO.tour.en];
+    // só mexe se estiver vazio ou com um prefixo nosso: nunca apaga o que o cliente escreveu
+    if(obs.value === '' || conhecidos.includes(obs.value)){
+      obs.value = prefixo ? PREFIXOS_ATALHO[prefixo][idiomaAtual === 'pt' ? 'pt' : 'en'] : '';
+    }
+  };
 </script>
 
 <script type="module">
@@ -1345,9 +1380,15 @@
     }catch(e){ /* sem número disponível — o botão fica escondido, sem problema */ }
   })();
 
-  function abrirFormularioCotacao(){
+  let formNoTopo = false;
+  function abrirFormularioCotacao(opcoes){
     const cardForm = document.getElementById('cardForm');
     const btnAbrir = document.getElementById('btnAbrirForm');
+    // aberto pelos botões do topo: o formulário aparece logo abaixo deles;
+    // por qualquer outro caminho, fica no sítio de sempre (junto do botão de baixo)
+    formNoTopo = !!(opcoes && opcoes.topo === true);
+    if(formNoTopo) document.getElementById('formSlotTopo').appendChild(cardForm);
+    else btnAbrir.insertAdjacentElement('afterend', cardForm);
     cardForm.style.display = 'block';
     btnAbrir.style.display = 'none';
     cardForm.scrollIntoView({behavior:'smooth', block:'start'});
@@ -1358,10 +1399,16 @@
     const btnAbrir = document.getElementById('btnAbrirForm');
     cardForm.style.display = 'none';
     btnAbrir.style.display = 'block';
-    btnAbrir.scrollIntoView({behavior:'smooth', block:'center'});
+    (formNoTopo ? document.getElementById('atalhosServicos') : btnAbrir).scrollIntoView({behavior:'smooth', block:'center'});
   }
   document.getElementById('btnCancelarForm').addEventListener('click', fecharFormularioCotacao);
   document.getElementById('btnAbrirForm').addEventListener('click', abrirFormularioCotacao);
+  document.querySelectorAll('#atalhosServicos .atalho').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      abrirFormularioCotacao({ topo: true });
+      window.prepararFormularioPorAtalho(btn.dataset.atalho);
+    });
+  });
   document.querySelectorAll('a[href="#cardForm"]').forEach(link=>{
     link.addEventListener('click', (e)=>{ e.preventDefault(); abrirFormularioCotacao(); });
   });
