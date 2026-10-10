@@ -395,6 +395,11 @@
     transition:transform .2s ease;
   }
   .ag-item.ag-aberto .ag-trajeto .ag-seta{transform:rotate(90deg);}
+  .ag-sanfona-cab{ width:100%; display:flex; justify-content:space-between; align-items:center; padding:13px 14px; border:1px solid var(--linha); border-radius:10px; background:var(--areia); color:var(--texto); font-family:'Helvetica Neue', Arial, sans-serif; font-size:14px; font-weight:bold; cursor:pointer; }
+  .ag-sanfona-seta{ display:inline-block; transition:transform .2s; color:#8a7378; }
+  .ag-sanfona.aberta .ag-sanfona-seta{ transform:rotate(90deg); }
+  .ag-sanfona-corpo{ display:none; margin-top:10px; }
+  .ag-sanfona.aberta .ag-sanfona-corpo{ display:block; }
   .ag-detalhes{display:none;}
   .ag-item.ag-aberto .ag-detalhes{display:block;}
   .ag-item .ag-meta{
@@ -1380,7 +1385,7 @@
     <p class="nota">Aqui aparecem os serviços por hora a partir do momento em que tocas em "🚗 Ir buscar cliente" no agendamento. O tempo só começa a contar quando tocas em "▶️ Iniciar" (cliente no carro). Ao finalizar, o valor é calculado pela regra definida em "Minhas tarifas" e podes enviar o resumo ao cliente. O agendamento só sai da lista quando o marcares como "Concluído".</p>
   </div>
 
-  <p style="text-align:center; font-family:'Helvetica Neue', Arial, sans-serif; font-size:11px; color:#8a7f66; margin-top:24px;">Trajeto · v9.9.1</p>
+  <p style="text-align:center; font-family:'Helvetica Neue', Arial, sans-serif; font-size:11px; color:#8a7f66; margin-top:24px;">Trajeto · v9.9.3</p>
 
 </main>
 
@@ -2501,13 +2506,23 @@
   }
 
   let filtroAg = 'ativos';
+  let concluidosAbertos = false;   // a sanfona dos concluídos começa sempre fechada
   document.getElementById('segFiltroAg').querySelectorAll('button').forEach(btn=>{
     btn.addEventListener('click', ()=>{
       document.getElementById('segFiltroAg').querySelectorAll('button').forEach(b=>b.classList.remove('active'));
       btn.classList.add('active');
       filtroAg = btn.dataset.v;
+      concluidosAbertos = false;
       renderLista();
     });
+  });
+  // Abre/fecha a sanfona sem refazer a lista (mantém o que já estava aberto dentro dela)
+  document.getElementById('listaAgendamentos').addEventListener('click', (e)=>{
+    const cab = e.target.closest('#btnSanfonaConcluidos');
+    if(!cab) return;
+    concluidosAbertos = !concluidosAbertos;
+    cab.closest('.ag-sanfona').classList.toggle('aberta', concluidosAbertos);
+    cab.setAttribute('aria-expanded', String(concluidosAbertos));
   });
 
   function renderLista(){
@@ -2525,7 +2540,7 @@
         : '<p class="ag-vazio">Nenhum agendamento ativo — tudo tratado! 🎉</p>';
       return;
     }
-    el.innerHTML = lista.map(ag => {
+    const itensHtml = lista.map(ag => {
       const seloPagamento = !ag.realizado ? '' :
         ag.pagamento === 'recebido' ? '<span class="ag-badge-pago">💰 Recebido</span>' :
         '<span class="ag-badge-pendente">⏳ A receber</span>';
@@ -2573,6 +2588,14 @@
         </div>
       </div>
     `;}).join('');
+    el.innerHTML = filtroAg === 'concluidos'
+      ? `<div class="ag-sanfona ${concluidosAbertos ? 'aberta' : ''}">
+           <button type="button" class="ag-sanfona-cab" id="btnSanfonaConcluidos" aria-expanded="${concluidosAbertos}">
+             <span>✔ Concluídos (${lista.length})</span><span class="ag-sanfona-seta">▸</span>
+           </button>
+           <div class="ag-sanfona-corpo">${itensHtml}</div>
+         </div>`
+      : itensHtml;
   }
 
   function normalizarTelefone(tel){
@@ -3210,6 +3233,7 @@
     const btn = e.target.closest('button');
     if(!btn) return;
     const item = e.target.closest('.ag-item');
+    if(!item) return;   // ex.: cabeçalho da sanfona dos concluídos (fora dos cartões)
     const id = item.dataset.id;
     const lista = lerAgendamentos();
     const ag = lista.find(a => a.id === id);
