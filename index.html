@@ -395,6 +395,10 @@
     transition:transform .2s ease;
   }
   .ag-item.ag-aberto .ag-trajeto .ag-seta{transform:rotate(90deg);}
+  .status-hora-site{ font-family:'Helvetica Neue', Arial, sans-serif; font-size:12.5px; line-height:1.5; padding:9px 11px; border-radius:8px; margin:10px 0 4px; background:var(--areia); color:#6a7378; }
+  .status-hora-site.ok{ background:rgba(46,139,87,.12); color:#2e6b49; }
+  .status-hora-site.aviso{ background:rgba(212,160,23,.14); color:#8a6a10; }
+  .status-hora-site.erro{ background:rgba(180,59,47,.12); color:#a02f24; }
   .ag-sanfona-cab{ width:100%; display:flex; justify-content:space-between; align-items:center; padding:13px 14px; border:1px solid var(--linha); border-radius:10px; background:var(--areia); color:var(--texto); font-family:'Helvetica Neue', Arial, sans-serif; font-size:14px; font-weight:bold; cursor:pointer; }
   .ag-sanfona-seta{ display:inline-block; transition:transform .2s; color:#8a7378; }
   .ag-sanfona.aberta .ag-sanfona-seta{ transform:rotate(90deg); }
@@ -1086,6 +1090,7 @@
           <div class="checks">
             <label class="chk"><input type="checkbox" id="cfg_hora_ativo"> Oferecer no site de pedidos</label>
           </div>
+          <p class="status-hora-site" id="statusHoraSite">Estado no site: aparece aqui depois de tocares em Aplicar.</p>
           <div class="cfg-row">
             <div><label>Valor por hora (€)</label><input type="number" step="0.5" min="0" id="cfg_hora_valor"></div>
             <div><label>Mínimo cobrado (min)</label><input type="number" min="1" id="cfg_hora_minimo_min"></div>
@@ -1095,7 +1100,7 @@
           </div>
           <p style="font-family:'Helvetica Neue', Arial, sans-serif; font-size:11.5px; color:#6a7378; margin:12px 0 0; line-height:1.6;">
             Regra: o tempo mínimo (normalmente a primeira hora) é sempre cobrado por inteiro. A partir daí, qualquer minuto a mais conta o bloco seguinte — ex: com 60 min e blocos de 30, 1h10 cobra 1h30 e 1h45 cobra 2h.<br>
-            "Oferecer no site de pedidos" mostra ao cliente a opção "Serviço por hora" (toca em Aplicar para publicar).
+            "Oferecer no site de pedidos" deixa o site aceitar pedidos "Serviço por hora" e mostra o preço ao cliente. Se desmarcares, o site deixa de os aceitar. Toca em Aplicar para publicar; o resultado aparece aqui em cima.
           </p>
         </div>
       </div>
@@ -1388,7 +1393,7 @@
     <p class="nota">Os serviços por hora agendados ficam em "📅 Agendados". Os que estão em andamento aparecem a partir do momento em que tocas em "🚗 Ir buscar cliente" no agendamento. O tempo só começa a contar quando tocas em "▶️ Iniciar" (cliente no carro). Ao finalizar, o valor é calculado pela regra definida em "Minhas tarifas" e podes enviar o resumo ao cliente. O agendamento só sai da lista quando o marcares como "Concluído".</p>
   </div>
 
-  <p style="text-align:center; font-family:'Helvetica Neue', Arial, sans-serif; font-size:11px; color:#8a7f66; margin-top:24px;">Trajeto · v9.9.4</p>
+  <p style="text-align:center; font-family:'Helvetica Neue', Arial, sans-serif; font-size:11px; color:#8a7f66; margin-top:24px;">Trajeto · v9.9.5</p>
 
 </main>
 
@@ -3101,14 +3106,84 @@
   document.addEventListener('visibilitychange', ()=>{ if(!document.hidden) atualizarRelogiosHora(); });
 
   // Publica no documento público do motorista a configuração do serviço por hora (site de pedidos)
-  function publicarServicoHora(forcar){
-    if(!window.TrajetoCloud || !window.TrajetoCloud.utilizadorAtual || !window.TrajetoCloud.publicarServicoHora) return;
-    const p = horaParams();
-    const dados = { ativo: Number(cfg.hora_ativo) === 1, valor: p.valor, minimoMin: p.minimo, blocoMin: p.bloco };
-    const chave = JSON.stringify(dados);
-    if(!forcar && chave === ultimaPubHora) return;
-    ultimaPubHora = chave;
-    window.TrajetoCloud.publicarServicoHora(dados);
+  function mostrarStatusHora(nivel, texto){
+    const el = document.getElementById('statusHoraSite');
+    if(!el) return;
+    el.textContent = texto;
+    el.className = 'status-hora-site ' + nivel;   // ok | aviso | erro
+  }
+  let toastTimer = null;
+  function mostrarToast(texto){
+    let el = document.getElementById('toastApp');
+    if(!el){
+      el = document.createElement('div');
+      el.id = 'toastApp';
+      el.style.cssText = "position:fixed; left:50%; bottom:28px; transform:translateX(-50%); max-width:86%; background:#0d1b2a; color:#fffaf1; padding:12px 16px; border-radius:10px; font:13.5px/1.4 'Helvetica Neue',Arial,sans-serif; z-index:9999; box-shadow:0 4px 14px rgba(0,0,0,.3); text-align:center;";
+      document.body.appendChild(el);
+    }
+    el.textContent = texto;
+    el.style.display = 'block';
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(()=>{ el.style.display = 'none'; }, 4200);
+  }
+
+  // Publica a definição do serviço por hora para o site, LÊ DE VOLTA o que o site vai ver e mostra o resultado
+  // (antes, qualquer falha era silenciosa e o site ficava sem a opção sem ninguém perceber).
+  async function publicarServicoHora(forcar){
+    try{
+      if(!window.TrajetoCloud || !window.TrajetoCloud.utilizadorAtual || !window.TrajetoCloud.publicarServicoHora){
+        mostrarStatusHora('aviso', '⚠️ Sem sessão iniciada: o site ainda não recebeu esta definição. Entra na tua conta e toca em Aplicar.');
+        if(forcar) alert('O serviço por hora NÃO foi enviado ao site porque não tens sessão iniciada. Entra na tua conta e toca em Aplicar de novo.');
+        return;
+      }
+      const p = horaParams();
+      const dados = { ativo: Number(cfg.hora_ativo) === 1, valor: p.valor, minimoMin: p.minimo, blocoMin: p.bloco };
+      const chave = JSON.stringify(dados);
+      if(!forcar && chave === ultimaPubHora) return;
+      ultimaPubHora = chave;
+
+      const envio = await window.TrajetoCloud.publicarServicoHora(dados);
+      if(!envio || !envio.ok){
+        ultimaPubHora = '';
+        const motivo = (envio && envio.erro) || 'erro desconhecido';
+        mostrarStatusHora('erro', `⚠️ Não consegui enviar ao site (${motivo}).`);
+        if(forcar) alert(`O serviço por hora NÃO chegou ao site (${motivo}). Confirma a internet e toca em Aplicar de novo. Se continuar, diz-me este código.`);
+        return;
+      }
+
+      let corrigiPadrao = false;
+      let v = await window.TrajetoCloud.verificarServicoHoraNoSite();
+      if(v && v.ok && v.uidPadrao !== v.uidMeu){
+        // o site lê o "motorista padrão": se não for a tua conta, ele nunca vê a tua definição
+        if(window.TrajetoCloud.utilizadorAtual.email === EMAIL_ADMIN){
+          const r = await window.TrajetoCloud.publicarMotoristaPadrao(v.uidMeu);
+          if(r && r.ok){ corrigiPadrao = true; v = await window.TrajetoCloud.verificarServicoHoraNoSite(); }
+        }
+        if(!v || !v.ok || v.uidPadrao !== v.uidMeu){
+          ultimaPubHora = '';
+          mostrarStatusHora('erro', '⚠️ O site está a ler outro motorista, por isso não vê esta definição.');
+          if(forcar) alert('O site está a ler outro motorista (o "motorista padrão" não é a tua conta), por isso não vê o serviço por hora. Toca em Aplicar de novo; se continuar, avisa-me.');
+          return;
+        }
+      }
+      if(!v || !v.ok){
+        mostrarStatusHora('aviso', `Enviado, mas não consegui confirmar o que o site vê (${(v && v.erro) || 'sem resposta'}).`);
+        return;
+      }
+      if(!v.hora || v.hora.ativo !== dados.ativo){
+        ultimaPubHora = '';
+        mostrarStatusHora('erro', '⚠️ O site ainda não mostra esta definição (o envio não ficou guardado).');
+        if(forcar) alert('Enviei, mas ao conferir o site ainda não mostra o serviço por hora. Toca em Aplicar de novo; se continuar, avisa-me.');
+        return;
+      }
+      const resumo = dados.ativo ? `ATIVO · €${p.valor}/h · mínimo ${p.minimo} min · blocos de ${p.bloco} min` : 'DESLIGADO';
+      const hhmm = new Date().toTimeString().slice(0, 5);
+      mostrarStatusHora('ok', `✅ No site: serviço por hora ${resumo} (confirmado às ${hhmm}${corrigiPadrao ? '; corrigi o motorista padrão do site' : ''}).`);
+      if(forcar) mostrarToast(dados.ativo ? '✅ Serviço por hora publicado no site' : '✅ Serviço por hora desligado no site');
+    }catch(e){
+      ultimaPubHora = '';
+      mostrarStatusHora('erro', '⚠️ Erro inesperado ao enviar ao site.');
+    }
   }
 
   // ---------- Placar digital ----------
@@ -3986,7 +4061,8 @@ if ('serviceWorker' in navigator) {
   async function publicarMotoristaPadrao(uid){
     try{
       await setDoc(doc(db, 'trajeto_publico', 'motorista_padrao'), { uid });
-    }catch(e){ /* falha silenciosa — só afeta o link antigo sem parâmetro */ }
+      return { ok: true };
+    }catch(e){ return { ok: false, erro: (e && (e.code || e.message)) || 'erro-desconhecido' }; }
   }
 
   // Publica o número de WhatsApp do motorista no seu próprio documento
@@ -4001,11 +4077,23 @@ if ('serviceWorker' in navigator) {
 
   // Publica a configuração do serviço por hora (ativo, tarifa, regra) no documento
   // público do motorista — é o que o site de pedidos lê para mostrar a opção ao cliente.
+  // Devolve { ok } ou { ok:false, erro } para o app poder MOSTRAR se funcionou (antes falhava em silêncio).
   async function publicarServicoHora(dados){
-    if(!auth.currentUser) return;
+    if(!auth.currentUser) return { ok: false, erro: 'sem-sessao' };
     try{
       await setDoc(doc(db, 'trajeto_publico', auth.currentUser.uid), { hora: dados }, { merge: true });
-    }catch(e){ /* falha silenciosa — só afeta a opção "Serviço por hora" do site */ }
+      return { ok: true };
+    }catch(e){ return { ok: false, erro: (e && (e.code || e.message)) || 'erro-desconhecido' }; }
+  }
+  // Lê de volta o que o SITE vai ver: para que motorista aponta o link padrão e o que está guardado nele.
+  async function verificarServicoHoraNoSite(){
+    if(!auth.currentUser) return { ok: false, erro: 'sem-sessao' };
+    try{
+      const padrao = await getDoc(doc(db, 'trajeto_publico', 'motorista_padrao'));
+      const uidPadrao = padrao.exists() ? ((padrao.data() || {}).uid || '') : '';
+      const meu = await getDoc(doc(db, 'trajeto_publico', auth.currentUser.uid));
+      return { ok: true, uidPadrao, uidMeu: auth.currentUser.uid, hora: meu.exists() ? ((meu.data() || {}).hora || null) : null };
+    }catch(e){ return { ok: false, erro: (e && (e.code || e.message)) || 'erro-desconhecido' }; }
   }
 
   // Publica a foto e a bio do motorista no seu documento público — é o que o
@@ -4079,6 +4167,7 @@ if ('serviceWorker' in navigator) {
     publicarMotoristaPadrao,
     publicarWhatsapp,
     publicarServicoHora,
+    verificarServicoHoraNoSite,
     publicarPerfilMotorista,
     publicarGaleria,
     publicarApresentacao,
