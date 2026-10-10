@@ -449,6 +449,9 @@
     margin-left:6px;
     vertical-align:middle;
   }
+  .hora-sec-titulo{ font-family:'Helvetica Neue', Arial, sans-serif; font-size:11px; letter-spacing:.12em; text-transform:uppercase; color:#8a7378; margin:4px 0 8px; }
+  @keyframes destaqueNovo{ 0%{ box-shadow:0 0 0 3px var(--terracota); } 100%{ box-shadow:0 0 0 0 rgba(193,85,44,0); } }
+  .destaque-novo{ animation:destaqueNovo 2.6s ease-out 1; }
   .hora-card{
     border:1px solid var(--azulejo);
     border-radius:10px;
@@ -1382,10 +1385,10 @@
       <button class="btn-agendar" id="btnNovoAgendamentoHora" style="margin-top:0; margin-bottom:14px;">➕ Agendar serviço por hora</button>
       <div class="lista-agendamentos" id="listaHora"></div>
     </div>
-    <p class="nota">Aqui aparecem os serviços por hora a partir do momento em que tocas em "🚗 Ir buscar cliente" no agendamento. O tempo só começa a contar quando tocas em "▶️ Iniciar" (cliente no carro). Ao finalizar, o valor é calculado pela regra definida em "Minhas tarifas" e podes enviar o resumo ao cliente. O agendamento só sai da lista quando o marcares como "Concluído".</p>
+    <p class="nota">Os serviços por hora agendados ficam em "📅 Agendados". Os que estão em andamento aparecem a partir do momento em que tocas em "🚗 Ir buscar cliente" no agendamento. O tempo só começa a contar quando tocas em "▶️ Iniciar" (cliente no carro). Ao finalizar, o valor é calculado pela regra definida em "Minhas tarifas" e podes enviar o resumo ao cliente. O agendamento só sai da lista quando o marcares como "Concluído".</p>
   </div>
 
-  <p style="text-align:center; font-family:'Helvetica Neue', Arial, sans-serif; font-size:11px; color:#8a7f66; margin-top:24px;">Trajeto · v9.9.3</p>
+  <p style="text-align:center; font-family:'Helvetica Neue', Arial, sans-serif; font-size:11px; color:#8a7f66; margin-top:24px;">Trajeto · v9.9.4</p>
 
 </main>
 
@@ -2923,6 +2926,15 @@
     if(acao === 'horaWaze'){
       abrirWaze(ag.partida);
       return;
+    } else if(acao === 'horaBuscar'){
+      ag.hEstado = 'a_caminho';
+      ag.hBuscarEm = Date.now();
+      gravarAgendamentos(lista);
+      renderLista();
+      abrirWaze(ag.partida);
+    } else if(acao === 'horaEditarAgendado'){
+      document.querySelector('#segModo button[data-v="transfer"]').click();
+      abrirEdicao(ag);
     } else if(acao === 'horaResumo'){
       pedirIdiomaEExecutar(()=> enviarResumoHora(ag));
       return;
@@ -2970,11 +2982,29 @@
   }
   document.getElementById('listaHora').addEventListener('click', handlerCliqueHora);
 
+  // Cartão de um serviço por hora ainda AGENDADO (aparece na secção "📅 Agendados" da aba Por hora)
+  function cartaoHoraAgendado(ag){
+    const id = escHtml(ag.id);
+    const linhaFinal = (ag.chegada && ag.chegada !== ag.partida) ? `<br>🏁 ${escHtml(ag.chegada)}` : '';
+    return `
+      <div class="hora-card" data-id="${id}">
+        <div class="hora-topo">👤 ${escHtml(ag.cliente)}</div>
+        <div class="hora-linhas">📍 ${escHtml(ag.partida)}${linhaFinal}<br>📅 ${escHtml((ag.data || '').split('-').reverse().join('/'))} às ${escHtml(ag.hora || '')}${ag.telefone ? '<br>📞 ' + escHtml(ag.telefone) : ''}${ag.observacoes ? '<br>📝 ' + escHtml(ag.observacoes) : ''}</div>
+        <button class="hora-btn-grande hora-btn-iniciar" data-acao="horaBuscar">🚗 Ir buscar cliente</button>
+        <div class="ag-acoes">
+          <button data-acao="horaEditarAgendado">✏️ Editar</button>
+        </div>
+      </div>`;
+  }
+
   function renderHora(){
     const ativos = lerAgendamentos()
       .filter(a => a.tipo === 'hora' && !a.realizado &&
         (a.hEstado === 'a_caminho' || a.hEstado === 'em_curso' || a.hEstado === 'finalizado'))
       .sort((a,b)=> (a.hBuscarEm || 0) - (b.hBuscarEm || 0));
+    const agendados = lerAgendamentos()
+      .filter(a => a.tipo === 'hora' && !a.realizado && (!a.hEstado || a.hEstado === 'agendado'))
+      .sort((a,b)=> (a.data + (a.hora || '')).localeCompare(b.data + (b.hora || '')));
 
     const selo = document.getElementById('seloHora');
     if(selo){
@@ -2983,11 +3013,14 @@
     }
     const el = document.getElementById('listaHora');
     if(!el) return;
-    if(ativos.length === 0){
+    if(ativos.length === 0 && agendados.length === 0){
       el.innerHTML = '<p class="ag-vazio">Nenhum serviço por hora em andamento. Agenda um serviço por hora e toca em "🚗 Ir buscar cliente" no agendamento.</p>';
       return;
     }
-    el.innerHTML = ativos.map(ag => {
+    const htmlAgendados = agendados.length
+      ? '<p class="hora-sec-titulo">📅 Agendados</p>' + agendados.map(cartaoHoraAgendado).join('') : '';
+    const tituloAndamento = (agendados.length && ativos.length) ? '<p class="hora-sec-titulo">⏱ Em andamento</p>' : '';
+    const htmlAtivos = ativos.map(ag => {
       const linhaFinal = (ag.chegada && ag.chegada !== ag.partida) ? `<br>🏁 ${escHtml(ag.chegada)}` : '';
       const topo = `
         <div class="hora-topo">👤 ${escHtml(ag.cliente)}</div>
@@ -3037,6 +3070,7 @@
           </div>
         </div>`;
     }).join('');
+    el.innerHTML = htmlAgendados + tituloAndamento + htmlAtivos;
     atualizarRelogiosHora();
   }
 
@@ -3456,6 +3490,25 @@
     `;}).join('');
   }
 
+  // Depois de aceitar um pedido: transfer -> aba Transfer (Meus agendamentos, cartão aberto);
+  // serviço por hora -> aba Por hora (secção "Agendados"). O cartão novo pisca para se ver qual é.
+  function irParaAgendamentoAceite(ag){
+    const modo = ag.tipo === 'hora' ? 'hora' : 'transfer';
+    if(modo === 'transfer' && filtroAg !== 'ativos'){
+      document.querySelector('#segFiltroAg button[data-v="ativos"]').click();
+    }
+    document.querySelector(`#segModo button[data-v="${modo}"]`).click();
+    setTimeout(()=>{
+      const el = document.querySelector(modo === 'hora'
+        ? `#listaHora .hora-card[data-id="${ag.id}"]`
+        : `#listaAgendamentos .ag-item[data-id="${ag.id}"]`);
+      if(!el) return;
+      if(modo === 'transfer') el.classList.add('ag-aberto');
+      el.classList.add('destaque-novo');
+      el.scrollIntoView({behavior:'smooth', block:'center'});
+    }, 60);
+  }
+
   document.getElementById('listaPedidos').addEventListener('click', async (e)=>{
     const btn = e.target.closest('button');
     if(!btn) return;
@@ -3491,11 +3544,12 @@
       lista.push(ag);
       gravarAgendamentos(lista);
       renderLista();
+      irParaAgendamentoAceite(ag);
 
       await window.TrajetoCloud.atualizarStatusPedido(id, 'aceite');
       alert(ehHora
-        ? 'Pedido aceite! O serviço por hora ficou guardado em "Meus agendamentos" — o valor final é calculado quando finalizares o serviço.'
-        : 'Pedido aceite! Já ficou guardado em "Meus agendamentos" — abre-o para ajustares o valor e confirmar.');
+        ? 'Pedido aceite! O serviço por hora ficou em "Agendados" — quando fores buscar o cliente, toca em "Ir buscar cliente". O valor final é calculado quando finalizares o serviço.'
+        : 'Pedido aceite! Já ficou em "Meus agendamentos", aberto — ajusta o valor e confirma.');
     }
   });
 
@@ -3646,7 +3700,7 @@
       sincronizarApresentacao(ag, apresentacao);
       if(tipo === 'hora' && painelHospedadoEm === 'hora'){
         const av = document.getElementById('avisoHoraAgendado');
-        av.textContent = `✅ Agendado: ${ag.cliente}, ${ag.data.split('-').reverse().join('/')} às ${ag.hora}. Fica em Transfer → Meus agendamentos; quando fores buscar o cliente, toca em "🚗 Ir buscar cliente" lá e ele passa a aparecer aqui.`;
+        av.textContent = `✅ Agendado: ${ag.cliente}, ${ag.data.split('-').reverse().join('/')} às ${ag.hora}. Fica em "📅 Agendados" aqui em baixo (e também em Transfer → Meus agendamentos); quando fores buscar o cliente, toca em "🚗 Ir buscar cliente" lá e ele passa a aparecer aqui.`;
         av.style.display = 'block';
       }
     }
