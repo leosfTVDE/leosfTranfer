@@ -772,7 +772,7 @@
 
   <div class="card" id="cardForm" style="display:none;">
     <form id="formPedido">
-      <div class="tipo-switch" id="tipoSwitch" style="display:none;">
+      <div class="tipo-switch" id="tipoSwitch">
         <button type="button" data-tipo="transfer" class="active" data-i18n="tipo_transfer">Transfer</button>
         <button type="button" data-tipo="hora" data-i18n="tipo_hora">Serviço por hora</button>
       </div>
@@ -903,7 +903,7 @@
   </div>
 
   <p class="copy">Trajeto Transfer · Lisboa</p>
-  <p class="versao">v9.9.4</p>
+  <p class="versao">v9.9.5</p>
 </footer>
 
 <script>
@@ -937,7 +937,8 @@
 
   // ============================================================
 
-  var servicoHora = null;      // configuração publicada pelo motorista (null = não oferece)
+  var servicoHora = null;      // tarifa publicada pelo motorista (null = ainda não chegou; só serve para mostrar o preço)
+  var horaDesativada = false;  // só fica true se o motorista tiver DESLIGADO o serviço por hora no app
   var tipoPedido = 'transfer'; // 'transfer' | 'hora'
 
   const TEXTOS = {
@@ -1235,7 +1236,14 @@
   function renderInfoHora(){
     const box = document.getElementById('infoHora');
     if(!box) return;
-    if(!servicoHora || tipoPedido !== 'hora'){ box.style.display = 'none'; return; }
+    if(tipoPedido !== 'hora'){ box.style.display = 'none'; return; }
+    if(!servicoHora){
+      box.textContent = idiomaAtual === 'pt'
+        ? 'Indique a duração estimada: confirmamos o valor consigo antes de avançar.'
+        : 'Tell us the estimated duration — we will confirm the price with you before going ahead.';
+      box.style.display = 'block';
+      return;
+    }
     const s = servicoHora, pt = idiomaAtual === 'pt';
     const dur = fmtDurPub(s.minimoMin);
     let texto;
@@ -1250,7 +1258,7 @@
     box.style.display = 'block';
   }
   function definirTipoPedido(tipo){
-    tipoPedido = tipo === 'hora' && servicoHora ? 'hora' : 'transfer';
+    tipoPedido = tipo === 'hora' && !horaDesativada ? 'hora' : 'transfer';
     const hora = tipoPedido === 'hora';
     document.getElementById('tipoSwitch').querySelectorAll('button').forEach(b=>{
       b.classList.toggle('active', b.dataset.tipo === tipoPedido);
@@ -1268,10 +1276,16 @@
   });
   // Chamado pelo módulo Firebase quando o documento público do motorista traz a configuração
   window.aplicarServicoHora = function(c){
+    if(c && c.ativo === false){
+      // o motorista desligou o serviço por hora: deixa de o oferecer
+      horaDesativada = true;
+      document.getElementById('tipoSwitch').style.display = 'none';
+      if(tipoPedido === 'hora') definirTipoPedido('transfer');
+      return;
+    }
     const valor = Number(c && c.valor), minimoMin = Number(c && c.minimoMin), blocoMin = Number(c && c.blocoMin);
     if(!c || c.ativo !== true || !(valor > 0) || !(minimoMin > 0) || !(blocoMin > 0)) return;
     servicoHora = { valor, minimoMin, blocoMin };
-    document.getElementById('tipoSwitch').style.display = 'flex';
     renderInfoHora();
   };
   window.obterTipoPedido = function(){ return tipoPedido; };
@@ -1281,7 +1295,7 @@
   const PREFIXOS_ATALHO = { hora: { pt: 'Serviço por hora: ', en: 'Hourly service: ' }, tour: { pt: 'Tour privado: ', en: 'Private tour: ' } };
   window.prepararFormularioPorAtalho = function(atalho){
     let tipo = 'transfer', prefixo = '';
-    if(atalho === 'hora'){ if(servicoHora) tipo = 'hora'; else prefixo = 'hora'; }
+    if(atalho === 'hora'){ if(!horaDesativada) tipo = 'hora'; else prefixo = 'hora'; }
     else if(atalho === 'tour'){ prefixo = 'tour'; }
     definirTipoPedido(tipo);
     const obs = document.getElementById('p_obs');
