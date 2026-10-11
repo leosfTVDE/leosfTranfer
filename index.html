@@ -395,6 +395,28 @@
     transition:transform .2s ease;
   }
   .ag-item.ag-aberto .ag-trajeto .ag-seta{transform:rotate(90deg);}
+  .btn-agendar-cliente{ width:100%; padding:15px 18px; margin:0 0 14px; border:none; border-radius:12px; background:var(--terracota); color:#fff; font-family:'Helvetica Neue', Arial, sans-serif; font-size:16px; font-weight:bold; cursor:pointer; box-shadow:0 2px 8px rgba(193,85,44,.3); }
+  .btn-agendar-cliente:active{ opacity:.88; }
+  .modal-card.modal-cli{ max-width:420px; max-height:88vh; overflow-y:auto; }
+  .modal-cli label{ display:block; font-family:'Helvetica Neue', Arial, sans-serif; font-size:12px; color:#6a7378; margin:12px 0 4px; }
+  .modal-cli input[type=text], .modal-cli textarea, #cli_busca, #ag_clienteMorada{ width:100%; padding:11px 12px; border:1.5px solid var(--linha); border-radius:9px; background:var(--areia); color:var(--texto); font-family:'Helvetica Neue', Arial, sans-serif; font-size:15px; }
+  .modal-cli input[type=text]:focus, .modal-cli textarea:focus, #cli_busca:focus{ outline:none; border-color:var(--azulejo); }
+  #cli_buscaAgendar{ margin-bottom:12px; }
+  #cli_busca{ margin:6px 0 10px; }
+  .cli-linha{ display:block; width:100%; text-align:left; padding:12px 14px; margin:0 0 8px; border:1px solid var(--linha); border-radius:10px; background:var(--areia); color:var(--texto); font-family:'Helvetica Neue', Arial, sans-serif; font-size:15px; cursor:pointer; }
+  .cli-linha span{ display:block; font-size:12px; color:#6a7378; margin-top:3px; font-weight:normal; }
+  .cli-item{ display:flex; align-items:center; gap:10px; padding:10px 12px; margin:0 0 8px; border:1px solid var(--linha); border-radius:10px; background:var(--areia); font-family:'Helvetica Neue', Arial, sans-serif; font-size:14px; color:var(--texto); }
+  .cli-item .cli-info{ flex:1; min-width:0; }
+  .cli-item .cli-info span{ font-size:12px; color:#6a7378; }
+  .cli-mini{ flex-shrink:0; padding:8px 11px; border:1px solid var(--linha); border-radius:8px; background:var(--branco); color:var(--texto); font-size:12.5px; cursor:pointer; }
+  .cli-btn{ display:block; width:100%; padding:13px; margin-top:10px; border:none; border-radius:10px; background:var(--azul-doca); color:#fff; font-family:'Helvetica Neue', Arial, sans-serif; font-size:14.5px; font-weight:bold; cursor:pointer; }
+  .cli-btn-sec{ background:none; color:#6a7378; border:1px solid var(--linha); font-weight:normal; }
+  .cli-btn-perigo{ background:none; color:#a02f24; border:1px solid rgba(180,59,47,.4); }
+  .cli-opcao{ display:block; width:100%; padding:15px 14px; margin:0 0 10px; border:none; border-radius:11px; background:var(--terracota); color:#fff; font-family:'Helvetica Neue', Arial, sans-serif; font-size:15.5px; font-weight:bold; cursor:pointer; text-align:left; }
+  .cli-vazio, .cli-nota, .cli-info-passo{ font-family:'Helvetica Neue', Arial, sans-serif; font-size:13px; color:#6a7378; line-height:1.55; margin:6px 0 10px; }
+  .cli-erro{ color:#a02f24; font-size:12.5px; min-height:1.3em; margin:8px 0 0; font-family:'Helvetica Neue', Arial, sans-serif; }
+  .ag-guardar-cliente{ margin:14px 0 0; }
+  .ag-guardar-cliente select{ width:100%; margin-top:6px; }
   .status-hora-site{ font-family:'Helvetica Neue', Arial, sans-serif; font-size:12.5px; line-height:1.5; padding:9px 11px; border-radius:8px; margin:10px 0 4px; background:var(--areia); color:#6a7378; }
   .status-hora-site.ok{ background:rgba(46,139,87,.12); color:#2e6b49; }
   .status-hora-site.aviso{ background:rgba(212,160,23,.14); color:#8a6a10; }
@@ -892,6 +914,8 @@
 
 <main>
 
+  <button type="button" id="btnAgendarCliente" class="btn-agendar-cliente">📅 Agendar cliente</button>
+
   <div class="seg seg-4" id="segModo" style="margin-bottom:18px;">
     <button data-v="transfer" class="active">Transfer</button>
     <button data-v="hora">⏱ Por hora<span class="selo-contagem" id="seloHora">0</span></button>
@@ -1106,6 +1130,16 @@
       </div>
 
       <div class="cfg-grupo">
+        <div class="cfg-titulo" data-acordeao="clientes">👥 Clientes salvos <span class="seta">▸</span></div>
+        <div class="cfg-conteudo" data-conteudo="clientes">
+          <p class="cli-nota">Os clientes ficam guardados na hora, sem precisares de tocar em Aplicar. Para agendar uma corrida, usa o botão "📅 Agendar cliente" no início do app.</p>
+          <input type="text" id="cli_busca" placeholder="🔎 Procurar cliente...">
+          <div id="listaClientesConfig"></div>
+          <button type="button" class="cli-btn" id="btnNovoClienteConfig">➕ Novo cliente</button>
+        </div>
+      </div>
+
+      <div class="cfg-grupo">
         <div class="cfg-titulo" data-acordeao="extras">🧳 Extras <span class="seta">▸</span></div>
         <div class="cfg-conteudo" data-conteudo="extras">
           <div class="cfg-row">
@@ -1284,6 +1318,17 @@
             <input type="text" id="ag_voo" placeholder="opcional">
           </div>
         </div>
+        <div class="ag-guardar-cliente" id="agGuardarClienteWrap">
+          <label class="chk"><input type="checkbox" id="ag_guardarCliente"> 💾 Guardar este cliente</label>
+          <div id="agMoradaWrap" style="display:none;">
+            <label for="ag_clienteMorada">A morada de casa do cliente é a…</label>
+            <select id="ag_clienteMorada">
+              <option value="partida">Partida</option>
+              <option value="chegada">Chegada</option>
+              <option value="nenhuma">Não guardar morada</option>
+            </select>
+          </div>
+        </div>
 
         <div class="ag-secao">🗒️ Detalhes</div>
         <div class="ag-row2">
@@ -1393,7 +1438,7 @@
     <p class="nota">Os serviços por hora agendados ficam em "📅 Agendados". Os que estão em andamento aparecem a partir do momento em que tocas em "🚗 Ir buscar cliente" no agendamento. O tempo só começa a contar quando tocas em "▶️ Iniciar" (cliente no carro). Ao finalizar, o valor é calculado pela regra definida em "Minhas tarifas" e podes enviar o resumo ao cliente. O agendamento só sai da lista quando o marcares como "Concluído".</p>
   </div>
 
-  <p style="text-align:center; font-family:'Helvetica Neue', Arial, sans-serif; font-size:11px; color:#8a7f66; margin-top:24px;">Trajeto · v9.9.6</p>
+  <p style="text-align:center; font-family:'Helvetica Neue', Arial, sans-serif; font-size:11px; color:#8a7f66; margin-top:24px;">Trajeto · v9.9.7</p>
 
 </main>
 
@@ -1466,6 +1511,46 @@
     <p>O pagamento desta corrida já foi recebido?</p>
     <button class="modal-btn modal-btn-recebido" id="btnModalRecebido">💰 Sim, já recebi</button>
     <button class="modal-btn modal-btn-pendente" id="btnModalPendente">⏳ Ainda não recebi</button>
+  </div>
+</div>
+
+<div class="modal-overlay" id="modalAgendarCliente">
+  <div class="modal-card modal-cli">
+    <div id="cliPasso1">
+      <h2>📅 Agendar cliente</h2>
+      <input type="text" id="cli_buscaAgendar" placeholder="🔎 Procurar cliente...">
+      <div id="listaClientesAgendar"></div>
+      <button type="button" class="cli-btn" id="btnNovoClienteAgendar">➕ Novo cliente</button>
+      <button type="button" class="cli-btn cli-btn-sec" id="btnFecharAgendarCliente">Fechar</button>
+    </div>
+    <div id="cliPasso2" style="display:none;">
+      <h2 id="cliTituloPasso2"></h2>
+      <p class="cli-info-passo" id="cliInfoPasso2"></p>
+      <div id="cliOpcoesTrajeto"></div>
+      <button type="button" class="cli-btn cli-btn-sec" id="btnVoltarCliente">← Voltar</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="modalFichaCliente" style="z-index:1100;">
+  <div class="modal-card modal-cli">
+    <h2 id="fichaTitulo">👤 Novo cliente</h2>
+    <label for="cli_nome">Nome *</label>
+    <input type="text" id="cli_nome" placeholder="ex: Sylvie Martin">
+    <label for="cli_telefone">Telefone (com indicativo)</label>
+    <input type="text" id="cli_telefone" placeholder="ex: 351 912 345 678">
+    <label for="cli_morada">Morada (casa)</label>
+    <input type="text" id="cli_morada" placeholder="ex: Rua do Passadiço 32, Lisboa">
+    <label for="cli_nomeplaca">Nome na placa (opcional)</label>
+    <input type="text" id="cli_nomeplaca" placeholder="opcional">
+    <label for="cli_fornecedor">Fornecedor habitual (opcional)</label>
+    <input type="text" id="cli_fornecedor" placeholder="ex: Martinez — só se vier sempre por um parceiro">
+    <label for="cli_notas">Notas (só para ti)</label>
+    <textarea id="cli_notas" placeholder="ex: gosta de ar condicionado baixo; tem um cão pequeno" style="min-height:60px;"></textarea>
+    <p class="cli-erro" id="cliErro"></p>
+    <button type="button" class="cli-btn" id="btnGuardarFicha">Guardar cliente</button>
+    <button type="button" class="cli-btn cli-btn-perigo" id="btnApagarFicha" style="display:none;">🗑 Apagar cliente</button>
+    <button type="button" class="cli-btn cli-btn-sec" id="btnCancelarFicha">Cancelar</button>
   </div>
 </div>
 
@@ -2114,6 +2199,8 @@
   };
 
   const AG_KEY = 'trajeto_agendamentos';
+  const CLIENTES_KEY = 'trajeto_clientes';
+  const AEROPORTO_PADRAO = 'Aeroporto de Lisboa';
   let editandoId = null;
   let tipoAgendar = 'transfer';      // 'transfer' | 'hora' (formulário Agendar corrida)
   let ultimaPubHora = null;          // última configuração de "serviço por hora" publicada nesta sessão
@@ -2152,7 +2239,8 @@
       msgTipo: localStorage.getItem('trajeto_msg_tipo') || 'auto',
       msgCustom: localStorage.getItem('trajeto_msg_custom') || '',
       bio: localStorage.getItem('trajeto_bio') || '',
-      foto: localStorage.getItem('trajeto_foto') || ''
+      foto: localStorage.getItem('trajeto_foto') || '',
+      clientes: lerClientes()
     };
   }
   function sincronizarNuvem(){
@@ -2165,6 +2253,10 @@
   function aplicarDadosDaNuvem(dados){
     if(Array.isArray(dados.agendamentos)){
       localStorage.setItem(AG_KEY, JSON.stringify(dados.agendamentos));
+    }
+    if(Array.isArray(dados.clientes)){
+      localStorage.setItem(CLIENTES_KEY, JSON.stringify(dados.clientes));
+      renderClientesConfig();
     }
     if(dados.cfg){
       cfg = { ...DEFAULTS, ...dados.cfg };
@@ -2708,6 +2800,7 @@
     document.getElementById('ag_valor').value = ag.valor;
     document.getElementById('ag_observacoes').value = ag.observacoes || '';
     document.getElementById('ag_apresentacao').value = ag.apresentacao || '';
+    limparOpcaoGuardarCliente();
   }
 
   function gerarLinkRepasse(ag){
@@ -3149,6 +3242,263 @@
   document.addEventListener('visibilitychange', ()=>{ if(!document.hidden) atualizarRelogiosHora(); });
 
   // Publica no documento público do motorista a configuração do serviço por hora (site de pedidos)
+  // =====================================================================
+  //  Clientes guardados (nome, telefone, morada de casa...) — para os clientes que repetem
+  // =====================================================================
+  function lerClientes(){
+    try{ const c = JSON.parse(localStorage.getItem(CLIENTES_KEY) || '[]'); return Array.isArray(c) ? c : []; }
+    catch(e){ return []; }
+  }
+  function gravarClientes(lista){
+    localStorage.setItem(CLIENTES_KEY, JSON.stringify(lista));
+    sincronizarNuvem();
+    renderClientesConfig();
+    if(document.getElementById('modalAgendarCliente').classList.contains('aberto')) renderClientesAgendar();
+  }
+  function soDigitos(t){ return (t || '').replace(/\D/g, ''); }
+  function mesmoTelefone(a, b){
+    const x = soDigitos(a), y = soDigitos(b);
+    return x.length >= 7 && y.length >= 7 && x.slice(-9) === y.slice(-9);
+  }
+  // Mesmo cliente? Pelo telefone; se não houver telefone, pelo nome (sem distinguir maiúsculas).
+  function procurarCliente(nome, telefone, lista){
+    lista = lista || lerClientes();
+    if(soDigitos(telefone).length >= 7) return lista.find(c => mesmoTelefone(c.telefone, telefone)) || null;
+    const n = (nome || '').trim().toLowerCase();
+    return n ? (lista.find(c => (c.nome || '').trim().toLowerCase() === n) || null) : null;
+  }
+  function novoIdCliente(){ return 'c' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6); }
+
+  // Chamado ao guardar um agendamento com "💾 Guardar este cliente" marcado
+  function guardarClienteDoAgendamento(d){
+    const nome = (d.nome || '').trim();
+    if(!nome) return;
+    const lista = lerClientes();
+    const existente = procurarCliente(nome, d.telefone, lista);
+    const morada = d.lado === 'partida' ? (d.partida || '') : d.lado === 'chegada' ? (d.chegada || '') : '';
+    const fornecedor = ehFornecedorParceiro(d.fornecedor) ? d.fornecedor.trim() : '';   // "Site"/"particular" não são "habituais"
+    if(existente){
+      if(!existente.nome) existente.nome = nome;   // mantém o nome da ficha (não troca por maiúsculas/minúsculas diferentes)
+      if(d.telefone) existente.telefone = d.telefone;
+      if(morada) existente.morada = morada;
+      if(d.nomePlaca) existente.nomePlaca = d.nomePlaca;
+      if(fornecedor) existente.fornecedor = fornecedor;
+      existente.atualizadoEm = Date.now();
+    } else {
+      lista.push({ id: novoIdCliente(), nome, telefone: d.telefone || '', morada, nomePlaca: d.nomePlaca || '', fornecedor, notas: '', atualizadoEm: Date.now() });
+    }
+    gravarClientes(lista);
+    mostrarToast(existente ? `💾 Cliente atualizado: ${nome}` : `💾 Cliente guardado: ${nome}`);
+  }
+
+  function filtrarClientes(lista, termo){
+    const t = (termo || '').trim().toLowerCase();
+    if(!t) return lista;
+    const td = soDigitos(t);
+    return lista.filter(c => (c.nome || '').toLowerCase().includes(t) || (c.morada || '').toLowerCase().includes(t) || (td && soDigitos(c.telefone).includes(td)));
+  }
+  function ordenarClientes(lista){
+    return lista.slice().sort((a, b) => (a.nome || '').localeCompare(b.nome || '', 'pt', { sensitivity: 'base' }));
+  }
+  const TEXTO_SEM_CLIENTES = 'Ainda não tens clientes guardados. Toca em ➕ Novo cliente ou, ao agendar uma corrida, marca "💾 Guardar este cliente".';
+
+  function renderClientesConfig(){
+    const el = document.getElementById('listaClientesConfig');
+    if(!el) return;
+    const todos = lerClientes();
+    if(!todos.length){ el.innerHTML = `<p class="cli-vazio">${escHtml(TEXTO_SEM_CLIENTES)}</p>`; return; }
+    const lista = ordenarClientes(filtrarClientes(todos, document.getElementById('cli_busca').value));
+    if(!lista.length){ el.innerHTML = '<p class="cli-vazio">Nenhum cliente encontrado.</p>'; return; }
+    el.innerHTML = lista.map(c => `
+      <div class="cli-item" data-id="${escHtml(c.id)}">
+        <div class="cli-info"><strong>${escHtml(c.nome)}</strong>${c.telefone ? ' · ' + escHtml(c.telefone) : ''}<br>
+          <span>${c.morada ? '🏠 ' + escHtml(c.morada) : '🏠 sem morada'}${c.fornecedor ? ' · 🏷 ' + escHtml(c.fornecedor) : ''}</span></div>
+        <button type="button" class="cli-mini" data-acao="editarCliente">✏️ Editar</button>
+      </div>`).join('');
+  }
+  function renderClientesAgendar(){
+    const el = document.getElementById('listaClientesAgendar');
+    const todos = lerClientes();
+    if(!todos.length){ el.innerHTML = `<p class="cli-vazio">${escHtml(TEXTO_SEM_CLIENTES)}</p>`; return; }
+    const lista = ordenarClientes(filtrarClientes(todos, document.getElementById('cli_buscaAgendar').value));
+    if(!lista.length){ el.innerHTML = '<p class="cli-vazio">Nenhum cliente encontrado.</p>'; return; }
+    el.innerHTML = lista.map(c => `
+      <button type="button" class="cli-linha" data-id="${escHtml(c.id)}"><strong>${escHtml(c.nome)}</strong>
+        <span>${c.telefone ? escHtml(c.telefone) + ' · ' : ''}${c.morada ? '🏠 ' + escHtml(c.morada) : '🏠 sem morada'}</span></button>`).join('');
+  }
+
+  // ----- janela "Agendar cliente": passo 1 (escolher) e passo 2 (que trajeto?) -----
+  let clienteDoPasso2 = null;
+  function abrirAgendarCliente(){
+    document.getElementById('cli_buscaAgendar').value = '';
+    document.getElementById('cliPasso1').style.display = 'block';
+    document.getElementById('cliPasso2').style.display = 'none';
+    renderClientesAgendar();
+    document.getElementById('modalAgendarCliente').classList.add('aberto');
+  }
+  function fecharAgendarCliente(){ document.getElementById('modalAgendarCliente').classList.remove('aberto'); }
+  function abrirPassoTrajeto(id){
+    const c = lerClientes().find(x => x.id === id);
+    if(!c) return;
+    clienteDoPasso2 = c.id;
+    document.getElementById('cliPasso1').style.display = 'none';
+    document.getElementById('cliPasso2').style.display = 'block';
+    document.getElementById('cliTituloPasso2').textContent = '📅 ' + c.nome;
+    document.getElementById('cliInfoPasso2').textContent = (c.telefone ? c.telefone + ' · ' : '') + (c.morada ? '🏠 ' + c.morada : 'sem morada guardada');
+    const ops = document.getElementById('cliOpcoesTrajeto');
+    if(c.morada){
+      ops.innerHTML = `
+        <button type="button" class="cli-opcao" data-trajeto="casa-aeroporto">🏠 → ✈️  Casa → Aeroporto</button>
+        <button type="button" class="cli-opcao" data-trajeto="aeroporto-casa">✈️ → 🏠  Aeroporto → Casa</button>
+        <button type="button" class="cli-opcao" data-trajeto="casa-outro">🏠 → 📍  Casa → outro local</button>`;
+    } else {
+      ops.innerHTML = `
+        <p class="cli-info-passo">Esta ficha ainda não tem a morada de casa. Preenche-a para teres os trajetos prontos.</p>
+        <button type="button" class="cli-opcao" data-trajeto="manual">📝 Agendar e preencher o trajeto à mão</button>
+        <button type="button" class="cli-btn cli-btn-sec" data-acao="editarCliente">✏️ Editar cliente</button>`;
+    }
+  }
+  function iniciarAgendamentoDoCliente(c, trajeto){
+    fecharAgendarCliente();
+    let partida = '', chegada = '', desc = '';
+    if(trajeto === 'casa-aeroporto'){ partida = c.morada; chegada = AEROPORTO_PADRAO; desc = 'casa → aeroporto'; }
+    else if(trajeto === 'aeroporto-casa'){ partida = AEROPORTO_PADRAO; chegada = c.morada; desc = 'aeroporto → casa'; }
+    else if(trajeto === 'casa-outro'){ partida = c.morada; chegada = ''; desc = 'casa → outro local'; }
+    document.querySelector('#segModo button[data-v="transfer"]').click();   // o formulário vive na aba Transfer
+    editandoId = null;
+    hospedarPainelAgendar('transfer');
+    preencherFormAgendamento({
+      partida, chegada, paragens: [], data: '', hora: '',
+      cliente: c.nome, telefone: c.telefone || '', nomePlaca: c.nomePlaca || '', voo: '',
+      fornecedor: c.fornecedor || '', observacoes: '', valor: ''
+    });
+    document.getElementById('btnGuardarAgendamento').textContent = 'Guardar e adicionar ao calendário';
+    const av = document.getElementById('agAvisoRefazer');
+    av.textContent = `👤 A agendar para ${c.nome}${desc ? ' (' + desc + ')' : ''}. Escolhe a data e o horário${trajeto === 'casa-outro' ? ', e o local de destino' : ''} — o resto já está preenchido.${c.notas ? ' 📝 ' + c.notas : ''}`;
+    av.style.display = 'block';
+    const p = document.getElementById('painelAgendar');
+    p.style.display = 'block';
+    p.scrollIntoView({behavior: 'smooth', block: 'start'});
+    if(trajeto === 'casa-outro') setTimeout(()=> document.getElementById('ag_chegada').focus(), 400);
+  }
+
+  // ----- ficha do cliente (criar / editar / apagar) -----
+  let fichaEditandoId = null;
+  let fichaVeioDoAgendar = false;
+  function abrirFichaCliente(id, doAgendar){
+    fichaEditandoId = id || null;
+    fichaVeioDoAgendar = !!doAgendar;
+    const c = id ? (lerClientes().find(x => x.id === id) || {}) : {};
+    document.getElementById('fichaTitulo').textContent = id ? '✏️ Editar cliente' : '👤 Novo cliente';
+    document.getElementById('cli_nome').value = c.nome || '';
+    document.getElementById('cli_telefone').value = c.telefone || '';
+    document.getElementById('cli_morada').value = c.morada || '';
+    document.getElementById('cli_nomeplaca').value = c.nomePlaca || '';
+    document.getElementById('cli_fornecedor').value = c.fornecedor || '';
+    document.getElementById('cli_notas').value = c.notas || '';
+    document.getElementById('cliErro').textContent = '';
+    document.getElementById('btnApagarFicha').style.display = id ? 'block' : 'none';
+    document.getElementById('modalFichaCliente').classList.add('aberto');
+    setTimeout(()=> document.getElementById('cli_nome').focus(), 100);
+  }
+  function fecharFichaCliente(){ document.getElementById('modalFichaCliente').classList.remove('aberto'); }
+  function guardarFichaCliente(){
+    const v = (id) => document.getElementById(id).value.trim();
+    const dados = { nome: v('cli_nome'), telefone: v('cli_telefone'), morada: v('cli_morada'), nomePlaca: v('cli_nomeplaca'), fornecedor: v('cli_fornecedor'), notas: v('cli_notas') };
+    const erro = document.getElementById('cliErro');
+    if(!dados.nome){ erro.textContent = 'Escreve o nome do cliente.'; return; }
+    const lista = lerClientes();
+    const repetido = soDigitos(dados.telefone).length >= 7 && lista.find(c => c.id !== fichaEditandoId && mesmoTelefone(c.telefone, dados.telefone));
+    if(repetido){ erro.textContent = `Já existe um cliente com este telefone: ${repetido.nome}.`; return; }
+    let idFinal = fichaEditandoId;
+    if(fichaEditandoId){
+      const c = lista.find(x => x.id === fichaEditandoId);
+      if(!c){ fecharFichaCliente(); return; }
+      Object.assign(c, dados, { atualizadoEm: Date.now() });
+    } else {
+      idFinal = novoIdCliente();
+      lista.push(Object.assign({ id: idFinal }, dados, { atualizadoEm: Date.now() }));
+    }
+    gravarClientes(lista);
+    fecharFichaCliente();
+    mostrarToast(`💾 Cliente guardado: ${dados.nome}`);
+    // veio do "Agendar cliente": segue direto para escolher o trajeto desse cliente
+    if(fichaVeioDoAgendar) abrirPassoTrajeto(idFinal);
+  }
+  function apagarFichaCliente(){
+    const c = lerClientes().find(x => x.id === fichaEditandoId);
+    if(!c) return;
+    if(!confirm(`Apagar o cliente "${c.nome}"? Os agendamentos que já fizeste para ele não são alterados.`)) return;
+    gravarClientes(lerClientes().filter(x => x.id !== fichaEditandoId));
+    fecharFichaCliente();
+    if(document.getElementById('cliPasso2').style.display !== 'none' && clienteDoPasso2 === fichaEditandoId){
+      document.getElementById('cliPasso1').style.display = 'block';
+      document.getElementById('cliPasso2').style.display = 'none';
+    }
+  }
+
+  // ----- "💾 Guardar este cliente" no formulário de agendar -----
+  function ladoMoradaProvavel(){
+    // se uma ponta é o aeroporto, a outra é a casa do cliente
+    const aP = /aeroporto|airport/i.test(document.getElementById('ag_partida').value);
+    const aC = /aeroporto|airport/i.test(document.getElementById('ag_chegada').value);
+    if(aC && !aP) return 'partida';
+    if(aP && !aC) return 'chegada';
+    return 'partida';
+  }
+  function limparOpcaoGuardarCliente(){
+    const cb = document.getElementById('ag_guardarCliente');
+    if(!cb) return;
+    cb.checked = false;
+    document.getElementById('agMoradaWrap').style.display = 'none';
+    const sel = document.getElementById('ag_clienteMorada');
+    sel.value = 'partida';
+    delete sel.dataset.tocado;
+  }
+  document.getElementById('ag_guardarCliente').addEventListener('change', (e)=>{
+    const sel = document.getElementById('ag_clienteMorada');
+    document.getElementById('agMoradaWrap').style.display = e.target.checked ? 'block' : 'none';
+    if(e.target.checked && !sel.dataset.tocado) sel.value = ladoMoradaProvavel();
+  });
+  document.getElementById('ag_clienteMorada').addEventListener('change', (e)=>{ e.target.dataset.tocado = '1'; });
+  ['ag_partida', 'ag_chegada'].forEach(id => document.getElementById(id).addEventListener('input', ()=>{
+    const sel = document.getElementById('ag_clienteMorada');
+    if(document.getElementById('ag_guardarCliente').checked && !sel.dataset.tocado) sel.value = ladoMoradaProvavel();
+  }));
+
+  // ----- ligações dos botões e listas -----
+  document.getElementById('btnAgendarCliente').addEventListener('click', abrirAgendarCliente);
+  document.getElementById('btnFecharAgendarCliente').addEventListener('click', fecharAgendarCliente);
+  document.getElementById('btnVoltarCliente').addEventListener('click', ()=>{
+    document.getElementById('cliPasso1').style.display = 'block';
+    document.getElementById('cliPasso2').style.display = 'none';
+  });
+  document.getElementById('cli_buscaAgendar').addEventListener('input', renderClientesAgendar);
+  document.getElementById('cli_busca').addEventListener('input', renderClientesConfig);
+  document.getElementById('btnNovoClienteAgendar').addEventListener('click', ()=> abrirFichaCliente(null, true));
+  document.getElementById('btnNovoClienteConfig').addEventListener('click', ()=> abrirFichaCliente(null, false));
+  document.getElementById('listaClientesAgendar').addEventListener('click', (e)=>{
+    const b = e.target.closest('.cli-linha');
+    if(b) abrirPassoTrajeto(b.dataset.id);
+  });
+  document.getElementById('listaClientesConfig').addEventListener('click', (e)=>{
+    const b = e.target.closest('[data-acao="editarCliente"]');
+    if(b) abrirFichaCliente(b.closest('.cli-item').dataset.id, false);
+  });
+  document.getElementById('cliOpcoesTrajeto').addEventListener('click', (e)=>{
+    const op = e.target.closest('[data-trajeto]');
+    if(op){
+      const c = lerClientes().find(x => x.id === clienteDoPasso2);
+      if(c) iniciarAgendamentoDoCliente(c, op.dataset.trajeto);
+      return;
+    }
+    if(e.target.closest('[data-acao="editarCliente"]')) abrirFichaCliente(clienteDoPasso2, true);
+  });
+  document.getElementById('btnGuardarFicha').addEventListener('click', guardarFichaCliente);
+  document.getElementById('btnApagarFicha').addEventListener('click', apagarFichaCliente);
+  document.getElementById('btnCancelarFicha').addEventListener('click', fecharFichaCliente);
+  renderClientesConfig();
+
   function mostrarStatusHora(nivel, texto){
     const el = document.getElementById('statusHoraSite');
     if(!el) return;
@@ -3764,6 +4114,9 @@
     const observacoes = document.getElementById('ag_observacoes').value.trim();
     const tipo = tipoAgendar;
     const apresentacao = tipo === 'transfer' ? document.getElementById('ag_apresentacao').value : '';
+    const guardarCli = document.getElementById('ag_guardarCliente').checked;
+    const ladoMorada = document.getElementById('ag_clienteMorada').value;
+    const dadosCliente = (a) => ({ nome: a.cliente, telefone: a.telefone, nomePlaca: a.nomePlaca, fornecedor: a.fornecedor, partida: a.partida, chegada: a.chegada, lado: ladoMorada });
     const paragens = tipo === 'hora' ? [] : lerParagensAgendar();
 
     if(!partida || (tipo !== 'hora' && !chegada) || !data || !hora || !cliente){
@@ -3800,6 +4153,7 @@
         renderFaturamento();
         abrirICS(ag);
         sincronizarApresentacao(ag, apresentacao);
+        if(guardarCli) guardarClienteDoAgendamento(dadosCliente(ag));
       }
       editandoId = null;
       document.getElementById('btnGuardarAgendamento').textContent = 'Guardar e adicionar ao calendário';
@@ -3816,6 +4170,7 @@
       renderLista();
       abrirICS(ag);
       sincronizarApresentacao(ag, apresentacao);
+      if(guardarCli) guardarClienteDoAgendamento(dadosCliente(ag));
       if(tipo === 'hora' && painelHospedadoEm === 'hora'){
         const av = document.getElementById('avisoHoraAgendado');
         av.textContent = `✅ Agendado: ${ag.cliente}, ${ag.data.split('-').reverse().join('/')} às ${ag.hora}. Fica em "📅 Agendados" aqui em baixo (e também em Transfer → Meus agendamentos); quando fores buscar o cliente, toca em "🚗 Ir buscar cliente" lá e ele passa a aparecer aqui.`;
@@ -3833,6 +4188,7 @@
     document.getElementById('ag_fornecedor').value = '';
     document.getElementById('ag_observacoes').value = '';
     document.getElementById('ag_apresentacao').value = '';
+    limparOpcaoGuardarCliente();
     document.getElementById('painelAgendar').style.display = 'none';
     aplicarTipoAgendar('transfer');
   });
@@ -3853,6 +4209,7 @@
     document.getElementById('ag_hora').value = '';
     document.getElementById('ag_observacoes').value = '';
     document.getElementById('ag_apresentacao').value = '';
+    limparOpcaoGuardarCliente();
     document.getElementById('painelAgendar').style.display = 'none';
     aplicarTipoAgendar('transfer');
     hospedarPainelAgendar('transfer');
@@ -3887,7 +4244,8 @@
       msgTipo: localStorage.getItem('trajeto_msg_tipo') || 'auto',
       msgCustom: localStorage.getItem('trajeto_msg_custom') || '',
       bio: localStorage.getItem('trajeto_bio') || '',
-      foto: localStorage.getItem('trajeto_foto') || ''
+      foto: localStorage.getItem('trajeto_foto') || '',
+      clientes: lerClientes()
     };
     const blob = new Blob([JSON.stringify(dados, null, 2)], {type:'application/json'});
     const url = URL.createObjectURL(blob);
@@ -3914,6 +4272,7 @@
         if(!confirm('Isto substitui os teus agendamentos e configurações atuais pelos do ficheiro. Continuar?')) return;
 
         if(Array.isArray(dados.agendamentos)) gravarAgendamentos(dados.agendamentos);
+        if(Array.isArray(dados.clientes)) gravarClientes(dados.clientes);
         if(dados.cfg){
           cfg = { ...DEFAULTS, ...dados.cfg };
           preencherPainel(cfg);
