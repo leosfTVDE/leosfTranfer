@@ -39,7 +39,7 @@
   header{
     background: linear-gradient(135deg, var(--azul-noite), var(--azul-doca));
     color:var(--branco);
-    padding:28px 20px 24px;
+    padding:16px 18px 14px;
     position:relative;
     overflow:hidden;
   }
@@ -89,7 +89,7 @@
   main{
     max-width:520px;
     margin:0 auto;
-    padding:20px 18px 0;
+    padding:14px 16px 0;
   }
   @media (min-width: 700px){
     main{ max-width:640px; }
@@ -105,7 +105,7 @@
     .seg button{ font-size:14.5px; padding:12px 8px; }
     .valor{ font-size:48px; }
     .ct-rec{ font-size:48px; }
-    .ct-min{ font-size:32px; }
+    .ct-min{ font-size:18px; }
     .ct-cobrar-input{ font-size:32px; padding:16px; }
     .chk{ font-size:14.5px; }
     .ag-item .ag-trajeto{ font-size:15.5px; }
@@ -116,8 +116,8 @@
     background:var(--branco);
     border:1px solid var(--linha);
     border-radius:10px;
-    padding:18px 18px 20px;
-    margin-bottom:16px;
+    padding:16px 16px 18px;
+    margin-bottom:14px;
     box-shadow: 0 2px 10px rgba(13,27,42,.05);
   }
   .card h2{
@@ -148,8 +148,9 @@
   .seg{
     display:flex;
     border:1px solid var(--linha);
-    border-radius:8px;
+    border-radius:10px;
     overflow:hidden;
+    box-shadow:0 1px 4px rgba(13,27,42,.06);
   }
   .seg button{
     flex:1;
@@ -167,7 +168,9 @@
   .seg button.active{
     background:var(--azulejo);
     color:#fff;
+    font-weight:600;
   }
+  .seg-4 button{ padding:11px 2px; font-size:clamp(11.5px, 3.4vw, 13.5px); white-space:nowrap; }
   .seg button{position:relative;}
   .selo-contagem{
     position:absolute;
@@ -222,7 +225,7 @@
     background: linear-gradient(135deg, var(--azul-noite), var(--azul-doca));
     color:var(--branco);
     border-radius:10px;
-    padding:22px 20px;
+    padding:18px 18px 16px;
     text-align:center;
     position:relative;
     overflow:hidden;
@@ -248,7 +251,7 @@
     background:rgba(255,255,255,.1);
     border:1px solid rgba(255,255,255,.25);
     color:#e8c9a0;
-    padding:8px 14px;
+    padding:7px 13px;
     border-radius:20px;
     cursor:pointer;
   }
@@ -413,6 +416,19 @@
   .cli-btn-sec{ background:none; color:#6a7378; border:1px solid var(--linha); font-weight:normal; }
   .cli-btn-perigo{ background:none; color:#a02f24; border:1px solid rgba(180,59,47,.4); }
   .cli-opcao{ display:block; width:100%; padding:15px 14px; margin:0 0 10px; border:none; border-radius:11px; background:var(--terracota); color:#fff; font-family:'Helvetica Neue', Arial, sans-serif; font-size:15.5px; font-weight:bold; cursor:pointer; text-align:left; }
+  .cli-opcao.cli-em-branco{ background:var(--azul-doca); margin-bottom:14px; }
+  .cli-em-branco span{ display:block; font-size:12px; font-weight:normal; opacity:.85; margin-top:2px; }
+  .ag-cab{ display:flex; flex-direction:column; gap:3px; min-width:0; flex:1; }
+  .ag-linha-quando{ font-family:'Helvetica Neue', Arial, sans-serif; font-size:12.5px; font-weight:normal; color:var(--azulejo); display:flex; flex-wrap:wrap; align-items:center; gap:6px; }
+  .ag-linha-quando b{ font-weight:700; color:var(--azul-noite); font-size:13.5px; }
+  .ag-linha-cliente{ font-size:15px; font-weight:bold; color:var(--texto); }
+  .ag-linha-rota{ font-family:'Helvetica Neue', Arial, sans-serif; font-size:12.5px; font-weight:normal; color:#6a7378; line-height:1.35; }
+  .ag-badge-agendado{ background:rgba(42,111,119,.12); color:var(--azulejo); border-radius:10px; padding:1px 8px; font-size:11px; }
+  .cab-info{ display:flex; align-items:center; justify-content:space-between; gap:8px; }
+  .btn-info{ background:none; border:1px solid var(--linha); border-radius:14px; padding:4px 10px; font-family:'Helvetica Neue', Arial, sans-serif; font-size:12px; color:var(--azulejo); text-transform:none; letter-spacing:0; font-weight:normal; cursor:pointer; white-space:nowrap; }
+  .btn-info-calc{ position:absolute; top:10px; right:10px; z-index:2; border-color:rgba(255,255,255,.35); background:rgba(255,255,255,.08); color:#e8c9a0; padding:2px 8px; font-size:14px; }
+  .modal-ajuda h3{ font-family:'Helvetica Neue', Arial, sans-serif; font-size:14px; color:var(--azul-noite); margin:16px 0 4px; }
+  .modal-ajuda p{ font-size:13.5px; line-height:1.55; margin:0; }
   .cli-vazio, .cli-nota, .cli-info-passo{ font-family:'Helvetica Neue', Arial, sans-serif; font-size:13px; color:#6a7378; line-height:1.55; margin:6px 0 10px; }
   .cli-erro{ color:#a02f24; font-size:12.5px; min-height:1.3em; margin:8px 0 0; font-family:'Helvetica Neue', Arial, sans-serif; }
   .ag-guardar-cliente{ margin:14px 0 0; }
@@ -596,14 +612,18 @@
     background: linear-gradient(135deg, var(--azul-noite), var(--azul-doca));
     color:var(--branco);
     border-radius:10px;
-    padding:14px 10px;
+    padding:14px 8px 12px;
     text-align:center;
   }
-  .fat-card .eyebrow{color:#e8c9a0; font-size:9.5px; margin-bottom:4px;}
+  .fat-card .eyebrow{color:#e8c9a0; font-size:10px; margin-bottom:4px;}
   .fat-card .fat-valor{
     font-family: Georgia, 'Times New Roman', serif;
-    font-size:20px;
+    font-size:clamp(20px, 6.4vw, 26px);
+    font-weight:bold;
   }
+  .fat-valor-item{ font-family: Georgia, 'Times New Roman', serif; font-weight:bold; font-size:17px; color:var(--terracota); white-space:nowrap; margin-left:10px; flex-shrink:0; }
+  .fat-item .ag-trajeto{ cursor:default; }
+  .fat-extra{ margin-top:6px; }
   .ag-vazio{
     font-family:'Helvetica Neue', Arial, sans-serif;
     font-size:12.5px;
@@ -622,9 +642,19 @@
   }
   .ct-min{
     font-family: Georgia, 'Times New Roman', serif;
-    font-size:28px;
+    font-size:16px;
     color:#c9d6da;
   }
+  .ct-min-linha{ font-family:'Helvetica Neue', Arial, sans-serif; font-size:13px; color:#a9bcc2; margin:2px 0 0; }
+  .resultado.minimo-igual .ct-min-linha{ opacity:.7; font-size:12px; }
+  .ct-acoes{ display:flex; flex-direction:column; gap:10px; margin-top:16px; }
+  .ct-acoes .btn-agendar{ margin-top:0; }
+  .btn-principal{ background:var(--terracota); border-color:var(--terracota); color:#fff; font-weight:bold; font-size:15px; padding:14px; }
+  .btn-principal:hover{ background:#a8481f; }
+  .btn-secundario{ background:transparent; border:1.5px solid rgba(255,255,255,.55); color:var(--branco); padding:12px; }
+  .btn-secundario:hover{ background:rgba(255,255,255,.1); }
+  .btn-terciario{ background:none; border:none; color:#c9d6da; text-decoration:underline; padding:12px 6px; font-size:13px; }
+  .btn-terciario:hover{ background:none; color:#fff; }
   .ct-rec{
     font-family: Georgia, 'Times New Roman', serif;
     font-weight:bold;
@@ -702,8 +732,8 @@
     background:#fdf0e6;
     border:1px solid var(--terracota);
     border-radius:10px;
-    padding:16px 18px;
-    margin-bottom:16px;
+    padding:14px 14px 10px;
+    margin-bottom:14px;
   }
   .fat-receber-card .fat-receber-titulo{
     font-family:'Helvetica Neue', Arial, sans-serif;
@@ -897,8 +927,8 @@
   }
   /* Logo Trajeto Transfer centrado no cabeçalho */
   header{ text-align:center; }
-  .logo-lockup{ display:block; width:clamp(150px, 46vw, 210px); height:auto; margin:0 auto; position:relative; z-index:1; }
-  .header-botoes{ display:flex; justify-content:center; flex-wrap:wrap; gap:10px; margin-top:16px; position:relative; z-index:1; }
+  .logo-lockup{ display:block; width:clamp(110px, 32vw, 150px); height:auto; margin:0 auto; position:relative; z-index:1; }
+  .header-botoes{ display:flex; justify-content:center; flex-wrap:wrap; gap:8px; margin-top:10px; position:relative; z-index:1; }
   .header-botoes .btn-config{ margin-top:0; }
 </style>
 </head>
@@ -914,7 +944,7 @@
 
 <main>
 
-  <button type="button" id="btnAgendarCliente" class="btn-agendar-cliente">📅 Agendar cliente</button>
+  <button type="button" id="btnAgendarCliente" class="btn-agendar-cliente">📅 Novo agendamento</button>
 
   <div class="seg seg-4" id="segModo" style="margin-bottom:18px;">
     <button data-v="transfer" class="active">Transfer</button>
@@ -1266,16 +1296,18 @@
       </div>
     </div>
 
-    <div class="resultado">
-      <p class="eyebrow">Valor mínimo</p>
-      <div class="ct-min" id="ct_valorMinimo">€0</div>
-      <p class="eyebrow" style="margin-top:14px;">Valor recomendado</p>
+    <div class="resultado" id="cartaoResultado">
+      <button type="button" class="btn-info btn-info-calc" id="btnAjudaCalc" aria-label="Como funciona?">ℹ️</button>
+      <p class="eyebrow">Preço recomendado</p>
       <div class="ct-rec" id="ct_valorRecomendado">€0</div>
-      <p class="eyebrow" style="margin-top:16px;">💰 Cobrar do cliente</p>
+      <p class="ct-min-linha">Valor mínimo: <span class="ct-min" id="ct_valorMinimo">€0</span></p>
+      <p class="eyebrow" style="margin-top:16px;">💰 Valor a cobrar ao cliente</p>
       <input type="number" id="ct_cobrar" class="ct-cobrar-input" step="0.5">
-      <button class="btn-agendar" id="btnCopiarOrcamento" style="margin-top:14px;">📋 Copiar orçamento</button>
-      <button class="btn-agendar" id="ct_btnNovo" style="margin-top:14px;">🔄 Novo cálculo</button>
-      <button class="btn-agendar" id="btnAbrirAgendar">📅 Agendar esta corrida</button>
+      <div class="ct-acoes">
+        <button class="btn-agendar btn-principal" id="btnCopiarOrcamento">📋 Copiar orçamento</button>
+        <button class="btn-agendar btn-secundario" id="btnAbrirAgendar">📅 Agendar esta corrida</button>
+        <button class="btn-agendar btn-terciario" id="ct_btnNovo">🔄 Novo cálculo</button>
+      </div>
     </div>
 
 <div id="painelAgendar">
@@ -1362,15 +1394,13 @@
     </div>
 
     <div class="card">
-      <h2>Meus agendamentos</h2>
+      <h2 class="cab-info">Meus agendamentos <button type="button" class="btn-info" id="btnAjudaAg">ℹ️ Como funciona?</button></h2>
       <div class="seg" id="segFiltroAg" style="margin-bottom:14px;">
         <button data-v="ativos" class="active">Ativos</button>
         <button data-v="concluidos">Concluídos</button>
       </div>
       <div class="lista-agendamentos" id="listaAgendamentos"></div>
     </div>
-
-    <p class="nota">Os botões "Ir buscar cliente" e "Iniciar viagem" abrem o Waze já com o destino certo — ele usa a tua localização atual como ponto de partida automaticamente (precisa do Waze instalado no telemóvel).<br><br>A calculadora não soma ida + volta automaticamente, a não ser que marques "Regresso vazio". Portagens não são calculadas automaticamente — confirma no Waze/Google Maps e insere aqui manualmente.<br><br>Os agendamentos ficam guardados só neste telemóvel/navegador. O lembrete 24h antes é feito pelo teu Calendário.</p>
 
     
   </div>
@@ -1413,11 +1443,10 @@
     </div>
 
     <div class="card">
-      <h2>Corridas faturadas</h2>
+      <h2 class="cab-info">Corridas faturadas <button type="button" class="btn-info" id="btnAjudaFat">ℹ️ Como funciona?</button></h2>
       <div class="lista-agendamentos" id="listaFaturamento"></div>
     </div>
 
-    <p class="nota">Aparecem aqui os agendamentos marcados como "✅ Concluído" na aba Transfer rápido. Os totais somam o valor guardado em cada agendamento.</p>
   </div>
 
   <div id="viewPedidos" style="display:none;">
@@ -1438,7 +1467,7 @@
     <p class="nota">Os serviços por hora agendados ficam em "📅 Agendados". Os que estão em andamento aparecem a partir do momento em que tocas em "🚗 Ir buscar cliente" no agendamento. O tempo só começa a contar quando tocas em "▶️ Iniciar" (cliente no carro). Ao finalizar, o valor é calculado pela regra definida em "Minhas tarifas" e podes enviar o resumo ao cliente. O agendamento só sai da lista quando o marcares como "Concluído".</p>
   </div>
 
-  <p style="text-align:center; font-family:'Helvetica Neue', Arial, sans-serif; font-size:11px; color:#8a7f66; margin-top:24px;">Trajeto · v9.9.7</p>
+  <p style="text-align:center; font-family:'Helvetica Neue', Arial, sans-serif; font-size:11px; color:#8a7f66; margin-top:24px;">Trajeto · v9.10.1</p>
 
 </main>
 
@@ -1517,7 +1546,9 @@
 <div class="modal-overlay" id="modalAgendarCliente">
   <div class="modal-card modal-cli">
     <div id="cliPasso1">
-      <h2>📅 Agendar cliente</h2>
+      <h2>📅 Novo agendamento</h2>
+      <button type="button" class="cli-opcao cli-em-branco" id="btnAgendamentoEmBranco">✏️ Agendamento em branco<span>sem cliente salvo — preenches tudo à mão</span></button>
+      <p class="cli-info-passo">Ou escolhe um cliente salvo:</p>
       <input type="text" id="cli_buscaAgendar" placeholder="🔎 Procurar cliente...">
       <div id="listaClientesAgendar"></div>
       <button type="button" class="cli-btn" id="btnNovoClienteAgendar">➕ Novo cliente</button>
@@ -1551,6 +1582,21 @@
     <button type="button" class="cli-btn" id="btnGuardarFicha">Guardar cliente</button>
     <button type="button" class="cli-btn cli-btn-perigo" id="btnApagarFicha" style="display:none;">🗑 Apagar cliente</button>
     <button type="button" class="cli-btn cli-btn-sec" id="btnCancelarFicha">Cancelar</button>
+  </div>
+</div>
+
+<div class="modal-overlay" id="modalAjuda">
+  <div class="modal-card modal-cli modal-ajuda">
+    <h2>ℹ️ Como funciona?</h2>
+    <h3 id="ajudaCalc">🧮 Calculadora</h3>
+    <p>A calculadora não soma ida + volta automaticamente, a não ser que marques "Regresso vazio". Portagens não são calculadas automaticamente — confirma no Waze/Google Maps e insere aqui manualmente.</p>
+    <h3 id="ajudaWaze">🚗 Waze e localização</h3>
+    <p>Os botões "Ir buscar cliente" e "Iniciar viagem" abrem o Waze já com o destino certo — ele usa a tua localização atual como ponto de partida automaticamente (precisa do Waze instalado no telemóvel).</p>
+    <h3 id="ajudaAgenda">📅 Agendamentos e lembretes</h3>
+    <p>Com a sessão iniciada, os agendamentos sincronizam com a tua conta e aparecem nos teus outros aparelhos; sem sessão, ficam só neste aparelho. O lembrete 24h antes é feito pelo teu Calendário.</p>
+    <h3 id="ajudaFat">💶 Faturamento</h3>
+    <p>Aparecem aqui os agendamentos marcados como "✅ Concluído". Os totais somam o valor guardado em cada agendamento.</p>
+    <button type="button" class="cli-btn" id="btnFecharAjuda">Entendi</button>
   </div>
 </div>
 
@@ -2625,9 +2671,27 @@
     cab.setAttribute('aria-expanded', String(concluidosAbertos));
   });
 
+  // "Hoje · 09:30", "Amanhã · 09:30" ou "Sáb 12/12 · 09:30" (com o ano só se não for o ano atual)
+  function rotuloQuando(ag){
+    const [y, m, d] = (ag.data || '').split('-').map(Number);
+    if(!y) return escHtml(ag.hora || '');
+    const hoje = new Date();
+    const base = new Date(hoje.getFullYear(), hoje.getMonth(), hoje.getDate());
+    const alvo = new Date(y, m - 1, d);
+    const dif = Math.round((alvo - base) / 86400000);
+    const sem = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'][alvo.getDay()];
+    const dia = dif === 0 ? 'Hoje' : dif === 1 ? 'Amanhã' : `${sem} ${pad(d)}/${pad(m)}${y !== hoje.getFullYear() ? '/' + y : ''}`;
+    return escHtml(`${dia} · ${ag.hora || ''}`);
+  }
+
   function renderLista(){
     renderHora();
     const todos = lerAgendamentos();
+    const nAtivos = todos.filter(a => !a.realizado).length;
+    const bAt = document.querySelector('#segFiltroAg button[data-v="ativos"]');
+    const bCo = document.querySelector('#segFiltroAg button[data-v="concluidos"]');
+    if(bAt) bAt.textContent = `Ativos (${nAtivos})`;
+    if(bCo) bCo.textContent = `Concluídos (${todos.length - nAtivos})`;
     const lista = todos
       .filter(ag => filtroAg === 'concluidos' ? ag.realizado : !ag.realizado)
       .sort((a,b)=> filtroAg === 'concluidos'
@@ -2653,6 +2717,7 @@
       const estadoHora = (eHora && !ag.realizado)
         ? ({ a_caminho: '🚗 A caminho', em_curso: '⏱ Em curso', finalizado: '🏁 Finalizado' }[ag.hEstado] || '') : '';
       const seloEstadoHora = estadoHora ? `<span class="ag-badge-hora">${estadoHora}</span>` : '';
+      const seloAgendado = (!ag.realizado && !estadoHora) ? '<span class="ag-badge-agendado">📅 Agendado</span>' : '';
       let navHtml;
       if(eHora){
         if(ag.realizado) navHtml = '';
@@ -2663,7 +2728,7 @@
       }
       return `
       <div class="ag-item ${ag.realizado ? 'ag-item-realizado' : ''}" data-id="${ag.id}">
-        <div class="ag-trajeto"><span>${tituloAg(ag)}${ag.realizado ? '<span class="ag-badge-ok">✔ Concluído</span>' : ''}${seloPagamento}${seloEstadoHora}</span><span class="ag-seta">▸</span></div>
+        <div class="ag-trajeto"><span class="ag-cab"><span class="ag-linha-quando"><b>${rotuloQuando(ag)}</b>${seloAgendado}${ag.realizado ? '<span class="ag-badge-ok">✔ Concluído</span>' : ''}${seloPagamento}${seloEstadoHora}</span><span class="ag-linha-cliente">${escHtml(ag.cliente)}</span><span class="ag-linha-rota">${tituloAg(ag)}</span></span><span class="ag-seta">▸</span></div>
         <div class="ag-detalhes">
         <div class="ag-meta">
           📅 ${escHtml(ag.data.split('-').reverse().join('/'))} às ${escHtml(ag.hora)}<br>
@@ -3467,6 +3532,21 @@
   }));
 
   // ----- ligações dos botões e listas -----
+  // Agendamento em branco: formulário vazio (sem cliente salvo e sem dados da calculadora).
+  function abrirAgendamentoEmBranco(){
+    fecharAgendarCliente();
+    document.querySelector('#segModo button[data-v="transfer"]').click();   // o formulário vive na aba Transfer
+    editandoId = null;                                                        // nunca edita um agendamento existente
+    hospedarPainelAgendar('transfer');
+    preencherFormAgendamento({ partida: '', chegada: '', paragens: [], data: '', hora: '', cliente: '', telefone: '', nomePlaca: '', voo: '', fornecedor: '', observacoes: '', valor: '' });
+    document.getElementById('btnGuardarAgendamento').textContent = 'Guardar e adicionar ao calendário';
+    document.getElementById('agAvisoRefazer').style.display = 'none';
+    const p = document.getElementById('painelAgendar');
+    p.style.display = 'block';
+    p.scrollIntoView({behavior: 'smooth', block: 'start'});
+    setTimeout(()=> document.getElementById('ag_cliente').focus(), 400);
+  }
+  document.getElementById('btnAgendamentoEmBranco').addEventListener('click', abrirAgendamentoEmBranco);
   document.getElementById('btnAgendarCliente').addEventListener('click', abrirAgendarCliente);
   document.getElementById('btnFecharAgendarCliente').addEventListener('click', fecharAgendarCliente);
   document.getElementById('btnVoltarCliente').addEventListener('click', ()=>{
@@ -3498,6 +3578,25 @@
   document.getElementById('btnApagarFicha').addEventListener('click', apagarFichaCliente);
   document.getElementById('btnCancelarFicha').addEventListener('click', fecharFichaCliente);
   renderClientesConfig();
+
+  // Janela "Como funciona?" (as explicações saíram do fim da página)
+  function abrirAjuda(secao){
+    document.getElementById('modalAjuda').classList.add('aberto');
+    const el = secao && document.getElementById(secao);
+    if(el) setTimeout(()=> el.scrollIntoView({block: 'start'}), 30);
+  }
+  document.getElementById('btnAjudaAg').addEventListener('click', ()=> abrirAjuda('ajudaWaze'));
+  document.getElementById('btnAjudaCalc').addEventListener('click', ()=> abrirAjuda('ajudaCalc'));
+  document.getElementById('btnAjudaFat').addEventListener('click', ()=> abrirAjuda('ajudaFat'));
+  document.getElementById('btnFecharAjuda').addEventListener('click', ()=> document.getElementById('modalAjuda').classList.remove('aberto'));
+
+  // Só visual: quando o valor mínimo é igual ao recomendado, o mínimo fica mais discreto.
+  (function(){
+    const rec = document.getElementById('ct_valorRecomendado'), min = document.getElementById('ct_valorMinimo'), cartao = document.getElementById('cartaoResultado');
+    const atualizar = () => cartao.classList.toggle('minimo-igual', rec.textContent === min.textContent);
+    [rec, min].forEach(el => new MutationObserver(atualizar).observe(el, { childList: true, characterData: true, subtree: true }));
+    atualizar();
+  })();
 
   function mostrarStatusHora(nivel, texto){
     const el = document.getElementById('statusHoraSite');
@@ -4049,20 +4148,17 @@
       elReceber.innerHTML = '<p class="ag-vazio">Nada pendente — tudo recebido! 🎉</p>';
     } else {
       const pendentesOrd = [...pendentes].sort((a,b)=> (a.data+a.hora).localeCompare(b.data+b.hora));
-      elReceber.innerHTML = pendentesOrd.map(ag => `
-        <div class="ag-item" data-id="${ag.id}">
-          <div class="ag-trajeto">${tituloAg(ag)}</div>
-          <div class="ag-meta">
-            📅 ${escHtml(ag.data.split('-').reverse().join('/'))}<br>
-            👤 ${escHtml(ag.cliente)} &nbsp;·&nbsp; <span class="ag-valor">€${ag.valor}</span>
-            ${linhaHoraMeta(ag)}
-            ${ag.fornecedor ? `<br>🏷 Fornecedor: ${escHtml(ag.fornecedor)}` : ''}
-          </div>
+      elReceber.innerHTML = pendentesOrd.map(ag => {
+        const extra = [linhaHoraMeta(ag), ag.fornecedor ? `<br>🏷 Fornecedor: ${escHtml(ag.fornecedor)}` : ''].join('').replace(/^\s*(<br>\s*)+/, '').trim();
+        return `
+        <div class="ag-item fat-item" data-id="${escHtml(ag.id)}">
+          <div class="ag-trajeto fat-cab"><span class="ag-cab"><span class="ag-linha-quando"><b>${rotuloQuando(ag)}</b><span class="ag-badge-pendente">⏳ A receber</span></span><span class="ag-linha-cliente">${escHtml(ag.cliente)}</span><span class="ag-linha-rota">${tituloAg(ag)}</span></span><span class="fat-valor-item">€${ag.valor}</span></div>
+          ${extra ? `<div class="ag-meta fat-extra">${extra}</div>` : ''}
           <div class="ag-acoes">
             <button class="ag-btn-ok" data-acao="marcarRecebido">💰 Marcar como recebido</button>
           </div>
-        </div>
-      `).join('');
+        </div>`;
+      }).join('');
     }
 
     const periodo = getPeriodo(fatModo, fatOffset);
@@ -4083,7 +4179,7 @@
       const selo = ag.pagamento === 'recebido' ? '<span class="ag-badge-pago">💰 Recebido</span>' : '<span class="ag-badge-pendente">⏳ A receber</span>';
       return `
       <div class="ag-item" data-id="${escHtml(ag.id)}">
-        <div class="ag-trajeto"><span>${tituloAg(ag)}${selo}</span><span class="ag-seta">▸</span></div>
+        <div class="ag-trajeto"><span class="ag-cab"><span class="ag-linha-quando"><b>${rotuloQuando(ag)}</b>${selo}</span><span class="ag-linha-cliente">${escHtml(ag.cliente)}</span><span class="ag-linha-rota">${tituloAg(ag)}</span></span><span class="fat-valor-item">€${ag.valor}</span><span class="ag-seta">▸</span></div>
         <div class="ag-detalhes">
         <div class="ag-meta">
           📅 ${escHtml(ag.data.split('-').reverse().join('/'))}<br>
