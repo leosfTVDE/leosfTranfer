@@ -273,6 +273,26 @@
   .erro{ min-height:16px; margin:10px 0 0; color:var(--terracota); font-size:12.5px; text-align:center; }
   .nota{ margin:12px 4px 0; font-size:11.5px; color:#8a7f66; text-align:center; line-height:1.55; }
 
+  /* Escolha do tour (formulário) */
+  .lab-tour{ margin:0 0 8px; font-size:12.5px; color:var(--sub); }
+  .tl{ display:flex; flex-direction:column; gap:8px; margin-bottom:6px; }
+  .to{ display:flex; gap:10px; align-items:stretch; width:100%; padding:0; border:1.5px solid var(--borda); border-radius:12px; background:#fff; overflow:hidden; text-align:left; font-family:var(--ui); color:var(--texto); cursor:pointer; }
+  .to.sel{ border-color:var(--azulejo); box-shadow:0 0 0 3px rgba(42,111,119,.15); }
+  .to .tfoto{ width:86px; min-height:86px; flex-shrink:0; background:linear-gradient(160deg,#2a6f77,#0d1b2a); position:relative; }
+  .to .tfoto img{ position:absolute; inset:0; width:100%; height:100%; object-fit:cover; }
+  .to .tx{ flex:1; min-width:0; padding:10px 0; }
+  .to .tx b{ display:block; font-size:14.5px; color:var(--azul-noite); }
+  .to .tx small{ display:block; margin-top:2px; font-size:12px; color:var(--sub); }
+  .to .vr{ display:inline-block; margin-top:6px; padding:0; border:none; background:none; font-family:var(--ui); font-size:12.5px; font-weight:700; color:var(--azulejo); cursor:pointer; }
+  .to .rad{ width:22px; height:22px; margin:auto 10px auto 0; flex-shrink:0; border:2px solid var(--linha); border-radius:50%; display:flex; align-items:center; justify-content:center; }
+  .to.sel .rad{ border-color:var(--azulejo); background:var(--azulejo); }
+  .to.sel .rad::after{ content:'✓'; color:#fff; font-size:13px; font-weight:700; }
+  .to.perso{ align-items:center; }
+  .to.perso .pi{ width:40px; height:40px; margin-left:12px; border-radius:10px; background:rgba(42,111,119,.1); color:var(--azulejo); display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+  .rot{ margin:6px 0 0; padding:0; list-style:none; counter-reset:r; }
+  .rot li{ position:relative; padding:2px 0 2px 24px; font-size:12.5px; color:#3d4c52; counter-increment:r; }
+  .rot li::before{ content:counter(r); position:absolute; left:0; top:3px; width:17px; height:17px; border-radius:50%; background:var(--azulejo); color:#fff; font-size:10px; font-weight:700; display:flex; align-items:center; justify-content:center; }
+
   /* Confirmação */
   .confirmacao{ display:none; text-align:center; }
   .confirmacao .ok{ width:64px; height:64px; margin:4px auto 10px; border-radius:50%; background:rgba(46,139,87,.13); color:#23704a; display:flex; align-items:center; justify-content:center; }
@@ -456,7 +476,13 @@
         </div>
         <div class="info-hora" id="infoHora" style="display:none;"></div>
 
-        <label for="p_partida" data-i18n="label_partida">Local de partida</label>
+        <div id="blocoTours" style="display:none;">
+          <p class="lab-tour" data-i18n="tour_escolha">Escolha um tour</p>
+          <div class="tl" id="tourLista"></div>
+          <p class="erro" id="erroTour" style="text-align:left; margin:0 0 6px;"></p>
+        </div>
+
+        <label for="p_partida" id="labelPartida" data-i18n="label_partida">Local de partida</label>
         <input type="text" id="p_partida" data-i18n-placeholder="ph_partida" placeholder="ex: Aeroporto de Lisboa, T1" required>
 
         <div id="blocoParagensPedido">
@@ -469,21 +495,24 @@
           <input type="text" id="p_chegada" data-i18n-placeholder="ph_chegada" placeholder="ex: Hotel Avenida Palace" required>
         </div>
 
-        <label for="p_voo" data-i18n="label_voo">Número do voo (opcional)</label>
-        <input type="text" id="p_voo" data-i18n-placeholder="ph_voo" placeholder="ex: TP1234">
+        <div id="blocoVooPedido">
+          <label for="p_voo" data-i18n="label_voo">Número do voo (opcional)</label>
+          <input type="text" id="p_voo" data-i18n-placeholder="ph_voo" placeholder="ex: TP1234">
+        </div>
 
         <div class="botoes-passo"><button type="button" class="btn-enviar" data-ir-passo="2" data-i18n="btn_continuar">Continuar</button></div>
         <button type="button" class="btn-cancelar" id="btnCancelarForm" data-i18n="btn_cancelar">Cancelar</button>
       </div>
 
       <div class="passo" data-passo="2" hidden>
+        <div class="prefill" id="resumoTourPasso2" hidden></div>
         <div class="row2" style="margin-top:0">
           <div>
             <label for="p_data" data-i18n="label_data">Data</label>
             <input type="date" id="p_data" required>
           </div>
           <div>
-            <label for="p_hora" data-i18n="label_hora">Horário</label>
+            <label for="p_hora" id="labelHora" data-i18n="label_hora">Horário</label>
             <input type="time" id="p_hora" required>
           </div>
         </div>
@@ -579,7 +608,7 @@
     <div class="parceiros-lista" id="parceirosLista"></div>
   </div>
   <p class="copy">Trajeto Transfer · Lisboa</p>
-  <p class="versao">v9.12.2</p>
+  <p class="versao">v9.13.0</p>
 </footer>
 
 <div class="barra" id="barraFixa">
@@ -626,6 +655,17 @@
 
   const TEXTOS = {
     pt: {
+      tour_escolha: 'Escolha um tour',
+      tour_perso: 'Tour personalizado',
+      tour_perso_sub: 'Diga-nos o que quer visitar',
+      ver_roteiro: 'Ver roteiro ▾',
+      ocultar_roteiro: 'Ocultar roteiro ▴',
+      paragens_n: '{n} paragens',
+      erro_tour: 'Escolha um tour (ou "Tour personalizado").',
+      label_recolha: 'Local de recolha (hotel ou morada)',
+      ph_recolha: 'ex: Hotel Avenida Palace',
+      hora_inicio: 'Hora de início',
+      recolha_em: 'recolha em {r}',
       servico_pergunta: 'Que serviço procura?',
       servico_toque: 'Toque num serviço para pedir a sua cotação.',
       atalho_transfer_sub: 'Aeroporto e cidade',
@@ -764,6 +804,17 @@
       parceiros_titulo: 'Parceiros'
     },
     en: {
+      tour_escolha: 'Choose a tour',
+      tour_perso: 'Custom tour',
+      tour_perso_sub: 'Tell us what you would like to see',
+      ver_roteiro: 'See itinerary ▾',
+      ocultar_roteiro: 'Hide itinerary ▴',
+      paragens_n: '{n} stops',
+      erro_tour: 'Choose a tour (or "Custom tour").',
+      label_recolha: 'Pick-up location (hotel or address)',
+      ph_recolha: 'e.g. Avenida Palace Hotel',
+      hora_inicio: 'Start time',
+      recolha_em: 'pick-up at {r}',
       servico_pergunta: 'What service do you need?',
       servico_toque: 'Tap a service to request your quote.',
       atalho_transfer_sub: 'Airport and city',
@@ -1041,17 +1092,25 @@
     box.style.display = 'block';
   }
   function definirTipoPedido(tipo){
-    tipoPedido = tipo === 'hora' && !horaDesativada ? 'hora' : 'transfer';
-    const hora = tipoPedido === 'hora';
+    tipoPedido = tipo === 'hora' && !horaDesativada ? 'hora' : tipo === 'tour' ? 'tour' : 'transfer';
+    const hora = tipoPedido === 'hora', tour = tipoPedido === 'tour';
     const tipoVisivel = (typeof window.tipoVisual === 'function') ? window.tipoVisual() : tipoPedido;
     document.getElementById('tipoSwitch').querySelectorAll('button').forEach(b=>{
       b.classList.toggle('active', b.dataset.tipo === tipoVisivel);
     });
-    document.getElementById('blocoParagensPedido').style.display = hora ? 'none' : 'block';
-    document.getElementById('blocoChegadaPedido').style.display = hora ? 'none' : 'block';
+    document.getElementById('blocoParagensPedido').style.display = (hora || tour) ? 'none' : 'block';
+    document.getElementById('blocoChegadaPedido').style.display = (hora || tour) ? 'none' : 'block';
     document.getElementById('blocoHoras').style.display = hora ? 'block' : 'none';
-    document.getElementById('p_chegada').required = !hora;
+    document.getElementById('p_chegada').required = !(hora || tour);
     document.getElementById('p_horas').required = hora;
+    // tour: escolher o tour, só o local de recolha (sem chegada, paragens nem voo)
+    document.getElementById('blocoTours').style.display = tour ? 'block' : 'none';
+    document.getElementById('blocoVooPedido').style.display = tour ? 'none' : 'block';
+    const t = TEXTOS[idiomaAtual];
+    document.getElementById('labelPartida').textContent = tour ? t.label_recolha : t.label_partida;
+    document.getElementById('p_partida').placeholder = tour ? t.ph_recolha : t.ph_partida;
+    document.getElementById('labelHora').textContent = tour ? t.hora_inicio : t.label_hora;
+    if(typeof window.aoMudarTipo === 'function') window.aoMudarTipo(tipoPedido);
     renderInfoHora();
   }
   document.getElementById('tipoSwitch').addEventListener('click', (e)=>{
@@ -1084,7 +1143,7 @@
   window.prepararFormularioPorAtalho = function(atalho){
     let tipo = 'transfer', prefixo = '';
     if(atalho === 'hora'){ if(!horaDesativada) tipo = 'hora'; else prefixo = 'hora'; }
-    else if(atalho === 'tour'){ prefixo = 'tour'; }
+    else if(atalho === 'tour'){ tipo = 'tour'; prefixo = 'tour'; }
     definirTipoPedido(tipo);
     const obs = document.getElementById('p_obs');
     if(!obs) return;
@@ -1112,11 +1171,79 @@
   const PREFIXOS_TOUR = ['Tour privado: ', 'Private tour: '];
 
   // ---- Tipo visível no seletor: "Tour" = transfer com a observação de tour ----
-  window.tipoVisual = function(){
+  window.tipoVisual = function(){ return tipoPedido; };
+
+  // ---- Escolha do tour no formulário (tours geridos no galeria.html) ----
+  let toursPublicados = [];          // [{nome, texto, duracao, roteiro[], foto}]
+  let tourEscolhido = null;          // índice em toursPublicados, 'perso' ou null
+  let roteiroAberto = -1;
+  function prefixoTour(){ return idiomaAtual === 'pt' ? 'Tour privado: ' : 'Private tour: '; }
+  function ehObsAutomatica(v){ return v === '' || PREFIXOS_TOUR.includes(v) || PREFIXOS_TOUR.includes(v + ' ') || (window.__obsAuto && v === window.__obsAuto); }
+  function escolherTour(escolha){
+    tourEscolhido = escolha;
+    document.getElementById('erroTour').textContent = '';
     const obs = document.getElementById('p_obs');
-    if(tipoPedido === 'transfer' && obs && PREFIXOS_TOUR.some(p => obs.value.startsWith(p))) return 'tour';
-    return tipoPedido;
+    if(ehObsAutomatica(obs.value)){
+      obs.value = escolha === 'perso' || escolha === null ? prefixoTour() : prefixoTour() + toursPublicados[escolha].nome;
+      window.__obsAuto = obs.value;
+    }
+    desenharTourLista();
+  }
+  function desenharTourLista(){
+    const lista = document.getElementById('tourLista'); if(!lista) return;
+    const t = tx(); lista.innerHTML = '';
+    toursPublicados.forEach((tr, i)=>{
+      const b = el('div', 'to' + (tourEscolhido === i ? ' sel' : '')); b.setAttribute('role', 'radio'); b.setAttribute('aria-checked', String(tourEscolhido === i)); b.tabIndex = 0; b.dataset.tourIdx = i;
+      const ft = el('div', 'tfoto'); const src = fotoSegura(tr.foto); if(src){ const im = el('img'); im.src = src; im.alt = ''; ft.appendChild(im); }
+      const txt = el('div', 'tx'); txt.appendChild(el('b', '', tr.nome));
+      const info = [tr.duracao, tr.roteiro.length ? t.paragens_n.replace('{n}', tr.roteiro.length) : ''].filter(Boolean).join(' · ');
+      if(info) txt.appendChild(el('small', '', info));
+      if(tr.roteiro.length){
+        if(roteiroAberto === i){ const ol = el('ol', 'rot'); tr.roteiro.forEach(r => ol.appendChild(el('li', '', r))); txt.appendChild(ol); }
+        const vr = el('button', 'vr', roteiroAberto === i ? t.ocultar_roteiro : t.ver_roteiro); vr.type = 'button'; vr.dataset.verRoteiro = i; txt.appendChild(vr);
+      }
+      b.appendChild(ft); b.appendChild(txt); b.appendChild(el('span', 'rad')); lista.appendChild(b);
+    });
+    const pz = el('div', 'to perso' + (tourEscolhido === 'perso' ? ' sel' : '')); pz.setAttribute('role', 'radio'); pz.setAttribute('aria-checked', String(tourEscolhido === 'perso')); pz.tabIndex = 0; pz.dataset.tourIdx = 'perso';
+    const pi = el('span', 'pi'); pi.innerHTML = '<svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20h4L19 9l-4-4L4 16z"/></svg>';
+    const ptx = el('div', 'tx'); ptx.appendChild(el('b', '', t.tour_perso)); ptx.appendChild(el('small', '', t.tour_perso_sub));
+    pz.appendChild(pi); pz.appendChild(ptx); pz.appendChild(el('span', 'rad')); lista.appendChild(pz);
+  }
+  document.getElementById('tourLista').addEventListener('click', (e)=>{
+    const vr = e.target.closest('[data-ver-roteiro]');
+    if(vr){ const i = Number(vr.dataset.verRoteiro); roteiroAberto = roteiroAberto === i ? -1 : i; desenharTourLista(); return; }
+    const c = e.target.closest('[data-tour-idx]'); if(!c) return;
+    escolherTour(c.dataset.tourIdx === 'perso' ? 'perso' : Number(c.dataset.tourIdx));
+  });
+  document.getElementById('tourLista').addEventListener('keydown', (e)=>{
+    if(e.key !== 'Enter' && e.key !== ' ') return;
+    const c = e.target.closest('[data-tour-idx]'); if(!c) return; e.preventDefault();
+    escolherTour(c.dataset.tourIdx === 'perso' ? 'perso' : Number(c.dataset.tourIdx));
+  });
+  window.aoMudarTipo = function(tipo){
+    if(tipo === 'tour'){
+      if(!toursPublicados.length && tourEscolhido === null) tourEscolhido = 'perso';   // sem tours publicados: só existe o personalizado
+      desenharTourLista();
+    }
+    desenharResumoTourPasso2();
   };
+  window.obterTourEscolhido = function(){
+    if(tourEscolhido === 'perso') return { nome: 'Tour personalizado', duracao: '', roteiro: [] };
+    if(typeof tourEscolhido === 'number' && toursPublicados[tourEscolhido]){ const t = toursPublicados[tourEscolhido]; return { nome: t.nome, duracao: t.duracao, roteiro: t.roteiro.slice() }; }
+    return null;
+  };
+  function nomeTourVisivel(){ const e = window.obterTourEscolhido(); if(!e) return ''; return tourEscolhido === 'perso' ? tx().tour_perso : e.nome; }
+  function desenharResumoTourPasso2(){
+    const caixa = document.getElementById('resumoTourPasso2'); if(!caixa) return;
+    const e = window.obterTourEscolhido();
+    if(tipoPedido !== 'tour' || !e){ caixa.hidden = true; return; }
+    const recolha = document.getElementById('p_partida').value.trim();
+    caixa.innerHTML = ''; caixa.appendChild(svgIco('mapa'));
+    const sp = el('span'); sp.appendChild(el('b', '', nomeTourVisivel()));
+    const resto = [e.duracao, recolha ? tx().recolha_em.replace('{r}', recolha) : ''].filter(Boolean).join(' · ');
+    if(resto) sp.appendChild(document.createTextNode(' · ' + resto));
+    caixa.appendChild(sp); caixa.hidden = false;
+  }
 
   // ---- Passos ----
   let passoAtual = 1;
@@ -1128,6 +1255,7 @@
     const txt = document.getElementById('passoTxt');
     txt.textContent = t.passo_de.replace('{n}', passoAtual) + ' · ';
     txt.appendChild(el('b', '', t['passo' + passoAtual]));
+    desenharResumoTourPasso2();
   }
   window.irParaPasso = function(n, reiniciar){
     passoAtual = n;
@@ -1143,6 +1271,11 @@
     }
   };
   function validarPasso(n){
+    if(n === 1 && tipoPedido === 'tour' && !window.obterTourEscolhido()){
+      document.getElementById('erroTour').textContent = tx().erro_tour;
+      document.getElementById('blocoTours').scrollIntoView({ behavior:'smooth', block:'center' });
+      return false;
+    }
     const campos = [...document.querySelectorAll(`#formPedido .passo[data-passo="${n}"] input, #formPedido .passo[data-passo="${n}"] textarea`)];
     for(const c of campos){
       if(visivel(c) && !c.checkValidity()){ c.reportValidity(); return false; }
@@ -1204,14 +1337,11 @@
     prefillAtual = { tipo:'destino', nome }; mostrarPrefill();
   }
   function abrirTour(nome){
+    tourEscolhido = null; roteiroAberto = -1;
     abrirComTipo('tour', { topo:true });
-    const obs = document.getElementById('p_obs');
-    if(obs.value === '' || PREFIXOS_TOUR.includes(obs.value) || obs.value === window.__obsAuto){
-      obs.value = (idiomaAtual === 'pt' ? 'Tour privado: ' : 'Private tour: ') + nome;
-      window.__obsAuto = obs.value;
-    }
-    definirTipoPedido('transfer');
-    prefillAtual = { tipo:'tour', nome }; mostrarPrefill();
+    const i = toursPublicados.findIndex(t => t.nome === nome);
+    if(i >= 0){ roteiroAberto = i; escolherTour(i); }
+    prefillAtual = null; mostrarPrefill();
   }
   document.getElementById('destinosSecao').addEventListener('click', (e)=>{
     const b = e.target.closest('[data-destino]');
@@ -1225,7 +1355,7 @@
     const b = e.target.closest('[data-servico]');
     if(b){ prefillAtual = null; abrirComTipo(b.dataset.servico); }
   });
-  document.querySelectorAll('#atalhosServicos .atalho, #btnAbrirForm').forEach(b => b.addEventListener('click', ()=>{ prefillAtual = null; }));
+  document.querySelectorAll('#atalhosServicos .atalho, #btnAbrirForm').forEach(b => b.addEventListener('click', ()=>{ prefillAtual = null; tourEscolhido = null; roteiroAberto = -1; }));
   document.querySelector('[data-tour-promo]').addEventListener('click', ()=>{ prefillAtual = null; window.prepararFormularioPorAtalho('tour'); });
   document.getElementById('barraCotacao').addEventListener('click', ()=>{ prefillAtual = null; window.abrirFormularioCotacao({ topo:true }); });
 
@@ -1305,6 +1435,11 @@
       carr.hidden = false; document.getElementById('destinosGrid').hidden = true;
     }
     const tours = (Array.isArray(docTours.itens) ? docTours.itens : []).filter(t => t && typeof t.nome === 'string' && t.nome.trim());
+    toursPublicados = tours.map(t => ({ nome: t.nome.trim().slice(0, 40), texto: typeof t.texto === 'string' ? t.texto : '', foto: t.foto,
+      duracao: typeof t.duracao === 'string' ? t.duracao.trim().slice(0, 40) : '',
+      roteiro: (Array.isArray(t.roteiro) ? t.roteiro : []).filter(r => typeof r === 'string' && r.trim()).slice(0, 12).map(r => r.trim().slice(0, 60)) }));
+    if(tourEscolhido === 'perso' && toursPublicados.length && tipoPedido !== 'tour') tourEscolhido = null;
+    desenharTourLista();
     if(tours.length){
       const carr = document.getElementById('toursCarr'); carr.innerHTML = '';
       tours.forEach(t => {
@@ -1380,7 +1515,11 @@
     if(!ultimoPedido){ caixa.hidden = true; return; }
     const p = ultimoPedido, t = tx(); caixa.innerHTML = '';
     const linha = (icone, texto) => { const d = el('div'); d.appendChild(svgIco(icone)); d.appendChild(el('span', '', texto)); caixa.appendChild(d); };
-    if(p.tipo === 'hora') linha('pin', p.partida + (p.horasEstimadas ? ' · ' + t.res_horas.replace('{n}', p.horasEstimadas) : ''));
+    if(p.tipo === 'tour'){
+      linha('mapa', (p.tourNome === 'Tour personalizado' ? t.tour_perso : p.tourNome) + (p.tourDuracao ? ' · ' + p.tourDuracao : ''));
+      linha('pin', t.recolha_em.replace('{r}', p.partida));
+    }
+    else if(p.tipo === 'hora') linha('pin', p.partida + (p.horasEstimadas ? ' · ' + t.res_horas.replace('{n}', p.horasEstimadas) : ''));
     else linha('pin', [p.partida, ...(p.paragens || []), p.chegada].filter(Boolean).join(' → '));
     linha('rel', String(p.data).split('-').reverse().join('/') + ' · ' + p.hora);
     if(p.passageiros) linha('carro', t.res_passageiros.replace('{n}', p.passageiros));
@@ -1389,7 +1528,7 @@
 
   // ---- Ao trocar PT/EN, redesenha as partes que o código cria ----
   document.getElementById('langSwitch').querySelectorAll('button').forEach(btn => btn.addEventListener('click', ()=>{
-    desenharPasso(); mostrarPrefill(); window.atualizarSubHora(); desenharAvaliacoes(); desenharResumo();
+    desenharPasso(); mostrarPrefill(); window.atualizarSubHora(); desenharAvaliacoes(); desenharResumo(); desenharTourLista();
     document.querySelectorAll('#destinosCarr .txt-pc').forEach(s => { s.textContent = tx().pedir_cotacao_curto; });
     const bio = document.getElementById('motoristaBio');
     document.getElementById('btnLerMais').textContent = bio.classList.contains('cortada') ? tx().ler_mais : tx().ler_menos;
@@ -1556,8 +1695,8 @@
     erroEl.textContent = '';
 
     const lang = localStorage.getItem('pedido_idioma') || 'pt';
-    const textos = { pt: {campos:'Preenche todos os campos obrigatórios.', envio:'Não foi possível enviar o pedido. Tenta novamente ou contacta-nos diretamente.', enviar:'Pedir cotação', enviando:'A enviar...', semMotorista:'Este link não é válido. Confirma o link com o motorista ou contacta-nos diretamente.', confHora:'Recebemos o seu pedido de serviço por hora. Vamos analisar e entrar em contacto consigo em breve para confirmar a disponibilidade e a reserva.'},
-                      en: {campos:'Please fill in all required fields.', envio:'Could not send your request. Please try again or contact us directly.', enviar:'Request quote', enviando:'Sending...', semMotorista:'This link is not valid. Please confirm the link with the driver or contact us directly.', confHora:'We\u2019ve received your hourly service request. We\u2019ll review it and get back to you shortly to confirm availability and booking.'} }[lang];
+    const textos = { pt: {campos:'Preenche todos os campos obrigatórios.', envio:'Não foi possível enviar o pedido. Tenta novamente ou contacta-nos diretamente.', enviar:'Pedir cotação', enviando:'A enviar...', semMotorista:'Este link não é válido. Confirma o link com o motorista ou contacta-nos diretamente.', confTour:'Recebemos o seu pedido de tour. Vamos analisar e entrar em contacto consigo em breve para confirmar a disponibilidade, o preço e a reserva.', confHora:'Recebemos o seu pedido de serviço por hora. Vamos analisar e entrar em contacto consigo em breve para confirmar a disponibilidade e a reserva.'},
+                      en: {campos:'Please fill in all required fields.', envio:'Could not send your request. Please try again or contact us directly.', enviar:'Request quote', enviando:'Sending...', semMotorista:'This link is not valid. Please confirm the link with the driver or contact us directly.', confTour:'We\u2019ve received your tour request. We\u2019ll review it and get back to you shortly to confirm availability, price and booking.', confHora:'We\u2019ve received your hourly service request. We\u2019ll review it and get back to you shortly to confirm availability and booking.'} }[lang];
 
     const motoristaUidResolvido = await resolucaoMotorista;
     const motoristaResolvido = !!motoristaUidResolvido;
@@ -1567,15 +1706,16 @@
     }
 
     const ehHora = (typeof window.obterTipoPedido === 'function') && window.obterTipoPedido() === 'hora';
+    const ehTour = (typeof window.obterTipoPedido === 'function') && window.obterTipoPedido() === 'tour';
 
     const pedido = {
       motoristaUid: motoristaUidResolvido,
       nome: document.getElementById('p_nome').value.trim(),
       contacto: document.getElementById('p_contacto').value.trim(),
       partida: document.getElementById('p_partida').value.trim(),
-      paragens: ehHora ? [] : lerParagensPedido(),
-      chegada: ehHora ? '' : document.getElementById('p_chegada').value.trim(),
-      voo: document.getElementById('p_voo').value.trim(),
+      paragens: (ehHora || ehTour) ? [] : lerParagensPedido(),
+      chegada: ehHora ? '' : ehTour ? document.getElementById('p_partida').value.trim() : document.getElementById('p_chegada').value.trim(),
+      voo: ehTour ? '' : document.getElementById('p_voo').value.trim(),
       data: document.getElementById('p_data').value,
       hora: document.getElementById('p_hora').value,
       passageiros: document.getElementById('p_passageiros').value || '',
@@ -1589,8 +1729,16 @@
       pedido.tipo = 'hora';
       pedido.horasEstimadas = document.getElementById('p_horas').value.trim();
     }
+    // Tour: o app novo mostra-o na aba Tours; um app antigo vê-o como transfer (recolha → recolha) com a observação "Tour privado: …"
+    const tourEsc = ehTour && typeof window.obterTourEscolhido === 'function' ? window.obterTourEscolhido() : null;
+    if(ehTour){
+      pedido.tipo = 'tour';
+      pedido.tourNome = tourEsc ? tourEsc.nome : '';
+      pedido.tourDuracao = tourEsc ? tourEsc.duracao : '';
+      pedido.tourRoteiro = tourEsc ? tourEsc.roteiro : [];
+    }
 
-    if(!pedido.nome || !pedido.contacto || !pedido.partida || (!ehHora && !pedido.chegada) || (ehHora && !pedido.horasEstimadas) || !pedido.data || !pedido.hora){
+    if(!pedido.nome || !pedido.contacto || !pedido.partida || (!ehHora && !pedido.chegada) || (ehHora && !pedido.horasEstimadas) || (ehTour && !pedido.tourNome) || !pedido.data || !pedido.hora){
       erroEl.textContent = textos.campos;
       return;
     }
@@ -1602,6 +1750,7 @@
       await addDoc(collection(db, 'trajeto_pedidos'), pedido);
       avisarMotoristaNovoPedido();
       if(ehHora) document.querySelector('#confirmacao p').textContent = textos.confHora;
+      if(ehTour) document.querySelector('#confirmacao p').textContent = textos.confTour;
       document.getElementById('cardForm').querySelector('form').style.display = 'none';
       document.getElementById('confirmacao').style.display = 'block';
       try{ if(typeof window.mostrarResumoConfirmacao === 'function') window.mostrarResumoConfirmacao(pedido); }catch(e){ /* só visual */ }
