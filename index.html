@@ -590,6 +590,12 @@
   .ag-btn-wpp{background:#25D366 !important; color:#fff !important; border:none !important;}
   .ag-btn-ok{background:var(--terracota) !important; color:#fff !important; border:none !important;}
   .ag-btn-del{color:var(--terracota);}
+  .rot-app{ margin:6px 0 4px; padding:0; list-style:none; counter-reset:r; }
+  .rot-app li{ position:relative; padding:2px 0 2px 24px; font-size:12.5px; color:#3d4c52; counter-increment:r; line-height:1.45; }
+  .rot-app li::before{ content:counter(r); position:absolute; left:0; top:3px; width:17px; height:17px; border-radius:50%; background:var(--azulejo); color:#fff; font-size:10px; font-weight:700; display:flex; align-items:center; justify-content:center; }
+  .ag-badge-tour{ display:inline-block; padding:3px 8px; border-radius:999px; background:rgba(193,85,44,.13); color:#a8451f; font-size:10.5px; font-weight:700; white-space:nowrap; }
+  #segModo.seg-4 button span:not(.selo-contagem){ overflow:hidden; text-overflow:clip; }
+  @media (max-width: 379px){ #segModo.seg-4 button, #segModo.seg-4 button[data-v]{ font-size:10.5px; letter-spacing:-.2px; } #segModo .ico{ width:18px; height:18px; } }
   .ag-acoes .ag-btn-av{ flex-basis:100% !important; order:-1; background:linear-gradient(180deg,#e8b84a,#d29a1f) !important; color:#3b2a05 !important; border:none !important; font-weight:bold; }
   .ag-badge-av, .ag-badge-av-pedida{ display:inline-block; padding:3px 8px; border-radius:999px; font-family:var(--ui, 'Helvetica Neue', Arial, sans-serif); font-size:10.5px; font-weight:700; white-space:nowrap; }
   .ag-badge-av{ background:rgba(226,179,58,.22); color:#7a5c0c; }
@@ -964,7 +970,7 @@
   .btn-agendar-cliente .ico{ width:22px; height:22px; stroke-width:1.7; }
 
   /* Abas: 4 mosaicos com ícone por cima */
-  #segModo.seg-4{ display:grid; grid-template-columns:repeat(4, minmax(0,1fr)); gap:6px; border:none; border-radius:0; overflow:visible; box-shadow:none; background:none; padding:0; margin-bottom:14px !important; }
+  #segModo.seg-4{ display:grid; grid-template-columns:repeat(5, minmax(0,1fr)); gap:6px; border:none; border-radius:0; overflow:visible; box-shadow:none; background:none; padding:0; margin-bottom:14px !important; }
   #segModo.seg-4 button, #segModo.seg-4 button[data-v]{ display:flex; flex-direction:column; align-items:center; justify-content:center; gap:4px; padding:9px 2px 8px; border:1px solid var(--borda); border-radius:12px; background:var(--cartao); color:var(--azul-noite); font-family:var(--ui); font-size:12px; font-weight:600; white-space:nowrap; box-shadow:0 1px 3px rgba(13,27,42,.05); min-height:58px; }
   #segModo.seg-4 button.active{ background:var(--azulejo); border-color:var(--azulejo); color:#fff; box-shadow:0 3px 10px rgba(42,111,119,.3); }
   #segModo .ico{ width:20px; height:20px; }
@@ -1113,6 +1119,7 @@
   <div class="seg seg-4" id="segModo" style="margin-bottom:18px;">
     <button data-v="transfer" class="active"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21s-7-6.2-7-11.5a7 7 0 0 1 14 0C19 14.8 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.5"/></svg><span>Transfer</span></button>
     <button data-v="hora"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.2 2"/></svg><span>Por hora</span><span class="selo-contagem" id="seloHora">0</span></button>
+    <button data-v="tours"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 4L3 6v14l6-2 6 2 6-2V4l-6 2z"/><path d="M9 4v14M15 6v14"/></svg><span>Tours</span><span class="selo-contagem" id="seloTours">0</span></button>
     <button data-v="faturamento"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 3h12v18l-3-2-3 2-3-2-3 2z"/><path d="M9 8h6M9 12h6M9 16h3"/></svg><span>Faturamento</span></button>
     <button data-v="pedidos"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 13l3-8h12l3 8v6a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1z"/><path d="M3 13h5l1 3h6l1-3h5"/></svg><span>Pedidos</span><span class="selo-contagem" id="seloPedidos">0</span></button>
   </div>
@@ -1496,12 +1503,22 @@
         <div class="seg" id="segTipoAg">
           <button type="button" data-v="transfer" class="active">Transfer</button>
           <button type="button" data-v="hora">⏱ Por hora</button>
+          <button type="button" data-v="tour">🗺️ Tour</button>
         </div>
         <p id="agDicaHora" style="display:none; font-family:'Helvetica Neue', Arial, sans-serif; font-size:12px; color:#6a7378; line-height:1.5; margin:8px 0 0;"></p>
 
         <div class="ag-secao">📍 Trajeto</div>
-        <label for="ag_partida">Endereço de partida</label>
+        <label for="ag_partida" id="ag_labelPartida">Endereço de partida</label>
         <input type="text" id="ag_partida" placeholder="ex: Aeroporto de Lisboa, T1">
+
+        <div id="blocoTourAg" style="display:none;">
+          <label for="ag_tourNome" style="margin-top:14px;">Nome do tour</label>
+          <input type="text" id="ag_tourNome" maxlength="60" placeholder="ex: Sintra e Cascais">
+          <label for="ag_tourDuracao" style="margin-top:14px;">Duração (opcional)</label>
+          <input type="text" id="ag_tourDuracao" maxlength="40" placeholder="ex: Dia inteiro (8 h)">
+          <label for="ag_tourRoteiro" style="margin-top:14px;">Roteiro — uma paragem por linha</label>
+          <textarea id="ag_tourRoteiro" style="min-height:110px;" placeholder="Palácio da Pena, Sintra&#10;Cabo da Roca&#10;Cascais (almoço)"></textarea>
+        </div>
 
         <div id="blocoParagensAg">
         <label style="margin-top:14px;">Paragens pelo meio (opcional)</label>
@@ -1637,6 +1654,18 @@
     <p class="nota">Estes pedidos vêm do teu site de cotações. "Aceitar" cria logo um agendamento (ainda podes editar tudo depois); "Recusar" só remove daqui.<br><br>Precisas de estar com sessão iniciada (em "Minhas tarifas") para veres os pedidos novos.</p>
   </div>
 
+  <div id="viewTours" style="display:none;">
+    <div class="card">
+      <h2>🗺️ Tours</h2>
+      <button class="btn-agendar" id="btnNovoAgendamentoTour" style="margin-top:0; margin-bottom:14px;">➕ Agendar tour</button>
+      <div class="seg" id="segFiltroTours" style="margin-bottom:14px;">
+        <button data-v="ativos" class="active">Ativos</button>
+        <button data-v="concluidos">Concluídos</button>
+      </div>
+      <div class="lista-agendamentos" id="listaTours"></div>
+    </div>
+  </div>
+
   <div id="viewHora" style="display:none;">
     <div class="card">
       <h2>⏱ Serviços por hora</h2>
@@ -1647,7 +1676,7 @@
     <p class="nota">Os serviços por hora agendados ficam em "📅 Agendados". Os que estão em andamento aparecem a partir do momento em que tocas em "🚗 Ir buscar cliente" no agendamento. O tempo só começa a contar quando tocas em "▶️ Iniciar" (cliente no carro). Ao finalizar, o valor é calculado pela regra definida em "Minhas tarifas" e podes enviar o resumo ao cliente. O agendamento só sai da lista quando o marcares como "Concluído".</p>
   </div>
 
-  <p style="text-align:center; font-family:'Helvetica Neue', Arial, sans-serif; font-size:11px; color:#8a7f66; margin-top:24px;">Trajeto · v9.12.1</p>
+  <p style="text-align:center; font-family:'Helvetica Neue', Arial, sans-serif; font-size:11px; color:#8a7f66; margin-top:24px;">Trajeto · v9.13.0</p>
 
 </main>
 
@@ -1903,7 +1932,7 @@
     });
   });
 
-  const VIEWS_POR_MODO = { transfer: 'viewTransfer', hora: 'viewHora', faturamento: 'viewFaturamento', pedidos: 'viewPedidos' };
+  const VIEWS_POR_MODO = { transfer: 'viewTransfer', hora: 'viewHora', tours: 'viewTours', faturamento: 'viewFaturamento', pedidos: 'viewPedidos' };
   let modoAntesDeConfig = 'transfer';
   function fecharPainelConfig(){
     const p = document.getElementById('painelConfig');
@@ -1914,6 +1943,7 @@
     document.getElementById(VIEWS_POR_MODO[modoAntesDeConfig]).style.display = 'block';
     if(modoAntesDeConfig === 'faturamento') renderFaturamento();
     if(modoAntesDeConfig === 'hora') renderHora();
+    if(modoAntesDeConfig === 'tours') renderTours();
   }
   document.getElementById('btnConfig').addEventListener('click', ()=>{
     const p = document.getElementById('painelConfig');
@@ -2137,9 +2167,11 @@
       document.getElementById('viewFaturamento').style.display = t === 'faturamento' ? 'block' : 'none';
       document.getElementById('viewPedidos').style.display = t === 'pedidos' ? 'block' : 'none';
       document.getElementById('viewHora').style.display = t === 'hora' ? 'block' : 'none';
+      document.getElementById('viewTours').style.display = t === 'tours' ? 'block' : 'none';
       document.getElementById('avisoHoraAgendado').style.display = 'none';
       if(t === 'faturamento') renderFaturamento();
       if(t === 'hora') renderHora();
+      if(t === 'tours') renderTours();
       if(t === 'pedidos'){ marcarPedidosComoVistos(window._trajetoPedidosAtuais); fecharPopupPedidoNovo(); }
     });
   });
@@ -2792,11 +2824,13 @@
     const [ano,mes,dia] = ag.data.split('-').map(Number);
     const [hora,min] = ag.hora.split(':').map(Number);
     const inicio = new Date(ano, mes-1, dia, hora, min);
-    const fim = new Date(inicio.getTime() + 60*60*1000);
+    const fim = new Date(inicio.getTime() + (ag.tipo === 'tour' ? duracaoTourMs(ag) : 60*60*1000));
     const fmt = (d)=> `${d.getFullYear()}${pad(d.getMonth()+1)}${pad(d.getDate())}T${pad(d.getHours())}${pad(d.getMinutes())}00`;
     const agora = new Date();
     const dtstamp = `${agora.getUTCFullYear()}${pad(agora.getUTCMonth()+1)}${pad(agora.getUTCDate())}T${pad(agora.getUTCHours())}${pad(agora.getUTCMinutes())}${pad(agora.getUTCSeconds())}Z`;
-    const desc = ag.tipo === 'hora'
+    const desc = ag.tipo === 'tour'
+      ? `Tour: ${ag.tourNome || ''}${ag.tourDuracao ? ' (' + ag.tourDuracao + ')' : ''}\nRecolha: ${ag.partida}${(ag.tourRoteiro || []).length ? '\nRoteiro: ' + ag.tourRoteiro.join(' → ') : ''}\nValor: €${ag.valor}${ag.fornecedor ? '\nFornecedor: ' + ag.fornecedor : ''}`
+      : ag.tipo === 'hora'
       ? `Serviço por hora\nPartida: ${ag.partida}\nTarifa: ${fmtEuro((ag.hParams || horaParams()).valor)}/hora${ag.fornecedor ? '\nFornecedor: ' + ag.fornecedor : ''}`
       : `Partida: ${ag.partida}\nChegada: ${ag.chegada}\nValor: €${ag.valor}${ag.fornecedor ? '\nFornecedor: ' + ag.fornecedor : ''}`;
 
@@ -2809,12 +2843,12 @@
       `DTSTAMP:${dtstamp}`,
       `DTSTART:${fmt(inicio)}`,
       `DTEND:${fmt(fim)}`,
-      `SUMMARY:${escapeICS((ag.tipo === 'hora' ? 'Serviço por hora: ' : 'Transfer: ') + ag.cliente)}`,
+      `SUMMARY:${escapeICS((ag.tipo === 'hora' ? 'Serviço por hora: ' : ag.tipo === 'tour' ? 'Tour: ' : 'Transfer: ') + ag.cliente)}`,
       `DESCRIPTION:${escapeICS(desc)}`,
       `LOCATION:${escapeICS(ag.partida)}`,
       'BEGIN:VALARM',
       'ACTION:DISPLAY',
-      `DESCRIPTION:${escapeICS('Lembrete: ' + (ag.tipo === 'hora' ? 'serviço por hora de ' : 'transfer de ') + ag.cliente + ' amanhã')}`,
+      `DESCRIPTION:${escapeICS('Lembrete: ' + (ag.tipo === 'hora' ? 'serviço por hora de ' : ag.tipo === 'tour' ? 'tour de ' : 'transfer de ') + ag.cliente + ' amanhã')}`,
       'TRIGGER:-P1D',
       'END:VALARM',
       'END:VEVENT',
@@ -2884,7 +2918,8 @@
 
   function renderLista(){
     renderHora();
-    const todos = lerAgendamentos();
+    renderTours();
+    const todos = lerAgendamentos().filter(a => a.tipo !== 'tour');   // os tours têm aba própria
     const nAtivos = todos.filter(a => !a.realizado).length;
     const bAt = document.querySelector('#segFiltroAg button[data-v="ativos"]');
     const bCo = document.querySelector('#segFiltroAg button[data-v="concluidos"]');
@@ -3014,6 +3049,7 @@
 
   function gerarMensagem(ag){
     if(ag.tipo === 'hora') return gerarMensagemHora(ag);
+    if(ag.tipo === 'tour') return gerarMensagemTour(ag);
     if(ehFornecedorParceiro(ag.fornecedor)) return gerarMensagemParceiro(ag);
     const dataFmt = ag.data.split('-').reverse().join('/');
     const nome = localStorage.getItem('trajeto_nome') || '';
@@ -3050,7 +3086,10 @@
   }
 
   function preencherFormAgendamento(ag){
-    aplicarTipoAgendar(ag.tipo === 'hora' ? 'hora' : 'transfer');
+    aplicarTipoAgendar(ag.tipo === 'hora' ? 'hora' : ag.tipo === 'tour' ? 'tour' : 'transfer');
+    document.getElementById('ag_tourNome').value = ag.tourNome || '';
+    document.getElementById('ag_tourDuracao').value = ag.tourDuracao || '';
+    document.getElementById('ag_tourRoteiro').value = (Array.isArray(ag.tourRoteiro) ? ag.tourRoteiro : []).join('\n');
     document.getElementById('ag_partida').value = ag.partida;
     document.getElementById('ag_chegada').value = ag.chegada;
     preencherParagensAgendar(ag.paragens || []);
@@ -3171,6 +3210,7 @@
   }
 
   function tituloAg(ag){
+    if(ag.tipo === 'tour') return `🗺️ ${escHtml(ag.tourNome || 'Tour')}`;
     if(ag.tipo === 'hora'){
       const fim = (ag.chegada && ag.chegada !== ag.partida) ? ` → ${escHtml(ag.chegada)}` : '';
       return `⏱ ${escHtml(ag.partida)}${fim}`;
@@ -3229,14 +3269,19 @@
   // ---- Tipo de serviço no formulário "Agendar corrida" ----
   function aplicarTipoAgendar(tipo, opcoes){
     opcoes = opcoes || {};
-    tipoAgendar = tipo === 'hora' ? 'hora' : 'transfer';
-    const hora = tipoAgendar === 'hora';
+    tipoAgendar = tipo === 'hora' ? 'hora' : tipo === 'tour' ? 'tour' : 'transfer';
+    const hora = tipoAgendar === 'hora', tour = tipoAgendar === 'tour';
+    // tour: nome, duração e roteiro; só o local de recolha (sem chegada nem paragens)
+    document.getElementById('blocoTourAg').style.display = tour ? 'block' : 'none';
+    document.getElementById('ag_labelChegada').style.display = tour ? 'none' : '';
+    document.getElementById('ag_chegada').style.display = tour ? 'none' : '';
+    document.getElementById('ag_labelPartida').textContent = tour ? 'Local de recolha (hotel ou morada)' : 'Endereço de partida';
     document.getElementById('segTipoAg').querySelectorAll('button').forEach(b=>{
       b.classList.toggle('active', b.dataset.v === tipoAgendar);
     });
-    document.getElementById('blocoParagensAg').style.display = hora ? 'none' : 'block';
-    document.getElementById('agCheckGaleriaWrap').style.display = hora ? 'none' : 'block';
-    if(hora) document.getElementById('ag_apresentacao').value = '';
+    document.getElementById('blocoParagensAg').style.display = (hora || tour) ? 'none' : 'block';
+    document.getElementById('agCheckGaleriaWrap').style.display = (hora || tour) ? 'none' : 'block';
+    if(hora || tour) document.getElementById('ag_apresentacao').value = '';
     document.getElementById('ag_labelChegada').textContent = hora
       ? 'Endereço final (opcional — se vazio, é o mesmo da partida)'
       : 'Endereço de chegada';
@@ -3252,7 +3297,7 @@
     if(opcoes.definirValor){
       document.getElementById('ag_valor').value = hora
         ? valorMinimoHora()
-        : document.getElementById('ct_cobrar').value;
+        : tour ? '' : document.getElementById('ct_cobrar').value;
     }
   }
   document.getElementById('segTipoAg').querySelectorAll('button').forEach(btn=>{
@@ -3269,16 +3314,16 @@
   function hospedarPainelAgendar(onde){
     const avisoRefazer = document.getElementById('agAvisoRefazer');
     if(avisoRefazer) avisoRefazer.style.display = 'none';
-    painelHospedadoEm = onde === 'hora' ? 'hora' : 'transfer';
-    if(painelHospedadoEm === 'hora'){
-      const v = document.getElementById('viewHora');
+    painelHospedadoEm = onde === 'hora' ? 'hora' : onde === 'tours' ? 'tours' : 'transfer';
+    if(painelHospedadoEm === 'hora' || painelHospedadoEm === 'tours'){
+      const v = document.getElementById(painelHospedadoEm === 'hora' ? 'viewHora' : 'viewTours');
       v.insertBefore(painelAg, v.firstChild);
     } else if(painelAg.parentNode !== painelOrigemPai){
       painelOrigemPai.insertBefore(painelAg, painelOrigemProximo && painelOrigemProximo.parentNode === painelOrigemPai ? painelOrigemProximo : null);
     }
-    const hora = painelHospedadoEm === 'hora';
-    document.getElementById('agSecaoTipo').style.display = hora ? 'none' : '';
-    document.getElementById('segTipoAg').style.display = hora ? 'none' : '';
+    const fixo = painelHospedadoEm !== 'transfer';
+    document.getElementById('agSecaoTipo').style.display = fixo ? 'none' : '';
+    document.getElementById('segTipoAg').style.display = fixo ? 'none' : '';
   }
   document.getElementById('btnNovoAgendamentoHora').addEventListener('click', ()=>{
     document.getElementById('avisoHoraAgendado').style.display = 'none';
@@ -3896,6 +3941,7 @@
   }
   function tipoServicoAvaliacao(ag){
     if(ag.tipo === 'hora') return 'hora';
+    if(ag.tipo === 'tour') return 'tour';
     if(/^(tour privado|private tour)/i.test((ag.observacoes || '').trim())) return 'tour';
     return 'transfer';
   }
@@ -3992,6 +4038,108 @@
     aoReceberAvaliacoes(window._trajetoAvaliacoes.filter(x => x.id !== id));
   });
   renderAvaliacoesConfig();
+
+  // =====================================================================
+  //  Tours (aba própria). Um tour é um agendamento com tipo 'tour', tourNome, tourDuracao e tourRoteiro[].
+  //  O roteiro é guardado no agendamento tal como estava no pedido (mudanças na galeria não alteram tours já marcados).
+  // =====================================================================
+  var filtroTours = 'ativos';   // var: pode ser lido antes desta linha correr (renderLista → renderTours)
+  function lerRoteiroTexto(txt){ return String(txt || '').split('\n').map(x => x.trim()).filter(Boolean).slice(0, 12).map(x => x.slice(0, 60)); }
+  // Para o Waze: tira o que está entre parênteses ("Cascais (almoço)" → "Cascais")
+  function paragemParaWaze(t){ return String(t || '').replace(/\([^)]*\)/g, ' ').replace(/\s+/g, ' ').trim() || String(t || ''); }
+  function duracaoTourMs(ag){
+    const m = /(\d+(?:[.,]\d+)?)\s*h/i.exec(ag.tourDuracao || '');
+    const horas = m ? parseFloat(m[1].replace(',', '.')) : 0;
+    return (horas > 0 && horas <= 24 ? horas : 1) * 60 * 60 * 1000;
+  }
+  function roteiroHtml(r){
+    const l = (Array.isArray(r) ? r : []).filter(x => typeof x === 'string' && x.trim());
+    return l.length ? `<ol class="rot-app">${l.map(x => `<li>${escHtml(x)}</li>`).join('')}</ol>` : '<br>';
+  }
+  function gerarMensagemTour(ag){
+    const dataFmt = ag.data.split('-').reverse().join('/');
+    const nome = localStorage.getItem('trajeto_nome') || '';
+    const rot = (ag.tourRoteiro || []).map((r, i) => `${i + 1}. ${r}`).join('\n');
+    const pax = (/^(\d+) passageiro/.exec(ag.observacoes || '') || [])[1];
+    if(idiomaOrcamento === 'en'){
+      const assinaturaEN = nome ? `This is ${nome}` : 'This is your driver';
+      return `Hello ${ag.cliente}! 👋\n\n${assinaturaEN} — confirming the details of your tour:\n\n🗺️ ${ag.tourNome}${ag.tourDuracao ? ' (' + ag.tourDuracao + ')' : ''}\n📍 Pick-up: ${ag.partida}\n📅 Date: ${dataFmt}\n🕐 Start: ${ag.hora}${pax ? '\n👥 ' + pax + ' passengers' : ''}${rot ? '\n\nItinerary:\n' + rot : ''}\n\n💰 Price: €${ag.valor}\n\nCould you please confirm this service? Thank you! 🚗`;
+    }
+    const assinatura = nome ? `Aqui é o ${nome}` : 'Aqui é o teu motorista';
+    return `Olá ${ag.cliente}! 👋\n\n${assinatura} — confirmo os dados do seu tour:\n\n🗺️ ${ag.tourNome}${ag.tourDuracao ? ' (' + ag.tourDuracao + ')' : ''}\n📍 Recolha: ${ag.partida}\n📅 Data: ${dataFmt}\n🕐 Início: ${ag.hora}${pax ? '\n👥 ' + pax + ' passageiros' : ''}${rot ? '\n\nRoteiro:\n' + rot : ''}\n\n💰 Valor: €${ag.valor}\n\nPode confirmar este serviço, por favor? Obrigado! 🚗`;
+  }
+  function renderTours(){
+    const todos = lerAgendamentos().filter(a => a.tipo === 'tour');
+    const nAtivos = todos.filter(a => !a.realizado).length;
+    const selo = document.getElementById('seloTours');
+    if(selo){ selo.textContent = nAtivos > 9 ? '9+' : String(nAtivos); selo.classList.toggle('mostrar', nAtivos > 0); }
+    const bAt = document.querySelector('#segFiltroTours button[data-v="ativos"]'), bCo = document.querySelector('#segFiltroTours button[data-v="concluidos"]');
+    if(bAt) bAt.textContent = `Ativos (${nAtivos})`;
+    if(bCo) bCo.textContent = `Concluídos (${todos.length - nAtivos})`;
+    const el = document.getElementById('listaTours');
+    if(!el) return;
+    const lista = todos.filter(a => filtroTours === 'concluidos' ? a.realizado : !a.realizado)
+      .sort((a, b)=> filtroTours === 'concluidos' ? (b.data + b.hora).localeCompare(a.data + a.hora) : (a.data + a.hora).localeCompare(b.data + b.hora));
+    if(!lista.length){
+      el.innerHTML = filtroTours === 'concluidos'
+        ? '<p class="ag-vazio">Ainda não tens tours concluídos.</p>'
+        : '<p class="ag-vazio">Nenhum tour marcado. Os pedidos de tour do site aparecem aqui depois de os aceitares.</p>';
+      return;
+    }
+    el.innerHTML = lista.map(ag => {
+      const seloPagamento = !ag.realizado ? '' : ag.pagamento === 'recebido' ? '<span class="ag-badge-pago">💰 Recebido</span>' : '<span class="ag-badge-pendente">⏳ A receber</span>';
+      const btnRecebido = (ag.realizado && ag.pagamento === 'pendente') ? `<button class="ag-btn-ok" data-acao="marcarRecebido">💰 Marcar como recebido</button>` : '';
+      const rot = Array.isArray(ag.tourRoteiro) ? ag.tourRoteiro : [];
+      const botoesParagens = rot.map((r, i) => `<button class="ag-btn-paragem" data-acao="tourParagem" data-idx="${i}">📍 ${i + 1} · ${escHtml(paragemParaWaze(r))}</button>`).join('');
+      return `
+      <div class="ag-item ${ag.realizado ? 'ag-item-realizado' : ''}" data-id="${escHtml(ag.id)}">
+        <div class="ag-trajeto">${colQuando(ag)}<span class="ag-cab"><span class="ag-linha-cliente">${escHtml(ag.cliente)}</span><span class="ag-linha-rota">🗺️ ${escHtml(ag.tourNome || 'Tour')}${ag.tourDuracao ? ' · ' + escHtml(ag.tourDuracao) : ''}</span></span><span class="ag-estado">${ag.realizado ? '<span class="ag-badge-ok">✔ Concluído</span>' : '<span class="ag-badge-agendado">📅 Agendado</span>'}${seloPagamento}${seloAvaliacao(ag)}</span><span class="ag-seta">▸</span></div>
+        <div class="ag-detalhes">
+        <div class="ag-meta">
+          📅 ${escHtml(ag.data.split('-').reverse().join('/'))} às ${escHtml(ag.hora)}${ag.tourDuracao ? ' · ⏱ ' + escHtml(ag.tourDuracao) : ''}<br>
+          👤 ${escHtml(ag.cliente)} &nbsp;·&nbsp; <span class="ag-valor">€${escHtml(ag.valor)}</span><br>
+          📍 Recolha: ${escHtml(ag.partida)}
+          ${roteiroHtml(rot)}
+          ${ag.fornecedor ? `🏷 Fornecedor: ${escHtml(ag.fornecedor)}<br>` : ''}
+          ${ag.observacoes ? `📝 ${escHtml(ag.observacoes)}` : ''}
+        </div>
+        ${ag.realizado ? '' : `<div class="ag-nav"><button class="ag-btn-buscar" data-acao="buscar">🚗 Ir buscar cliente</button>${botoesParagens}<button class="ag-btn-levar" data-acao="levar">🏁 Regressar à recolha</button></div>`}
+        <div class="ag-acoes">
+          ${(ag.realizado && !avaliacaoRecebida(ag)) ? '<button class="ag-btn-av" data-acao="pedirAvaliacao">⭐ Pedir avaliação</button>' : ''}
+          <button class="ag-btn-cal" data-acao="editar">✏️ Editar</button>
+          ${ag.realizado ? '<button class="ag-btn-cal" data-acao="refazer">🔁 Refazer</button>' : ''}
+          <button class="ag-btn-cal" data-acao="cal">📅 Calendário</button>
+          <button class="ag-btn-wpp" data-acao="wpp">✉️ Mensagem</button>
+          <button class="ag-btn-ok" data-acao="realizado">${ag.realizado ? '↩️ Desfazer' : '✅ Concluído'}</button>
+          ${btnRecebido}
+          <button class="ag-btn-del" data-acao="del">🗑 Remover</button>
+        </div>
+        </div>
+      </div>`;
+    }).join('');
+  }
+  document.getElementById('segFiltroTours').querySelectorAll('button').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      document.getElementById('segFiltroTours').querySelectorAll('button').forEach(b=>b.classList.remove('active'));
+      btn.classList.add('active');
+      filtroTours = btn.dataset.v;
+      renderTours();
+    });
+  });
+  document.getElementById('btnNovoAgendamentoTour').addEventListener('click', ()=>{
+    editandoId = null;
+    hospedarPainelAgendar('tours');
+    document.getElementById('btnGuardarAgendamento').textContent = 'Guardar e adicionar ao calendário';
+    ['ag_partida','ag_chegada','ag_cliente','ag_telefone','ag_nomeplaca','ag_voo','ag_fornecedor','ag_observacoes','ag_tourNome','ag_tourDuracao','ag_tourRoteiro'].forEach(id=>{ document.getElementById(id).value = ''; });
+    limparParagensAgendar();
+    if(!document.getElementById('ag_data').value){
+      const amanha = new Date(); amanha.setDate(amanha.getDate() + 1);
+      document.getElementById('ag_data').value = `${amanha.getFullYear()}-${pad(amanha.getMonth()+1)}-${pad(amanha.getDate())}`;
+    }
+    aplicarTipoAgendar('tour', { definirValor: true });
+    painelAg.style.display = 'block';
+    painelAg.scrollIntoView({behavior:'smooth', block:'start'});
+  });
 
   // ---------- Placar digital ----------
   let wakeLock = null;
@@ -4109,12 +4257,13 @@
   function refazerAgendamento(id){
     const ag = lerAgendamentos().find(a => a.id === id);
     if(!ag) return;
-    const eHora = ag.tipo === 'hora';
-    document.querySelector('#segModo button[data-v="transfer"]').click();   // o formulário vive na aba Transfer
+    const eHora = ag.tipo === 'hora', eTour = ag.tipo === 'tour';
+    document.querySelector(`#segModo button[data-v="${eTour ? 'tours' : 'transfer'}"]`).click();   // o formulário vive na aba Transfer (ou Tours)
     editandoId = null;
-    hospedarPainelAgendar('transfer');
+    hospedarPainelAgendar(eTour ? 'tours' : 'transfer');
     preencherFormAgendamento({
-      tipo: eHora ? 'hora' : undefined,
+      tipo: eHora ? 'hora' : eTour ? 'tour' : undefined,
+      tourNome: ag.tourNome || '', tourDuracao: ag.tourDuracao || '', tourRoteiro: (ag.tourRoteiro || []).slice(),
       partida: ag.partida, chegada: ag.chegada, paragens: (ag.paragens || []).slice(),
       data: '', hora: '',
       cliente: ag.cliente, telefone: ag.telefone || '', nomePlaca: ag.nomePlaca || '', voo: '',
@@ -4132,7 +4281,7 @@
 
   function abrirEdicao(ag){
     editandoId = ag.id;
-    hospedarPainelAgendar('transfer');
+    hospedarPainelAgendar(ag.tipo === 'tour' ? 'tours' : 'transfer');
     preencherFormAgendamento(ag);
     document.getElementById('btnGuardarAgendamento').textContent = 'Guardar alterações';
     const p = document.getElementById('painelAgendar');
@@ -4176,6 +4325,9 @@
       pedirAvaliacao(ag.id, btn);
     } else if(btn.dataset.acao === 'refazer'){
       refazerAgendamento(ag.id);
+    } else if(btn.dataset.acao === 'tourParagem'){
+      const idx = parseInt(btn.dataset.idx, 10);
+      if(Array.isArray(ag.tourRoteiro) && ag.tourRoteiro[idx]) abrirWaze(paragemParaWaze(ag.tourRoteiro[idx]));
     } else if(btn.dataset.acao === 'editar'){
       abrirEdicao(ag);
     } else if(btn.dataset.acao === 'cal'){
@@ -4214,6 +4366,7 @@
     }
   }
   document.getElementById('listaAgendamentos').addEventListener('click', handlerCliqueAgendamento);
+  document.getElementById('listaTours').addEventListener('click', handlerCliqueAgendamento);
 
   document.getElementById('listaFaturamento').addEventListener('click', (e)=>{
     const btnRefazer = e.target.closest('button[data-acao="refazer"]');
@@ -4356,10 +4509,11 @@
     el.innerHTML = ordenados.map(p => {
       return `
       <div class="ag-item" data-id="${p.id}">
-        <div class="ag-trajeto">${colQuando({ data: String(p.data || ''), hora: p.hora })}<span class="ag-cab"><span class="ag-linha-cliente">${escHtml(p.nome)}</span><span class="ag-linha-rota">${p.tipo === 'hora' ? '⏱ ' + escHtml(p.partida) : escHtml(p.partida) + ' → ' + escHtml(p.chegada)}</span></span></div>
+        <div class="ag-trajeto">${colQuando({ data: String(p.data || ''), hora: p.hora })}<span class="ag-cab"><span class="ag-linha-cliente">${escHtml(p.nome)}</span><span class="ag-linha-rota">${p.tipo === 'tour' ? '🗺️ ' + escHtml(p.tourNome || 'Tour') : p.tipo === 'hora' ? '⏱ ' + escHtml(p.partida) : escHtml(p.partida) + ' → ' + escHtml(p.chegada)}</span></span></div>
         <div class="ag-meta">
           📅 ${escHtml(String(p.data).split('-').reverse().join('/'))} às ${escHtml(p.hora)}<br>
           👤 ${escHtml(p.nome)} &nbsp;·&nbsp; 📞 ${escHtml(p.contacto)}
+          ${p.tipo === 'tour' ? `<br>🗺️ <strong>Tour: ${escHtml(p.tourNome || '')}</strong>${p.tourDuracao ? ' · ' + escHtml(p.tourDuracao) : ''}${roteiroHtml(p.tourRoteiro)}📍 Recolha: ${escHtml(p.partida)}` : ''}
           ${p.tipo === 'hora' ? `<br>⏱ <strong>Serviço por hora</strong>${p.horasEstimadas ? ` · duração estimada: ${escHtml(p.horasEstimadas)}h` : ''}` : ''}
           ${(p.paragens && p.paragens.length) ? `<br>📍 Paragens: ${p.paragens.map(escHtml).join(' → ')}` : ''}
           ${p.voo ? `<br>✈️ Voo: ${escHtml(p.voo)}` : ''}
@@ -4377,7 +4531,8 @@
   // Depois de aceitar um pedido: transfer -> aba Transfer (Meus agendamentos, cartão aberto);
   // serviço por hora -> aba Por hora (secção "Agendados"). O cartão novo pisca para se ver qual é.
   function irParaAgendamentoAceite(ag){
-    const modo = ag.tipo === 'hora' ? 'hora' : 'transfer';
+    const modo = ag.tipo === 'hora' ? 'hora' : ag.tipo === 'tour' ? 'tours' : 'transfer';
+    if(modo === 'tours' && filtroTours !== 'ativos') document.querySelector('#segFiltroTours button[data-v="ativos"]').click();
     if(modo === 'transfer' && filtroAg !== 'ativos'){
       document.querySelector('#segFiltroAg button[data-v="ativos"]').click();
     }
@@ -4385,9 +4540,10 @@
     setTimeout(()=>{
       const el = document.querySelector(modo === 'hora'
         ? `#listaHora .hora-card[data-id="${ag.id}"]`
+        : modo === 'tours' ? `#listaTours .ag-item[data-id="${ag.id}"]`
         : `#listaAgendamentos .ag-item[data-id="${ag.id}"]`);
       if(!el) return;
-      if(modo === 'transfer') el.classList.add('ag-aberto');
+      if(modo === 'transfer' || modo === 'tours') el.classList.add('ag-aberto');
       el.classList.add('destaque-novo');
       el.scrollIntoView({behavior:'smooth', block:'center'});
     }, 60);
@@ -4424,6 +4580,13 @@
         realizado: false
       };
       if(ehHora){ ag.tipo = 'hora'; ag.hEstado = 'agendado'; }
+      if(p.tipo === 'tour'){
+        ag.tipo = 'tour';
+        ag.tourNome = String(p.tourNome || 'Tour').slice(0, 60);
+        ag.tourDuracao = typeof p.tourDuracao === 'string' ? p.tourDuracao.slice(0, 40) : '';
+        ag.tourRoteiro = (Array.isArray(p.tourRoteiro) ? p.tourRoteiro : []).filter(r => typeof r === 'string' && r.trim()).slice(0, 12).map(r => r.trim().slice(0, 60));
+        ag.paragens = []; ag.voo = ''; ag.chegada = p.partida;
+      }
       const lista = lerAgendamentos();
       lista.push(ag);
       gravarAgendamentos(lista);
@@ -4431,7 +4594,9 @@
       irParaAgendamentoAceite(ag);
 
       await window.TrajetoCloud.atualizarStatusPedido(id, 'aceite');
-      alert(ehHora
+      alert(p.tipo === 'tour'
+        ? 'Pedido aceite! O tour ficou na aba Tours, aberto — ajusta o valor e confirma com o cliente.'
+        : ehHora
         ? 'Pedido aceite! O serviço por hora ficou em "Agendados" — quando fores buscar o cliente, toca em "Ir buscar cliente". O valor final é calculado quando finalizares o serviço.'
         : 'Pedido aceite! Já ficou em "Meus agendamentos", aberto — ajusta o valor e confirma.');
     }
@@ -4530,15 +4695,22 @@
     const guardarCli = document.getElementById('ag_guardarCliente').checked;
     const ladoMorada = document.getElementById('ag_clienteMorada').value;
     const dadosCliente = (a) => ({ nome: a.cliente, telefone: a.telefone, nomePlaca: a.nomePlaca, fornecedor: a.fornecedor, partida: a.partida, chegada: a.chegada, lado: ladoMorada });
-    const paragens = tipo === 'hora' ? [] : lerParagensAgendar();
+    const paragens = (tipo === 'hora' || tipo === 'tour') ? [] : lerParagensAgendar();
+    const tourNome = document.getElementById('ag_tourNome').value.trim();
+    const tourDuracao = document.getElementById('ag_tourDuracao').value.trim();
+    const tourRoteiro = lerRoteiroTexto(document.getElementById('ag_tourRoteiro').value);
 
-    if(!partida || (tipo !== 'hora' && !chegada) || !data || !hora || !cliente){
+    if(tipo === 'tour' && (!partida || !tourNome || !data || !hora || !cliente)){
+      alert('Preenche o nome do tour, o local de recolha, a data, o horário e o nome do cliente.');
+      return;
+    }
+    if(!partida || (tipo !== 'hora' && tipo !== 'tour' && !chegada) || !data || !hora || !cliente){
       alert(tipo === 'hora'
         ? 'Preenche partida, data, horário e nome do cliente.'
         : 'Preenche partida, chegada, data, horário e nome do cliente.');
       return;
     }
-    const chegadaFinal = chegada || partida;
+    const chegadaFinal = tipo === 'tour' ? partida : (chegada || partida);
 
     const lista = lerAgendamentos();
 
@@ -4560,7 +4732,9 @@
         ag.apresentacao = apresentacao;
         ag.mostrarGaleria = !!apresentacao;
         if(tipo === 'hora'){ ag.tipo = 'hora'; if(!ag.hEstado) ag.hEstado = 'agendado'; }
+        else if(tipo === 'tour'){ ag.tipo = 'tour'; ag.tourNome = tourNome; ag.tourDuracao = tourDuracao; ag.tourRoteiro = tourRoteiro; }
         else { delete ag.tipo; }
+        if(tipo !== 'tour'){ delete ag.tourNome; delete ag.tourDuracao; delete ag.tourRoteiro; }
         gravarAgendamentos(lista);
         renderLista();
         renderFaturamento();
@@ -4574,16 +4748,18 @@
       const ag = {
         id: Date.now().toString(36) + Math.random().toString(36).slice(2,7),
         partida, chegada: chegadaFinal, paragens, data, hora, cliente, telefone, nomePlaca, voo, fornecedor, observacoes,
-        valor: valor || (tipo === 'hora' ? String(valorMinimoHora()) : document.getElementById('ct_cobrar').value),
+        valor: valor || (tipo === 'hora' ? String(valorMinimoHora()) : tipo === 'tour' ? '' : document.getElementById('ct_cobrar').value),
         realizado: false, apresentacao, mostrarGaleria: !!apresentacao
       };
       if(tipo === 'hora'){ ag.tipo = 'hora'; ag.hEstado = 'agendado'; }
+      if(tipo === 'tour'){ ag.tipo = 'tour'; ag.tourNome = tourNome; ag.tourDuracao = tourDuracao; ag.tourRoteiro = tourRoteiro; }
       lista.push(ag);
       gravarAgendamentos(lista);
       renderLista();
       abrirICS(ag);
       sincronizarApresentacao(ag, apresentacao);
       if(guardarCli) guardarClienteDoAgendamento(dadosCliente(ag));
+      if(tipo === 'tour') setTimeout(()=> irParaAgendamentoAceite(ag), 30);
       if(tipo === 'hora' && painelHospedadoEm === 'hora'){
         const av = document.getElementById('avisoHoraAgendado');
         av.textContent = `✅ Agendado: ${ag.cliente}, ${ag.data.split('-').reverse().join('/')} às ${ag.hora}. Fica em "📅 Agendados" aqui em baixo (e também em Transfer → Meus agendamentos); quando fores buscar o cliente, toca em "🚗 Ir buscar cliente" lá e ele passa a aparecer aqui.`;
@@ -4593,6 +4769,7 @@
 
     document.getElementById('ag_partida').value = '';
     document.getElementById('ag_chegada').value = '';
+    ['ag_tourNome','ag_tourDuracao','ag_tourRoteiro'].forEach(id => { document.getElementById(id).value = ''; });
     limparParagensAgendar();
     document.getElementById('ag_cliente').value = '';
     document.getElementById('ag_telefone').value = '';
@@ -4611,6 +4788,7 @@
     document.getElementById('btnGuardarAgendamento').textContent = 'Guardar e adicionar ao calendário';
     document.getElementById('ag_partida').value = '';
     document.getElementById('ag_chegada').value = '';
+    ['ag_tourNome','ag_tourDuracao','ag_tourRoteiro'].forEach(id => { document.getElementById(id).value = ''; });
     limparParagensAgendar();
     document.getElementById('ag_cliente').value = '';
     document.getElementById('ag_telefone').value = '';
@@ -4756,6 +4934,7 @@
     document.getElementById('viewFaturamento').style.display = 'none';
     document.getElementById('viewPedidos').style.display = 'none';
     document.getElementById('viewHora').style.display = 'none';
+    document.getElementById('viewTours').style.display = 'none';
 
     document.getElementById('painelAgendar').style.display = 'block';
     setTimeout(()=>{
