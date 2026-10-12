@@ -346,7 +346,7 @@
     </div>
 
     <div class="painel-aba" id="painelTours" style="display:none;">
-      <p class="sub">As ideias de tour do <strong>site de pedidos</strong>. O cliente toca num tour e o pedido segue como "Tour privado: nome do tour". Até 6 tours.</p>
+      <p class="sub">Os tours do <strong>site de pedidos</strong>. O cliente escolhe um destes tours no formulário (ou "Tour personalizado") e o pedido chega ao app na aba Tours, com o roteiro. Até 6 tours; a ordem aqui é a ordem no site.</p>
       <div id="listaTours"></div>
       <button type="button" class="btn-adicionar" id="btnAddTour">+ Adicionar tour</button>
       <button type="button" class="btn-principal" id="btnGuardarTours">Guardar</button>
@@ -776,12 +776,15 @@
           const campo = document.createElement(c.tipo === 'area' ? 'textarea' : 'input');
           if(c.tipo !== 'area') campo.type = 'text';
           campo.maxLength = c.max; campo.placeholder = c.placeholder || '';
-          campo.value = c.chave === 'etiquetas' ? (it.etiquetas || []).join(', ') : (it[c.chave] || '');
+          campo.value = c.chave === 'etiquetas' ? (it.etiquetas || []).join(', ') : c.chave === 'roteiro' ? (Array.isArray(it.roteiro) ? it.roteiro : []).join('\n') : (it[c.chave] || '');
+          if(c.linhas) campo.style.minHeight = '120px';
           campo.addEventListener('input', ()=>{
             if(c.chave === 'etiquetas') it.etiquetas = campo.value.split(',').map(x => x.trim()).filter(Boolean).slice(0, 3).map(x => x.slice(0, 24));
+            else if(c.chave === 'roteiro') it.roteiro = campo.value.split('\n').map(x => x.trim()).filter(Boolean).slice(0, 12).map(x => x.slice(0, 60));
             else it[c.chave] = campo.value;
           });
           card.appendChild(campo);
+          if(c.dica){ const d = document.createElement('div'); d.className = 'contador'; d.style.textAlign = 'left'; d.style.lineHeight = '1.5'; d.textContent = c.dica; card.appendChild(d); }
         });
         listaEl.appendChild(card);
       });
@@ -797,7 +800,7 @@
       okEl.style.display = 'none'; avisoEl.style.display = 'none';
       const limpos = itens.map(it => {
         const o = { foto: it.foto || '', nome: (it.nome || '').trim() };
-        cfg.campos.forEach(c => { if(c.chave === 'etiquetas') o.etiquetas = (it.etiquetas || []).slice(0, 3); else if(c.chave !== 'nome') o[c.chave] = (it[c.chave] || '').trim(); });
+        cfg.campos.forEach(c => { if(c.chave === 'etiquetas') o.etiquetas = (it.etiquetas || []).slice(0, 3); else if(c.chave === 'roteiro') o.roteiro = (Array.isArray(it.roteiro) ? it.roteiro : []).slice(0, 12); else if(c.chave !== 'nome') o[c.chave] = (it[c.chave] || '').trim(); });
         return o;
       });
       const semNome = limpos.findIndex(o => !o.nome);
@@ -824,7 +827,10 @@
   const listaDestinos = criarListaVitrine({ lista:'listaDestinos', btnAdd:'btnAddDestino', btnGuardar:'btnGuardarDestinos', sufixo:'-destinos', maximo:10, rotulo:'Destino',
     campos:[ { chave:'nome', rotulo:'Nome do destino *', max:30, placeholder:'ex: Sintra' }, { chave:'sub', rotulo:'Frase curta (opcional)', max:40, placeholder:'ex: Palácios e serra' } ] });
   const listaTours = criarListaVitrine({ lista:'listaTours', btnAdd:'btnAddTour', btnGuardar:'btnGuardarTours', sufixo:'-tours', maximo:6, rotulo:'Tour',
-    campos:[ { chave:'nome', rotulo:'Nome do tour *', max:40, placeholder:'ex: Sintra e Cascais' }, { chave:'texto', rotulo:'Frase curta (opcional)', tipo:'area', max:120, placeholder:'ex: Palácios na serra e regresso pela costa.' }, { chave:'etiquetas', rotulo:'Etiquetas, separadas por vírgula (até 3)', max:80, placeholder:'ex: Dia inteiro, Até 6 pax' } ] });
+    campos:[ { chave:'nome', rotulo:'Nome do tour *', max:40, placeholder:'ex: Sintra e Cascais' }, { chave:'texto', rotulo:'Frase curta (opcional)', tipo:'area', max:120, placeholder:'ex: Palácios na serra e regresso pela costa.' }, { chave:'etiquetas', rotulo:'Etiquetas, separadas por vírgula (até 3)', max:80, placeholder:'ex: Até 6 pax' },
+      { chave:'duracao', rotulo:'Duração (opcional)', max:40, placeholder:'ex: Dia inteiro (8 h)' },
+      { chave:'roteiro', rotulo:'Roteiro — uma paragem por linha', tipo:'area', linhas:true, max:900, placeholder:'Palácio da Pena, Sintra\nCabo da Roca\nCascais (almoço)',
+        dica:'Aparece numerado no site e no app, e cada linha vira um botão do Waze. Escreve nomes que o Waze conheça (ex: "Palácio da Pena, Sintra"); o que estiver entre parênteses não entra na pesquisa do Waze, por isso serve para notas como "(almoço)". Até 12 paragens.' } ] });
   async function carregarVitrine(uid){
     try{
       const [sd, st] = await Promise.all([ getDoc(doc(db, 'trajeto_publico', uid + '-destinos')), getDoc(doc(db, 'trajeto_publico', uid + '-tours')) ]);
