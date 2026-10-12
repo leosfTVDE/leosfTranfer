@@ -512,7 +512,7 @@
   const painelPartidas = criarPainelSimples('p', 'galeriaPartidas', 'btnGuardarPartidas');
 
   // ---------- Abas ----------
-  const LINKS_POR_ABA = { geral:'fotos.html', chegadas:'fotos.html?tipo=chegada', partidas:'fotos.html?tipo=partida', destinos:'index.html', tours:'index.html' };
+  const LINKS_POR_ABA = { geral:'fotos.html', chegadas:'fotos.html?tipo=chegada', partidas:'fotos.html?tipo=partida', destinos:'pedido.html', tours:'pedido.html' };
   document.querySelectorAll('.aba-btn').forEach(btn=>{
     btn.addEventListener('click', ()=>{
       document.querySelectorAll('.aba-btn').forEach(b=> b.classList.remove('ativa'));
