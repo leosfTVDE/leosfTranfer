@@ -589,6 +589,19 @@
   .ag-btn-wpp{background:#25D366 !important; color:#fff !important; border:none !important;}
   .ag-btn-ok{background:var(--terracota) !important; color:#fff !important; border:none !important;}
   .ag-btn-del{color:var(--terracota);}
+  .ag-acoes .ag-btn-av{ flex-basis:100% !important; order:-1; background:linear-gradient(180deg,#e8b84a,#d29a1f) !important; color:#3b2a05 !important; border:none !important; font-weight:bold; }
+  .ag-badge-av, .ag-badge-av-pedida{ display:inline-block; padding:3px 8px; border-radius:999px; font-family:var(--ui, 'Helvetica Neue', Arial, sans-serif); font-size:10.5px; font-weight:700; white-space:nowrap; }
+  .ag-badge-av{ background:rgba(226,179,58,.22); color:#7a5c0c; }
+  .ag-badge-av-pedida{ background:#f1ebde; color:#6a7378; }
+  .av-cfg-resumo{ font-family:'Helvetica Neue', Arial, sans-serif; font-size:13px; color:#4a5a60; margin:0 0 10px; }
+  .av-cfg-item{ background:#fff; border:1px solid #e9e0ce; border-radius:12px; padding:11px; margin-bottom:8px; font-family:'Helvetica Neue', Arial, sans-serif; }
+  .av-cfg-item .top{ display:flex; justify-content:space-between; align-items:center; gap:8px; }
+  .av-cfg-item b{ font-size:13.5px; color:var(--azul-noite); overflow-wrap:anywhere; }
+  .av-cfg-item .est{ color:#d29a1f; font-size:13px; letter-spacing:1px; white-space:nowrap; }
+  .av-cfg-item p{ margin:5px 0 8px; font-size:12.5px; color:#4a5a60; line-height:1.45; overflow-wrap:anywhere; }
+  .av-cfg-item .rod{ display:flex; justify-content:space-between; align-items:center; gap:8px; }
+  .av-cfg-item small{ font-size:11px; color:#6a7378; }
+  .av-cfg-item .btn-apagar-av{ flex-shrink:0; min-height:34px; padding:6px 11px; border-radius:8px; border:1px solid rgba(180,59,47,.35); background:#fff; color:#a02f24; font-size:12px; font-weight:bold; cursor:pointer; }
   .ag-item-realizado{opacity:.72; border-color:var(--azulejo);}
   .ag-badge-ok{
     display:inline-block;
@@ -1310,6 +1323,14 @@
       </div>
 
       <div class="cfg-grupo">
+        <div class="cfg-titulo" data-acordeao="avaliacoes">⭐ Avaliações <span class="seta">▸</span></div>
+        <div class="cfg-conteudo" data-conteudo="avaliacoes">
+          <p class="cli-nota">As avaliações chegam pelo link "⭐ Pedir avaliação" (nas corridas concluídas) e aparecem logo no site de pedidos. Podes apagar, mas não editar.</p>
+          <div id="listaAvaliacoesConfig"></div>
+        </div>
+      </div>
+
+      <div class="cfg-grupo">
         <div class="cfg-titulo" data-acordeao="clientes">👥 Clientes salvos <span class="seta">▸</span></div>
         <div class="cfg-conteudo" data-conteudo="clientes">
           <p class="cli-nota">Os clientes ficam guardados na hora, sem precisares de tocar em Aplicar. Para agendar uma corrida, usa o botão "📅 Agendar cliente" no início do app.</p>
@@ -1625,7 +1646,7 @@
     <p class="nota">Os serviços por hora agendados ficam em "📅 Agendados". Os que estão em andamento aparecem a partir do momento em que tocas em "🚗 Ir buscar cliente" no agendamento. O tempo só começa a contar quando tocas em "▶️ Iniciar" (cliente no carro). Ao finalizar, o valor é calculado pela regra definida em "Minhas tarifas" e podes enviar o resumo ao cliente. O agendamento só sai da lista quando o marcares como "Concluído".</p>
   </div>
 
-  <p style="text-align:center; font-family:'Helvetica Neue', Arial, sans-serif; font-size:11px; color:#8a7f66; margin-top:24px;">Trajeto · v9.11.0</p>
+  <p style="text-align:center; font-family:'Helvetica Neue', Arial, sans-serif; font-size:11px; color:#8a7f66; margin-top:24px;">Trajeto · v9.12.0</p>
 
 </main>
 
@@ -2052,7 +2073,8 @@
     if(window.TrajetoCloud && window.TrajetoCloud.utilizadorAtual){
       window.TrajetoCloud.publicarPerfilMotorista({
         bio: localStorage.getItem('trajeto_bio') || '',
-        foto: localStorage.getItem('trajeto_foto') || ''
+        foto: localStorage.getItem('trajeto_foto') || '',
+        nome: localStorage.getItem('trajeto_nome') || ''
       });
     }
     let galeriaGrandeDemais = false;
@@ -2506,7 +2528,8 @@
     if(typeof dados.bio === 'string' || typeof dados.foto === 'string'){
       window.TrajetoCloud && window.TrajetoCloud.utilizadorAtual && window.TrajetoCloud.publicarPerfilMotorista({
         bio: localStorage.getItem('trajeto_bio') || '',
-        foto: localStorage.getItem('trajeto_foto') || ''
+        foto: localStorage.getItem('trajeto_foto') || '',
+        nome: localStorage.getItem('trajeto_nome') || ''
       });
     }
   }
@@ -2601,6 +2624,8 @@
     window.TrajetoCloud.ligarOuvintePedidos((pedidos)=>{
       renderPedidos(pedidos);
     });
+    if(window.TrajetoCloud.ligarOuvinteAvaliacoes) window.TrajetoCloud.ligarOuvinteAvaliacoes(aoReceberAvaliacoes);
+    renderAvaliacoesConfig();
     if(window.TrajetoCloud.utilizadorAtual.email === EMAIL_ADMIN){
       window.TrajetoCloud.publicarMotoristaPadrao(uid);
       if(!localStorage.getItem('trajeto_whatsapp')){
@@ -2900,7 +2925,7 @@
       }
       return `
       <div class="ag-item ${ag.realizado ? 'ag-item-realizado' : ''}" data-id="${ag.id}">
-        <div class="ag-trajeto">${colQuando(ag)}<span class="ag-cab"><span class="ag-linha-cliente">${escHtml(ag.cliente)}</span><span class="ag-linha-rota">${tituloAg(ag)}</span></span><span class="ag-estado">${seloAgendado}${ag.realizado ? '<span class="ag-badge-ok">✔ Concluído</span>' : ''}${seloPagamento}${seloEstadoHora}</span><span class="ag-seta">▸</span></div>
+        <div class="ag-trajeto">${colQuando(ag)}<span class="ag-cab"><span class="ag-linha-cliente">${escHtml(ag.cliente)}</span><span class="ag-linha-rota">${tituloAg(ag)}</span></span><span class="ag-estado">${seloAgendado}${ag.realizado ? '<span class="ag-badge-ok">✔ Concluído</span>' : ''}${seloPagamento}${seloEstadoHora}${seloAvaliacao(ag)}</span><span class="ag-seta">▸</span></div>
         <div class="ag-detalhes">
         <div class="ag-meta">
           📅 ${escHtml(ag.data.split('-').reverse().join('/'))} às ${escHtml(ag.hora)}<br>
@@ -2912,6 +2937,7 @@
         </div>
         ${navHtml ? `<div class="ag-nav">${navHtml}</div>` : ''}
         <div class="ag-acoes">
+          ${(ag.realizado && !avaliacaoRecebida(ag)) ? '<button class="ag-btn-av" data-acao="pedirAvaliacao">⭐ Pedir avaliação</button>' : ''}
           <button class="ag-btn-cal" data-acao="editar">✏️ Editar</button>
           ${ag.realizado ? '<button class="ag-btn-cal" data-acao="refazer">🔁 Refazer</button>' : ''}
           <button class="ag-btn-cal" data-acao="cal">📅 Calendário</button>
@@ -3850,6 +3876,122 @@
     }
   }
 
+  // =====================================================================
+  //  Avaliações: o app cria um link de uso único por corrida concluída e envia-o pelo WhatsApp.
+  //  O cliente avalia em avaliar.html; a avaliação aparece logo no site. Aqui só se pode APAGAR.
+  // =====================================================================
+  window._trajetoAvaliacoes = window._trajetoAvaliacoes || [];
+  function avaliacaoRecebida(ag){
+    return !!(ag && ag.avaliacaoCodigo && (window._trajetoAvaliacoes || []).some(a => a.id === ag.avaliacaoCodigo));
+  }
+  function seloAvaliacao(ag){
+    if(!ag || !ag.avaliacaoCodigo) return '';
+    return avaliacaoRecebida(ag) ? '<span class="ag-badge-av">⭐ Avaliado</span>' : '<span class="ag-badge-av-pedida">⭐ Pedida</span>';
+  }
+  function gerarCodigoAvaliacao(){
+    const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+    const n = new Uint32Array(8); (window.crypto || window.msCrypto).getRandomValues(n);
+    return Array.from(n, x => chars[x % chars.length]).join('');
+  }
+  function tipoServicoAvaliacao(ag){
+    if(ag.tipo === 'hora') return 'hora';
+    if(/^(tour privado|private tour)/i.test((ag.observacoes || '').trim())) return 'tour';
+    return 'transfer';
+  }
+  function linkAvaliacao(codigo, idioma){ return `https://trajetotransfer.pt/avaliar.html?c=${codigo}&l=${idioma === 'en' ? 'en' : 'pt'}`; }
+  function gerarMensagemAvaliacao(ag){
+    const nome = (localStorage.getItem('trajeto_nome') || '').trim();
+    const link = linkAvaliacao(ag.avaliacaoCodigo, idiomaOrcamento);
+    if(idiomaOrcamento === 'en'){
+      return `Hello ${ag.cliente}! 👋\n\nThank you for travelling with Trajeto Transfer. If you have a minute, I'd love to hear about your trip:\n${link}\n\nThank you! 🚗${nome ? ' ' + nome : ''}`;
+    }
+    return `Olá ${ag.cliente}! 👋\n\nObrigado por ter viajado com a Trajeto Transfer. Se tiver um minuto, gostava muito de saber como correu a sua viagem:\n${link}\n\nObrigado! 🚗${nome ? ' ' + nome : ''}`;
+  }
+  function enviarPedidoAvaliacao(ag){
+    const texto = gerarMensagemAvaliacao(ag);
+    if(ag.telefone){
+      const tel = normalizarTelefone(ag.telefone);
+      window.open(`https://wa.me/${tel}?text=${encodeURIComponent(texto)}`, '_blank');
+    } else if(navigator.clipboard){
+      navigator.clipboard.writeText(texto).catch(()=>{});
+      alert('Não há telefone guardado — mensagem copiada! Cola no WhatsApp. (Adiciona o telefone em "Editar" para abrir direto.)');
+    } else {
+      alert(texto);
+    }
+  }
+  async function pedirAvaliacao(id, botao){
+    let ag = lerAgendamentos().find(a => a.id === id);
+    if(!ag) return;
+    if(!ag.avaliacaoCodigo){
+      if(!window.TrajetoCloud || !window.TrajetoCloud.utilizadorAtual || !window.TrajetoCloud.criarLinkAvaliacao){
+        alert('Para pedir uma avaliação precisas de ter sessão iniciada (em "Minhas tarifas").');
+        return;
+      }
+      const original = botao ? botao.textContent : '';
+      if(botao){ botao.disabled = true; botao.textContent = 'A criar o link...'; }
+      const codigo = gerarCodigoAvaliacao();
+      const r = await window.TrajetoCloud.criarLinkAvaliacao({ codigo, agendamentoId: ag.id, tipo: tipoServicoAvaliacao(ag), mes: String(ag.data || '').slice(0, 7) });
+      if(botao){ botao.disabled = false; botao.textContent = original; }
+      if(!r || !r.ok){
+        alert(`Não consegui criar o link de avaliação (${(r && r.erro) || 'erro desconhecido'}). Confirma a internet e se as regras novas do Firebase já foram publicadas.`);
+        return;
+      }
+      const lista = lerAgendamentos();
+      const alvo = lista.find(a => a.id === id);
+      if(!alvo) return;
+      alvo.avaliacaoCodigo = codigo;
+      gravarAgendamentos(lista);
+      ag = alvo;
+      renderListaMantendoAbertos();
+    }
+    const agFinal = ag;
+    pedirIdiomaEExecutar(()=> enviarPedidoAvaliacao(agFinal));
+  }
+  function nomeTipoServico(t){ return t === 'hora' ? 'Serviço por hora' : t === 'tour' ? 'Tour' : 'Transfer'; }
+  function bandeiraPais(c){ return /^[A-Z]{2}$/.test(c || '') ? String.fromCodePoint(...[...c].map(x => 127397 + x.charCodeAt(0))) : ''; }
+  function renderAvaliacoesConfig(){
+    const el = document.getElementById('listaAvaliacoesConfig');
+    if(!el) return;
+    if(!window.TrajetoCloud || !window.TrajetoCloud.utilizadorAtual){ el.innerHTML = '<p class="cli-vazio">Entra na tua conta para veres as avaliações.</p>'; return; }
+    const lista = [...window._trajetoAvaliacoes].sort((a, b)=> msAvaliacao(b) - msAvaliacao(a));
+    if(!lista.length){ el.innerHTML = '<p class="cli-vazio">Ainda não tens avaliações. Numa corrida concluída, toca em "⭐ Pedir avaliação".</p>'; return; }
+    const media = lista.reduce((s, a)=> s + (Number(a.estrelas) || 0), 0) / lista.length;
+    const ags = lerAgendamentos();
+    el.innerHTML = `<p class="av-cfg-resumo"><b>${String(Math.round(media * 10) / 10).replace('.', ',')}</b> de média · ${lista.length} ${lista.length === 1 ? 'avaliação' : 'avaliações'}</p>` +
+      lista.map(a => {
+        const ag = ags.find(x => x.avaliacaoCodigo === a.id);
+        const n = Math.max(0, Math.min(5, Number(a.estrelas) || 0));
+        const mes = /^\d{4}-\d{2}$/.test(a.mes || '') ? a.mes.split('-').reverse().join('/') : '';
+        const origem = [nomeTipoServico(a.tipo), mes, ag ? 'cliente ' + ag.cliente : ''].filter(Boolean).join(' · ');
+        return `<div class="av-cfg-item" data-id="${escHtml(a.id)}"><div class="top"><b>${escHtml(a.nome)} ${bandeiraPais(a.pais)}</b><span class="est">${'★'.repeat(n)}${'☆'.repeat(5 - n)}</span></div>${a.texto ? `<p>“${escHtml(a.texto)}”</p>` : ''}<div class="rod"><small>${escHtml(origem)}</small><button type="button" class="btn-apagar-av" data-acao="apagarAvaliacao">🗑 Apagar</button></div></div>`;
+      }).join('');
+  }
+  function msAvaliacao(a){ const c = a && a.criadoEm; if(!c) return 0; if(typeof c.toMillis === 'function') return c.toMillis(); if(typeof c.seconds === 'number') return c.seconds * 1000; return Number(c) || 0; }
+  // Redesenha a lista sem fechar os cartões que estavam abertos
+  function renderListaMantendoAbertos(){
+    const abertos = [...document.querySelectorAll('#listaAgendamentos .ag-item.ag-aberto')].map(e => e.dataset.id);
+    renderLista();
+    abertos.forEach(id => { const e = document.querySelector(`#listaAgendamentos .ag-item[data-id="${CSS.escape(id)}"]`); if(e) e.classList.add('ag-aberto'); });
+  }
+  function aoReceberAvaliacoes(lista){
+    window._trajetoAvaliacoes = Array.isArray(lista) ? lista : [];
+    renderAvaliacoesConfig();
+    renderListaMantendoAbertos();
+  }
+  document.getElementById('listaAvaliacoesConfig').addEventListener('click', async (e)=>{
+    const b = e.target.closest('[data-acao="apagarAvaliacao"]');
+    if(!b) return;
+    const id = b.closest('.av-cfg-item').dataset.id;
+    const a = window._trajetoAvaliacoes.find(x => x.id === id);
+    if(!a) return;
+    if(!confirm(`Apagar a avaliação de "${a.nome}"?\n\nSai do site de imediato e não pode ser recuperada. O link desse serviço continua usado.`)) return;
+    b.disabled = true;
+    const r = await window.TrajetoCloud.apagarAvaliacao(id);
+    if(!r || !r.ok){ b.disabled = false; alert(`Não consegui apagar (${(r && r.erro) || 'erro desconhecido'}). Tenta de novo.`); return; }
+    aoReceberAvaliacoes(window._trajetoAvaliacoes.filter(x => x.id !== id));
+  });
+  renderAvaliacoesConfig();
+
   // ---------- Placar digital ----------
   let wakeLock = null;
   async function pedirWakeLock(){
@@ -4029,6 +4171,8 @@
       document.querySelector('#segModo button[data-v="hora"]').click();
     } else if(btn.dataset.acao === 'horaResumo'){
       pedirIdiomaEExecutar(()=> enviarResumoHora(ag));
+    } else if(btn.dataset.acao === 'pedirAvaliacao'){
+      pedirAvaliacao(ag.id, btn);
     } else if(btn.dataset.acao === 'refazer'){
       refazerAgendamento(ag.id);
     } else if(btn.dataset.acao === 'editar'){
@@ -4803,6 +4947,36 @@ if ('serviceWorker' in navigator) {
     catch(e){ /* falha silenciosa — não há nada crítico aqui */ }
   }
 
+  // ---------- Avaliações ----------
+  // trajeto_avaliacao_links/{codigo}: criado aqui (uso único). trajeto_avaliacoes/{codigo}: criado pelo cliente em avaliar.html.
+  async function criarLinkAvaliacao(d){
+    if(!auth.currentUser) return { ok: false, erro: 'sem-sessao' };
+    try{
+      await setDoc(doc(db, 'trajeto_avaliacao_links', d.codigo), {
+        motoristaUid: auth.currentUser.uid, agendamentoId: String(d.agendamentoId || ''),
+        tipo: d.tipo, mes: d.mes, usado: false, criadoEm: Date.now()
+      });
+      return { ok: true };
+    }catch(e){ return { ok: false, erro: (e && (e.code || e.message)) || 'erro-desconhecido' }; }
+  }
+  let cancelarOuvinteAvaliacoes = null;
+  function ligarOuvinteAvaliacoes(aoReceber){
+    if(!auth.currentUser) return;
+    if(cancelarOuvinteAvaliacoes) cancelarOuvinteAvaliacoes();
+    try{
+      const q = query(collection(db, 'trajeto_avaliacoes'), where('motoristaUid', '==', auth.currentUser.uid));
+      cancelarOuvinteAvaliacoes = onSnapshot(q, (snap)=>{
+        const lista = [];
+        snap.forEach(d => lista.push({ id: d.id, ...d.data() }));
+        aoReceber(lista);
+      }, ()=>{ /* sem permissão (regras ainda não publicadas): fica sem avaliações, nada mais muda */ });
+    }catch(e){ /* idem */ }
+  }
+  async function apagarAvaliacao(codigo){
+    try{ await deleteDoc(doc(db, 'trajeto_avaliacoes', codigo)); return { ok: true }; }
+    catch(e){ return { ok: false, erro: (e && (e.code || e.message)) || 'erro-desconhecido' }; }
+  }
+
   async function verificarCodigoConvite(codigo){
     if(!codigo) return false;
     const ref = doc(db, 'trajeto_convites', codigo.trim());
@@ -4827,6 +5001,7 @@ if ('serviceWorker' in navigator) {
     sair: () => {
       if(cancelarOuvinte){ cancelarOuvinte(); cancelarOuvinte = null; }
       if(cancelarOuvintePedidos){ cancelarOuvintePedidos(); cancelarOuvintePedidos = null; }
+      if(cancelarOuvinteAvaliacoes){ cancelarOuvinteAvaliacoes(); cancelarOuvinteAvaliacoes = null; }
       return signOut(auth);
     },
     enviarParaNuvem,
@@ -4842,6 +5017,9 @@ if ('serviceWorker' in navigator) {
     publicarGaleria,
     publicarApresentacao,
     removerApresentacao,
+    criarLinkAvaliacao,
+    ligarOuvinteAvaliacoes,
+    apagarAvaliacao,
     onAuthChange: (cb) => onAuthStateChanged(auth, cb),
     get utilizadorAtual(){ return auth.currentUser; }
   };
