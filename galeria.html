@@ -117,6 +117,18 @@
   .apresentacao-card .info{ font-size:12px; color:#6a7378; line-height:1.6; }
   .apresentacao-card .btn-apagar-agendamento{ background:none; border:1px solid var(--linha); color:#6a7378; border-radius:8px; padding:7px 11px; font-size:12px; cursor:pointer; flex-shrink:0; }
   .apresentacao-vazio{ color:#6a7378; font-size:13.5px; text-align:center; padding:24px 0; }
+  .item-vit{ background:var(--branco); border:1px solid var(--linha); border-radius:12px; padding:14px; margin-bottom:12px; }
+  .item-vit-topo{ display:flex; align-items:center; justify-content:space-between; margin-bottom:10px; }
+  .item-vit-topo b{ font-size:13px; color:var(--azul-noite); }
+  .item-vit-topo .acoes{ display:flex; gap:6px; }
+  .item-vit-topo .acoes button{ min-width:38px; height:36px; border:1px solid var(--linha); border-radius:8px; background:#fff; color:#6a7378; font-size:14px; cursor:pointer; }
+  .item-vit .slot-topo{ margin-bottom:10px; }
+  .item-vit label{ display:block; font-size:12px; color:#6a7378; margin:8px 0 4px; }
+  .item-vit input[type=text], .item-vit textarea{ width:100%; padding:10px 12px; border:1.5px solid var(--linha); border-radius:8px; font-family:inherit; font-size:15px; background:var(--areia); color:var(--texto); }
+  .item-vit textarea{ min-height:64px; resize:vertical; }
+  .btn-adicionar{ width:100%; padding:12px; margin:0 0 12px; border:1px dashed var(--linha); border-radius:10px; background:none; color:var(--azulejo); font-family:inherit; font-size:14px; font-weight:bold; cursor:pointer; }
+  .btn-adicionar:disabled{ opacity:.4; cursor:default; }
+  .vazio-vit{ color:#6a7378; font-size:13px; text-align:center; padding:14px 0 18px; }
   .ver-apresentacao{
     display:block; text-align:center; margin-top:22px; font-size:13.5px; color:var(--azulejo); text-decoration:none; font-weight:600;
   }
@@ -152,6 +164,8 @@
       <button type="button" class="aba-btn ativa" data-aba="geral">Geral</button>
       <button type="button" class="aba-btn" data-aba="chegadas">Chegadas</button>
       <button type="button" class="aba-btn" data-aba="partidas">Partidas</button>
+      <button type="button" class="aba-btn" data-aba="destinos">Destinos</button>
+      <button type="button" class="aba-btn" data-aba="tours">Tours</button>
     </div>
 
     <div class="mensagem-ok" id="mensagemOk">✅ Guardado! As fotos já estão atualizadas no site.</div>
@@ -324,6 +338,20 @@
       <div id="clientesPartidas"></div>
     </div>
 
+    <div class="painel-aba" id="painelDestinos" style="display:none;">
+      <p class="sub">Os destinos que aparecem no <strong>site de pedidos</strong>, com foto. O cliente toca num destino e o formulário abre com ele já escrito. Até 10 destinos; a ordem aqui é a ordem no site. Se não houver nenhum, o site mostra a lista simples de sempre.</p>
+      <div id="listaDestinos"></div>
+      <button type="button" class="btn-adicionar" id="btnAddDestino">+ Adicionar destino</button>
+      <button type="button" class="btn-principal" id="btnGuardarDestinos">Guardar</button>
+    </div>
+
+    <div class="painel-aba" id="painelTours" style="display:none;">
+      <p class="sub">As ideias de tour do <strong>site de pedidos</strong>. O cliente toca num tour e o pedido segue como "Tour privado: nome do tour". Até 6 tours.</p>
+      <div id="listaTours"></div>
+      <button type="button" class="btn-adicionar" id="btnAddTour">+ Adicionar tour</button>
+      <button type="button" class="btn-principal" id="btnGuardarTours">Guardar</button>
+    </div>
+
     <a href="fotos.html" target="_blank" class="ver-apresentacao" id="verApresentacaoLink">Ver a apresentação →</a>
   </main>
 </div>
@@ -484,7 +512,7 @@
   const painelPartidas = criarPainelSimples('p', 'galeriaPartidas', 'btnGuardarPartidas');
 
   // ---------- Abas ----------
-  const LINKS_POR_ABA = { geral:'fotos.html', chegadas:'fotos.html?tipo=chegada', partidas:'fotos.html?tipo=partida' };
+  const LINKS_POR_ABA = { geral:'fotos.html', chegadas:'fotos.html?tipo=chegada', partidas:'fotos.html?tipo=partida', destinos:'index.html', tours:'index.html' };
   document.querySelectorAll('.aba-btn').forEach(btn=>{
     btn.addEventListener('click', ()=>{
       document.querySelectorAll('.aba-btn').forEach(b=> b.classList.remove('ativa'));
@@ -493,8 +521,11 @@
       document.getElementById('painelGeral').style.display = aba==='geral' ? 'block' : 'none';
       document.getElementById('painelChegadas').style.display = aba==='chegadas' ? 'block' : 'none';
       document.getElementById('painelPartidas').style.display = aba==='partidas' ? 'block' : 'none';
+      document.getElementById('painelDestinos').style.display = aba==='destinos' ? 'block' : 'none';
+      document.getElementById('painelTours').style.display = aba==='tours' ? 'block' : 'none';
       atualizarLinkVer();
       document.getElementById('mensagemOk').style.display = 'none';
+      document.getElementById('mensagemOk').textContent = '✅ Guardado! As fotos já estão atualizadas no site.';
       document.getElementById('avisoTamanho').style.display = 'none';
     });
   });
@@ -520,6 +551,7 @@
     const verLink = document.getElementById('verApresentacaoLink');
     verLink.style.display = 'block';
     verLink.href = link;
+    verLink.textContent = (abaAtiva === 'destinos' || abaAtiva === 'tours') ? 'Ver no site de pedidos →' : 'Ver a apresentação →';
   }
   function selecionarSubaba(grupo, idSub){
     const g = GRUPOS_CLIENTES[grupo];
@@ -677,6 +709,130 @@
     });
   }
 
+  // ---------- Vitrine do site de pedidos: Destinos e Tours ----------
+  // Cada lista fica no seu próprio documento público (não pesa no documento das galerias):
+  //   trajeto_publico/{uid}-destinos  →  { itens: [ { foto, nome, sub } ] }
+  //   trajeto_publico/{uid}-tours     →  { itens: [ { foto, nome, texto, etiquetas:[...] } ] }
+  function comprimirFotoVitrine(file){
+    return new Promise((resolve, reject)=>{
+      const leitor = new FileReader();
+      leitor.onload = (e)=>{
+        const img = new Image();
+        img.onload = ()=>{
+          const escala = Math.min(1, 900 / Math.max(img.width, img.height));
+          const lw = Math.round(img.width * escala), lh = Math.round(img.height * escala);
+          const canvas = document.createElement('canvas'); canvas.width = lw; canvas.height = lh;
+          canvas.getContext('2d').drawImage(img, 0, 0, lw, lh);
+          let q = 0.75, url = canvas.toDataURL('image/jpeg', q);
+          while(url.length > 95000 && q > 0.3){ q -= 0.07; url = canvas.toDataURL('image/jpeg', q); }
+          resolve(url);
+        };
+        img.onerror = ()=> reject(new Error('imagem inválida'));
+        img.src = e.target.result;
+      };
+      leitor.onerror = ()=> reject(new Error('não foi possível ler o ficheiro'));
+      leitor.readAsDataURL(file);
+    });
+  }
+  function criarListaVitrine(cfg){
+    // cfg: { lista, btnAdd, btnGuardar, sufixo, maximo, rotulo, campos:[{chave, rotulo, tipo, max, placeholder}] }
+    let itens = [];
+    const listaEl = document.getElementById(cfg.lista);
+    function desenhar(){
+      listaEl.innerHTML = '';
+      if(!itens.length){ const v = document.createElement('p'); v.className = 'vazio-vit'; v.textContent = 'Ainda não há nada. Toca em "+ Adicionar".'; listaEl.appendChild(v); }
+      itens.forEach((it, i)=>{
+        const card = document.createElement('div'); card.className = 'item-vit';
+        const topo = document.createElement('div'); topo.className = 'item-vit-topo';
+        const tit = document.createElement('b'); tit.textContent = cfg.rotulo + ' ' + (i + 1); topo.appendChild(tit);
+        const acoes = document.createElement('div'); acoes.className = 'acoes';
+        [['↑', -1, 'Subir'], ['↓', 1, 'Descer']].forEach(([s, d, aria])=>{
+          const b = document.createElement('button'); b.type = 'button'; b.textContent = s; b.setAttribute('aria-label', aria);
+          b.disabled = (i + d < 0 || i + d >= itens.length);
+          b.addEventListener('click', ()=>{ const j = i + d; [itens[i], itens[j]] = [itens[j], itens[i]]; desenhar(); });
+          acoes.appendChild(b);
+        });
+        const del = document.createElement('button'); del.type = 'button'; del.textContent = '🗑'; del.setAttribute('aria-label', 'Apagar');
+        del.addEventListener('click', ()=>{ if(confirm(`Apagar "${it.nome || cfg.rotulo + ' ' + (i + 1)}"?`)){ itens.splice(i, 1); desenhar(); } });
+        acoes.appendChild(del); topo.appendChild(acoes); card.appendChild(topo);
+
+        const st = document.createElement('div'); st.className = 'slot-topo';
+        const prev = document.createElement('div'); prev.className = 'slot-preview';
+        if(it.foto){ const im = document.createElement('img'); im.src = it.foto; prev.appendChild(im); } else prev.textContent = '🖼️';
+        const bt = document.createElement('div'); bt.className = 'slot-botoes';
+        const inp = document.createElement('input'); inp.type = 'file'; inp.accept = 'image/*'; inp.style.display = 'none';
+        const esc = document.createElement('button'); esc.type = 'button'; esc.className = 'btn-escolher'; esc.textContent = it.foto ? 'Trocar foto' : 'Escolher foto';
+        esc.addEventListener('click', ()=> inp.click());
+        inp.addEventListener('change', async (e)=>{
+          const f = e.target.files[0]; e.target.value = ''; if(!f) return;
+          try{ it.foto = await comprimirFotoVitrine(f); desenhar(); }catch(err){ alert('Não foi possível usar essa imagem. Tenta outra foto.'); }
+        });
+        bt.appendChild(inp); bt.appendChild(esc);
+        if(it.foto){ const rm = document.createElement('button'); rm.type = 'button'; rm.className = 'btn-remover'; rm.style.display = 'block'; rm.textContent = '✕'; rm.addEventListener('click', ()=>{ it.foto = ''; desenhar(); }); bt.appendChild(rm); }
+        st.appendChild(prev); st.appendChild(bt); card.appendChild(st);
+
+        cfg.campos.forEach(c=>{
+          const lb = document.createElement('label'); lb.textContent = c.rotulo; card.appendChild(lb);
+          const campo = document.createElement(c.tipo === 'area' ? 'textarea' : 'input');
+          if(c.tipo !== 'area') campo.type = 'text';
+          campo.maxLength = c.max; campo.placeholder = c.placeholder || '';
+          campo.value = c.chave === 'etiquetas' ? (it.etiquetas || []).join(', ') : (it[c.chave] || '');
+          campo.addEventListener('input', ()=>{
+            if(c.chave === 'etiquetas') it.etiquetas = campo.value.split(',').map(x => x.trim()).filter(Boolean).slice(0, 3).map(x => x.slice(0, 24));
+            else it[c.chave] = campo.value;
+          });
+          card.appendChild(campo);
+        });
+        listaEl.appendChild(card);
+      });
+      document.getElementById(cfg.btnAdd).disabled = itens.length >= cfg.maximo;
+    }
+    document.getElementById(cfg.btnAdd).addEventListener('click', ()=>{
+      if(itens.length >= cfg.maximo) return;
+      itens.push({ foto:'', nome:'' }); desenhar();
+      const cards = listaEl.querySelectorAll('.item-vit'); if(cards.length) cards[cards.length - 1].scrollIntoView({ behavior:'smooth', block:'center' });
+    });
+    document.getElementById(cfg.btnGuardar).addEventListener('click', async ()=>{
+      const okEl = document.getElementById('mensagemOk'), avisoEl = document.getElementById('avisoTamanho');
+      okEl.style.display = 'none'; avisoEl.style.display = 'none';
+      const limpos = itens.map(it => {
+        const o = { foto: it.foto || '', nome: (it.nome || '').trim() };
+        cfg.campos.forEach(c => { if(c.chave === 'etiquetas') o.etiquetas = (it.etiquetas || []).slice(0, 3); else if(c.chave !== 'nome') o[c.chave] = (it[c.chave] || '').trim(); });
+        return o;
+      });
+      const semNome = limpos.findIndex(o => !o.nome);
+      if(semNome >= 0){ avisoEl.style.display = 'block'; avisoEl.textContent = `⚠️ Falta o nome em "${cfg.rotulo} ${semNome + 1}".`; return; }
+      if(JSON.stringify(limpos).length > 950000){ avisoEl.style.display = 'block'; avisoEl.textContent = '⚠️ As fotos, juntas, ficaram grandes demais para guardar. Remove uma foto e tenta de novo.'; return; }
+      const btn = document.getElementById(cfg.btnGuardar);
+      btn.disabled = true; btn.textContent = 'A guardar...';
+      try{
+        await setDoc(doc(db, 'trajeto_publico', auth.currentUser.uid + cfg.sufixo), { itens: limpos, atualizadoEm: Date.now() });
+        itens = limpos.map(o => Object.assign({}, o));
+        okEl.textContent = '✅ Guardado! O site de pedidos já mostra a versão nova.';
+        okEl.style.display = 'block';
+      }catch(err){
+        avisoEl.style.display = 'block';
+        avisoEl.textContent = 'Não foi possível guardar agora. Confirma a ligação à internet e tenta de novo.';
+      }
+      btn.disabled = false; btn.textContent = 'Guardar';
+      desenhar();
+    });
+    return {
+      carregar(dados){ itens = (Array.isArray(dados && dados.itens) ? dados.itens : []).map(o => Object.assign({}, o)); desenhar(); }
+    };
+  }
+  const listaDestinos = criarListaVitrine({ lista:'listaDestinos', btnAdd:'btnAddDestino', btnGuardar:'btnGuardarDestinos', sufixo:'-destinos', maximo:10, rotulo:'Destino',
+    campos:[ { chave:'nome', rotulo:'Nome do destino *', max:30, placeholder:'ex: Sintra' }, { chave:'sub', rotulo:'Frase curta (opcional)', max:40, placeholder:'ex: Palácios e serra' } ] });
+  const listaTours = criarListaVitrine({ lista:'listaTours', btnAdd:'btnAddTour', btnGuardar:'btnGuardarTours', sufixo:'-tours', maximo:6, rotulo:'Tour',
+    campos:[ { chave:'nome', rotulo:'Nome do tour *', max:40, placeholder:'ex: Sintra e Cascais' }, { chave:'texto', rotulo:'Frase curta (opcional)', tipo:'area', max:120, placeholder:'ex: Palácios na serra e regresso pela costa.' }, { chave:'etiquetas', rotulo:'Etiquetas, separadas por vírgula (até 3)', max:80, placeholder:'ex: Dia inteiro, Até 6 pax' } ] });
+  async function carregarVitrine(uid){
+    try{
+      const [sd, st] = await Promise.all([ getDoc(doc(db, 'trajeto_publico', uid + '-destinos')), getDoc(doc(db, 'trajeto_publico', uid + '-tours')) ]);
+      listaDestinos.carregar(sd.exists() ? sd.data() : {});
+      listaTours.carregar(st.exists() ? st.data() : {});
+    }catch(e){ listaDestinos.carregar({}); listaTours.carregar({}); }
+  }
+
   onAuthStateChanged(auth, async (user)=>{
     if(user){
       document.getElementById('telaLogin').style.display = 'none';
@@ -689,6 +845,7 @@
         painelPartidas.carregar(dados);
       }catch(e){ /* a pessoa pode sempre escolher fotos novas e guardar */ }
       await carregarApresentacoes(user.uid);
+      await carregarVitrine(user.uid);
     } else {
       document.getElementById('telaLogin').style.display = 'flex';
       document.getElementById('telaGaleria').style.display = 'none';
