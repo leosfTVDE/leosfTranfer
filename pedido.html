@@ -579,7 +579,7 @@
     <div class="parceiros-lista" id="parceirosLista"></div>
   </div>
   <p class="copy">Trajeto Transfer · Lisboa</p>
-  <p class="versao">v9.12.0</p>
+  <p class="versao">v9.12.1</p>
 </footer>
 
 <div class="barra" id="barraFixa">
@@ -1428,7 +1428,7 @@
       const url = 'https://ntfy.sh/' + NTFY_TOPICO
         + '?title=' + encodeURIComponent('Trajeto Transfer')
         + '&tags=car&priority=high'
-        + '&click=' + encodeURIComponent('https://trajetotransfer.pt/app/');
+        + '&click=' + encodeURIComponent('https://trajetotransfer.pt/');
       fetch(url, { method: 'POST', body: 'Novo pedido de cotação no site.', mode: 'no-cors', keepalive: true }).catch(()=>{});
     }catch(e){ /* o aviso é um extra: se falhar, o pedido continua guardado */ }
   }
