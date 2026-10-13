@@ -1676,7 +1676,7 @@
     <p class="nota">Os serviços por hora agendados ficam em "📅 Agendados". Os que estão em andamento aparecem a partir do momento em que tocas em "🚗 Ir buscar cliente" no agendamento. O tempo só começa a contar quando tocas em "▶️ Iniciar" (cliente no carro). Ao finalizar, o valor é calculado pela regra definida em "Minhas tarifas" e podes enviar o resumo ao cliente. O agendamento só sai da lista quando o marcares como "Concluído".</p>
   </div>
 
-  <p style="text-align:center; font-family:'Helvetica Neue', Arial, sans-serif; font-size:11px; color:#8a7f66; margin-top:24px;">Trajeto · v9.13.0</p>
+  <p style="text-align:center; font-family:'Helvetica Neue', Arial, sans-serif; font-size:11px; color:#8a7f66; margin-top:24px;">Trajeto · v9.13.1</p>
 
 </main>
 
@@ -1749,6 +1749,17 @@
     <p>O pagamento desta corrida já foi recebido?</p>
     <button class="modal-btn modal-btn-recebido" id="btnModalRecebido">💰 Sim, já recebi</button>
     <button class="modal-btn modal-btn-pendente" id="btnModalPendente">⏳ Ainda não recebi</button>
+    <p id="notaParceiroPag" style="display:none; font-size:12px; color:#6a7378; margin:12px 0 0;"></p>
+  </div>
+</div>
+
+<div class="modal-overlay" id="modalPedirAvaliacao">
+  <div class="modal-card">
+    <h2>⭐ Pedir avaliação?</h2>
+    <p id="pedirAvTexto"></p>
+    <button class="modal-btn" id="btnPedirAvSim" style="background:linear-gradient(180deg,#e8b84a,#d29a1f); color:#3b2a05;">⭐ Sim, enviar agora</button>
+    <button class="modal-btn modal-btn-secundario" id="btnPedirAvNao">Agora não</button>
+    <p style="font-size:12px; color:#6a7378; margin:12px 0 0;">Podes pedir mais tarde no cartão da corrida.</p>
   </div>
 </div>
 
@@ -4226,6 +4237,18 @@
   let idPendenteModal = null;
   function abrirModalPagamento(id){
     idPendenteModal = id;
+    // cliente de parceiro: avisa (discretamente) que não será sugerido pedir avaliação
+    const ag = lerAgendamentos().find(a => a.id === id);
+    const nota = document.getElementById('notaParceiroPag');
+    if(ag && ehFornecedorParceiro(ag.fornecedor) && !ag.avaliacaoCodigo){
+      nota.textContent = '';
+      nota.appendChild(document.createTextNode('Cliente do parceiro '));
+      const b = document.createElement('b'); b.textContent = ag.fornecedor.trim(); nota.appendChild(b);
+      nota.appendChild(document.createTextNode(': não é pedida avaliação.'));
+      nota.style.display = 'block';
+    } else {
+      nota.style.display = 'none';
+    }
     document.getElementById('modalPagamento').classList.add('aberto');
   }
   function fecharModalPagamento(){
@@ -4244,7 +4267,37 @@
       renderFaturamento();
     }
     fecharModalPagamento();
+    if(ag && deveSugerirAvaliacao(ag)) abrirModalPedirAvaliacao(ag);
   }
+  // Depois de concluir: sugerir o pedido de avaliação só a clientes próprios (não de parceiros),
+  // ainda sem avaliação pedida, e com sessão iniciada (sem sessão não dá para criar o link).
+  let idPedirAvaliacao = null;
+  function deveSugerirAvaliacao(ag){
+    return !!(ag && ag.realizado && !ag.avaliacaoCodigo && !ehFornecedorParceiro(ag.fornecedor)
+      && window.TrajetoCloud && window.TrajetoCloud.utilizadorAtual && window.TrajetoCloud.criarLinkAvaliacao);
+  }
+  function abrirModalPedirAvaliacao(ag){
+    idPedirAvaliacao = ag.id;
+    const t = document.getElementById('pedirAvTexto');
+    t.textContent = '';
+    t.appendChild(document.createTextNode('Enviar a '));
+    const b = document.createElement('b'); b.textContent = ag.cliente; t.appendChild(b);
+    t.appendChild(document.createTextNode(' o link para avaliar o serviço? A avaliação aparece no teu site de pedidos.'));
+    document.getElementById('modalPedirAvaliacao').classList.add('aberto');
+  }
+  function fecharModalPedirAvaliacao(){
+    idPedirAvaliacao = null;
+    document.getElementById('modalPedirAvaliacao').classList.remove('aberto');
+  }
+  document.getElementById('btnPedirAvSim').addEventListener('click', ()=>{
+    const id = idPedirAvaliacao;
+    fecharModalPedirAvaliacao();
+    if(id) pedirAvaliacao(id, null);   // o mesmo caminho do botão "⭐ Pedir avaliação" do cartão
+  });
+  document.getElementById('btnPedirAvNao').addEventListener('click', fecharModalPedirAvaliacao);
+  document.getElementById('modalPedirAvaliacao').addEventListener('click', (e)=>{
+    if(e.target.id === 'modalPedirAvaliacao') fecharModalPedirAvaliacao();
+  });
   document.getElementById('btnModalRecebido').addEventListener('click', ()=> concluirComPagamento('recebido'));
   document.getElementById('btnModalPendente').addEventListener('click', ()=> concluirComPagamento('pendente'));
   document.getElementById('modalPagamento').addEventListener('click', (e)=>{
