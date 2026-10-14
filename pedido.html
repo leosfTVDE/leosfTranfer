@@ -614,7 +614,7 @@
     <div class="parceiros-lista" id="parceirosLista"></div>
   </div>
   <p class="copy">Trajeto Transfer · Lisboa</p>
-  <p class="versao">v9.13.1</p>
+  <p class="versao">v9.14.0</p>
 </footer>
 
 <div class="barra" id="barraFixa">
@@ -1379,7 +1379,7 @@
   })();
 
   // ---- Capa com as fotos da galeria Geral + "Viaje com conforto" + motorista ----
-  let capaIdx = 0, capaTimer = null;
+  let capaIdx = 0, capaTimer = null, capaIntervaloMs = 5000, capaAutoLigado = true;
   function capaMostrar(i){
     const imgs = document.querySelectorAll('#capaFotos img'), pts = document.querySelectorAll('#capaPontos button');
     if(!imgs.length) return;
@@ -1387,29 +1387,83 @@
     imgs.forEach((im, k)=> im.classList.toggle('on', k === capaIdx));
     pts.forEach((p, k)=> p.classList.toggle('on', k === capaIdx));
   }
-  function capaAuto(){ clearInterval(capaTimer); capaTimer = setInterval(()=> capaMostrar(capaIdx + 1), 5000); }
-  window.aplicarVitrine = function(dados){
-    const fotos = (Array.isArray(dados.galeria) ? dados.galeria : []).filter(f => f && fotoSegura(f.foto));
-    if(fotos.length){
-      const caixa = document.getElementById('capaFotos'), pontos = document.getElementById('capaPontos');
-      caixa.innerHTML = ''; pontos.innerHTML = '';
-      fotos.forEach((f, i)=>{
-        const im = el('img'); im.src = fotoSegura(f.foto); im.alt = f.legenda || ''; if(i === 0) im.classList.add('on'); caixa.appendChild(im);
-        if(fotos.length > 1){ const p = el('button'); p.type = 'button'; p.setAttribute('aria-label', String(i + 1)); if(i === 0) p.classList.add('on'); p.addEventListener('click', ()=>{ capaMostrar(i); capaAuto(); }); pontos.appendChild(p); }
-      });
-      if(fotos.length > 1){
-        capaAuto();
-        let x0 = null; const capa = document.getElementById('capa');
-        capa.addEventListener('touchstart', e => { x0 = e.touches[0].clientX; }, { passive:true });
-        capa.addEventListener('touchend', e => { if(x0 === null) return; const dx = e.changedTouches[0].clientX - x0; x0 = null; if(Math.abs(dx) > 40){ capaMostrar(capaIdx + (dx < 0 ? 1 : -1)); capaAuto(); } }, { passive:true });
-      }
-      const carr = document.getElementById('confortoCarr'); carr.innerHTML = '';
-      fotos.forEach(f => {
-        const fig = el('figure', 'galc'), ft = el('div', 'foto'), im = el('img'); im.src = fotoSegura(f.foto); im.alt = f.legenda || ''; im.loading = 'lazy';
-        ft.appendChild(im); fig.appendChild(ft); if(f.legenda) fig.appendChild(el('figcaption', '', f.legenda)); carr.appendChild(fig);
-      });
-      document.getElementById('confortoSecao').hidden = false;
+  function capaAuto(){
+    clearInterval(capaTimer);
+    if(!capaAutoLigado || document.querySelectorAll('#capaFotos img').length < 2) return;
+    capaTimer = setInterval(()=> capaMostrar(capaIdx + 1), capaIntervaloMs);
+  }
+  // Deslizar o dedo na capa (registado uma só vez; funciona com qualquer lista de fotos)
+  (function(){
+    let x0 = null; const capa = document.getElementById('capa');
+    capa.addEventListener('touchstart', e => { x0 = e.touches[0].clientX; }, { passive:true });
+    capa.addEventListener('touchend', e => { if(x0 === null) return; const dx = e.changedTouches[0].clientX - x0; x0 = null; if(document.querySelectorAll('#capaFotos img').length > 1 && Math.abs(dx) > 40){ capaMostrar(capaIdx + (dx < 0 ? 1 : -1)); capaAuto(); } }, { passive:true });
+  })();
+
+  // ---- Fotos do site: Capa e "Viaje com conforto" ----
+  // Cada uma tem a sua lista no galeria.html (trajeto_publico/{uid}-capa e -conforto), com temporizador próprio.
+  // Enquanto a lista própria estiver vazia, usa-se a galeria "Geral" (como antes).
+  let fotosGeral = [];
+  let docCapa = null, docConforto = null, docsFotosLidos = false, esperaCapaAcabou = false;
+  function limparFotos(lista){ return (Array.isArray(lista) ? lista : []).filter(f => f && fotoSegura(f.foto)); }
+  function lerTempo(d, autoPadrao, segPadrao){
+    const auto = d && typeof d.auto === 'boolean' ? d.auto : autoPadrao;
+    const seg = d && Number(d.segundos) >= 2 && Number(d.segundos) <= 120 ? Number(d.segundos) : segPadrao;
+    return { auto, ms: seg * 1000 };
+  }
+  let capaDesenhada = '', capaTempoAtual = '';
+  function desenharCapa(){
+    if(!docsFotosLidos && !esperaCapaAcabou) return;          // espera um pouco pela lista própria, para não trocar de fotos à frente do cliente
+    const proprias = limparFotos(docCapa && docCapa.itens);
+    const fotos = proprias.length ? proprias : fotosGeral;
+    const t = lerTempo(docCapa, true, 5);
+    capaAutoLigado = t.auto; capaIntervaloMs = t.ms;
+    const chave = fotos.map(f => f.foto.length + ':' + f.foto.slice(-24)).join('|');
+    const tempo = t.auto + ':' + t.ms;
+    if(chave === capaDesenhada){ if(tempo !== capaTempoAtual){ capaTempoAtual = tempo; capaAuto(); } return; }   // mesmas fotos: só reinicia se o tempo mudou
+    capaTempoAtual = tempo;
+    capaDesenhada = chave;
+    if(!fotos.length) return;
+    const caixa = document.getElementById('capaFotos'), pontos = document.getElementById('capaPontos');
+    caixa.innerHTML = ''; pontos.innerHTML = ''; capaIdx = 0;
+    fotos.forEach((f, i)=>{
+      const im = el('img'); im.src = fotoSegura(f.foto); im.alt = f.legenda || ''; if(i === 0) im.classList.add('on'); caixa.appendChild(im);
+      if(fotos.length > 1){ const p = el('button'); p.type = 'button'; p.setAttribute('aria-label', String(i + 1)); if(i === 0) p.classList.add('on'); p.addEventListener('click', ()=>{ capaMostrar(i); capaAuto(); }); pontos.appendChild(p); }
+    });
+    capaAuto();
+  }
+  let confortoTimer = null, confortoPausaAte = 0;
+  function desenharConforto(){
+    const proprias = limparFotos(docConforto && docConforto.itens);
+    const fotos = proprias.length ? proprias : fotosGeral;
+    const carr = document.getElementById('confortoCarr'); carr.innerHTML = '';
+    clearInterval(confortoTimer);
+    if(!fotos.length){ document.getElementById('confortoSecao').hidden = true; return; }
+    fotos.forEach(f => {
+      const fig = el('figure', 'galc'), ft = el('div', 'foto'), im = el('img'); im.src = fotoSegura(f.foto); im.alt = f.legenda || ''; im.loading = 'lazy';
+      ft.appendChild(im); fig.appendChild(ft); if(f.legenda) fig.appendChild(el('figcaption', '', f.legenda)); carr.appendChild(fig);
+    });
+    document.getElementById('confortoSecao').hidden = false;
+    const t = lerTempo(docConforto, false, 5);    // por omissão: parado (como sempre foi)
+    const reduzir = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if(t.auto && fotos.length > 1 && !reduzir){
+      confortoTimer = setInterval(()=>{
+        if(Date.now() < confortoPausaAte) return;            // o cliente mexeu há pouco: não interromper
+        const cards = [...carr.children]; if(cards.length < 2) return;
+        const atual = cards.findIndex(c => c.offsetLeft - carr.offsetLeft >= carr.scrollLeft - 4);
+        const prox = (atual < 0 || atual >= cards.length - 1 || carr.scrollLeft + carr.clientWidth >= carr.scrollWidth - 4) ? 0 : atual + 1;
+        carr.scrollTo({ left: cards[prox].offsetLeft - carr.offsetLeft - 14 < 0 ? 0 : cards[prox].offsetLeft - carr.offsetLeft - 14, behavior: 'smooth' });
+      }, t.ms);
     }
+  }
+  ['touchstart', 'pointerdown', 'wheel'].forEach(ev => document.getElementById('confortoCarr').addEventListener(ev, ()=>{ confortoPausaAte = Date.now() + 10000; }, { passive:true }));
+  setTimeout(()=>{ esperaCapaAcabou = true; desenharCapa(); }, 2500);
+  window.aplicarFotosSite = function(capa, conforto){
+    docCapa = capa || {}; docConforto = conforto || {}; docsFotosLidos = true;
+    desenharCapa(); desenharConforto();
+  };
+  window.aplicarVitrine = function(dados){
+    fotosGeral = limparFotos(dados.galeria);
+    desenharCapa(); desenharConforto();
     const perfil = dados.perfil || {};
     if(typeof perfil.nome === 'string' && perfil.nome.trim()){
       const n = document.getElementById('motoristaNome'); n.textContent = perfil.nome.trim(); n.hidden = false;
@@ -1645,6 +1699,17 @@
       ]);
       if(typeof window.aplicarVitrineExtra === 'function') window.aplicarVitrineExtra(sd.exists() ? sd.data() : {}, st.exists() ? st.data() : {});
     }catch(e){ /* fica a versão sem fotos */ }
+  })();
+  (async ()=>{
+    let capa = {}, conforto = {};
+    try{
+      const uid = await resolucaoMotorista;
+      if(uid){
+        const [sc, sf] = await Promise.all([ getDoc(doc(db, 'trajeto_publico', uid + '-capa')), getDoc(doc(db, 'trajeto_publico', uid + '-conforto')) ]);
+        capa = sc.exists() ? sc.data() : {}; conforto = sf.exists() ? sf.data() : {};
+      }
+    }catch(e){ /* fica com a galeria Geral */ }
+    try{ if(typeof window.aplicarFotosSite === 'function') window.aplicarFotosSite(capa, conforto); }catch(e){}
   })();
   (async ()=>{
     try{
