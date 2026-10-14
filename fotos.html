@@ -162,7 +162,8 @@
   let galeriaFotos = [];
   let galeriaIndice = 0;
   let galeriaTimer = null;
-  const GALERIA_INTERVALO_MS = 6000;
+  let GALERIA_INTERVALO_MS = 6000;   // pode ser mudado no galeria.html ("Passagem das fotos")
+  let galeriaAuto = true;
 
   function galeriaPrefereMenosMovimento(){
     return window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -184,7 +185,7 @@
   }
   function galeriaReiniciarTimer(){
     if(galeriaTimer) clearInterval(galeriaTimer);
-    if(galeriaFotos.length < 2 || galeriaPrefereMenosMovimento()) return;
+    if(galeriaFotos.length < 2 || galeriaPrefereMenosMovimento() || !galeriaAuto) return;
     galeriaTimer = setInterval(()=> galeriaMostrarIndice(galeriaIndice + 1), GALERIA_INTERVALO_MS);
   }
   function galeriaProxima(){ galeriaMostrarIndice(galeriaIndice + 1); galeriaReiniciarTimer(); }
@@ -251,13 +252,19 @@
       const linkPedido = montarLinkPedido();
       document.getElementById('galeriaLogoLink').href = linkPedido;
 
+      let uidTempo = null, chaveTempo = paramTipo === 'chegada' ? 'chegadas' : paramTipo === 'partida' ? 'partidas' : 'geral';
       if(paramAgendamento){
         const snap = await getDoc(doc(db, 'trajeto_apresentacoes', paramAgendamento));
         if(snap.exists() && Array.isArray(snap.data().galeria)){
           galeriaFotos = snap.data().galeria.filter(item => item && item.foto);
         }
+        if(snap.exists()){
+          uidTempo = snap.data().motoristaUid || null;
+          chaveTempo = snap.data().tipo === 'partida' ? 'partidas' : snap.data().tipo === 'chegada' ? 'chegadas' : 'geral';
+        }
       } else {
         const uid = await resolucaoMotorista;
+        uidTempo = uid;
         if(uid){
           const snap = await getDoc(doc(db, 'trajeto_publico', uid));
           const dadosPublicos = snap.exists() ? snap.data() : {};
@@ -266,6 +273,16 @@
             galeriaFotos = dadosPublicos[campo].filter(item => item && item.foto);
           }
         }
+      }
+
+      // Temporizador escolhido no galeria.html (trajeto_publico/{uid}-tempos). Sem escolha: 6 s, como sempre.
+      if(uidTempo){
+        try{
+          const st = await getDoc(doc(db, 'trajeto_publico', uidTempo + '-tempos'));
+          const cfgT = st.exists() ? st.data()[chaveTempo] : null;
+          if(cfgT && typeof cfgT.auto === 'boolean') galeriaAuto = cfgT.auto;
+          if(cfgT && Number(cfgT.segundos) >= 2 && Number(cfgT.segundos) <= 120) GALERIA_INTERVALO_MS = Number(cfgT.segundos) * 1000;
+        }catch(e){ /* fica com o tempo de sempre */ }
       }
 
       if(galeriaFotos.length){
