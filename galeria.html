@@ -128,6 +128,17 @@
   .item-vit textarea{ min-height:64px; resize:vertical; }
   .btn-adicionar{ width:100%; padding:12px; margin:0 0 12px; border:1px dashed var(--linha); border-radius:10px; background:none; color:var(--azulejo); font-family:inherit; font-size:14px; font-weight:bold; cursor:pointer; }
   .btn-adicionar:disabled{ opacity:.4; cursor:default; }
+  .tempo-box{ background:var(--branco); border:1px solid var(--linha); border-radius:12px; padding:12px 14px; margin:0 0 16px; }
+  .tempo-box b{ display:block; font-size:14px; color:var(--azul-noite); margin-bottom:8px; }
+  .tempo-seg{ display:flex; gap:3px; padding:3px; margin-bottom:10px; border-radius:10px; background:#ebe3d3; }
+  .tempo-seg button{ flex:1; padding:9px 4px; border:none; border-radius:8px; background:transparent; color:var(--texto); font-family:inherit; font-size:13px; cursor:pointer; }
+  .tempo-seg button.on{ background:var(--azulejo); color:#fff; font-weight:bold; }
+  .tempo-row{ display:flex; align-items:center; gap:8px; flex-wrap:wrap; font-size:13.5px; color:#3d4c52; }
+  .tempo-st{ display:flex; align-items:center; border:1.5px solid var(--linha); border-radius:9px; background:#fff; }
+  .tempo-st button{ width:38px; height:38px; margin:2px; border:none; border-radius:7px; background:#f1ebde; color:var(--azul-noite); font-size:18px; cursor:pointer; }
+  .tempo-st span{ min-width:46px; text-align:center; font-weight:bold; font-size:16px; color:var(--azul-noite); }
+  .tempo-box small{ display:block; margin-top:8px; font-size:11.5px; color:#6a7378; line-height:1.45; }
+  .tempo-box .tempo-ok{ color:#2e7d4f; font-weight:bold; }
   .vazio-vit{ color:#6a7378; font-size:13px; text-align:center; padding:14px 0 18px; }
   .ver-apresentacao{
     display:block; text-align:center; margin-top:22px; font-size:13.5px; color:var(--azulejo); text-decoration:none; font-weight:600;
@@ -166,6 +177,8 @@
       <button type="button" class="aba-btn" data-aba="partidas">Partidas</button>
       <button type="button" class="aba-btn" data-aba="destinos">Destinos</button>
       <button type="button" class="aba-btn" data-aba="tours">Tours</button>
+      <button type="button" class="aba-btn" data-aba="capa">Capa</button>
+      <button type="button" class="aba-btn" data-aba="conforto">Conforto</button>
     </div>
 
     <div class="mensagem-ok" id="mensagemOk">✅ Guardado! As fotos já estão atualizadas no site.</div>
@@ -173,6 +186,7 @@
 
     <div class="painel-aba" id="painelGeral">
       <p class="sub">Até 4 fotos que aparecem na apresentação em ecrã inteiro (<strong>fotos.html</strong>) e no site de pedidos. Prefere fotos tiradas na horizontal — a foto preenche sempre o ecrã todo.</p>
+      <div class="tempo-box" id="tempoGeral"></div>
       <div class="slot">
         <div class="slot-topo">
           <div class="slot-preview" id="gFotoPreview1">🖼️</div>
@@ -225,6 +239,7 @@
     </div>
 
     <div class="painel-aba" id="painelChegadas" style="display:none;">
+      <div class="tempo-box" id="tempoChegadas"></div>
       <div class="subabas" id="subabasChegadas"><button type="button" class="subaba-btn ativa" data-sub="fixo">Trajeto Transfer</button></div>
       <div id="fixoChegadas">
       <p class="sub">Fotos de boas-vindas para clientes que vais buscar ao aeroporto.</p>
@@ -282,6 +297,7 @@
     </div>
 
     <div class="painel-aba" id="painelPartidas" style="display:none;">
+      <div class="tempo-box" id="tempoPartidas"></div>
       <div class="subabas" id="subabasPartidas"><button type="button" class="subaba-btn ativa" data-sub="fixo">Trajeto Transfer</button></div>
       <div id="fixoPartidas">
       <p class="sub">Fotos para clientes que estás a levar ao aeroporto.</p>
@@ -350,6 +366,20 @@
       <div id="listaTours"></div>
       <button type="button" class="btn-adicionar" id="btnAddTour">+ Adicionar tour</button>
       <button type="button" class="btn-principal" id="btnGuardarTours">Guardar</button>
+    </div>
+
+    <div class="painel-aba" id="painelCapa" style="display:none;">
+      <p class="sub">Até 6 fotos para o <strong>topo do site de pedidos</strong> (a foto grande que passa sozinha). Enquanto esta lista estiver vazia, o site usa as fotos da aba Geral. Prefere fotos na horizontal.</p>
+      <div class="tempo-box" id="tempoCapa"></div>
+      <div id="listaCapa"></div>
+      <button type="button" class="btn-principal" id="btnGuardarCapa">Guardar</button>
+    </div>
+
+    <div class="painel-aba" id="painelConforto" style="display:none;">
+      <p class="sub">Até 6 fotos com legenda para a secção <strong>"Viaje com conforto"</strong> do site de pedidos. Enquanto esta lista estiver vazia, o site usa as fotos da aba Geral.</p>
+      <div class="tempo-box" id="tempoConforto"></div>
+      <div id="listaConforto"></div>
+      <button type="button" class="btn-principal" id="btnGuardarConforto">Guardar</button>
     </div>
 
     <a href="fotos.html" target="_blank" class="ver-apresentacao" id="verApresentacaoLink">Ver a apresentação →</a>
@@ -512,7 +542,7 @@
   const painelPartidas = criarPainelSimples('p', 'galeriaPartidas', 'btnGuardarPartidas');
 
   // ---------- Abas ----------
-  const LINKS_POR_ABA = { geral:'fotos.html', chegadas:'fotos.html?tipo=chegada', partidas:'fotos.html?tipo=partida', destinos:'pedido.html', tours:'pedido.html' };
+  const LINKS_POR_ABA = { geral:'fotos.html', chegadas:'fotos.html?tipo=chegada', partidas:'fotos.html?tipo=partida', destinos:'pedido.html', tours:'pedido.html', capa:'pedido.html', conforto:'pedido.html' };
   document.querySelectorAll('.aba-btn').forEach(btn=>{
     btn.addEventListener('click', ()=>{
       document.querySelectorAll('.aba-btn').forEach(b=> b.classList.remove('ativa'));
@@ -523,6 +553,8 @@
       document.getElementById('painelPartidas').style.display = aba==='partidas' ? 'block' : 'none';
       document.getElementById('painelDestinos').style.display = aba==='destinos' ? 'block' : 'none';
       document.getElementById('painelTours').style.display = aba==='tours' ? 'block' : 'none';
+      document.getElementById('painelCapa').style.display = aba==='capa' ? 'block' : 'none';
+      document.getElementById('painelConforto').style.display = aba==='conforto' ? 'block' : 'none';
       atualizarLinkVer();
       document.getElementById('mensagemOk').style.display = 'none';
       document.getElementById('mensagemOk').textContent = '✅ Guardado! As fotos já estão atualizadas no site.';
@@ -551,7 +583,7 @@
     const verLink = document.getElementById('verApresentacaoLink');
     verLink.style.display = 'block';
     verLink.href = link;
-    verLink.textContent = (abaAtiva === 'destinos' || abaAtiva === 'tours') ? 'Ver no site de pedidos →' : 'Ver a apresentação →';
+    verLink.textContent = ['destinos','tours','capa','conforto'].includes(abaAtiva) ? 'Ver no site de pedidos →' : 'Ver a apresentação →';
   }
   function selecionarSubaba(grupo, idSub){
     const g = GRUPOS_CLIENTES[grupo];
@@ -839,6 +871,144 @@
     }catch(e){ listaDestinos.carregar({}); listaTours.carregar({}); }
   }
 
+  // =====================================================================
+  //  Temporizador ("Passagem das fotos") e listas Capa / Conforto do site de pedidos
+  //   trajeto_publico/{uid}-tempos   → { geral:{auto,segundos}, chegadas:{…}, partidas:{…} }  (vitrine do Tesla)
+  //   trajeto_publico/{uid}-capa     → { itens:[{foto}], auto, segundos }
+  //   trajeto_publico/{uid}-conforto → { itens:[{foto, legenda}], auto, segundos }
+  //  Documentos próprios: não pesam no documento das galerias Geral/Chegadas/Partidas.
+  // =====================================================================
+  function criarCaixaTempo(id, titulo, padrao, notaCom, notaSem, gravar){
+    const box = document.getElementById(id);
+    let estado = { auto: padrao.auto, segundos: padrao.segundos };
+    let timerGravar = null;
+    box.innerHTML = `<b>⏱ ${titulo}</b>
+      <div class="tempo-seg"><button type="button" data-auto="1">Com temporizador</button><button type="button" data-auto="0">Sem temporizador</button></div>
+      <div class="tempo-row">Mudar de foto a cada <span class="tempo-st"><button type="button" data-delta="-1" aria-label="Menos">−</button><span class="tempo-seg-valor"></span><button type="button" data-delta="1" aria-label="Mais">+</button></span></div>
+      <small class="tempo-nota"></small>`;
+    function desenhar(){
+      box.querySelectorAll('[data-auto]').forEach(b => b.classList.toggle('on', (b.dataset.auto === '1') === estado.auto));
+      box.querySelector('.tempo-row').style.display = estado.auto ? 'flex' : 'none';
+      box.querySelector('.tempo-seg-valor').textContent = estado.segundos + ' s';
+      box.querySelector('.tempo-nota').textContent = estado.auto ? notaCom : notaSem;
+    }
+    function mudou(){
+      desenhar();
+      clearTimeout(timerGravar);
+      timerGravar = setTimeout(async ()=>{
+        const nota = box.querySelector('.tempo-nota');
+        try{ await gravar({ auto: estado.auto, segundos: estado.segundos }); nota.innerHTML = ''; const ok = document.createElement('span'); ok.className = 'tempo-ok'; ok.textContent = '✅ Guardado. '; nota.appendChild(ok); nota.appendChild(document.createTextNode(estado.auto ? notaCom : notaSem)); }
+        catch(e){ nota.textContent = '⚠️ Não foi possível guardar o tempo agora. Confirma a internet e tenta de novo.'; }
+      }, 700);
+    }
+    box.addEventListener('click', (e)=>{
+      const a = e.target.closest('[data-auto]');
+      if(a){ estado.auto = a.dataset.auto === '1'; mudou(); return; }
+      const d = e.target.closest('[data-delta]');
+      if(d){ const n = Math.min(30, Math.max(3, estado.segundos + Number(d.dataset.delta))); if(n !== estado.segundos){ estado.segundos = n; mudou(); } }
+    });
+    desenhar();
+    return {
+      carregar(c){ if(c && typeof c.auto === 'boolean') estado.auto = c.auto; if(c && Number(c.segundos) >= 3 && Number(c.segundos) <= 30) estado.segundos = Number(c.segundos); desenhar(); },
+      valor(){ return { auto: estado.auto, segundos: estado.segundos }; }
+    };
+  }
+  const gravarTempoTesla = (chave) => (v) => setDoc(doc(db, 'trajeto_publico', auth.currentUser.uid + '-tempos'), { [chave]: v }, { merge: true });
+  const NOTA_TESLA_SEM = 'Sem temporizador: a foto só muda quando se toca nas setas ou se desliza o dedo.';
+  const tempoGeral = criarCaixaTempo('tempoGeral', 'Passagem das fotos no Tesla', { auto: true, segundos: 6 }, 'Vale para a vitrine do Tesla (fotos.html).', NOTA_TESLA_SEM, gravarTempoTesla('geral'));
+  const tempoChegadas = criarCaixaTempo('tempoChegadas', 'Passagem das fotos (Chegadas)', { auto: true, segundos: 6 }, 'Vale para a apresentação de Chegadas e para as apresentações de cada cliente de chegada.', NOTA_TESLA_SEM, gravarTempoTesla('chegadas'));
+  const tempoPartidas = criarCaixaTempo('tempoPartidas', 'Passagem das fotos (Partidas)', { auto: true, segundos: 6 }, 'Vale para a apresentação de Partidas e para as apresentações de cada cliente de partida.', NOTA_TESLA_SEM, gravarTempoTesla('partidas'));
+
+  function comprimirFotoTamanho(file, maxLado, alvo){
+    return new Promise((resolve, reject)=>{
+      const leitor = new FileReader();
+      leitor.onload = (e)=>{
+        const img = new Image();
+        img.onload = ()=>{
+          const escala = Math.min(1, maxLado / Math.max(img.width, img.height));
+          const lw = Math.round(img.width * escala), lh = Math.round(img.height * escala);
+          const canvas = document.createElement('canvas'); canvas.width = lw; canvas.height = lh;
+          canvas.getContext('2d').drawImage(img, 0, 0, lw, lh);
+          let q = 0.82, url = canvas.toDataURL('image/jpeg', q);
+          while(url.length > alvo && q > 0.3){ q -= 0.06; url = canvas.toDataURL('image/jpeg', q); }
+          resolve(url);
+        };
+        img.onerror = ()=> reject(new Error('imagem inválida'));
+        img.src = e.target.result;
+      };
+      leitor.onerror = ()=> reject(new Error('não foi possível ler o ficheiro'));
+      leitor.readAsDataURL(file);
+    });
+  }
+  function criarListaFotos(cfg){
+    // cfg: { lista, btnGuardar, sufixo, legenda, maxLado, alvo, caixa (criarCaixaTempo), msgOk }
+    const N = 6; let itens = Array.from({ length: N }, ()=> ({ foto:'', legenda:'' }));
+    const listaEl = document.getElementById(cfg.lista);
+    function desenhar(){
+      listaEl.innerHTML = '';
+      itens.forEach((it, i)=>{
+        const slot = document.createElement('div'); slot.className = 'slot';
+        const topo = document.createElement('div'); topo.className = 'slot-topo';
+        const prev = document.createElement('div'); prev.className = 'slot-preview';
+        if(it.foto){ const im = document.createElement('img'); im.src = it.foto; prev.appendChild(im); } else prev.textContent = '🖼️';
+        const bt = document.createElement('div'); bt.className = 'slot-botoes';
+        const inp = document.createElement('input'); inp.type = 'file'; inp.accept = 'image/*'; inp.style.display = 'none';
+        const esc = document.createElement('button'); esc.type = 'button'; esc.className = 'btn-escolher'; esc.textContent = (it.foto ? 'Trocar foto ' : 'Escolher foto ') + (i + 1);
+        esc.addEventListener('click', ()=> inp.click());
+        inp.addEventListener('change', async (e)=>{
+          const f = e.target.files[0]; e.target.value = ''; if(!f) return;
+          try{ it.foto = await comprimirFotoTamanho(f, cfg.maxLado, cfg.alvo); desenhar(); }catch(err){ alert('Não foi possível usar essa imagem. Tenta outra foto.'); }
+        });
+        bt.appendChild(inp); bt.appendChild(esc);
+        if(it.foto){ const rm = document.createElement('button'); rm.type = 'button'; rm.className = 'btn-remover'; rm.style.display = 'block'; rm.textContent = '✕'; rm.setAttribute('aria-label', 'Remover foto ' + (i + 1)); rm.addEventListener('click', ()=>{ it.foto = ''; desenhar(); }); bt.appendChild(rm); }
+        topo.appendChild(prev); topo.appendChild(bt); slot.appendChild(topo);
+        if(cfg.legenda){
+          const leg = document.createElement('input'); leg.type = 'text'; leg.maxLength = 100; leg.placeholder = 'Legenda curta (opcional)'; leg.value = it.legenda || '';
+          const cont = document.createElement('div'); cont.className = 'contador'; cont.textContent = `${leg.value.length} / 100`;
+          leg.addEventListener('input', ()=>{ it.legenda = leg.value; cont.textContent = `${leg.value.length} / 100`; });
+          slot.appendChild(leg); slot.appendChild(cont);
+        }
+        listaEl.appendChild(slot);
+      });
+    }
+    document.getElementById(cfg.btnGuardar).addEventListener('click', async ()=>{
+      const okEl = document.getElementById('mensagemOk'), avisoEl = document.getElementById('avisoTamanho');
+      okEl.style.display = 'none'; avisoEl.style.display = 'none';
+      const limpos = itens.filter(it => it.foto).map(it => cfg.legenda ? { foto: it.foto, legenda: (it.legenda || '').trim() } : { foto: it.foto });
+      if(JSON.stringify(limpos).length > 1000000){ avisoEl.style.display = 'block'; avisoEl.textContent = '⚠️ As fotos, juntas, ficaram grandes demais para guardar. Remove uma foto e tenta de novo.'; return; }
+      const btn = document.getElementById(cfg.btnGuardar); btn.disabled = true; btn.textContent = 'A guardar...';
+      try{
+        await setDoc(doc(db, 'trajeto_publico', auth.currentUser.uid + cfg.sufixo), Object.assign({ itens: limpos, atualizadoEm: Date.now() }, cfg.caixa.valor()));
+        okEl.textContent = cfg.msgOk; okEl.style.display = 'block';
+      }catch(err){
+        avisoEl.style.display = 'block'; avisoEl.textContent = 'Não foi possível guardar agora. Confirma a ligação à internet e tenta de novo.';
+      }
+      btn.disabled = false; btn.textContent = 'Guardar';
+    });
+    desenhar();
+    return {
+      carregar(d){
+        const l = (d && Array.isArray(d.itens) ? d.itens : []).filter(x => x && typeof x.foto === 'string' && x.foto);
+        itens = Array.from({ length: N }, (_, i)=> l[i] ? { foto: l[i].foto, legenda: l[i].legenda || '' } : { foto:'', legenda:'' });
+        desenhar();
+      }
+    };
+  }
+  const gravarTempoLista = (sufixo) => (v) => setDoc(doc(db, 'trajeto_publico', auth.currentUser.uid + sufixo), v, { merge: true });
+  const tempoCapa = criarCaixaTempo('tempoCapa', 'Passagem das fotos da capa', { auto: true, segundos: 5 }, 'O site muda de foto sozinho. O cliente também pode deslizar com o dedo.', 'Sem temporizador: a foto só muda quando o cliente desliza com o dedo ou toca nos pontos.', gravarTempoLista('-capa'));
+  const tempoConforto = criarCaixaTempo('tempoConforto', 'Passagem das fotos', { auto: false, segundos: 5 }, 'As fotos deslizam sozinhas. Se o cliente mexer, espera 10 s antes de continuar.', 'Sem temporizador: as fotos ficam paradas e o cliente desliza com o dedo.', gravarTempoLista('-conforto'));
+  const listaCapa = criarListaFotos({ lista:'listaCapa', btnGuardar:'btnGuardarCapa', sufixo:'-capa', legenda:false, maxLado:1600, alvo:150000, caixa: tempoCapa, msgOk:'✅ Guardado! A capa do site de pedidos já mostra estas fotos.' });
+  const listaConforto = criarListaFotos({ lista:'listaConforto', btnGuardar:'btnGuardarConforto', sufixo:'-conforto', legenda:true, maxLado:1280, alvo:140000, caixa: tempoConforto, msgOk:'✅ Guardado! A secção "Viaje com conforto" já mostra estas fotos.' });
+  async function carregarFotosSiteETempos(uid){
+    try{
+      const [sc, sf, st] = await Promise.all([ getDoc(doc(db, 'trajeto_publico', uid + '-capa')), getDoc(doc(db, 'trajeto_publico', uid + '-conforto')), getDoc(doc(db, 'trajeto_publico', uid + '-tempos')) ]);
+      const capa = sc.exists() ? sc.data() : {}, conforto = sf.exists() ? sf.data() : {}, tempos = st.exists() ? st.data() : {};
+      listaCapa.carregar(capa); tempoCapa.carregar(capa);
+      listaConforto.carregar(conforto); tempoConforto.carregar(conforto);
+      tempoGeral.carregar(tempos.geral); tempoChegadas.carregar(tempos.chegadas); tempoPartidas.carregar(tempos.partidas);
+    }catch(e){ /* fica com os valores por omissão */ }
+  }
+
   onAuthStateChanged(auth, async (user)=>{
     if(user){
       document.getElementById('telaLogin').style.display = 'none';
@@ -852,6 +1022,7 @@
       }catch(e){ /* a pessoa pode sempre escolher fotos novas e guardar */ }
       await carregarApresentacoes(user.uid);
       await carregarVitrine(user.uid);
+      await carregarFotosSiteETempos(user.uid);
     } else {
       document.getElementById('telaLogin').style.display = 'flex';
       document.getElementById('telaGaleria').style.display = 'none';
