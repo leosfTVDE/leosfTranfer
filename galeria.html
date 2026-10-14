@@ -104,7 +104,7 @@
     background:rgba(46,139,87,.1); border:1px solid rgba(46,139,87,.3);
     font-size:13px; color:#2e8b57; line-height:1.5;
   }
-  .abas{ display:flex; gap:6px; margin-bottom:20px; border-bottom:1px solid var(--linha); overflow-x:auto; }
+  .abas{ display:flex; flex-wrap:wrap; column-gap:6px; row-gap:0; margin-bottom:20px; border-bottom:1px solid var(--linha); }   /* todas as abas à vista (em 2 linhas se for preciso) */
   .aba-btn{ background:none; border:none; padding:10px 4px; margin-right:16px; font-family:inherit; font-size:13.5px; color:#6a7378; cursor:pointer; white-space:nowrap; border-bottom:2px solid transparent; }
   .aba-btn.ativa{ color:var(--terracota); border-bottom-color:var(--terracota); font-weight:bold; }
   .painel-aba{ display:block; }
