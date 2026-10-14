@@ -1131,6 +1131,16 @@
       <label for="cfg_nome">O teu nome (para as mensagens ao cliente)</label>
       <input type="text" id="cfg_nome" placeholder="ex: Carlos">
 
+      <label style="margin-top:14px;">O teu carro (opcional — se preencheres, aparece nas mensagens ao cliente; nas recolhas no aeroporto não aparece)</label>
+      <div class="cfg-row">
+        <div><label for="cfg_carro_modelo">Modelo</label><input type="text" id="cfg_carro_modelo" maxlength="40" placeholder="ex: Tesla Model Y"></div>
+        <div><label for="cfg_carro_matricula">Matrícula</label><input type="text" id="cfg_carro_matricula" maxlength="15" placeholder="ex: AB-12-CD"></div>
+      </div>
+      <div class="cfg-row">
+        <div><label for="cfg_carro_cor">Cor (português)</label><input type="text" id="cfg_carro_cor" maxlength="20" placeholder="ex: preto"></div>
+        <div><label for="cfg_carro_cor_en">Cor (inglês)</label><input type="text" id="cfg_carro_cor_en" maxlength="20" placeholder="ex: black"></div>
+      </div>
+
       <label for="cfg_whatsapp" style="margin-top:14px;">O teu número de WhatsApp (para o site de pedidos)</label>
       <input type="text" id="cfg_whatsapp" placeholder="ex: 351969698927">
 
@@ -1679,7 +1689,7 @@
     <p class="nota">Os serviços por hora agendados ficam em "📅 Agendados". Os que estão em andamento aparecem a partir do momento em que tocas em "🚗 Ir buscar cliente" no agendamento. O tempo só começa a contar quando tocas em "▶️ Iniciar" (cliente no carro). Ao finalizar, o valor é calculado pela regra definida em "Minhas tarifas" e podes enviar o resumo ao cliente. O agendamento só sai da lista quando o marcares como "Concluído".</p>
   </div>
 
-  <p style="text-align:center; font-family:'Helvetica Neue', Arial, sans-serif; font-size:11px; color:#8a7f66; margin-top:24px;">Trajeto · v9.14.0</p>
+  <p style="text-align:center; font-family:'Helvetica Neue', Arial, sans-serif; font-size:11px; color:#8a7f66; margin-top:24px;">Trajeto · v9.15.0</p>
 
 </main>
 
@@ -1882,6 +1892,33 @@
   }
   preencherPainel(cfg);
   document.getElementById('cfg_nome').value = localStorage.getItem('trajeto_nome') || '';
+  // ---------- O carro do motorista (opcional; usado nas mensagens) ----------
+  function lerCarro(){
+    try{ const c = JSON.parse(localStorage.getItem('trajeto_carro') || 'null') || {}; return { modelo: String(c.modelo || ''), matricula: String(c.matricula || ''), cor: String(c.cor || ''), corEn: String(c.corEn || '') }; }
+    catch(e){ return { modelo:'', matricula:'', cor:'', corEn:'' }; }
+  }
+  function preencherCarroUI(c){
+    document.getElementById('cfg_carro_modelo').value = c.modelo || '';
+    document.getElementById('cfg_carro_matricula').value = c.matricula || '';
+    document.getElementById('cfg_carro_cor').value = c.cor || '';
+    document.getElementById('cfg_carro_cor_en').value = c.corEn || '';
+  }
+  function gravarCarro(c){
+    const limpo = { modelo: String(c.modelo || '').trim(), matricula: String(c.matricula || '').trim(), cor: String(c.cor || '').trim(), corEn: String(c.corEn || '').trim() };
+    if(limpo.modelo || limpo.matricula || limpo.cor || limpo.corEn) localStorage.setItem('trajeto_carro', JSON.stringify(limpo));
+    else localStorage.removeItem('trajeto_carro');
+  }
+  // Linha "🚗 Carro: …" — só se o motorista preencheu o modelo ou a matrícula
+  function linhaCarro(en){
+    const c = lerCarro();
+    if(!c.modelo.trim() && !c.matricula.trim()) return '';
+    const cor = en ? (c.corEn.trim() || c.cor.trim()) : c.cor.trim();
+    const desc = en ? [cor, c.modelo.trim()].filter(Boolean).join(' ') : [c.modelo.trim(), cor].filter(Boolean).join(' ');
+    const txt = [desc, c.matricula.trim()].filter(Boolean).join(' · ');
+    return en ? `🚗 Car: ${txt}\n` : `🚗 Carro: ${txt}\n`;
+  }
+  function ehAeroporto(t){ return /aeroporto|airport/i.test(t || ''); }
+  preencherCarroUI(lerCarro());
   document.getElementById('cfg_whatsapp').value = localStorage.getItem('trajeto_whatsapp') || '';
   document.getElementById('cfg_bio').value = localStorage.getItem('trajeto_bio') || '';
   document.getElementById('bioContador').textContent = document.getElementById('cfg_bio').value.length + ' / 300';
@@ -2096,6 +2133,7 @@
   document.getElementById('btnAplicar').addEventListener('click', ()=>{
     cfg = lerPainel();
     localStorage.setItem('trajeto_nome', document.getElementById('cfg_nome').value.trim());
+    gravarCarro({ modelo: document.getElementById('cfg_carro_modelo').value, matricula: document.getElementById('cfg_carro_matricula').value, cor: document.getElementById('cfg_carro_cor').value, corEn: document.getElementById('cfg_carro_cor_en').value });
     const numeroWhatsapp = document.getElementById('cfg_whatsapp').value.trim();
     localStorage.setItem('trajeto_whatsapp', numeroWhatsapp);
     if(window.TrajetoCloud && window.TrajetoCloud.utilizadorAtual){
@@ -2501,6 +2539,7 @@
       agendamentos: lerAgendamentos(),
       cfg: cfg,
       nome: localStorage.getItem('trajeto_nome') || '',
+      carro: lerCarro(),
       whatsapp: localStorage.getItem('trajeto_whatsapp') || '',
       pagamentos: JSON.parse(localStorage.getItem('trajeto_pagamentos') || 'null') || { mbway:true, dinheiro:true, cartao:true },
       msgTipo: localStorage.getItem('trajeto_msg_tipo') || 'auto',
@@ -2532,6 +2571,10 @@
     if(typeof dados.nome === 'string'){
       localStorage.setItem('trajeto_nome', dados.nome);
       document.getElementById('cfg_nome').value = dados.nome;
+    }
+    if(dados.carro && typeof dados.carro === 'object'){
+      gravarCarro(dados.carro);
+      preencherCarroUI(lerCarro());
     }
     if(typeof dados.whatsapp === 'string'){
       localStorage.setItem('trajeto_whatsapp', dados.whatsapp);
@@ -3026,27 +3069,31 @@
     const strDe = (d) => `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
     const quando = ag.data === strDe(agora) ? 'hoje'
       : ag.data === strDe(new Date(agora.getFullYear(), agora.getMonth(), agora.getDate() + 1)) ? 'amanha' : 'outro';
-    const aeroDestino = /aeroporto|airport/i.test(ag.chegada || '');
-    const aeroOrigem = /aeroporto|airport/i.test(ag.partida || '');
+    const aeroDestino = ehAeroporto(ag.chegada);
+    const aeroOrigem = ehAeroporto(ag.partida);
+    const hotelDestino = /hotel/i.test(ag.chegada || '');
+    const voo = (aeroOrigem || aeroDestino) ? (ag.voo || '').trim() : '';   // o voo só faz sentido em transfers de/para o aeroporto
 
     if(en){
       const equipaEN = forn.replace(/^d[oae]s?\s+/i, '');   // tira o "do/da" se o nome vier escrito em português
-      const intro = nome ? `This is ${nome}, I'm a driver on the ${equipaEN} team.` : `I'm a driver on the ${equipaEN} team.`;
+      const intro = nome ? `This is ${nome} from the ${equipaEN} team.` : `I'm a driver from the ${equipaEN} team.`;
       const dia = quando === 'hoje' ? 'Today' : quando === 'amanha' ? 'Tomorrow' : `On ${dataFmt}`;
-      const trajeto = aeroDestino ? ' to the Airport' : aeroOrigem ? ' from the Airport' : '';
+      const trajeto = aeroOrigem ? (hotelDestino ? ' from the airport to your hotel' : ' from the airport') : aeroDestino ? ' to the airport' : '';
       const paragensEN = (ag.paragens && ag.paragens.length) ? ag.paragens.map(p => `📍 Stop: ${p}\n`).join('') : '';
-      const fechoEN = quando === 'hoje' ? 'See you soon.' : quando === 'amanha' ? 'See you tomorrow.' : 'See you then.';
-      return `Hello ${ag.cliente}! 👋\n\n${intro}\n\n${dia} I will be your driver for your transfer${trajeto}.\n\nDetails 👇🏻\n\n📍 From: ${ag.partida}\n${paragensEN}📍 To: ${ag.chegada}\n📅 Date: ${dataFmt}\n🕐 Time: ${ag.hora}\n\nPlease let me know if you have any questions.\n\n${fechoEN}`;
+      const extras = (voo ? `✈️ Flight: ${voo}\n` : '') + (aeroOrigem ? `🪧 I'll be waiting at Arrivals with a sign with your name.\n` : linhaCarro(true));
+      const fechoEN = (aeroOrigem || aeroDestino) ? 'Safe travels! ✈️' : quando === 'hoje' ? 'See you soon.' : quando === 'amanha' ? 'See you tomorrow.' : 'See you then.';
+      return `Hello ${ag.cliente}! 👋\n\n${intro} ${dia} I'll be your driver for your transfer${trajeto}.\n\n📍 From: ${ag.partida}\n${paragensEN}📍 To: ${ag.chegada}\n📅 Date: ${dataFmt}\n🕐 Time: ${ag.hora}\n${extras}\nIf you have any questions, I'm at your disposal.\n\n${fechoEN}`;
     }
 
-    // "da equipe do Martinez"; se o nome já vier com artigo ("da Cascais Tours"), usa-o como está
+    // "da equipa do Martinez"; se o nome já vier com artigo ("da Cascais Tours"), usa-o como está
     const equipa = /^d[oae]s?\s/i.test(forn) ? forn : `do ${forn}`;
-    const intro = nome ? `Aqui é o ${nome}, sou motorista da equipe ${equipa}.` : `Sou motorista da equipe ${equipa}.`;
+    const intro = nome ? `Aqui é o ${nome}, da equipa ${equipa}.` : `Sou motorista da equipa ${equipa}.`;
     const dia = quando === 'hoje' ? 'Hoje' : quando === 'amanha' ? 'Amanhã' : `No dia ${dataFmt}`;
-    const trajeto = aeroDestino ? 'para o transfer até ao Aeroporto' : aeroOrigem ? 'para o transfer a partir do Aeroporto' : 'para o seu transfer';
+    const trajeto = aeroOrigem ? (hotelDestino ? ' do aeroporto para o seu hotel' : ' a partir do aeroporto') : aeroDestino ? ' para o aeroporto' : '';
     const paragens = (ag.paragens && ag.paragens.length) ? ag.paragens.map(p => `📍 Paragem: ${p}\n`).join('') : '';
-    const fecho = quando === 'hoje' ? 'Até já.' : quando === 'amanha' ? 'Até amanhã.' : 'Até breve.';
-    return `Olá ${ag.cliente}! 👋\n\n${intro}\n\n${dia} serei seu motorista ${trajeto}.\n\nInformações 👇🏻\n\n📍 De: ${ag.partida}\n${paragens}📍 Para: ${ag.chegada}\n📅 Data: ${dataFmt}\n🕐 Horário: ${ag.hora}\n\nQualquer questão estou à disposição.\n\n${fecho}`;
+    const extras = (voo ? `✈️ Voo: ${voo}\n` : '') + (aeroOrigem ? `🪧 Estarei nas Chegadas com uma placa com o seu nome.\n` : linhaCarro(false));
+    const fecho = (aeroOrigem || aeroDestino) ? 'Boa viagem! ✈️' : quando === 'hoje' ? 'Até já.' : quando === 'amanha' ? 'Até amanhã.' : 'Até breve.';
+    return `Olá ${ag.cliente}! 👋\n\n${intro} ${dia} serei o seu motorista no transfer${trajeto}.\n\n📍 De: ${ag.partida}\n${paragens}📍 Para: ${ag.chegada}\n📅 Data: ${dataFmt}\n🕐 Horário: ${ag.hora}\n${extras}\nQualquer questão, estou à disposição.\n\n${fecho}`;
   }
 
   function gerarMensagem(ag){
@@ -3060,13 +3107,13 @@
       const linhaParagensEN = (ag.paragens && ag.paragens.length)
         ? ag.paragens.map(p => `📍 Stop: ${p}\n`).join('')
         : '';
-      return `Hello ${ag.cliente}! 👋\n\n${assinaturaEN} — confirming the details of your transfer:\n\n📍 From: ${ag.partida}\n${linhaParagensEN}📍 To: ${ag.chegada}\n📅 Date: ${dataFmt}\n🕐 Time: ${ag.hora}\n💰 Price: €${ag.valor}\n\nCould you please confirm this service? Looking forward to your reply. Thank you! 🚗`;
+      return `Hello ${ag.cliente}! 👋\n\n${assinaturaEN} — confirming the details of your transfer:\n\n📍 From: ${ag.partida}\n${linhaParagensEN}📍 To: ${ag.chegada}\n📅 Date: ${dataFmt}\n🕐 Time: ${ag.hora}\n${ehAeroporto(ag.partida) ? '' : linhaCarro(true)}💰 Price: €${ag.valor}\n\nCould you please confirm this service? Looking forward to your reply. Thank you! 🚗`;
     }
     const assinatura = nome ? `Aqui é o ${nome}` : 'Aqui é o teu motorista';
     const linhaParagens = (ag.paragens && ag.paragens.length)
       ? ag.paragens.map(p => `📍 Paragem: ${p}\n`).join('')
       : '';
-    return `Olá ${ag.cliente}! 👋\n\n${assinatura} — confirmo os dados do seu transfer:\n\n📍 De: ${ag.partida}\n${linhaParagens}📍 Para: ${ag.chegada}\n📅 Data: ${dataFmt}\n🕐 Horário: ${ag.hora}\n💰 Valor: €${ag.valor}\n\nPode confirmar este serviço, por favor? Fico a aguardar a sua resposta. Obrigado! 🚗`;
+    return `Olá ${ag.cliente}! 👋\n\n${assinatura} — confirmo os dados do seu transfer:\n\n📍 De: ${ag.partida}\n${linhaParagens}📍 Para: ${ag.chegada}\n📅 Data: ${dataFmt}\n🕐 Horário: ${ag.hora}\n${ehAeroporto(ag.partida) ? '' : linhaCarro(false)}💰 Valor: €${ag.valor}\n\nPode confirmar este serviço, por favor? Fico a aguardar a sua resposta. Obrigado! 🚗`;
   }
 
   function enviarMensagem(ag){
@@ -3236,11 +3283,11 @@
     if(idiomaOrcamento === 'en'){
       const assinaturaEN = nome ? `This is ${nome}` : 'This is your driver';
       const linhaFinalEN = (ag.chegada && ag.chegada !== ag.partida) ? `📍 Final stop: ${ag.chegada}\n` : '';
-      return `Hello ${ag.cliente}! 👋\n\n${assinaturaEN} — confirming the details of your hourly service:\n\n📍 Pick-up location: ${ag.partida}\n${linhaFinalEN}📅 Date: ${dataFmt}\n🕐 Time: ${ag.hora}\n💰 Rate: ${fmtEuro(p.valor)} per hour\n\n${fraseRegraHoraEN(p)} The clock starts when you get in the car, and you can stop wherever you like during the service.\n\nCould you please confirm this service? Looking forward to your reply. Thank you! 🚗`;
+      return `Hello ${ag.cliente}! 👋\n\n${assinaturaEN} — confirming the details of your hourly service:\n\n📍 Pick-up location: ${ag.partida}\n${linhaFinalEN}📅 Date: ${dataFmt}\n🕐 Time: ${ag.hora}\n${ehAeroporto(ag.partida) ? '' : linhaCarro(true)}💰 Rate: ${fmtEuro(p.valor)} per hour\n\n${fraseRegraHoraEN(p)} The clock starts when you get in the car, and you can stop wherever you like during the service.\n\nCould you please confirm this service? Looking forward to your reply. Thank you! 🚗`;
     }
     const assinatura = nome ? `Aqui é o ${nome}` : 'Aqui é o teu motorista';
     const linhaFinal = (ag.chegada && ag.chegada !== ag.partida) ? `📍 Local final: ${ag.chegada}\n` : '';
-    return `Olá ${ag.cliente}! 👋\n\n${assinatura} — confirmo os dados do seu serviço por hora:\n\n📍 Local de partida: ${ag.partida}\n${linhaFinal}📅 Data: ${dataFmt}\n🕐 Horário: ${ag.hora}\n💰 Tarifa: ${fmtEuro(p.valor)} por hora\n\n${fraseRegraHora(p)} O tempo começa a contar quando entrar no carro e pode parar onde quiser durante o serviço.\n\nPode confirmar este serviço, por favor? Fico a aguardar a sua resposta. Obrigado! 🚗`;
+    return `Olá ${ag.cliente}! 👋\n\n${assinatura} — confirmo os dados do seu serviço por hora:\n\n📍 Local de partida: ${ag.partida}\n${linhaFinal}📅 Data: ${dataFmt}\n🕐 Horário: ${ag.hora}\n${ehAeroporto(ag.partida) ? '' : linhaCarro(false)}💰 Tarifa: ${fmtEuro(p.valor)} por hora\n\n${fraseRegraHora(p)} O tempo começa a contar quando entrar no carro e pode parar onde quiser durante o serviço.\n\nPode confirmar este serviço, por favor? Fico a aguardar a sua resposta. Obrigado! 🚗`;
   }
   function gerarResumoHora(ag){
     const nome = localStorage.getItem('trajeto_nome') || '';
@@ -4065,10 +4112,10 @@
     const pax = (/^(\d+) passageiro/.exec(ag.observacoes || '') || [])[1];
     if(idiomaOrcamento === 'en'){
       const assinaturaEN = nome ? `This is ${nome}` : 'This is your driver';
-      return `Hello ${ag.cliente}! 👋\n\n${assinaturaEN} — confirming the details of your tour:\n\n🗺️ ${ag.tourNome}${ag.tourDuracao ? ' (' + ag.tourDuracao + ')' : ''}\n📍 Pick-up: ${ag.partida}\n📅 Date: ${dataFmt}\n🕐 Start: ${ag.hora}${pax ? '\n👥 ' + pax + ' passengers' : ''}${rot ? '\n\nItinerary:\n' + rot : ''}\n\n💰 Price: €${ag.valor}\n\nCould you please confirm this service? Thank you! 🚗`;
+      return `Hello ${ag.cliente}! 👋\n\n${assinaturaEN} — confirming the details of your tour:\n\n🗺️ ${ag.tourNome}${ag.tourDuracao ? ' (' + ag.tourDuracao + ')' : ''}\n📍 Pick-up: ${ag.partida}\n📅 Date: ${dataFmt}\n🕐 Start: ${ag.hora}${pax ? '\n👥 ' + pax + ' passengers' : ''}${ehAeroporto(ag.partida) || !linhaCarro(true) ? '' : '\n' + linhaCarro(true).trim()}${rot ? '\n\nItinerary:\n' + rot : ''}\n\n💰 Price: €${ag.valor}\n\nCould you please confirm this service? Thank you! 🚗`;
     }
     const assinatura = nome ? `Aqui é o ${nome}` : 'Aqui é o teu motorista';
-    return `Olá ${ag.cliente}! 👋\n\n${assinatura} — confirmo os dados do seu tour:\n\n🗺️ ${ag.tourNome}${ag.tourDuracao ? ' (' + ag.tourDuracao + ')' : ''}\n📍 Recolha: ${ag.partida}\n📅 Data: ${dataFmt}\n🕐 Início: ${ag.hora}${pax ? '\n👥 ' + pax + ' passageiros' : ''}${rot ? '\n\nRoteiro:\n' + rot : ''}\n\n💰 Valor: €${ag.valor}\n\nPode confirmar este serviço, por favor? Obrigado! 🚗`;
+    return `Olá ${ag.cliente}! 👋\n\n${assinatura} — confirmo os dados do seu tour:\n\n🗺️ ${ag.tourNome}${ag.tourDuracao ? ' (' + ag.tourDuracao + ')' : ''}\n📍 Recolha: ${ag.partida}\n📅 Data: ${dataFmt}\n🕐 Início: ${ag.hora}${pax ? '\n👥 ' + pax + ' passageiros' : ''}${ehAeroporto(ag.partida) || !linhaCarro(false) ? '' : '\n' + linhaCarro(false).trim()}${rot ? '\n\nRoteiro:\n' + rot : ''}\n\n💰 Valor: €${ag.valor}\n\nPode confirmar este serviço, por favor? Obrigado! 🚗`;
   }
   function renderTours(){
     const todos = lerAgendamentos().filter(a => a.tipo === 'tour');
@@ -4875,6 +4922,7 @@
       agendamentos: lerAgendamentos(),
       cfg: cfg,
       nome: localStorage.getItem('trajeto_nome') || '',
+      carro: lerCarro(),
       pagamentos: JSON.parse(localStorage.getItem('trajeto_pagamentos') || 'null') || { mbway:true, dinheiro:true, cartao:true },
       msgTipo: localStorage.getItem('trajeto_msg_tipo') || 'auto',
       msgCustom: localStorage.getItem('trajeto_msg_custom') || '',
@@ -4915,6 +4963,10 @@
         if(typeof dados.nome === 'string'){
           localStorage.setItem('trajeto_nome', dados.nome);
           document.getElementById('cfg_nome').value = dados.nome;
+        }
+        if(dados.carro && typeof dados.carro === 'object'){
+          gravarCarro(dados.carro);
+          preencherCarroUI(lerCarro());
         }
         if(dados.pagamentos){
           localStorage.setItem('trajeto_pagamentos', JSON.stringify(dados.pagamentos));
