@@ -139,6 +139,18 @@
   .tempo-st span{ min-width:46px; text-align:center; font-weight:bold; font-size:16px; color:var(--azul-noite); }
   .tempo-box small{ display:block; margin-top:8px; font-size:11.5px; color:#6a7378; line-height:1.45; }
   .tempo-box .tempo-ok{ color:#2e7d4f; font-weight:bold; }
+  .tx-card{ background:var(--branco); border:1px solid var(--linha); border-radius:12px; padding:14px; margin-bottom:14px; }
+  .tx-card h3{ margin:0 0 4px; font-size:15px; color:var(--azul-noite); }
+  .tx-card .onde{ margin:0 0 10px; font-size:12px; color:#6a7378; }
+  .tx-lang{ display:flex; gap:3px; padding:3px; margin-bottom:10px; border-radius:10px; background:#ebe3d3; }
+  .tx-lang button{ flex:1; padding:8px; border:none; border-radius:8px; background:transparent; color:var(--texto); font-family:inherit; font-size:13px; cursor:pointer; }
+  .tx-lang button.on{ background:var(--azulejo); color:#fff; font-weight:bold; }
+  .tx-card label{ display:block; margin:8px 0 4px; font-size:12px; color:#6a7378; }
+  .tx-card input[type=text], .tx-card textarea{ width:100%; padding:10px 12px; border:1.5px solid var(--linha); border-radius:8px; font-family:inherit; font-size:15px; background:var(--areia); color:var(--texto); }
+  .tx-card textarea{ min-height:110px; line-height:1.45; resize:vertical; }
+  .tx-card .rep{ margin-top:10px; padding:0; border:none; background:none; color:#a8451f; font-family:inherit; font-size:12.5px; text-decoration:underline; cursor:pointer; }
+  .tx-mot{ display:flex; gap:12px; align-items:center; margin-bottom:6px; }
+  .tx-mot .slot-preview{ border-radius:50%; }
   .vazio-vit{ color:#6a7378; font-size:13px; text-align:center; padding:14px 0 18px; }
   .ver-apresentacao{
     display:block; text-align:center; margin-top:22px; font-size:13.5px; color:var(--azulejo); text-decoration:none; font-weight:600;
@@ -179,6 +191,7 @@
       <button type="button" class="aba-btn" data-aba="tours">Tours</button>
       <button type="button" class="aba-btn" data-aba="capa">Capa</button>
       <button type="button" class="aba-btn" data-aba="conforto">Conforto</button>
+      <button type="button" class="aba-btn" data-aba="textos">Textos</button>
     </div>
 
     <div class="mensagem-ok" id="mensagemOk">✅ Guardado! As fotos já estão atualizadas no site.</div>
@@ -382,6 +395,12 @@
       <button type="button" class="btn-principal" id="btnGuardarConforto">Guardar</button>
     </div>
 
+    <div class="painel-aba" id="painelTextos" style="display:none;">
+      <p class="sub">Os textos do <strong>site de pedidos</strong>. O que ficar vazio usa o texto de sempre (aparece em cinzento dentro do campo). Cada bloco tem versão em português e em inglês.</p>
+      <div id="blocosTextos"></div>
+      <button type="button" class="btn-principal" id="btnGuardarTextos">Guardar textos</button>
+    </div>
+
     <a href="fotos.html" target="_blank" class="ver-apresentacao" id="verApresentacaoLink">Ver a apresentação →</a>
   </main>
 </div>
@@ -542,7 +561,7 @@
   const painelPartidas = criarPainelSimples('p', 'galeriaPartidas', 'btnGuardarPartidas');
 
   // ---------- Abas ----------
-  const LINKS_POR_ABA = { geral:'fotos.html', chegadas:'fotos.html?tipo=chegada', partidas:'fotos.html?tipo=partida', destinos:'pedido.html', tours:'pedido.html', capa:'pedido.html', conforto:'pedido.html' };
+  const LINKS_POR_ABA = { geral:'fotos.html', chegadas:'fotos.html?tipo=chegada', partidas:'fotos.html?tipo=partida', destinos:'pedido.html', tours:'pedido.html', capa:'pedido.html', conforto:'pedido.html', textos:'pedido.html' };
   document.querySelectorAll('.aba-btn').forEach(btn=>{
     btn.addEventListener('click', ()=>{
       document.querySelectorAll('.aba-btn').forEach(b=> b.classList.remove('ativa'));
@@ -555,6 +574,7 @@
       document.getElementById('painelTours').style.display = aba==='tours' ? 'block' : 'none';
       document.getElementById('painelCapa').style.display = aba==='capa' ? 'block' : 'none';
       document.getElementById('painelConforto').style.display = aba==='conforto' ? 'block' : 'none';
+      document.getElementById('painelTextos').style.display = aba==='textos' ? 'block' : 'none';
       atualizarLinkVer();
       document.getElementById('mensagemOk').style.display = 'none';
       document.getElementById('mensagemOk').textContent = '✅ Guardado! As fotos já estão atualizadas no site.';
@@ -583,7 +603,7 @@
     const verLink = document.getElementById('verApresentacaoLink');
     verLink.style.display = 'block';
     verLink.href = link;
-    verLink.textContent = ['destinos','tours','capa','conforto'].includes(abaAtiva) ? 'Ver no site de pedidos →' : 'Ver a apresentação →';
+    verLink.textContent = ['destinos','tours','capa','conforto','textos'].includes(abaAtiva) ? 'Ver no site de pedidos →' : 'Ver a apresentação →';
   }
   function selecionarSubaba(grupo, idSub){
     const g = GRUPOS_CLIENTES[grupo];
@@ -1009,6 +1029,107 @@
     }catch(e){ /* fica com os valores por omissão */ }
   }
 
+  // =====================================================================
+  //  Aba "Textos": textos do site de pedidos (PT/EN) e o bloco "O seu motorista".
+  //   trajeto_publico/{uid}-textos → { blocos:{ pt:{chave:texto}, en:{…} }, motorista:{ nome, foto, bio:{pt,en} } }
+  //   Campo vazio = o site usa o texto de sempre.
+  // =====================================================================
+  const TEXTOS_PADRAO = {"pt": {"tours_titulo": "Tours privados em Lisboa e Portugal", "tours_texto": "Descubra Portugal com mais liberdade e conforto. A Trajeto oferece tours privados e personalizados para quem deseja conhecer Lisboa, Sintra, Cascais e outros destinos de Portugal, acompanhado por motorista particular.", "tours_botao": "Pedir cotação para um tour", "sobre_titulo": "Fala diretamente com quem vai conduzir", "sobre_texto": "A Trajeto Transfer não é uma plataforma — é um serviço de transfer privado com motorista próprio. Fala diretamente comigo, combinamos os detalhes do seu trajeto e viaja sempre com a mesma pessoa responsável pelo serviço, do início ao fim. Atendo Lisboa e arredores — Cascais, Sintra, Oeiras — e também outras regiões de Portugal, mediante cotação. O foco é simples: pontualidade, conforto e um serviço personalizado para cada cliente.", "valor1": "Sempre pontual", "valor2": "Viagem confortável", "valor3": "Serviço personalizado", "como1_t": "Peça", "como1_p": "Diga o trajeto e a data.", "como2_t": "Receba o preço", "como2_p": "Respondemos o mais rápido possível.", "como3_t": "Viaje", "como3_p": "Confirma e fica reservado."}, "en": {"tours_titulo": "Private Tours in Lisbon & Portugal", "tours_texto": "Discover Portugal with more freedom and comfort. Trajeto offers private, personalized tours for those who want to explore Lisbon, Sintra, Cascais and other destinations in Portugal, with a private driver.", "tours_botao": "Request a tour quote", "sobre_titulo": "You speak directly with your driver", "sobre_texto": "Trajeto Transfer isn’t a platform — it’s a private transfer service with your own driver. You speak to me directly, we arrange the details of your trip together, and you always travel with the same person responsible for your service, from start to finish. I cover Lisbon and the surrounding area — Cascais, Sintra, Oeiras — as well as other regions of Portugal, upon request. The focus is simple: punctuality, comfort and a personal service for every client.", "valor1": "Always on time", "valor2": "Comfortable ride", "valor3": "Personalized service", "como1_t": "Request", "como1_p": "Tell us the route and date.", "como2_t": "Get your price", "como2_p": "We reply as quickly as possible.", "como3_t": "Travel", "como3_p": "Confirm and it’s booked."}};
+  const BLOCOS_TEXTO = [
+    { id:'tours', icone:'🗺️', titulo:'Cartão "Tours privados"', onde:'Aparece no site quando ainda não há tours na aba Tours.',
+      campos:[ ['tours_titulo','Título',80], ['tours_texto','Texto',600,true], ['tours_botao','Texto do botão',40] ] },
+    { id:'sobre', icone:'💬', titulo:'"Fala diretamente com quem vai conduzir"', onde:'Bloco de apresentação, mais abaixo na página.',
+      campos:[ ['sobre_titulo','Título',90], ['sobre_texto','Texto',900,true] ] },
+    { id:'selos', icone:'✅', titulo:'Os três selos do topo', onde:'Por baixo da foto da capa.',
+      campos:[ ['valor1','Selo 1',30], ['valor2','Selo 2',30], ['valor3','Selo 3',30] ] },
+    { id:'como', icone:'🔢', titulo:'"Como funciona" (3 passos)', onde:'Logo a seguir à escolha do serviço.',
+      campos:[ ['como1_t','Passo 1 — título',24], ['como1_p','Passo 1 — texto',60], ['como2_t','Passo 2 — título',24], ['como2_p','Passo 2 — texto',60], ['como3_t','Passo 3 — título',24], ['como3_p','Passo 3 — texto',60] ] }
+  ];
+  let textosAtuais = { pt:{}, en:{} };
+  let motoristaAtual = { nome:'', foto:'', bio:{ pt:'', en:'' } };
+  const linguaBloco = {};
+  function desenharTextos(){
+    const cont = document.getElementById('blocosTextos'); cont.innerHTML = '';
+    BLOCOS_TEXTO.forEach(bl => {
+      const lang = linguaBloco[bl.id] || 'pt';
+      const card = document.createElement('div'); card.className = 'tx-card';
+      const h = document.createElement('h3'); h.textContent = bl.icone + ' ' + bl.titulo; card.appendChild(h);
+      const o = document.createElement('p'); o.className = 'onde'; o.textContent = bl.onde; card.appendChild(o);
+      const seg = document.createElement('div'); seg.className = 'tx-lang';
+      [['pt','🇵🇹 Português'],['en','🇬🇧 English']].forEach(([l, t])=>{ const b = document.createElement('button'); b.type = 'button'; b.textContent = t; if(l === lang) b.classList.add('on'); b.addEventListener('click', ()=>{ linguaBloco[bl.id] = l; desenharTextos(); }); seg.appendChild(b); });
+      card.appendChild(seg);
+      bl.campos.forEach(([chave, rotulo, max, area])=>{
+        const lb = document.createElement('label'); lb.textContent = rotulo; card.appendChild(lb);
+        const c = document.createElement(area ? 'textarea' : 'input'); if(!area) c.type = 'text';
+        c.maxLength = max; c.placeholder = TEXTOS_PADRAO[lang][chave] || ''; c.value = textosAtuais[lang][chave] || '';
+        c.addEventListener('input', ()=>{ textosAtuais[lang][chave] = c.value; });
+        card.appendChild(c);
+      });
+      const rep = document.createElement('button'); rep.type = 'button'; rep.className = 'rep'; rep.textContent = '↺ Repor o texto original (' + (lang === 'pt' ? 'português' : 'inglês') + ')';
+      rep.addEventListener('click', ()=>{ bl.campos.forEach(([chave])=>{ delete textosAtuais[lang][chave]; }); desenharTextos(); });
+      card.appendChild(rep); cont.appendChild(card);
+    });
+    // ---- O seu motorista ----
+    const lang = linguaBloco.motorista || 'pt';
+    const card = document.createElement('div'); card.className = 'tx-card';
+    card.innerHTML = '<h3>👤 "O seu motorista"</h3><p class="onde">Nome, foto e apresentação. Sem nome, foto e apresentação, a secção não aparece no site.</p>';
+    const linha = document.createElement('div'); linha.className = 'tx-mot';
+    const prev = document.createElement('div'); prev.className = 'slot-preview';
+    if(motoristaAtual.foto){ const im = document.createElement('img'); im.src = motoristaAtual.foto; prev.appendChild(im); } else prev.textContent = '👤';
+    const bt = document.createElement('div'); bt.className = 'slot-botoes';
+    const inp = document.createElement('input'); inp.type = 'file'; inp.accept = 'image/*'; inp.style.display = 'none';
+    const esc = document.createElement('button'); esc.type = 'button'; esc.className = 'btn-escolher'; esc.textContent = motoristaAtual.foto ? 'Trocar foto' : 'Escolher foto';
+    esc.addEventListener('click', ()=> inp.click());
+    inp.addEventListener('change', async (e)=>{ const f = e.target.files[0]; e.target.value = ''; if(!f) return; try{ motoristaAtual.foto = await comprimirFotoTamanho(f, 400, 60000); desenharTextos(); }catch(err){ alert('Não foi possível usar essa imagem. Tenta outra foto.'); } });
+    bt.appendChild(inp); bt.appendChild(esc);
+    if(motoristaAtual.foto){ const rm = document.createElement('button'); rm.type = 'button'; rm.className = 'btn-remover'; rm.style.display = 'block'; rm.textContent = '✕'; rm.setAttribute('aria-label', 'Remover foto'); rm.addEventListener('click', ()=>{ motoristaAtual.foto = ''; desenharTextos(); }); bt.appendChild(rm); }
+    linha.appendChild(prev); linha.appendChild(bt); card.appendChild(linha);
+    const ln = document.createElement('label'); ln.textContent = 'Nome'; card.appendChild(ln);
+    const nome = document.createElement('input'); nome.type = 'text'; nome.maxLength = 40; nome.placeholder = 'ex: Leonardo Favero'; nome.value = motoristaAtual.nome || '';
+    nome.addEventListener('input', ()=>{ motoristaAtual.nome = nome.value; }); card.appendChild(nome);
+    const seg = document.createElement('div'); seg.className = 'tx-lang'; seg.style.marginTop = '12px';
+    [['pt','🇵🇹 Português'],['en','🇬🇧 English']].forEach(([l, t])=>{ const b = document.createElement('button'); b.type = 'button'; b.textContent = t; if(l === lang) b.classList.add('on'); b.addEventListener('click', ()=>{ linguaBloco.motorista = l; desenharTextos(); }); seg.appendChild(b); });
+    card.appendChild(seg);
+    const lb = document.createElement('label'); lb.textContent = lang === 'pt' ? 'Apresentação' : 'Apresentação em inglês (opcional — sem ela, o site mostra a portuguesa)'; card.appendChild(lb);
+    const bio = document.createElement('textarea'); bio.maxLength = 600; bio.value = (motoristaAtual.bio && motoristaAtual.bio[lang]) || '';
+    bio.placeholder = lang === 'pt' ? 'ex: Sou motorista em Lisboa há 3 anos…' : 'e.g. I have been a driver in Lisbon for 3 years…';
+    bio.addEventListener('input', ()=>{ motoristaAtual.bio[lang] = bio.value; }); card.appendChild(bio);
+    cont.appendChild(card);
+  }
+  document.getElementById('btnGuardarTextos').addEventListener('click', async ()=>{
+    const okEl = document.getElementById('mensagemOk'), avisoEl = document.getElementById('avisoTamanho');
+    okEl.style.display = 'none'; avisoEl.style.display = 'none';
+    const limpar = (o)=> Object.fromEntries(Object.entries(o || {}).map(([k, v])=> [k, String(v || '').trim()]).filter(([, v])=> v));
+    const dados = {
+      blocos: { pt: limpar(textosAtuais.pt), en: limpar(textosAtuais.en) },
+      motorista: { nome: (motoristaAtual.nome || '').trim(), foto: motoristaAtual.foto || '', bio: { pt: (motoristaAtual.bio.pt || '').trim(), en: (motoristaAtual.bio.en || '').trim() } },
+      atualizadoEm: Date.now()
+    };
+    const btn = document.getElementById('btnGuardarTextos'); btn.disabled = true; btn.textContent = 'A guardar...';
+    try{
+      await setDoc(doc(db, 'trajeto_publico', auth.currentUser.uid + '-textos'), dados);
+      okEl.textContent = '✅ Guardado! O site de pedidos já mostra os textos novos.'; okEl.style.display = 'block';
+    }catch(err){ avisoEl.style.display = 'block'; avisoEl.textContent = 'Não foi possível guardar agora. Confirma a ligação à internet e tenta de novo.'; }
+    btn.disabled = false; btn.textContent = 'Guardar textos';
+  });
+  async function carregarTextos(uid){
+    try{
+      const [st, sp] = await Promise.all([ getDoc(doc(db, 'trajeto_publico', uid + '-textos')), getDoc(doc(db, 'trajeto_publico', uid)) ]);
+      const t = st.exists() ? st.data() : null;
+      if(t){
+        textosAtuais = { pt: Object.assign({}, t.blocos && t.blocos.pt), en: Object.assign({}, t.blocos && t.blocos.en) };
+        const m = t.motorista || {};
+        motoristaAtual = { nome: m.nome || '', foto: m.foto || '', bio: { pt: (m.bio && m.bio.pt) || '', en: (m.bio && m.bio.en) || '' } };
+      } else {
+        // Primeira vez: começa com o que o app publicou até agora, para nada se perder
+        const perfil = (sp.exists() && sp.data().perfil) || {};
+        motoristaAtual = { nome: perfil.nome || '', foto: perfil.foto || '', bio: { pt: perfil.bio || '', en: '' } };
+      }
+    }catch(e){ /* fica vazio: o site continua com os textos de sempre */ }
+    desenharTextos();
+  }
+  desenharTextos();
+
   onAuthStateChanged(auth, async (user)=>{
     if(user){
       document.getElementById('telaLogin').style.display = 'none';
@@ -1023,6 +1144,7 @@
       await carregarApresentacoes(user.uid);
       await carregarVitrine(user.uid);
       await carregarFotosSiteETempos(user.uid);
+      await carregarTextos(user.uid);
     } else {
       document.getElementById('telaLogin').style.display = 'flex';
       document.getElementById('telaGaleria').style.display = 'none';
