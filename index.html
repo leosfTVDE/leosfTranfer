@@ -1164,6 +1164,8 @@
       <div class="cfg-grupo">
         <div class="cfg-titulo" data-acordeao="perfil">👤 Sobre mim (foto e bio) <span class="seta">▸</span></div>
         <div class="cfg-conteudo" data-conteudo="perfil">
+          <p class="cli-nota" style="margin-top:0;">O nome, a foto e a apresentação do site de pedidos ("O seu motorista") passaram a ser geridos no <strong>galeria.html</strong>, na aba <strong>Textos</strong>, em português e inglês.</p>
+          <div hidden>
           <div style="display:flex; align-items:center; gap:14px; margin-bottom:14px;">
             <div id="perfilFotoPreview" style="width:72px; height:72px; border-radius:50%; background:var(--areia); border:1px solid var(--linha); flex-shrink:0; display:flex; align-items:center; justify-content:center; overflow:hidden; font-size:28px; color:#8a7378;">👤</div>
             <div style="flex:1;">
@@ -1178,6 +1180,7 @@
           <p style="font-family:'Helvetica Neue', Arial, sans-serif; font-size:11.5px; color:#6a7378; margin:12px 0 0; line-height:1.6;">
             A foto é redimensionada automaticamente para 300×300 — escolhe uma onde o teu rosto apareça bem. Tudo isto é opcional: se deixares em branco, o site de pedidos continua igual, sem essa secção.
           </p>
+          </div>
         </div>
       </div>
 
@@ -1676,7 +1679,7 @@
     <p class="nota">Os serviços por hora agendados ficam em "📅 Agendados". Os que estão em andamento aparecem a partir do momento em que tocas em "🚗 Ir buscar cliente" no agendamento. O tempo só começa a contar quando tocas em "▶️ Iniciar" (cliente no carro). Ao finalizar, o valor é calculado pela regra definida em "Minhas tarifas" e podes enviar o resumo ao cliente. O agendamento só sai da lista quando o marcares como "Concluído".</p>
   </div>
 
-  <p style="text-align:center; font-family:'Helvetica Neue', Arial, sans-serif; font-size:11px; color:#8a7f66; margin-top:24px;">Trajeto · v9.13.1</p>
+  <p style="text-align:center; font-family:'Helvetica Neue', Arial, sans-serif; font-size:11px; color:#8a7f66; margin-top:24px;">Trajeto · v9.14.0</p>
 
 </main>
 
@@ -2112,13 +2115,7 @@
       else localStorage.removeItem('trajeto_foto');
       fotoBase64Atual = undefined;
     }
-    if(window.TrajetoCloud && window.TrajetoCloud.utilizadorAtual){
-      window.TrajetoCloud.publicarPerfilMotorista({
-        bio: localStorage.getItem('trajeto_bio') || '',
-        foto: localStorage.getItem('trajeto_foto') || '',
-        nome: localStorage.getItem('trajeto_nome') || ''
-      });
-    }
+    // v9.14: o perfil do site ("O seu motorista") é gerido no galeria.html (aba Textos); o app já não o publica.
     let galeriaGrandeDemais = false;
     {
       const legendas = [1,2,3,4].map(i => document.getElementById('cfg_legenda'+i).value.trim());
@@ -2569,13 +2566,7 @@
     renderFaturamento();
     calcularTransfer();
     if(dados.cfg) publicarServicoHora();
-    if(typeof dados.bio === 'string' || typeof dados.foto === 'string'){
-      window.TrajetoCloud && window.TrajetoCloud.utilizadorAtual && window.TrajetoCloud.publicarPerfilMotorista({
-        bio: localStorage.getItem('trajeto_bio') || '',
-        foto: localStorage.getItem('trajeto_foto') || '',
-        nome: localStorage.getItem('trajeto_nome') || ''
-      });
-    }
+    // v9.14: o perfil do site é gerido no galeria.html (aba Textos); importar um backup já não o publica.
   }
 
   const EMAIL_ADMIN = 'leonardosf.tvde@gmail.com';
