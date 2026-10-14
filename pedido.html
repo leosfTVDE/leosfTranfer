@@ -614,7 +614,7 @@
     <div class="parceiros-lista" id="parceirosLista"></div>
   </div>
   <p class="copy">Trajeto Transfer · Lisboa</p>
-  <p class="versao">v9.14.0</p>
+  <p class="versao">v9.15.0</p>
 </footer>
 
 <div class="barra" id="barraFixa">
@@ -1457,6 +1457,38 @@
   }
   ['touchstart', 'pointerdown', 'wheel'].forEach(ev => document.getElementById('confortoCarr').addEventListener(ev, ()=>{ confortoPausaAte = Date.now() + 10000; }, { passive:true }));
   setTimeout(()=>{ esperaCapaAcabou = true; desenharCapa(); }, 2500);
+  // ---- Textos e "O seu motorista" geridos no galeria.html (aba Textos) ----
+  // Campo vazio = texto de sempre. Sem documento de textos, o motorista continua a vir do perfil antigo (publicado pelo app).
+  const CHAVES_TEXTO = ['tours_titulo','tours_texto','tours_botao','sobre_titulo','sobre_texto','valor1','valor2','valor3','como1_t','como1_p','como2_t','como2_p','como3_t','como3_p'];
+  let docTextos = null;
+  function desenharMotorista(){
+    if(!docTextos || !docTextos.motorista) return;                    // sem textos guardados: fica o perfil antigo
+    const m = docTextos.motorista, bioObj = m.bio || {};
+    const bioTxt = (idiomaAtual === 'en' && typeof bioObj.en === 'string' && bioObj.en.trim()) ? bioObj.en.trim() : (typeof bioObj.pt === 'string' ? bioObj.pt.trim() : '');
+    const nome = typeof m.nome === 'string' ? m.nome.trim().slice(0, 40) : '';
+    const foto = fotoSegura(m.foto);
+    const sec = document.getElementById('motoristaSecao');
+    if(!nome && !foto && !bioTxt){ sec.style.display = 'none'; document.getElementById('navMotorista').style.display = 'none'; return; }
+    const img = document.getElementById('motoristaFoto'); if(foto){ img.src = foto; img.style.display = 'block'; } else { img.removeAttribute('src'); img.style.display = 'none'; }
+    const n = document.getElementById('motoristaNome'); n.textContent = nome; n.hidden = !nome;
+    const bio = document.getElementById('motoristaBio'); bio.textContent = bioTxt; bio.classList.add('cortada');
+    document.getElementById('btnLerMais').textContent = tx().ler_mais;
+    sec.style.display = 'block'; document.getElementById('navMotorista').style.display = '';
+    requestAnimationFrame(()=>{ document.getElementById('btnLerMais').hidden = !(bio.textContent && bio.scrollHeight > bio.clientHeight + 2); });
+  }
+  window.aplicarTextosSite = function(d){
+    if(!d || typeof d !== 'object') return;
+    docTextos = d;
+    const blocos = d.blocos || {};
+    ['pt', 'en'].forEach(l => {
+      const b = blocos[l] || {};
+      CHAVES_TEXTO.forEach(k => { if(typeof b[k] === 'string' && b[k].trim()) TEXTOS[l][k] = b[k].trim().slice(0, 900); });
+    });
+    CHAVES_TEXTO.forEach(k => document.querySelectorAll(`[data-i18n="${k}"]`).forEach(e => { e.textContent = TEXTOS[idiomaAtual][k]; }));
+    desenharMotorista();
+  };
+  document.getElementById('langSwitch').querySelectorAll('button').forEach(btn => btn.addEventListener('click', ()=> desenharMotorista()));
+
   window.aplicarFotosSite = function(capa, conforto){
     docCapa = capa || {}; docConforto = conforto || {}; docsFotosLidos = true;
     desenharCapa(); desenharConforto();
@@ -1472,6 +1504,7 @@
       const bio = document.getElementById('motoristaBio');
       if(bio.textContent && bio.scrollHeight > bio.clientHeight + 2) document.getElementById('btnLerMais').hidden = false;
     });
+    desenharMotorista();   // se a galeria já tiver o motorista, é esse que conta
   };
   document.getElementById('btnLerMais').addEventListener('click', ()=>{
     const bio = document.getElementById('motoristaBio');
@@ -1701,15 +1734,16 @@
     }catch(e){ /* fica a versão sem fotos */ }
   })();
   (async ()=>{
-    let capa = {}, conforto = {};
+    let capa = {}, conforto = {}, textos = null;
     try{
       const uid = await resolucaoMotorista;
       if(uid){
-        const [sc, sf] = await Promise.all([ getDoc(doc(db, 'trajeto_publico', uid + '-capa')), getDoc(doc(db, 'trajeto_publico', uid + '-conforto')) ]);
-        capa = sc.exists() ? sc.data() : {}; conforto = sf.exists() ? sf.data() : {};
+        const [sc, sf, stx] = await Promise.all([ getDoc(doc(db, 'trajeto_publico', uid + '-capa')), getDoc(doc(db, 'trajeto_publico', uid + '-conforto')), getDoc(doc(db, 'trajeto_publico', uid + '-textos')) ]);
+        capa = sc.exists() ? sc.data() : {}; conforto = sf.exists() ? sf.data() : {}; textos = stx.exists() ? stx.data() : null;
       }
-    }catch(e){ /* fica com a galeria Geral */ }
+    }catch(e){ /* fica com a galeria Geral e os textos de sempre */ }
     try{ if(typeof window.aplicarFotosSite === 'function') window.aplicarFotosSite(capa, conforto); }catch(e){}
+    try{ if(textos && typeof window.aplicarTextosSite === 'function') window.aplicarTextosSite(textos); }catch(e){}
   })();
   (async ()=>{
     try{
