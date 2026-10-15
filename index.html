@@ -590,6 +590,21 @@
   .ag-btn-wpp{background:#25D366 !important; color:#fff !important; border:none !important;}
   .ag-btn-ok{background:var(--terracota) !important; color:#fff !important; border:none !important;}
   .ag-btn-del{color:var(--terracota);}
+  .par-item{ display:flex; align-items:center; flex-wrap:wrap; gap:10px; background:#fff; border:1px solid #e9e0ce; border-radius:12px; padding:10px 12px; margin-bottom:8px; font-family:'Helvetica Neue', Arial, sans-serif; }
+  .par-item .par-lg{ width:110px; height:52px; border-radius:8px; background:var(--azul-noite); display:flex; align-items:center; justify-content:center; flex-shrink:0; overflow:hidden; color:#8a97a0; font-size:11px; text-align:center; }
+  .par-item .par-lg img{ max-width:100%; max-height:100%; object-fit:contain; }
+  .par-item .par-info{ flex:1; min-width:120px; }
+  .par-item b{ display:block; font-size:14.5px; color:var(--azul-noite); overflow-wrap:anywhere; }
+  .par-item label{ display:flex; align-items:center; gap:6px; margin:4px 0 0; font-size:12px; color:#6a7378; }
+  .par-item .par-acs{ display:flex; gap:6px; margin-left:auto; }
+  .par-item .par-acs button{ min-height:34px; padding:6px 10px; border:1px solid var(--linha); border-radius:8px; background:#fff; color:#3d4c52; font-size:12px; cursor:pointer; }
+  .par-item .par-acs .par-del{ color:#a02f24; border-color:rgba(180,59,47,.35); }
+  .par-add{ border:1px dashed var(--linha); border-radius:12px; padding:12px; margin-top:6px; }
+  .par-add-row{ display:flex; gap:8px; margin-top:8px; }
+  .par-add-row button{ flex:1; min-height:42px; border:none; border-radius:8px; background:#f1ebde; color:var(--azul-noite); font-size:13px; font-weight:bold; cursor:pointer; }
+  .par-add-row .par-add-ok{ background:var(--azulejo); color:#fff; }
+  .par-add-prev{ margin-top:8px; height:52px; width:110px; border-radius:8px; background:var(--azul-noite); display:flex; align-items:center; justify-content:center; overflow:hidden; }
+  .par-add-prev img{ max-width:100%; max-height:100%; object-fit:contain; }
   .rot-app{ margin:6px 0 4px; padding:0; list-style:none; counter-reset:r; }
   .rot-app li{ position:relative; padding:2px 0 2px 24px; font-size:12.5px; color:#3d4c52; counter-increment:r; line-height:1.45; }
   .rot-app li::before{ content:counter(r); position:absolute; left:0; top:3px; width:17px; height:17px; border-radius:50%; background:var(--azulejo); color:#fff; font-size:10px; font-weight:700; display:flex; align-items:center; justify-content:center; }
@@ -848,6 +863,17 @@
     padding:24px;
     color:var(--texto);
   }
+  /* Faixa da marca em baixo da placa (Trajeto, ou a logo do parceiro registada em Minhas tarifas) */
+  #placarDisplay{ position:relative; }
+  #placarDisplay.com-faixa{ padding-bottom:calc(24px + clamp(76px, 22vmin, 190px)); }
+  #placarFaixa{ position:absolute; left:0; right:0; bottom:0; display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:clamp(8px, 2.5vmin, 24px); padding:clamp(12px, 3.5vmin, 28px) clamp(16px, 5vmin, 40px); background:var(--azul-noite); }
+  #placarFaixa[hidden]{ display:none; }
+  #placarFaixa .logo-h{ display:flex; align-items:center; gap:clamp(4px, 1vmin, 10px); }
+  #placarFaixa .logo-pin{ height:clamp(40px, 13vmin, 104px); width:auto; }
+  #placarFaixa .logo-txt{ height:clamp(48px, 15.5vmin, 124px); width:auto; }
+  #placarFaixa .faixa-site{ color:#e8c9a0; font:600 clamp(15px, 5.2vmin, 42px) 'Helvetica Neue', Arial, sans-serif; letter-spacing:.04em; }
+  #placarFaixa .faixa-logo-parceiro{ height:clamp(44px, 15vmin, 120px); max-width:62%; object-fit:contain; display:block; }
+  #placarFaixa .faixa-nome{ color:#fff; font:700 clamp(18px, 5vmin, 40px) Georgia, 'Times New Roman', serif; }
   .placar-nome{
     font-family: Georgia, 'Times New Roman', serif;
     font-weight:bold;
@@ -1344,6 +1370,23 @@
       </div>
 
       <div class="cfg-grupo">
+        <div class="cfg-titulo" data-acordeao="parceiros">🤝 Parceiros <span class="seta">▸</span></div>
+        <div class="cfg-conteudo" data-conteudo="parceiros">
+          <p class="cli-nota">O nome tem de ser igual ao que escreves em "Fornecedor" nos agendamentos (maiúsculas e acentos não importam). Com logo, a placa do aeroporto mostra a logo do parceiro; sem logo, a placa fica só com o nome do cliente. A placa dos teus clientes mostra a logo Trajeto.</p>
+          <div id="listaParceiros"></div>
+          <div class="par-add">
+            <input type="text" id="parNovoNome" maxlength="40" placeholder="Nome do parceiro (ex: Martinez)">
+            <div class="par-add-row">
+              <button type="button" id="btnParEscolherLogo">🖼️ Escolher logo</button>
+              <button type="button" id="btnParAdicionar" class="par-add-ok">➕ Adicionar</button>
+            </div>
+            <div class="par-add-prev" id="parNovoPrev" hidden></div>
+            <input type="file" id="parNovoLogo" accept="image/*" style="display:none;">
+          </div>
+        </div>
+      </div>
+
+      <div class="cfg-grupo">
         <div class="cfg-titulo" data-acordeao="avaliacoes">⭐ Avaliações <span class="seta">▸</span></div>
         <div class="cfg-conteudo" data-conteudo="avaliacoes">
           <p class="cli-nota">As avaliações chegam pelo link "⭐ Pedir avaliação" (nas corridas concluídas) e aparecem logo no site de pedidos. Podes apagar, mas não editar.</p>
@@ -1689,7 +1732,7 @@
     <p class="nota">Os serviços por hora agendados ficam em "📅 Agendados". Os que estão em andamento aparecem a partir do momento em que tocas em "🚗 Ir buscar cliente" no agendamento. O tempo só começa a contar quando tocas em "▶️ Iniciar" (cliente no carro). Ao finalizar, o valor é calculado pela regra definida em "Minhas tarifas" e podes enviar o resumo ao cliente. O agendamento só sai da lista quando o marcares como "Concluído".</p>
   </div>
 
-  <p style="text-align:center; font-family:'Helvetica Neue', Arial, sans-serif; font-size:11px; color:#8a7f66; margin-top:24px;">Trajeto · v9.15.0</p>
+  <p style="text-align:center; font-family:'Helvetica Neue', Arial, sans-serif; font-size:11px; color:#8a7f66; margin-top:24px;">Trajeto · v9.16.0</p>
 
 </main>
 
@@ -1753,6 +1796,7 @@
     <div class="placar-acoes">
       <button id="btnNovoNomePlacar">↩ Outro nome</button>
     </div>
+    <div class="placar-faixa" id="placarFaixa" hidden></div>
   </div>
 </div>
 
@@ -2540,6 +2584,7 @@
       cfg: cfg,
       nome: localStorage.getItem('trajeto_nome') || '',
       carro: lerCarro(),
+      parceiros: lerParceiros(),
       whatsapp: localStorage.getItem('trajeto_whatsapp') || '',
       pagamentos: JSON.parse(localStorage.getItem('trajeto_pagamentos') || 'null') || { mbway:true, dinheiro:true, cartao:true },
       msgTipo: localStorage.getItem('trajeto_msg_tipo') || 'auto',
@@ -2575,6 +2620,10 @@
     if(dados.carro && typeof dados.carro === 'object'){
       gravarCarro(dados.carro);
       preencherCarroUI(lerCarro());
+    }
+    if(Array.isArray(dados.parceiros)){
+      localStorage.setItem(PARCEIROS_KEY, JSON.stringify(dados.parceiros));
+      renderParceirosConfig();
     }
     if(typeof dados.whatsapp === 'string'){
       localStorage.setItem('trajeto_whatsapp', dados.whatsapp);
@@ -4190,6 +4239,137 @@
     painelAg.scrollIntoView({behavior:'smooth', block:'start'});
   });
 
+  // =====================================================================
+  //  Parceiros (Minhas tarifas → 🤝 Parceiros): nome + logo opcional + "mostrar o nome ao lado da logo".
+  //  Usado na placa do aeroporto. Guardado no telemóvel, sincronizado e no backup.
+  // =====================================================================
+  const PARCEIROS_KEY = 'trajeto_parceiros';
+  function lerParceiros(){
+    try{ const l = JSON.parse(localStorage.getItem(PARCEIROS_KEY) || '[]'); return Array.isArray(l) ? l.filter(p => p && typeof p.nome === 'string' && p.nome.trim()) : []; }
+    catch(e){ return []; }
+  }
+  function gravarParceiros(l){
+    localStorage.setItem(PARCEIROS_KEY, JSON.stringify(l));
+    sincronizarNuvem();
+    renderParceirosConfig();
+  }
+  function normNomeParceiro(t){
+    return String(t || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/^\s*d[oae]s?\s+/, '').replace(/\s+/g, ' ').trim();
+  }
+  function acharParceiro(fornecedor){
+    const n = normNomeParceiro(fornecedor);
+    return n ? (lerParceiros().find(p => normNomeParceiro(p.nome) === n) || null) : null;
+  }
+  // Logo: reduzida e guardada em PNG (mantém o fundo transparente)
+  function comprimirLogoParceiro(file){
+    return new Promise((resolve, reject)=>{
+      const leitor = new FileReader();
+      leitor.onload = (e)=>{
+        const img = new Image();
+        img.onload = ()=>{
+          let escala = Math.min(1, 600 / img.width, 200 / img.height), url = '';
+          for(let i = 0; i < 6; i++){
+            const c = document.createElement('canvas'); c.width = Math.max(1, Math.round(img.width * escala)); c.height = Math.max(1, Math.round(img.height * escala));
+            c.getContext('2d').drawImage(img, 0, 0, c.width, c.height);
+            url = c.toDataURL('image/png');
+            if(url.length <= 90000) break;
+            escala *= 0.8;
+          }
+          resolve(url);
+        };
+        img.onerror = ()=> reject(new Error('imagem inválida'));
+        img.src = e.target.result;
+      };
+      leitor.onerror = ()=> reject(new Error('não foi possível ler o ficheiro'));
+      leitor.readAsDataURL(file);
+    });
+  }
+  function cabemLogos(lista){ return JSON.stringify(lista).length <= 400000; }
+  let logoNovoParceiro = '';
+  function renderParceirosConfig(){
+    const el = document.getElementById('listaParceiros');
+    if(!el) return;
+    const lista = lerParceiros();
+    el.innerHTML = '';
+    if(!lista.length){ el.innerHTML = '<p class="cli-vazio">Ainda não tens parceiros registados.</p>'; }
+    lista.forEach((p, i)=>{
+      const item = document.createElement('div'); item.className = 'par-item';
+      const lg = document.createElement('div'); lg.className = 'par-lg';
+      if(p.logo){ const im = document.createElement('img'); im.src = p.logo; im.alt = ''; lg.appendChild(im); } else lg.textContent = 'sem logo';
+      const info = document.createElement('div'); info.className = 'par-info';
+      const b = document.createElement('b'); b.textContent = p.nome; info.appendChild(b);
+      if(p.logo){
+        const lb = document.createElement('label'); const cb = document.createElement('input'); cb.type = 'checkbox'; cb.checked = p.mostrarNome !== false;
+        cb.addEventListener('change', ()=>{ const l = lerParceiros(); if(l[i]){ l[i].mostrarNome = cb.checked; gravarParceiros(l); } });
+        lb.appendChild(cb); lb.appendChild(document.createTextNode('Mostrar o nome ao lado da logo')); info.appendChild(lb);
+      }
+      const acs = document.createElement('div'); acs.className = 'par-acs';
+      const fi = document.createElement('input'); fi.type = 'file'; fi.accept = 'image/*'; fi.style.display = 'none';
+      fi.addEventListener('change', async (e)=>{
+        const f = e.target.files[0]; e.target.value = ''; if(!f) return;
+        try{
+          const url = await comprimirLogoParceiro(f);
+          const l = lerParceiros(); if(!l[i]) return; l[i].logo = url;
+          if(!cabemLogos(l)){ alert('As logos, juntas, ficaram grandes demais. Apaga a logo de outro parceiro ou escolhe uma imagem mais pequena.'); return; }
+          gravarParceiros(l);
+        }catch(err){ alert('Não foi possível usar essa imagem. Tenta outra.'); }
+      });
+      const bLogo = document.createElement('button'); bLogo.type = 'button'; bLogo.textContent = p.logo ? 'Trocar' : 'Logo'; bLogo.addEventListener('click', ()=> fi.click());
+      acs.appendChild(fi); acs.appendChild(bLogo);
+      if(p.logo){ const bSem = document.createElement('button'); bSem.type = 'button'; bSem.textContent = 'Tirar logo'; bSem.addEventListener('click', ()=>{ const l = lerParceiros(); if(l[i]){ l[i].logo = ''; gravarParceiros(l); } }); acs.appendChild(bSem); }
+      const bDel = document.createElement('button'); bDel.type = 'button'; bDel.className = 'par-del'; bDel.textContent = '🗑'; bDel.setAttribute('aria-label', 'Apagar ' + p.nome);
+      bDel.addEventListener('click', ()=>{ if(!confirm(`Apagar o parceiro "${p.nome}"?\n\nOs agendamentos não mudam; só a placa deixa de mostrar a logo dele.`)) return; const l = lerParceiros(); l.splice(i, 1); gravarParceiros(l); });
+      acs.appendChild(bDel);
+      item.appendChild(lg); item.appendChild(info); item.appendChild(acs); el.appendChild(item);
+    });
+  }
+  document.getElementById('btnParEscolherLogo').addEventListener('click', ()=> document.getElementById('parNovoLogo').click());
+  document.getElementById('parNovoLogo').addEventListener('change', async (e)=>{
+    const f = e.target.files[0]; e.target.value = ''; if(!f) return;
+    try{
+      logoNovoParceiro = await comprimirLogoParceiro(f);
+      const pv = document.getElementById('parNovoPrev'); pv.innerHTML = ''; const im = document.createElement('img'); im.src = logoNovoParceiro; im.alt = ''; pv.appendChild(im); pv.hidden = false;
+    }catch(err){ alert('Não foi possível usar essa imagem. Tenta outra.'); }
+  });
+  document.getElementById('btnParAdicionar').addEventListener('click', ()=>{
+    const nome = document.getElementById('parNovoNome').value.trim();
+    if(!nome){ alert('Escreve o nome do parceiro (igual ao que usas em "Fornecedor").'); return; }
+    if(!ehFornecedorParceiro(nome)){ alert('Esse nome não pode ser usado para um parceiro (vazio, "Site", "Trajeto" ou "particular" contam como clientes teus).'); return; }
+    const l = lerParceiros();
+    if(l.some(p => normNomeParceiro(p.nome) === normNomeParceiro(nome))){ alert(`Já existe o parceiro "${nome}". Usa "Trocar" para mudar a logo.`); return; }
+    if(l.length >= 12){ alert('Máximo de 12 parceiros.'); return; }
+    l.push({ nome, logo: logoNovoParceiro || '', mostrarNome: true });
+    if(!cabemLogos(l)){ alert('As logos, juntas, ficaram grandes demais. Escolhe uma imagem mais pequena.'); return; }
+    gravarParceiros(l);
+    document.getElementById('parNovoNome').value = ''; logoNovoParceiro = '';
+    const pv = document.getElementById('parNovoPrev'); pv.innerHTML = ''; pv.hidden = true;
+  });
+  renderParceirosConfig();
+
+  // Faixa da placa: cliente teu → logo Trajeto + site; parceiro com logo → logo (e nome) do parceiro; parceiro sem logo → sem faixa (como antes)
+  function aplicarFaixaPlaca(fornecedor){
+    const disp = document.getElementById('placarDisplay'), faixa = document.getElementById('placarFaixa'), fornEl = document.getElementById('placarFornecedorGrande');
+    faixa.innerHTML = '';
+    let mostrar = false;
+    if(!ehFornecedorParceiro(fornecedor)){
+      const logo = document.querySelector('header .logo-h');
+      if(logo){ faixa.appendChild(logo.cloneNode(true)); }
+      const site = document.createElement('span'); site.className = 'faixa-site'; site.textContent = 'trajetotransfer.pt'; faixa.appendChild(site);
+      fornEl.textContent = '';
+      mostrar = true;
+    } else {
+      const p = acharParceiro(fornecedor);
+      if(p && p.logo){
+        const im = document.createElement('img'); im.className = 'faixa-logo-parceiro'; im.src = p.logo; im.alt = p.nome; faixa.appendChild(im);
+        if(p.mostrarNome !== false){ const n = document.createElement('span'); n.className = 'faixa-nome'; n.textContent = p.nome; faixa.appendChild(n); }
+        fornEl.textContent = '';
+        mostrar = true;
+      }
+    }
+    faixa.hidden = !mostrar;
+    disp.classList.toggle('com-faixa', mostrar);
+  }
+
   // ---------- Placar digital ----------
   let wakeLock = null;
   async function pedirWakeLock(){
@@ -4226,6 +4406,7 @@
     document.getElementById('placarNomeGrande').textContent = nome;
     document.getElementById('placarVooGrande').textContent = voo ? `✈️ Voo ${voo}` : '';
     document.getElementById('placarFornecedorGrande').textContent = fornecedor || '';
+    aplicarFaixaPlaca(fornecedor || '');
     document.getElementById('placarPicker').style.display = 'none';
     document.getElementById('placarDisplay').style.display = 'flex';
     pedirWakeLock();
@@ -4923,6 +5104,7 @@
       cfg: cfg,
       nome: localStorage.getItem('trajeto_nome') || '',
       carro: lerCarro(),
+      parceiros: lerParceiros(),
       pagamentos: JSON.parse(localStorage.getItem('trajeto_pagamentos') || 'null') || { mbway:true, dinheiro:true, cartao:true },
       msgTipo: localStorage.getItem('trajeto_msg_tipo') || 'auto',
       msgCustom: localStorage.getItem('trajeto_msg_custom') || '',
@@ -4967,6 +5149,10 @@
         if(dados.carro && typeof dados.carro === 'object'){
           gravarCarro(dados.carro);
           preencherCarroUI(lerCarro());
+        }
+        if(Array.isArray(dados.parceiros)){
+          localStorage.setItem(PARCEIROS_KEY, JSON.stringify(dados.parceiros));
+          renderParceirosConfig();
         }
         if(dados.pagamentos){
           localStorage.setItem('trajeto_pagamentos', JSON.stringify(dados.pagamentos));
