@@ -590,6 +590,15 @@
   .ag-btn-wpp{background:#25D366 !important; color:#fff !important; border:none !important;}
   .ag-btn-ok{background:var(--terracota) !important; color:#fff !important; border:none !important;}
   .ag-btn-del{color:var(--terracota);}
+  .prev-rap{ display:flex; gap:8px; margin:6px 0 10px; }
+  .prev-rap button{ flex:1; min-height:42px; padding:8px 4px; border-radius:10px; border:1.5px solid var(--linha); background:#fff; font:600 13px 'Helvetica Neue', Arial, sans-serif; color:var(--azul-noite); cursor:pointer; }
+  .prev-rap button.on{ background:var(--azulejo); border-color:var(--azulejo); color:#fff; }
+  .prev-inp{ width:100%; padding:12px; border:1.5px solid var(--linha); border-radius:10px; font-size:16px; margin-bottom:12px; background:#fff; }
+  .ag-badge-prev{ display:inline-block; padding:3px 8px; border-radius:999px; background:#fdf0e6; color:#a8451f; font:700 10.5px 'Helvetica Neue', Arial, sans-serif; white-space:nowrap; }
+  .ag-badge-prev.atrasado{ background:#fbe3df; color:#a02f24; }
+  .rec-linha{ display:flex; justify-content:space-between; align-items:center; gap:8px; flex-wrap:wrap; margin:6px 0 0; font:13px 'Helvetica Neue', Arial, sans-serif; color:#3d4c52; }
+  .rec-linha b{ color:var(--azul-noite); } .rec-linha .rec-atr{ color:#a02f24; font-weight:700; } .rec-linha .rec-falta{ color:#6a7378; }
+  .rec-aviso{ margin:4px 0 8px; font:600 12.5px 'Helvetica Neue', Arial, sans-serif; color:#a02f24; }
   .par-item{ display:flex; align-items:center; flex-wrap:wrap; gap:10px; background:#fff; border:1px solid #e9e0ce; border-radius:12px; padding:10px 12px; margin-bottom:8px; font-family:'Helvetica Neue', Arial, sans-serif; }
   .par-item .par-lg{ width:110px; height:52px; border-radius:8px; background:var(--azul-noite); display:flex; align-items:center; justify-content:center; flex-shrink:0; overflow:hidden; color:#8a97a0; font-size:11px; text-align:center; }
   .par-item .par-lg img{ max-width:100%; max-height:100%; object-fit:contain; }
@@ -1326,7 +1335,7 @@
             <div><label>€/km van (+20km)</label><input type="number" step="0.01" id="cfg_ct_km_rate_van"></div>
           </div>
           <div class="cfg-row">
-            <div><label>% da hora na volta vazia</label><input type="number" id="cfg_ct_volta_pct"></div>
+            <div><label>Volta vazia: % do tempo de ida</label><input type="number" id="cfg_ct_volta_pct"></div>
             <div><label>Margem adicional (%)</label><input type="number" id="cfg_ct_margem_pct"></div>
           </div>
           <div class="cfg-row">
@@ -1484,7 +1493,7 @@
       <input type="number" id="ct_km" placeholder="ex: 34" min="0">
 
       <label class="chk" style="margin-top:14px;">
-        <input type="checkbox" id="regressoVazio"> Regresso vazio (cobrar tempo da volta)
+        <input type="checkbox" id="regressoVazio"> Regresso vazio (soma a volta: parte do tempo de ida × €/hora)
       </label>
 
       <div id="blocoDuracaoSimples" class="row2" style="margin-top:14px;">
@@ -1503,7 +1512,7 @@
           <label for="ct_duracaoIda">Duração ida (min)</label>
           <input type="number" id="ct_duracaoIda" placeholder="0" min="0">
         </div>
-        <div>
+        <div style="display:none;">
           <label for="ct_duracaoVolta">Duração volta (min)</label>
           <input type="number" id="ct_duracaoVolta" placeholder="0" min="0">
         </div>
@@ -1676,6 +1685,7 @@
 
     <div class="fat-receber-card" id="fatReceberCard">
       <p class="fat-receber-titulo">⏳ A receber (de sempre)</p>
+      <p class="rec-aviso" id="fatAtrasados" hidden></p>
       <div class="fat-receber-total" id="fatReceberTotal">€0</div>
       <div class="lista-agendamentos" id="listaAReceber" style="margin-top:12px;"></div>
     </div>
@@ -1732,7 +1742,7 @@
     <p class="nota">Os serviços por hora agendados ficam em "📅 Agendados". Os que estão em andamento aparecem a partir do momento em que tocas em "🚗 Ir buscar cliente" no agendamento. O tempo só começa a contar quando tocas em "▶️ Iniciar" (cliente no carro). Ao finalizar, o valor é calculado pela regra definida em "Minhas tarifas" e podes enviar o resumo ao cliente. O agendamento só sai da lista quando o marcares como "Concluído".</p>
   </div>
 
-  <p style="text-align:center; font-family:'Helvetica Neue', Arial, sans-serif; font-size:11px; color:#8a7f66; margin-top:24px;">Trajeto · v9.16.0</p>
+  <p style="text-align:center; font-family:'Helvetica Neue', Arial, sans-serif; font-size:11px; color:#8a7f66; margin-top:24px;">Trajeto · v9.17.0</p>
 
 </main>
 
@@ -1797,6 +1807,21 @@
       <button id="btnNovoNomePlacar">↩ Outro nome</button>
     </div>
     <div class="placar-faixa" id="placarFaixa" hidden></div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="modalPrevisao">
+  <div class="modal-card">
+    <h2>⏳ Data prevista de recebimento</h2>
+    <p id="previsaoTexto"></p>
+    <div class="prev-rap">
+      <button type="button" data-dias="15">+15 dias</button>
+      <button type="button" data-dias="30">+30 dias</button>
+      <button type="button" data-outra="1">Outra data</button>
+    </div>
+    <input type="date" id="previsaoData" class="prev-inp" aria-label="Data prevista">
+    <button class="modal-btn modal-btn-recebido" id="btnPrevisaoGuardar">Guardar data</button>
+    <button class="modal-btn modal-btn-secundario" id="btnPrevisaoSem">Sem data</button>
   </div>
 </div>
 
@@ -1866,7 +1891,7 @@
   <div class="modal-card modal-cli modal-ajuda">
     <h2>ℹ️ Como funciona?</h2>
     <h3 id="ajudaCalc">🧮 Calculadora</h3>
-    <p>A calculadora não soma ida + volta automaticamente, a não ser que marques "Regresso vazio". Portagens não são calculadas automaticamente — confirma no Waze/Google Maps e insere aqui manualmente.</p>
+    <p>A calculadora não soma ida + volta automaticamente. Se marcares "Regresso vazio", soma a volta: a percentagem de "volta vazia" (Minhas tarifas) do tempo de ida, à tua tarifa por hora — ex.: 2 h de ida, 50% e €15/h → +€15. Portagens não são calculadas automaticamente — confirma no Waze/Google Maps e insere aqui manualmente.</p>
     <h3 id="ajudaWaze">🚗 Waze e localização</h3>
     <p>Os botões "Ir buscar cliente" e "Iniciar viagem" abrem o Waze já com o destino certo — ele usa a tua localização atual como ponto de partida automaticamente (precisa do Waze instalado no telemóvel).</p>
     <h3 id="ajudaAgenda">📅 Agendamentos e lembretes</h3>
@@ -2380,11 +2405,12 @@
 
     let esperaMin = 0, valorServico;
     if(regressoVazio){
+      // v9.17: a volta vazia é SOMADA — % do tempo de ida × tarifa por hora (ex.: 2 h de ida, 50%, €15/h → +€15)
       const duracaoIdaMin = parseFloat(document.getElementById('ct_duracaoIda').value) || 0;
-      const duracaoVoltaMin = parseFloat(document.getElementById('ct_duracaoVolta').value) || 0;
       esperaMin = parseFloat(document.getElementById('ct_esperaDupla').value) || 0;
-      const horaExtra = (duracaoIdaMin/60)*horaRate + (duracaoVoltaMin/60)*horaRate*(cfg.ct_volta_pct/100);
-      valorServico = Math.max(valorKm, horaExtra);
+      const valorIda = (duracaoIdaMin/60) * horaRate;
+      const valorVoltaVazia = (duracaoIdaMin/60) * (cfg.ct_volta_pct/100) * horaRate;
+      valorServico = Math.max(valorKm, valorIda) + valorVoltaVazia;
     } else {
       const tempoMin = parseFloat(document.getElementById('ct_tempo').value) || 0;
       esperaMin = parseFloat(document.getElementById('ct_espera').value) || 0;
@@ -3055,7 +3081,7 @@
       }
       return `
       <div class="ag-item ${ag.realizado ? 'ag-item-realizado' : ''}" data-id="${ag.id}">
-        <div class="ag-trajeto">${colQuando(ag)}<span class="ag-cab"><span class="ag-linha-cliente">${escHtml(ag.cliente)}</span><span class="ag-linha-rota">${tituloAg(ag)}</span></span><span class="ag-estado">${seloAgendado}${ag.realizado ? '<span class="ag-badge-ok">✔ Concluído</span>' : ''}${seloPagamento}${seloEstadoHora}${seloAvaliacao(ag)}</span><span class="ag-seta">▸</span></div>
+        <div class="ag-trajeto">${colQuando(ag)}<span class="ag-cab"><span class="ag-linha-cliente">${escHtml(ag.cliente)}</span><span class="ag-linha-rota">${tituloAg(ag)}</span></span><span class="ag-estado">${seloAgendado}${ag.realizado ? '<span class="ag-badge-ok">✔ Concluído</span>' : ''}${seloPagamento}${seloPrevisao(ag)}${seloEstadoHora}${seloAvaliacao(ag)}</span><span class="ag-seta">▸</span></div>
         <div class="ag-detalhes">
         <div class="ag-meta">
           📅 ${escHtml(ag.data.split('-').reverse().join('/'))} às ${escHtml(ag.hora)}<br>
@@ -4191,7 +4217,7 @@
       const botoesParagens = rot.map((r, i) => `<button class="ag-btn-paragem" data-acao="tourParagem" data-idx="${i}">📍 ${i + 1} · ${escHtml(paragemParaWaze(r))}</button>`).join('');
       return `
       <div class="ag-item ${ag.realizado ? 'ag-item-realizado' : ''}" data-id="${escHtml(ag.id)}">
-        <div class="ag-trajeto">${colQuando(ag)}<span class="ag-cab"><span class="ag-linha-cliente">${escHtml(ag.cliente)}</span><span class="ag-linha-rota">🗺️ ${escHtml(ag.tourNome || 'Tour')}${ag.tourDuracao ? ' · ' + escHtml(ag.tourDuracao) : ''}</span></span><span class="ag-estado">${ag.realizado ? '<span class="ag-badge-ok">✔ Concluído</span>' : '<span class="ag-badge-agendado">📅 Agendado</span>'}${seloPagamento}${seloAvaliacao(ag)}</span><span class="ag-seta">▸</span></div>
+        <div class="ag-trajeto">${colQuando(ag)}<span class="ag-cab"><span class="ag-linha-cliente">${escHtml(ag.cliente)}</span><span class="ag-linha-rota">🗺️ ${escHtml(ag.tourNome || 'Tour')}${ag.tourDuracao ? ' · ' + escHtml(ag.tourDuracao) : ''}</span></span><span class="ag-estado">${ag.realizado ? '<span class="ag-badge-ok">✔ Concluído</span>' : '<span class="ag-badge-agendado">📅 Agendado</span>'}${seloPagamento}${seloPrevisao(ag)}${seloAvaliacao(ag)}</span><span class="ag-seta">▸</span></div>
         <div class="ag-detalhes">
         <div class="ag-meta">
           📅 ${escHtml(ag.data.split('-').reverse().join('/'))} às ${escHtml(ag.hora)}${ag.tourDuracao ? ' · ⏱ ' + escHtml(ag.tourDuracao) : ''}<br>
@@ -4486,8 +4512,63 @@
       renderFaturamento();
     }
     fecharModalPagamento();
-    if(ag && deveSugerirAvaliacao(ag)) abrirModalPedirAvaliacao(ag);
+    const depois = ()=>{ if(ag && deveSugerirAvaliacao(ag)) abrirModalPedirAvaliacao(ag); };
+    if(ag && status === 'pendente') abrirModalPrevisao(ag.id, depois);
+    else depois();
   }
+
+  // ---------- Data prevista de recebimento (opcional, para serviços "a receber") ----------
+  let previsaoId = null, previsaoDepois = null;
+  function hojeISO(){ const d = new Date(); return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`; }
+  function somarDias(iso, n){ const [a, m, d] = String(iso).split('-').map(Number); const dt = new Date(a, (m || 1) - 1, d || 1); dt.setDate(dt.getDate() + n); return `${dt.getFullYear()}-${pad(dt.getMonth()+1)}-${pad(dt.getDate())}`; }
+  function diasEntre(deISO, ateISO){ const f = (x)=>{ const [a, m, d] = x.split('-').map(Number); return Date.UTC(a, m - 1, d); }; return Math.round((f(ateISO) - f(deISO)) / 86400000); }
+  function previsaoValida(ag){ return !!(ag && /^\d{4}-\d{2}-\d{2}$/.test(ag.previsaoRecebimento || '')); }
+  function seloPrevisao(ag){
+    if(!ag || !ag.realizado || ag.pagamento !== 'pendente' || !previsaoValida(ag)) return '';
+    const atrasado = ag.previsaoRecebimento < hojeISO();
+    const [, m, d] = ag.previsaoRecebimento.split('-');
+    return `<span class="ag-badge-prev${atrasado ? ' atrasado' : ''}">📅 prev. ${d}/${m}</span>`;
+  }
+  function abrirModalPrevisao(id, depois){
+    const ag = lerAgendamentos().find(a => a.id === id);
+    if(!ag){ if(depois) depois(); return; }
+    previsaoId = id; previsaoDepois = depois || null;
+    const t = document.getElementById('previsaoTexto'); t.textContent = '';
+    t.appendChild(document.createTextNode('Quando conta receber deste serviço'));
+    const quem = (ag.fornecedor || '').trim();
+    if(quem && ehFornecedorParceiro(quem)){ t.appendChild(document.createTextNode(' (')); const b = document.createElement('b'); b.textContent = quem; t.appendChild(b); t.appendChild(document.createTextNode(')')); }
+    t.appendChild(document.createTextNode('? É opcional.'));
+    const inp = document.getElementById('previsaoData');
+    inp.value = previsaoValida(ag) ? ag.previsaoRecebimento : '';
+    document.querySelectorAll('#modalPrevisao .prev-rap button').forEach(b => b.classList.remove('on'));
+    document.getElementById('modalPrevisao').classList.add('aberto');
+  }
+  function fecharModalPrevisao(){
+    document.getElementById('modalPrevisao').classList.remove('aberto');
+    const depois = previsaoDepois; previsaoId = null; previsaoDepois = null;
+    if(depois) depois();
+  }
+  function gravarPrevisao(valor){
+    const lista = lerAgendamentos(); const ag = lista.find(a => a.id === previsaoId);
+    if(ag){
+      if(valor) ag.previsaoRecebimento = valor; else delete ag.previsaoRecebimento;
+      gravarAgendamentos(lista); renderLista(); renderFaturamento();
+    }
+    fecharModalPrevisao();
+  }
+  document.querySelectorAll('#modalPrevisao .prev-rap button').forEach(b => b.addEventListener('click', ()=>{
+    const ag = lerAgendamentos().find(a => a.id === previsaoId);
+    const inp = document.getElementById('previsaoData');
+    document.querySelectorAll('#modalPrevisao .prev-rap button').forEach(x => x.classList.toggle('on', x === b));
+    if(b.dataset.dias){ inp.value = somarDias((ag && ag.data) || hojeISO(), parseInt(b.dataset.dias, 10)); }   // conta a partir da data do serviço
+    else { inp.focus(); if(inp.showPicker){ try{ inp.showPicker(); }catch(e){} } }
+  }));
+  document.getElementById('btnPrevisaoGuardar').addEventListener('click', ()=>{
+    const v = document.getElementById('previsaoData').value;
+    gravarPrevisao(/^\d{4}-\d{2}-\d{2}$/.test(v) ? v : '');
+  });
+  document.getElementById('btnPrevisaoSem').addEventListener('click', ()=> gravarPrevisao(''));
+  document.getElementById('modalPrevisao').addEventListener('click', (e)=>{ if(e.target.id === 'modalPrevisao') fecharModalPrevisao(); });
   // Depois de concluir: sugerir o pedido de avaliação só a clientes próprios (não de parceiros),
   // ainda sem avaliação pedida, e com sessão iniciada (sem sessão não dá para criar o link).
   let idPedirAvaliacao = null;
@@ -4898,18 +4979,37 @@
     const totalPendente = pendentes.reduce((s,ag)=> s + (parseFloat(ag.valor)||0), 0);
     document.getElementById('fatReceberTotal').textContent = `€${totalPendente.toFixed(2)}`;
     const elReceber = document.getElementById('listaAReceber');
+    const hojeStrPrev = hojeISO();
+    const nAtrasados = pendentes.filter(ag => previsaoValida(ag) && ag.previsaoRecebimento < hojeStrPrev).length;
+    const avisoAtr = document.getElementById('fatAtrasados');
+    avisoAtr.hidden = !nAtrasados;
+    avisoAtr.textContent = nAtrasados === 1 ? '⚠️ 1 pagamento atrasado' : `⚠️ ${nAtrasados} pagamentos atrasados`;
     if(pendentes.length === 0){
       elReceber.innerHTML = '<p class="ag-vazio">Nada pendente — tudo recebido! 🎉</p>';
     } else {
-      const pendentesOrd = [...pendentes].sort((a,b)=> (a.data+a.hora).localeCompare(b.data+b.hora));
+      // Primeiro os que têm data prevista (mais próxima primeiro); depois os sem data, pela data do serviço
+      const pendentesOrd = [...pendentes].sort((a,b)=>{
+        const pa = previsaoValida(a), pb = previsaoValida(b);
+        if(pa && pb) return a.previsaoRecebimento.localeCompare(b.previsaoRecebimento) || (a.data+a.hora).localeCompare(b.data+b.hora);
+        if(pa !== pb) return pa ? -1 : 1;
+        return (a.data+a.hora).localeCompare(b.data+b.hora);
+      });
       elReceber.innerHTML = pendentesOrd.map(ag => {
         const extra = [linhaHoraMeta(ag), ag.fornecedor ? `<br>🏷 Fornecedor: ${escHtml(ag.fornecedor)}` : ''].join('').replace(/^\s*(<br>\s*)+/, '').trim();
+        let linhaPrev = '<div class="rec-linha"><span class="rec-falta">📅 Sem data prevista</span></div>';
+        if(previsaoValida(ag)){
+          const dif = diasEntre(hojeStrPrev, ag.previsaoRecebimento);
+          const quando = dif > 0 ? `<span class="rec-falta">${dif === 1 ? 'falta 1 dia' : `faltam ${dif} dias`}</span>` : dif === 0 ? '<span class="rec-falta">é hoje</span>' : `<span class="rec-atr">${-dif === 1 ? 'atrasado 1 dia' : `atrasado ${-dif} dias`}</span>`;
+          linhaPrev = `<div class="rec-linha"><span>📅 Previsto: <b>${ag.previsaoRecebimento.split('-').reverse().join('/')}</b></span>${quando}</div>`;
+        }
         return `
         <div class="ag-item fat-item" data-id="${escHtml(ag.id)}">
           <div class="ag-trajeto fat-cab">${colQuando(ag)}<span class="ag-cab"><span class="ag-linha-cliente">${escHtml(ag.cliente)}</span><span class="ag-linha-rota">${tituloAg(ag)}</span></span><span class="ag-estado"><span class="fat-valor-item">€${ag.valor}</span><span class="ag-badge-pendente">⏳ A receber</span></span></div>
           ${extra ? `<div class="ag-meta fat-extra">${extra}</div>` : ''}
+          ${linhaPrev}
           <div class="ag-acoes">
             <button class="ag-btn-ok" data-acao="marcarRecebido">💰 Marcar como recebido</button>
+            <button class="ag-btn-cal" data-acao="previsao">📅 Data prevista</button>
           </div>
         </div>`;
       }).join('');
@@ -5080,6 +5180,7 @@
 
   document.getElementById('listaAReceber').addEventListener('click', (e)=>{
     const btn = e.target.closest('button');
+    if(btn && btn.dataset.acao === 'previsao'){ abrirModalPrevisao(btn.closest('.ag-item').dataset.id, null); return; }
     if(!btn || btn.dataset.acao !== 'marcarRecebido') return;
     const item = e.target.closest('.ag-item');
     const id = item.dataset.id;
