@@ -44,6 +44,8 @@
   .btn.pri{ background:linear-gradient(180deg,#cd6438,#b84f28); color:#fff; box-shadow:0 4px 14px rgba(193,85,44,.25); }
   .btn.pri:disabled{ opacity:.6; cursor:default; }
   .btn.sec{ background:#fff; border:1.5px solid var(--borda); color:var(--azul-noite); margin-top:10px; }
+  .priv{ margin:8px 0 0 32px; font-size:12.5px; }
+  .priv a{ color:var(--azulejo); font-weight:600; }
   .erro{ min-height:16px; margin:10px 0 0; color:var(--terracota); font-size:12.5px; text-align:center; }
   .centro{ text-align:center; }
   .circ{ width:64px; height:64px; margin:4px auto 12px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:30px; }
@@ -81,6 +83,7 @@
     <textarea id="f_texto" maxlength="300" data-tp="ph_texto"></textarea>
     <div class="cont" id="contador">0 / 300</div>
     <label class="consent"><input type="checkbox" id="f_ok"><span data-t="consent">Autorizo que a minha avaliação (nome, país e texto) apareça no site da Trajeto Transfer.</span></label>
+    <p class="priv"><a href="privacidade.html" data-t="priv_link">Política de privacidade</a></p>
     <p class="erro" id="erro"></p>
     <button type="submit" class="btn pri" id="btnEnviar" data-t="enviar">Enviar avaliação</button>
   </form>
@@ -98,6 +101,7 @@
 <script>
   const T = {
     pt: { titulo:'Como foi a sua viagem?', sub:'Demora menos de um minuto.', l_nome:'O seu nome', ph_nome:'ex: Sarah M.', l_pais:'País', l_texto:'Comentário curto (opcional)', ph_texto:'O que mais gostou?',
+      priv_link:'Política de privacidade',
       consent:'Autorizo que a minha avaliação (nome, país e texto) apareça no site da Trajeto Transfer.', enviar:'Enviar avaliação', enviando:'A enviar...', outro_pais:'Prefiro não dizer',
       estrelas:['Mau','Fraco','Bom','Muito bom','Excelente'], e_estrelas:'Escolha de 1 a 5 estrelas.', e_nome:'Escreva o seu nome.', e_ok:'Para publicar, marque a autorização.', e_envio:'Não foi possível enviar. Confirme a ligação à internet e tente de novo.',
       tipos:{ transfer:'Transfer', hora:'Serviço por hora', tour:'Tour' }, meses:['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'],
@@ -105,6 +109,7 @@
       erro_t:'Sem ligação', erro_p:'Não foi possível abrir a avaliação. Confirme a internet e tente de novo.', obrigado:'Obrigado, {n}!', obrigado_txt:'A sua avaliação já está no nosso site.',
       ver_aval:'Ver avaliações', nova_cot:'Pedir nova cotação', ir_site:'Ir para o site' },
     en: { titulo:'How was your trip?', sub:'Takes less than a minute.', l_nome:'Your name', ph_nome:'e.g. Sarah M.', l_pais:'Country', l_texto:'Short review (optional)', ph_texto:'What did you like most?',
+      priv_link:'Privacy policy',
       consent:'I agree that my review (name, country and text) is shown on the Trajeto Transfer website.', enviar:'Send review', enviando:'Sending...', outro_pais:'Prefer not to say',
       estrelas:['Poor','Fair','Good','Very good','Excellent'], e_estrelas:'Choose 1 to 5 stars.', e_nome:'Please enter your name.', e_ok:'To publish, please tick the consent box.', e_envio:'Could not send. Check your internet connection and try again.',
       tipos:{ transfer:'Transfer', hora:'Hourly service', tour:'Tour' }, meses:['January','February','March','April','May','June','July','August','September','October','November','December'],
