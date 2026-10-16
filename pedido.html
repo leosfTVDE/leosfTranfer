@@ -299,6 +299,10 @@
   .rot li{ position:relative; padding:2px 0 2px 24px; font-size:12.5px; color:#3d4c52; counter-increment:r; }
   .rot li::before{ content:counter(r); position:absolute; left:0; top:3px; width:17px; height:17px; border-radius:50%; background:var(--azulejo); color:#fff; font-size:10px; font-weight:700; display:flex; align-items:center; justify-content:center; }
 
+  .link-priv{ color:var(--azulejo); font-weight:600; }
+  .rodape-priv{ margin:18px 0 0; font-size:12.5px; }
+  .rodape-priv a{ color:#e8c9a0; }
+
   /* Confirmação */
   .confirmacao{ display:none; text-align:center; }
   .confirmacao .ok{ width:64px; height:64px; margin:4px auto 10px; border-radius:50%; background:rgba(46,139,87,.13); color:#23704a; display:flex; align-items:center; justify-content:center; }
@@ -555,6 +559,7 @@
         <div class="botoes-passo"><button type="button" class="btn-voltar" data-ir-passo="2" data-i18n="btn_voltar">Voltar</button><button type="submit" class="btn-enviar" id="btnEnviar" data-i18n="btn_enviar">Pedir cotação</button></div>
         <p class="erro" id="erroForm"></p>
         <p class="nota" data-i18n="nota">Este pedido é só um orçamento — a reserva fica confirmada depois de recebermos a sua resposta.</p>
+        <p class="nota"><span data-i18n="priv_nota">Os seus dados são usados apenas para tratar o seu pedido.</span> <a href="privacidade.html" class="link-priv" data-i18n="priv_link">Política de privacidade</a></p>
       </div>
     </form>
 
@@ -613,8 +618,9 @@
     <p class="parceiros-titulo" data-i18n="parceiros_titulo">Parceiros</p>
     <div class="parceiros-lista" id="parceirosLista"></div>
   </div>
+  <p class="rodape-priv"><a href="privacidade.html" data-i18n="priv_link">Política de privacidade</a></p>
   <p class="copy">Trajeto Transfer · Lisboa</p>
-  <p class="versao">v9.15.0</p>
+  <p class="versao">v9.15.1</p>
 </footer>
 
 <div class="barra" id="barraFixa">
@@ -672,6 +678,8 @@
       ph_recolha: 'ex: Hotel Avenida Palace',
       hora_inicio: 'Hora de início',
       recolha_em: 'recolha em {r}',
+      priv_nota: 'Os seus dados são usados apenas para tratar o seu pedido.',
+      priv_link: 'Política de privacidade',
       servico_pergunta: 'Que serviço procura?',
       servico_toque: 'Toque num serviço para pedir a sua cotação.',
       atalho_transfer_sub: 'Aeroporto e cidade',
@@ -821,6 +829,8 @@
       ph_recolha: 'e.g. Avenida Palace Hotel',
       hora_inicio: 'Start time',
       recolha_em: 'pick-up at {r}',
+      priv_nota: 'Your data is only used to handle your request.',
+      priv_link: 'Privacy policy',
       servico_pergunta: 'What service do you need?',
       servico_toque: 'Tap a service to request your quote.',
       atalho_transfer_sub: 'Airport and city',
