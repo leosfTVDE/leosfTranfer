@@ -590,6 +590,36 @@
   .ag-btn-wpp{background:#25D366 !important; color:#fff !important; border:none !important;}
   .ag-btn-ok{background:var(--terracota) !important; color:#fff !important; border:none !important;}
   .ag-btn-del{color:var(--terracota);}
+  /* Calculadora: o preço só aparece quando se está a calcular */
+  .calc-sub{ margin:-4px 0 0; font:13px 'Helvetica Neue', Arial, sans-serif; color:#6a7378; cursor:pointer; }
+  .calc-dica{ display:flex; gap:10px; align-items:center; margin-top:14px; padding:14px; border-radius:14px; background:#f1ebde; color:#3d4c52; font:13.5px 'Helvetica Neue', Arial, sans-serif; line-height:1.45; }
+  /* Painel "O seu dia" (por baixo dos agendamentos) */
+  .dia{ background:var(--branco); border:1px solid var(--linha); border-radius:16px; padding:16px; margin-bottom:16px; font-family:'Helvetica Neue', Arial, sans-serif; }
+  .dia h3{ margin:0 0 10px; font-size:17px; color:var(--azul-noite); display:flex; justify-content:space-between; align-items:baseline; }
+  .dia h3 small{ font-size:12.5px; color:#6a7378; font-weight:400; }
+  .dia-lin{ display:flex; align-items:center; gap:12px; width:100%; padding:11px 0; border:none; border-top:1px solid #efe7d8; background:none; text-align:left; font-family:inherit; color:inherit; }
+  button.dia-lin{ cursor:pointer; }
+  .dia-lin:first-of-type{ border-top:none; padding-top:0; }
+  .dia-lin .dia-ic{ width:38px; height:38px; border-radius:10px; display:flex; align-items:center; justify-content:center; font-size:18px; flex-shrink:0; }
+  .dia-lin .dia-tx{ flex:1; min-width:0; }
+  .dia-lin b{ display:flex; align-items:center; gap:8px; font-size:14px; color:var(--azul-noite); }
+  .dia-lin .dia-sub{ display:block; font-size:12.5px; color:#6a7378; margin-top:2px; overflow-wrap:anywhere; }
+  .dia-lin .dia-seta{ color:#9aa3a6; flex-shrink:0; }
+  .dia-alerta{ color:#a02f24 !important; font-weight:700; }
+  .dia-olho{ margin-left:auto; width:36px; height:36px; border-radius:50%; border:1px solid #e9e0ce; background:#fff; font-size:16px; cursor:pointer; flex-shrink:0; }
+  .dia-fat3{ display:flex; gap:8px; margin-top:6px; }
+  .dia-fat3 div{ flex:1; background:#f1ebde; border-radius:10px; padding:8px 4px; text-align:center; }
+  .dia-fat3 small{ display:block; font-size:11px; color:#6a7378; }
+  .dia-fat3 strong{ font-size:15px; color:var(--azul-noite); }
+  .dia-compacto .dia-fat3{ display:none; }
+  .dia-tira-t{ margin:14px 0 8px; font-size:12px; letter-spacing:.06em; text-transform:uppercase; color:var(--azulejo); font-weight:700; }
+  .dia-tira{ display:grid; grid-template-columns:repeat(7, minmax(0,1fr)); gap:5px; }
+  .dia-dd{ padding:7px 0 8px; border-radius:10px; background:#fff; border:1px solid #e9e0ce; text-align:center; font-family:inherit; cursor:pointer; }
+  .dia-dd small{ display:block; font-size:10.5px; color:#6a7378; }
+  .dia-dd strong{ display:block; font-size:16px; color:var(--azul-noite); margin:1px 0 3px; }
+  .dia-dd span{ display:inline-block; min-width:20px; padding:1px 5px; border-radius:999px; background:var(--azulejo); color:#fff; font-size:11px; font-weight:700; }
+  .dia-dd.vazio span{ background:transparent; color:#b0a890; }
+  .dia-dd.hoje{ border-color:var(--azulejo); box-shadow:0 0 0 2px rgba(42,111,119,.2); }
   .prev-rap{ display:flex; gap:8px; margin:6px 0 10px; }
   .prev-rap button{ flex:1; min-height:42px; padding:8px 4px; border-radius:10px; border:1.5px solid var(--linha); background:#fff; font:600 13px 'Helvetica Neue', Arial, sans-serif; color:var(--azul-noite); cursor:pointer; }
   .prev-rap button.on{ background:var(--azulejo); border-color:var(--azulejo); color:#fff; }
@@ -1469,6 +1499,7 @@
 
     <div class="card calc-card">
       <h2 id="ct_toggleCalc" style="cursor:pointer; display:flex; align-items:center; justify-content:space-between;"><span class="calc-titulo"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="3" width="14" height="18" rx="2"/><path d="M8 7h8M8.5 11.5h.01M12 11.5h.01M15.5 11.5h.01M8.5 15h.01M12 15h.01M15.5 15h.01"/></svg>Calculadora de Transfer</span> <span class="seta" id="ct_setaCalc" style="font-size:14px; color:var(--azulejo); transition:transform .2s ease;">▸</span></h2>
+      <p class="calc-sub" id="ct_subCalc">Toque para calcular o preço de um serviço.</p>
       <p class="calc-rotulo"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 17v-4l2.2-5.2A2 2 0 0 1 7 6.5h10a2 2 0 0 1 1.8 1.3L21 13v4"/><path d="M3 13h18M3 17h18"/><circle cx="7" cy="17" r="1.6"/><circle cx="17" cy="17" r="1.6"/></svg>Veículo</p>
       <div class="seg" id="segVeiculoT">
         <button data-v="sedan" class="active"><span class="vt-ico"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 17v-4l2.2-5.2A2 2 0 0 1 7 6.5h10a2 2 0 0 1 1.8 1.3L21 13v4"/><path d="M3 13h18M3 17h18"/><circle cx="7" cy="17" r="1.6"/><circle cx="17" cy="17" r="1.6"/></svg></span><span class="vt-txt"><span class="vt-nome">Sedan</span> <span class="vt-pax">(1–3 pax)</span></span></button>
@@ -1536,6 +1567,7 @@
       </div>
       </div>
 
+    <div class="calc-dica" id="ct_dicaCalc" style="display:none;"><span>💡</span><span>Preencha a <b>distância</b> ou o <b>tempo</b> para ver o preço recomendado.</span></div>
     <div class="resultado" id="cartaoResultado">
       <div class="res-topo">
         <div class="res-rec">
@@ -1661,6 +1693,8 @@
       <div class="lista-agendamentos" id="listaAgendamentos"></div>
     </div>
 
+    <div class="dia" id="painelDia"></div>
+
     
   </div>
 
@@ -1742,7 +1776,7 @@
     <p class="nota">Os serviços por hora agendados ficam em "📅 Agendados". Os que estão em andamento aparecem a partir do momento em que tocas em "🚗 Ir buscar cliente" no agendamento. O tempo só começa a contar quando tocas em "▶️ Iniciar" (cliente no carro). Ao finalizar, o valor é calculado pela regra definida em "Minhas tarifas" e podes enviar o resumo ao cliente. O agendamento só sai da lista quando o marcares como "Concluído".</p>
   </div>
 
-  <p style="text-align:center; font-family:'Helvetica Neue', Arial, sans-serif; font-size:11px; color:#8a7f66; margin-top:24px;">Trajeto · v9.17.0</p>
+  <p style="text-align:center; font-family:'Helvetica Neue', Arial, sans-serif; font-size:11px; color:#8a7f66; margin-top:24px;">Trajeto · v9.18.0</p>
 
 </main>
 
@@ -2026,7 +2060,21 @@
     const aberto = conteudo.style.display !== 'block';
     conteudo.style.display = aberto ? 'block' : 'none';
     seta.style.transform = aberto ? 'rotate(90deg)' : 'rotate(0deg)';
+    atualizarVisibilidadeCalc();
   });
+  document.getElementById('ct_subCalc').addEventListener('click', ()=> document.getElementById('ct_toggleCalc').click());
+  // v9.18: fechada → só o título; aberta → veículo e campos; o cartão do preço só aparece com distância ou tempo preenchidos.
+  // (Só mostra/esconde: os cálculos continuam exatamente os mesmos.)
+  function atualizarVisibilidadeCalc(){
+    const aberto = document.getElementById('ct_conteudoCalc').style.display === 'block';
+    const num = (id)=> parseFloat(document.getElementById(id).value) || 0;
+    const temDados = num('ct_km') > 0 || num('ct_tempo') > 0 || (document.getElementById('regressoVazio').checked && num('ct_duracaoIda') > 0);
+    document.getElementById('ct_subCalc').style.display = aberto ? 'none' : '';
+    document.getElementById('segVeiculoT').style.display = aberto ? '' : 'none';
+    document.querySelector('.calc-card .calc-rotulo').style.display = aberto ? '' : 'none';
+    document.getElementById('cartaoResultado').style.display = (aberto && temDados) ? '' : 'none';
+    document.getElementById('ct_dicaCalc').style.display = (aberto && !temDados) ? 'flex' : 'none';
+  }
 
   function aplicarPagamentosUI(pag){
     document.getElementById('cfg_pag_mbway').checked = !!pag.mbway;
@@ -2430,6 +2478,7 @@
     if(!campoCobrar.dataset.editado){
       campoCobrar.value = valorRecomendado.toFixed(2);
     }
+    if(typeof atualizarVisibilidadeCalc === 'function') atualizarVisibilidadeCalc();   // v9.18: só visual
   }
 
   document.getElementById('ct_cobrar').addEventListener('input', (e)=>{
@@ -3036,7 +3085,13 @@
     return `<span class="ag-linha-quando"><b>${escHtml(ag.hora || '')}</b><small>${escHtml(dia)}</small></span>`;
   }
 
+  let painelDiaAgendado = false;
+  function agendarPainelDia(){   // depois da lista e do faturamento estarem desenhados
+    if(painelDiaAgendado) return; painelDiaAgendado = true;
+    setTimeout(()=>{ painelDiaAgendado = false; if(typeof renderPainelDia === 'function') renderPainelDia(); }, 0);
+  }
   function renderLista(){
+    agendarPainelDia();
     renderHora();
     renderTours();
     const todos = lerAgendamentos().filter(a => a.tipo !== 'tour');   // os tours têm aba própria
@@ -4396,6 +4451,81 @@
     disp.classList.toggle('com-faixa', mostrar);
   }
 
+  // =====================================================================
+  //  Painel "O seu dia" (por baixo de "Meus agendamentos"). Só lê dados que o app já tem; não muda nada.
+  //  Faturado e "A receber" vêm do Faturamento (os mesmos números); o olho esconde-os só aqui (escolha guardada no aparelho).
+  // =====================================================================
+  const PAINEL_OCULTO_KEY = 'trajeto_painel_valores_ocultos';
+  function painelValoresOcultos(){ try{ return localStorage.getItem(PAINEL_OCULTO_KEY) === '1'; }catch(e){ return false; } }
+  function criarPainelDia(){
+    const el = document.getElementById('painelDia');
+    el.addEventListener('click', (e)=>{
+      const olho = e.target.closest('[data-dia="olho"]');
+      if(olho){ e.stopPropagation(); try{ localStorage.setItem(PAINEL_OCULTO_KEY, painelValoresOcultos() ? '0' : '1'); }catch(err){} renderPainelDia(); return; }
+      const b = e.target.closest('[data-dia]'); if(!b) return;
+      const acao = b.dataset.dia;
+      if(acao === 'proximo' || acao === 'dia'){
+        const ag = lerAgendamentos().find(a => a.id === b.dataset.id);
+        if(ag) irParaAgendamentoAceite(ag);
+      } else if(acao === 'receber'){
+        document.querySelector('#segModo button[data-v="faturamento"]').click();
+        setTimeout(()=>{ const c = document.getElementById('fatReceberCard'); if(c) c.scrollIntoView({ behavior:'smooth', block:'start' }); }, 60);
+      } else if(acao === 'pedidos'){
+        document.querySelector('#segModo button[data-v="pedidos"]').click();
+      }
+    });
+  }
+  function renderPainelDia(){
+    const el = document.getElementById('painelDia'); if(!el) return;
+    const todos = lerAgendamentos();
+    const ativos = todos.filter(a => !a.realizado).sort((a, b)=> (a.data + a.hora).localeCompare(b.data + b.hora));
+    const agora = new Date(); const hoje = hojeISO(); const hhmm = `${pad(agora.getHours())}:${pad(agora.getMinutes())}`;
+    const amanha = somarDias(hoje, 1);
+    const nomeDia = (iso)=> iso === hoje ? 'Hoje' : iso === amanha ? 'Amanhã' : iso.split('-').reverse().slice(0, 2).join('/');
+    const rota = (ag)=> ag.tipo === 'tour' ? '🗺️ ' + (ag.tourNome || 'Tour') : ag.tipo === 'hora' ? '⏱ ' + ag.partida : `${ag.partida} → ${ag.chegada}`;
+    const hojeAtivos = ativos.filter(a => a.data === hoje);
+    const proximo = ativos.find(a => a.data > hoje || (a.data === hoje && a.hora >= hhmm)) || hojeAtivos[0] || null;
+    let tituloProx, subProx;
+    if(proximo && proximo.data === hoje){ tituloProx = `Próximo: ${proximo.hora} · ${proximo.cliente}`; subProx = rota(proximo); }
+    else { tituloProx = hojeAtivos.length ? 'Serviços de hoje concluídos' : 'Sem serviços hoje'; subProx = proximo ? `Próximo: ${nomeDia(proximo.data)} ${proximo.hora} · ${rota(proximo)}` : 'Sem serviços marcados'; }
+    const compacto = ativos.length > 0;
+    const oculto = painelValoresOcultos();
+    const val = (id)=> oculto ? '€ •••' : (document.getElementById(id) ? document.getElementById(id).textContent : '€0');
+    const pendentes = todos.filter(a => a.realizado && a.pagamento === 'pendente');
+    const atrasados = pendentes.filter(a => previsaoValida(a) && a.previsaoRecebimento < hoje).length;
+    const nPedidos = (window._trajetoPedidosAtuais || []).length;
+    // próximos 7 dias
+    const tira = [];
+    for(let i = 0; i < 7; i++){
+      const iso = somarDias(hoje, i); const doDia = ativos.filter(a => a.data === iso);
+      const [y, m, d] = iso.split('-').map(Number); const sem = ['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'][new Date(y, m - 1, d).getDay()];
+      tira.push(`<button type="button" class="dia-dd${i === 0 ? ' hoje' : ''}${doDia.length ? '' : ' vazio'}" ${doDia.length ? `data-dia="dia" data-id="${escHtml(doDia[0].id)}"` : 'disabled'} aria-label="${i === 0 ? 'Hoje' : sem} ${d}: ${doDia.length} serviço(s)"><small>${i === 0 ? 'Hoje' : sem}</small><strong>${d}</strong><span>${doDia.length || '–'}</span></button>`);
+    }
+    el.classList.toggle('dia-compacto', compacto);
+    el.innerHTML = `
+      <h3>O seu dia <small>${hoje.split('-').reverse().slice(0, 2).join('/')}</small></h3>
+      ${proximo ? `<button type="button" class="dia-lin" data-dia="proximo" data-id="${escHtml(proximo.id)}">` : '<div class="dia-lin">'}
+        <span class="dia-ic" style="background:rgba(42,111,119,.12)">🚗</span>
+        <span class="dia-tx"><b>${escHtml(tituloProx)}</b><span class="dia-sub">${escHtml(subProx)}</span></span>
+        ${proximo ? '<span class="dia-seta">›</span></button>' : '</div>'}
+      <div class="dia-lin">
+        <span class="dia-ic" style="background:rgba(46,139,87,.12)">💰</span>
+        <span class="dia-tx"><b>Faturado <button type="button" class="dia-olho" data-dia="olho" aria-label="${oculto ? 'Mostrar valores' : 'Esconder valores'}">${oculto ? '🙈' : '👁'}</button></b>
+          ${compacto ? `<span class="dia-sub">Hoje ${val('fat_hoje')} · Semana ${val('fat_semana')} · Mês ${val('fat_mes')}</span>` : ''}
+          <span class="dia-fat3"><div><small>Hoje</small><strong>${val('fat_hoje')}</strong></div><div><small>Semana</small><strong>${val('fat_semana')}</strong></div><div><small>Mês</small><strong>${val('fat_mes')}</strong></div></span>
+        </span>
+      </div>
+      <button type="button" class="dia-lin" data-dia="receber">
+        <span class="dia-ic" style="background:#fdf0e6">⏳</span>
+        <span class="dia-tx"><b>A receber: ${val('fatReceberTotal')}</b><span class="dia-sub${atrasados ? ' dia-alerta' : ''}">${atrasados ? (atrasados === 1 ? '⚠️ 1 atrasado' : `⚠️ ${atrasados} atrasados`) : (pendentes.length ? `${pendentes.length} serviço(s) por receber` : 'Nada pendente')}</span></span>
+        <span class="dia-seta">›</span>
+      </button>
+      ${nPedidos ? `<button type="button" class="dia-lin" data-dia="pedidos"><span class="dia-ic" style="background:rgba(193,85,44,.12)">📥</span><span class="dia-tx"><b>${nPedidos === 1 ? '1 pedido do site por responder' : `${nPedidos} pedidos do site por responder`}</b><span class="dia-sub">Toque para ver</span></span><span class="dia-seta">›</span></button>` : ''}
+      <p class="dia-tira-t">Próximos 7 dias</p>
+      <div class="dia-tira">${tira.join('')}</div>`;
+  }
+  criarPainelDia();
+
   // ---------- Placar digital ----------
   let wakeLock = null;
   async function pedirWakeLock(){
@@ -4846,6 +4976,7 @@
 
   function renderPedidos(pedidos){
     window._trajetoPedidosAtuais = pedidos || [];
+    agendarPainelDia();
     avaliarPopupPedidoNovo(pedidos);
 
     const selo = document.getElementById('seloPedidos');
@@ -4956,6 +5087,7 @@
   });
 
   function renderFaturamento(){
+    agendarPainelDia();
     const todos = lerAgendamentos().filter(a => a.realizado);
     const hoje = new Date();
     const hojeStr = `${hoje.getFullYear()}-${pad(hoje.getMonth()+1)}-${pad(hoje.getDate())}`;
