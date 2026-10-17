@@ -590,6 +590,9 @@
   .ag-btn-wpp{background:#25D366 !important; color:#fff !important; border:none !important;}
   .ag-btn-ok{background:var(--terracota) !important; color:#fff !important; border:none !important;}
   .ag-btn-del{color:var(--terracota);}
+  .nota-lb{ display:block; margin:4px 0 6px; font:13px 'Helvetica Neue', Arial, sans-serif; color:#6a7378; text-align:left; }
+  .nota-tx{ display:block; width:100%; min-height:74px; padding:10px 12px; margin-bottom:14px; border:1.5px solid var(--linha); border-radius:10px; font:15px 'Helvetica Neue', Arial, sans-serif; background:#fff; color:var(--texto); resize:vertical; }
+  .nota-card{ margin:8px 0 0; padding:9px 11px; border-radius:10px; background:#fff8e6; border:1px solid #f0dca8; font:13px 'Helvetica Neue', Arial, sans-serif; color:#5a4a1e; line-height:1.45; overflow-wrap:anywhere; white-space:pre-line; }
   /* Calculadora: o preço só aparece quando se está a calcular */
   .calc-sub{ margin:-4px 0 0; font:13px 'Helvetica Neue', Arial, sans-serif; color:#6a7378; cursor:pointer; }
   .calc-dica{ display:flex; gap:10px; align-items:center; margin-top:14px; padding:14px; border-radius:14px; background:#f1ebde; color:#3d4c52; font:13.5px 'Helvetica Neue', Arial, sans-serif; line-height:1.45; }
@@ -1776,7 +1779,7 @@
     <p class="nota">Os serviços por hora agendados ficam em "📅 Agendados". Os que estão em andamento aparecem a partir do momento em que tocas em "🚗 Ir buscar cliente" no agendamento. O tempo só começa a contar quando tocas em "▶️ Iniciar" (cliente no carro). Ao finalizar, o valor é calculado pela regra definida em "Minhas tarifas" e podes enviar o resumo ao cliente. O agendamento só sai da lista quando o marcares como "Concluído".</p>
   </div>
 
-  <p style="text-align:center; font-family:'Helvetica Neue', Arial, sans-serif; font-size:11px; color:#8a7f66; margin-top:24px;">Trajeto · v9.18.0</p>
+  <p style="text-align:center; font-family:'Helvetica Neue', Arial, sans-serif; font-size:11px; color:#8a7f66; margin-top:24px;">Trajeto · v9.19.0</p>
 
 </main>
 
@@ -1863,9 +1866,21 @@
   <div class="modal-card">
     <h2>Concluir corrida</h2>
     <p>O pagamento desta corrida já foi recebido?</p>
+    <label class="nota-lb" for="notaConcluir">📝 Nota (opcional)</label>
+    <textarea id="notaConcluir" class="nota-tx" maxlength="500" placeholder="ex: voo atrasou 1 h · pagou portagem · deixou gorjeta"></textarea>
     <button class="modal-btn modal-btn-recebido" id="btnModalRecebido">💰 Sim, já recebi</button>
     <button class="modal-btn modal-btn-pendente" id="btnModalPendente">⏳ Ainda não recebi</button>
     <p id="notaParceiroPag" style="display:none; font-size:12px; color:#6a7378; margin:12px 0 0;"></p>
+  </div>
+</div>
+
+<div class="modal-overlay" id="modalNota">
+  <div class="modal-card">
+    <h2>📝 Nota do serviço</h2>
+    <p>Só para ti: não vai nas mensagens nem na placa.</p>
+    <textarea id="notaTexto" class="nota-tx" maxlength="500" placeholder="ex: voo atrasou 1 h · pagou portagem · deixou gorjeta"></textarea>
+    <button class="modal-btn modal-btn-recebido" id="btnNotaGuardar">Guardar nota</button>
+    <button class="modal-btn modal-btn-secundario" id="btnNotaCancelar">Cancelar</button>
   </div>
 </div>
 
@@ -3146,9 +3161,11 @@
           ${(ag.paragens && ag.paragens.length) ? `<br>📍 Paragens: ${ag.paragens.map(escHtml).join(' → ')}` : ''}
           ${ag.observacoes ? `<br>📝 ${escHtml(ag.observacoes)}` : ''}
         </div>
+        ${htmlNota(ag)}
         ${navHtml ? `<div class="ag-nav">${navHtml}</div>` : ''}
         <div class="ag-acoes">
           ${(ag.realizado && !avaliacaoRecebida(ag)) ? '<button class="ag-btn-av" data-acao="pedirAvaliacao">⭐ Pedir avaliação</button>' : ''}
+          ${ag.realizado ? `<button class="ag-btn-cal" data-acao="nota">📝 ${ag.nota ? 'Editar nota' : 'Nota'}</button>` : ''}
           <button class="ag-btn-cal" data-acao="editar">✏️ Editar</button>
           ${ag.realizado ? '<button class="ag-btn-cal" data-acao="refazer">🔁 Refazer</button>' : ''}
           <button class="ag-btn-cal" data-acao="cal">📅 Calendário</button>
@@ -4282,9 +4299,11 @@
           ${ag.fornecedor ? `🏷 Fornecedor: ${escHtml(ag.fornecedor)}<br>` : ''}
           ${ag.observacoes ? `📝 ${escHtml(ag.observacoes)}` : ''}
         </div>
+        ${htmlNota(ag)}
         ${ag.realizado ? '' : `<div class="ag-nav"><button class="ag-btn-buscar" data-acao="buscar">🚗 Ir buscar cliente</button>${botoesParagens}<button class="ag-btn-levar" data-acao="levar">🏁 Regressar à recolha</button></div>`}
         <div class="ag-acoes">
           ${(ag.realizado && !avaliacaoRecebida(ag)) ? '<button class="ag-btn-av" data-acao="pedirAvaliacao">⭐ Pedir avaliação</button>' : ''}
+          ${ag.realizado ? `<button class="ag-btn-cal" data-acao="nota">📝 ${ag.nota ? 'Editar nota' : 'Nota'}</button>` : ''}
           <button class="ag-btn-cal" data-acao="editar">✏️ Editar</button>
           ${ag.realizado ? '<button class="ag-btn-cal" data-acao="refazer">🔁 Refazer</button>' : ''}
           <button class="ag-btn-cal" data-acao="cal">📅 Calendário</button>
@@ -4614,6 +4633,7 @@
     idPendenteModal = id;
     // cliente de parceiro: avisa (discretamente) que não será sugerido pedir avaliação
     const ag = lerAgendamentos().find(a => a.id === id);
+    document.getElementById('notaConcluir').value = (ag && ag.nota) || '';
     const nota = document.getElementById('notaParceiroPag');
     if(ag && ehFornecedorParceiro(ag.fornecedor) && !ag.avaliacaoCodigo){
       nota.textContent = '';
@@ -4637,6 +4657,9 @@
     if(ag){
       ag.realizado = true;
       ag.pagamento = status;
+      marcarDataRecebimento(ag);
+      const nota = document.getElementById('notaConcluir').value.trim();
+      if(nota) ag.nota = nota.slice(0, 500); else delete ag.nota;
       gravarAgendamentos(lista);
       renderLista();
       renderFaturamento();
@@ -4646,6 +4669,33 @@
     if(ag && status === 'pendente') abrirModalPrevisao(ag.id, depois);
     else depois();
   }
+
+  // ---------- v9.19: data do recebimento (para o Finance Drive) e nota do serviço ----------
+  // recebidoEm = o dia em que o pagamento foi marcado como recebido. Só existe a partir desta versão.
+  function marcarDataRecebimento(ag){
+    if(ag.pagamento === 'recebido'){ if(!ag.recebidoEm) ag.recebidoEm = hojeISO(); }
+    else delete ag.recebidoEm;
+  }
+  function htmlNota(ag){ return ag && ag.nota ? `<div class="nota-card">📝 <b>Nota:</b> ${escHtml(ag.nota)}</div>` : ''; }
+  let notaId = null;
+  function abrirModalNota(id){
+    const ag = lerAgendamentos().find(a => a.id === id); if(!ag) return;
+    notaId = id;
+    document.getElementById('notaTexto').value = ag.nota || '';
+    document.getElementById('modalNota').classList.add('aberto');
+  }
+  function fecharModalNota(){ notaId = null; document.getElementById('modalNota').classList.remove('aberto'); }
+  document.getElementById('btnNotaGuardar').addEventListener('click', ()=>{
+    const lista = lerAgendamentos(); const ag = lista.find(a => a.id === notaId);
+    if(ag){
+      const v = document.getElementById('notaTexto').value.trim();
+      if(v) ag.nota = v.slice(0, 500); else delete ag.nota;
+      gravarAgendamentos(lista); renderLista(); renderFaturamento();
+    }
+    fecharModalNota();
+  });
+  document.getElementById('btnNotaCancelar').addEventListener('click', fecharModalNota);
+  document.getElementById('modalNota').addEventListener('click', (e)=>{ if(e.target.id === 'modalNota') fecharModalNota(); });
 
   // ---------- Data prevista de recebimento (opcional, para serviços "a receber") ----------
   let previsaoId = null, previsaoDepois = null;
@@ -4822,6 +4872,8 @@
       pedirIdiomaEExecutar(()=> enviarMensagem(ag));
     } else if(btn.dataset.acao === 'repassar'){
       repassarAgendamento(ag);
+    } else if(btn.dataset.acao === 'nota'){
+      abrirModalNota(id);
     } else if(btn.dataset.acao === 'realizado'){
       if(!ag.realizado){
         if(ag.tipo === 'hora' && ag.hEstado === 'em_curso'){
@@ -4831,12 +4883,14 @@
         abrirModalPagamento(id);
       } else {
         ag.realizado = false;
+        delete ag.recebidoEm;   // ao desfazer, deixa de contar como recebido (também no Finance Drive)
         gravarAgendamentos(lista);
         renderLista();
         renderFaturamento();
       }
     } else if(btn.dataset.acao === 'marcarRecebido'){
       ag.pagamento = 'recebido';
+      marcarDataRecebimento(ag);
       gravarAgendamentos(lista);
       renderLista();
       renderFaturamento();
@@ -5139,6 +5193,7 @@
           <div class="ag-trajeto fat-cab">${colQuando(ag)}<span class="ag-cab"><span class="ag-linha-cliente">${escHtml(ag.cliente)}</span><span class="ag-linha-rota">${tituloAg(ag)}</span></span><span class="ag-estado"><span class="fat-valor-item">€${ag.valor}</span><span class="ag-badge-pendente">⏳ A receber</span></span></div>
           ${extra ? `<div class="ag-meta fat-extra">${extra}</div>` : ''}
           ${linhaPrev}
+          ${htmlNota(ag)}
           <div class="ag-acoes">
             <button class="ag-btn-ok" data-acao="marcarRecebido">💰 Marcar como recebido</button>
             <button class="ag-btn-cal" data-acao="previsao">📅 Data prevista</button>
@@ -5173,6 +5228,7 @@
           ${linhaHoraMeta(ag)}
           ${ag.fornecedor ? `<br>🏷 Fornecedor: ${escHtml(ag.fornecedor)}` : ''}
         </div>
+        ${htmlNota(ag)}
         <div class="ag-acoes">
           <button class="ag-btn-cal" data-acao="refazer">🔁 Refazer</button>
         </div>
@@ -5320,6 +5376,7 @@
     const ag = lista.find(a => a.id === id);
     if(!ag) return;
     ag.pagamento = 'recebido';
+    marcarDataRecebimento(ag);
     gravarAgendamentos(lista);
     renderLista();
     renderFaturamento();
