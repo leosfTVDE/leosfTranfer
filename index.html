@@ -827,6 +827,40 @@
     font-size:28px;
     color:var(--terracota);
   }
+  /* ===== Ecrã de corrida (v9.20) ===== */
+  .corrida-overlay{ display:none; position:fixed; inset:0; z-index:1500; background:#f3ede1; flex-direction:column; color:var(--azul-noite); }
+  .corrida-overlay.aberto{ display:flex; }
+  .cr-top{ background:var(--azul-noite); color:#f5efe3; padding:calc(env(safe-area-inset-top, 0px) + 12px) 16px 12px; flex-shrink:0; }
+  .cr-row{ display:flex; align-items:center; gap:10px; }
+  .cr-x{ width:38px; height:38px; border-radius:50%; border:none; background:rgba(255,255,255,.1); color:#e8c9a0; font-size:22px; line-height:1; cursor:pointer; flex-shrink:0; }
+  .cr-tit{ min-width:0; } .cr-tit b{ display:block; font-family:Georgia, 'Times New Roman', serif; font-size:17px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .cr-tit small{ display:block; font-size:12px; color:#b9c4cc; margin-top:1px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .cr-fase{ display:flex; gap:4px; margin-top:12px; } .cr-fase i{ flex:1; height:5px; border-radius:3px; background:rgba(255,255,255,.14); } .cr-fase i.on{ background:#e58b56; }
+  .cr-fasetx{ font-size:11px; color:#e8c9a0; margin-top:6px; letter-spacing:.05em; text-transform:uppercase; font-weight:700; }
+  .cr-corpo{ flex:1; overflow-y:auto; -webkit-overflow-scrolling:touch; padding:0 12px 96px; }
+  .cr-end{ display:flex; align-items:center; gap:12px; margin-top:12px; padding:14px; background:#fffdf8; border:1px solid #e9e0ce; border-radius:16px; }
+  .cr-end-t{ flex:1; min-width:0; } .cr-end small{ font-size:11.5px; color:var(--azulejo); letter-spacing:.06em; text-transform:uppercase; font-weight:700; }
+  .cr-end p{ font-size:19px; line-height:1.25; margin:3px 0 0; font-weight:700; overflow-wrap:anywhere; }
+  .cr-chip{ display:inline-block; margin-top:7px; padding:3px 9px; border-radius:999px; background:#eef4f4; color:var(--azulejo); font-size:12px; font-weight:700; }
+  .cr-waze{ width:66px; flex-shrink:0; border:none; background:none; text-align:center; font:700 11px 'Helvetica Neue', Arial, sans-serif; color:var(--azulejo); cursor:pointer; padding:0; }
+  .cr-waze span{ width:56px; height:56px; margin:0 auto 3px; border-radius:50%; background:#33ccff; display:flex; align-items:center; justify-content:center; box-shadow:0 4px 12px rgba(51,204,255,.35); }
+  .cr-waze svg{ width:30px; height:30px; }
+  .cr-paragens{ display:flex; flex-wrap:wrap; gap:6px; margin-top:8px; }
+  .cr-paragens button{ min-height:36px; padding:6px 10px; border-radius:10px; border:1px solid #e9e0ce; background:#fffdf8; color:var(--azul-noite); font:600 12.5px 'Helvetica Neue', Arial, sans-serif; cursor:pointer; max-width:100%; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .cr-aviso{ margin-top:10px; padding:11px 13px; border-radius:12px; background:#fff8e6; border:1px solid #f0dca8; color:#5a4a1e; font-size:14.5px; line-height:1.45; overflow-wrap:anywhere; white-space:pre-line; }
+  .cr-mapa{ position:relative; height:230px; margin-top:10px; border-radius:16px; overflow:hidden; background:#e8eef0; border:1px solid #e9e0ce; }
+  .cr-mapa iframe{ position:absolute; inset:0; width:100%; height:100%; border:0; }
+  .cr-mapa .cr-mapa-off{ position:absolute; inset:0; display:flex; align-items:center; justify-content:center; padding:16px; text-align:center; font-size:13px; color:#6a7378; }
+  .cr-inf{ margin-top:10px; padding:12px 14px; background:#fffdf8; border:1px solid #e9e0ce; border-radius:16px; }
+  .cr-hora{ font-size:12.5px; color:#6a7378; } .cr-hora b{ display:block; font-size:21px; color:var(--azul-noite); margin-top:1px; font-family:Georgia, 'Times New Roman', serif; }
+  .cr-l{ display:flex; align-items:center; gap:10px; padding-top:9px; font-size:15px; overflow-wrap:anywhere; } .cr-l span{ width:28px; height:28px; border-radius:8px; display:flex; align-items:center; justify-content:center; font-size:15px; background:#f1ebde; flex-shrink:0; }
+  .cr-acts{ display:grid; grid-template-columns:repeat(3, 1fr); gap:8px; margin-top:10px; }
+  .cr-act{ display:block; text-align:center; padding:9px 0; border-radius:12px; background:#fffdf8; border:1px solid #e9e0ce; font:600 12.5px 'Helvetica Neue', Arial, sans-serif; color:var(--azul-noite); text-decoration:none; cursor:pointer; }
+  .cr-act b{ display:block; font-size:19px; margin-bottom:1px; } .cr-act.off{ opacity:.4; pointer-events:none; }
+  .cr-rodape{ position:absolute; left:0; right:0; bottom:0; padding:10px 12px calc(env(safe-area-inset-bottom, 0px) + 12px); background:linear-gradient(rgba(243,237,225,0), #f3ede1 30%); }
+  .cr-go{ width:100%; min-height:60px; border:none; border-radius:16px; font:700 19px 'Helvetica Neue', Arial, sans-serif; color:#fff; cursor:pointer; box-shadow:0 6px 18px rgba(13,27,42,.18); }
+  .cr-go.f0{ background:var(--azulejo); } .cr-go.f1{ background:var(--terracota); } .cr-go.f2{ background:var(--azul-noite); }
+  .ag-badge-corrida{ display:inline-block; padding:3px 8px; border-radius:999px; background:#e8f1f2; color:var(--azulejo); font:700 10.5px 'Helvetica Neue', Arial, sans-serif; white-space:nowrap; }
   .placar-overlay{
     display:none;
     position:fixed;
@@ -1779,7 +1813,7 @@
     <p class="nota">Os serviços por hora agendados ficam em "📅 Agendados". Os que estão em andamento aparecem a partir do momento em que tocas em "🚗 Ir buscar cliente" no agendamento. O tempo só começa a contar quando tocas em "▶️ Iniciar" (cliente no carro). Ao finalizar, o valor é calculado pela regra definida em "Minhas tarifas" e podes enviar o resumo ao cliente. O agendamento só sai da lista quando o marcares como "Concluído".</p>
   </div>
 
-  <p style="text-align:center; font-family:'Helvetica Neue', Arial, sans-serif; font-size:11px; color:#8a7f66; margin-top:24px;">Trajeto · v9.19.0</p>
+  <p style="text-align:center; font-family:'Helvetica Neue', Arial, sans-serif; font-size:11px; color:#8a7f66; margin-top:24px;">Trajeto · v9.20.0</p>
 
 </main>
 
@@ -1822,6 +1856,36 @@
     <p id="authErro" style="color:var(--terracota); font-family:'Helvetica Neue', Arial, sans-serif; font-size:12.5px; margin:10px 0 0; text-align:center;"></p>
     <button id="btnAuthFechar" style="width:100%; margin-top:14px; background:none; border:none; color:#8a7378; font-family:'Helvetica Neue', Arial, sans-serif; font-size:13px; cursor:pointer;">Fechar</button>
   </div>
+</div>
+
+<div class="corrida-overlay" id="corridaOverlay" aria-hidden="true">
+  <div class="cr-top">
+    <div class="cr-row">
+      <button type="button" class="cr-x" id="btnCorridaFechar" aria-label="Voltar">‹</button>
+      <div class="cr-tit"><b id="crCliente"></b><small id="crSub"></small></div>
+    </div>
+    <div class="cr-fase" id="crFase"><i></i><i></i><i></i></div>
+    <div class="cr-fasetx" id="crFaseTx"></div>
+  </div>
+  <div class="cr-corpo">
+    <div class="cr-end">
+      <div class="cr-end-t"><small id="crRotulo"></small><p id="crEndereco"></p><span class="cr-chip" id="crChip" hidden></span></div>
+      <button type="button" class="cr-waze" id="btnCorridaWaze" aria-label="Abrir no Waze"><span><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="11" r="8" fill="#fff"/><circle cx="9.3" cy="10" r="1.1" fill="#0d1b2a"/><circle cx="14.7" cy="10" r="1.1" fill="#0d1b2a"/><path d="M9 13.2 Q12 15.6 15 13.2" stroke="#0d1b2a" stroke-width="1.2" fill="none" stroke-linecap="round"/><circle cx="8" cy="20" r="1.6" fill="#0d1b2a"/><circle cx="15" cy="20" r="1.6" fill="#0d1b2a"/></svg></span>Waze</button>
+    </div>
+    <div class="cr-paragens" id="crParagens" hidden></div>
+    <div class="cr-aviso" id="crAviso" hidden></div>
+    <div class="cr-mapa" id="crMapa"></div>
+    <div class="cr-inf">
+      <div class="cr-hora">Hora marcada<b id="crHora"></b></div>
+      <div id="crLinhas"></div>
+    </div>
+    <div class="cr-acts">
+      <a class="cr-act" id="crLigar" href="#"><b>📞</b>Ligar</a>
+      <button type="button" class="cr-act" id="crWhats"><b>💬</b>WhatsApp</button>
+      <button type="button" class="cr-act" id="crPlaca"><b>🪧</b>Placa</button>
+    </div>
+  </div>
+  <div class="cr-rodape"><button type="button" class="cr-go" id="btnCorridaPasso"></button></div>
 </div>
 
 <div class="placar-overlay" id="placarOverlay">
@@ -3140,7 +3204,7 @@
       const estadoHora = (eHora && !ag.realizado)
         ? ({ a_caminho: '🚗 A caminho', em_curso: '⏱ Em curso', finalizado: '🏁 Finalizado' }[ag.hEstado] || '') : '';
       const seloEstadoHora = estadoHora ? `<span class="ag-badge-hora">${estadoHora}</span>` : '';
-      const seloAgendado = (!ag.realizado && !estadoHora) ? '<span class="ag-badge-agendado">📅 Agendado</span>' : '';
+      const seloAgendado = (!ag.realizado && !estadoHora) ? (seloCorrida(ag) || '<span class="ag-badge-agendado">📅 Agendado</span>') : '';
       let navHtml;
       if(eHora){
         if(ag.realizado) navHtml = '';
@@ -4545,6 +4609,125 @@
   }
   criarPainelDia();
 
+  // =====================================================================
+  //  Ecrã de corrida (v9.20): recolha → destino em 3 passos, mapa do Google, navegação sempre pelo Waze.
+  //  ag.corridaFase: 0 = ainda não saiu · 1 = a caminho / no local · 2 = em viagem (só visual; não mexe em valores).
+  // =====================================================================
+  const MAPS_EMBED_KEY = 'AIzaSyB-Cca1n7MN5ZxI6gbWc3RhTy7vnnTCPL8';
+  let corridaId = null, corridaMapaUrl = '';
+  function corridaParagens(ag){
+    if(ag.tipo === 'tour') return (Array.isArray(ag.tourRoteiro) ? ag.tourRoteiro : []).map(paragemParaWaze).filter(Boolean);
+    return (Array.isArray(ag.paragens) ? ag.paragens : []).filter(Boolean);
+  }
+  function corridaDestino(ag){
+    if(ag.tipo === 'tour'){ const r = corridaParagens(ag); return (ag.chegada && ag.chegada !== ag.partida) ? ag.chegada : (r.length ? r[r.length - 1] : ''); }
+    return ag.chegada || '';
+  }
+  function urlMapaCorrida(ag){
+    const base = 'https://www.google.com/maps/embed/v1/';
+    const o = (ag.partida || '').trim(); const d = (corridaDestino(ag) || '').trim();
+    if(!o) return '';
+    if(!d || d === o) return `${base}place?key=${MAPS_EMBED_KEY}&q=${encodeURIComponent(o)}&language=pt-PT&region=PT`;
+    let w = corridaParagens(ag).filter(x => x !== d);
+    if(ag.tipo === 'tour' && d === w[w.length - 1]) w = w.slice(0, -1);
+    w = w.slice(0, 20);
+    return `${base}directions?key=${MAPS_EMBED_KEY}&origin=${encodeURIComponent(o)}&destination=${encodeURIComponent(d)}${w.length ? '&waypoints=' + w.map(encodeURIComponent).join('|') : ''}&mode=driving&language=pt-PT&region=PT`;
+  }
+  function abrirCorrida(id){
+    const ag = lerAgendamentos().find(a => a.id === id); if(!ag) return;
+    corridaId = id; corridaMapaUrl = '';
+    document.getElementById('corridaOverlay').classList.add('aberto');
+    document.getElementById('corridaOverlay').setAttribute('aria-hidden', 'false');
+    renderCorrida();
+  }
+  function fecharCorrida(){
+    corridaId = null;
+    document.getElementById('corridaOverlay').classList.remove('aberto');
+    document.getElementById('corridaOverlay').setAttribute('aria-hidden', 'true');
+  }
+  function renderCorrida(){
+    const ag = lerAgendamentos().find(a => a.id === corridaId);
+    if(!ag || ag.realizado){ fecharCorrida(); return; }
+    const fase = Math.min(2, Math.max(0, parseInt(ag.corridaFase, 10) || 0));
+    const eTour = ag.tipo === 'tour';
+    const forn = (ag.fornecedor || '').trim();
+    const parceiro = forn && ehFornecedorParceiro(forn);
+    document.getElementById('crCliente').textContent = ag.cliente || 'Cliente';
+    document.getElementById('crSub').textContent = [eTour ? '🗺️ ' + (ag.tourNome || 'Tour') : 'Transfer', parceiro ? forn : '', `${ag.data.split('-').reverse().slice(0, 2).join('/')} · ${ag.hora}`].filter(Boolean).join(' · ');
+    document.querySelectorAll('#crFase i').forEach((el, i)=> el.classList.toggle('on', i <= fase));
+    document.getElementById('crFaseTx').textContent = ['Passo 1 de 3 · ir buscar o cliente', 'Passo 2 de 3 · a caminho da recolha', eTour ? 'Passo 3 de 3 · em tour' : 'Passo 3 de 3 · a caminho do destino'][fase];
+    const destino = corridaDestino(ag);
+    const emViagem = fase === 2 && !!destino;
+    document.getElementById('crRotulo').textContent = emViagem ? (eTour ? 'Fim do tour' : 'Destino') : 'Recolha';
+    document.getElementById('crEndereco').textContent = emViagem ? destino : (ag.partida || '—');
+    const chip = document.getElementById('crChip'); chip.hidden = !parceiro; chip.textContent = parceiro ? '🏷 ' + forn : '';
+    // paragens (Waze em cada uma) — no passo 3
+    const pr = document.getElementById('crParagens'); pr.innerHTML = '';
+    const lista = corridaParagens(ag);
+    if(fase === 2 && lista.length){
+      lista.forEach((t, i)=>{ const b = document.createElement('button'); b.type = 'button'; b.textContent = `📍 ${i + 1} · ${t}`; b.addEventListener('click', ()=> abrirWaze(t)); pr.appendChild(b); });
+      pr.hidden = false;
+    } else pr.hidden = true;
+    const av = document.getElementById('crAviso');
+    const aviso = [ag.observacoes ? '📝 ' + ag.observacoes : '', ag.nota ? '🗒 ' + ag.nota : ''].filter(Boolean).join('\n');
+    av.textContent = aviso; av.hidden = !aviso;
+    // mapa: só recarrega se o percurso mudou
+    const url = urlMapaCorrida(ag), mapa = document.getElementById('crMapa');
+    if(url !== corridaMapaUrl){
+      corridaMapaUrl = url; mapa.innerHTML = '';
+      if(url && navigator.onLine !== false){
+        const f = document.createElement('iframe'); f.src = url; f.loading = 'lazy'; f.referrerPolicy = 'no-referrer-when-downgrade'; f.allowFullscreen = true; f.title = 'Mapa do percurso'; mapa.appendChild(f);
+      } else {
+        const d = document.createElement('div'); d.className = 'cr-mapa-off'; d.textContent = url ? 'Sem internet: o mapa aparece quando houver ligação. O Waze continua a funcionar.' : 'Sem morada de recolha.'; mapa.appendChild(d);
+      }
+    }
+    document.getElementById('crHora').textContent = `${new Date(ag.data + 'T12:00:00').toLocaleDateString('pt-PT', { weekday:'short', day:'numeric', month:'short' })} · ${ag.hora}`;
+    const linhas = [];
+    if(ag.voo) linhas.push(['✈️', 'Voo ' + ag.voo]);
+    const pax = (/(\d+)\s*passageiro/i.exec(ag.observacoes || '') || [])[1];
+    if(pax) linhas.push(['👥', pax + (pax === '1' ? ' passageiro' : ' passageiros')]);
+    if(ag.nomePlaca && ag.nomePlaca !== ag.cliente) linhas.push(['🪧', 'Placa: ' + ag.nomePlaca]);
+    if(eTour && ag.tourDuracao) linhas.push(['⏱', ag.tourDuracao]);
+    const el = document.getElementById('crLinhas'); el.innerHTML = '';
+    linhas.forEach(([ic, tx])=>{ const d = document.createElement('div'); d.className = 'cr-l'; const s1 = document.createElement('span'); s1.textContent = ic; d.appendChild(s1); d.appendChild(document.createTextNode(tx)); el.appendChild(d); });
+    const tel = ag.telefone ? normalizarTelefone(ag.telefone) : '';
+    const lig = document.getElementById('crLigar'); lig.href = tel ? 'tel:+' + tel.replace(/^\+/, '') : '#'; lig.classList.toggle('off', !tel);
+    document.getElementById('crWhats').classList.toggle('off', !tel);
+    const btn = document.getElementById('btnCorridaPasso');
+    btn.className = 'cr-go f' + fase;
+    btn.textContent = ['🚗 A caminho', eTour ? '📍 Cheguei · Iniciar tour' : '📍 Cheguei · Iniciar viagem', '🏁 Concluir serviço'][fase];
+  }
+  function gravarFaseCorrida(fase){
+    const lista = lerAgendamentos(); const ag = lista.find(a => a.id === corridaId); if(!ag) return;
+    ag.corridaFase = fase; gravarAgendamentos(lista); renderLista(); renderCorrida();
+  }
+  document.getElementById('btnCorridaFechar').addEventListener('click', fecharCorrida);
+  document.getElementById('btnCorridaWaze').addEventListener('click', ()=>{
+    const ag = lerAgendamentos().find(a => a.id === corridaId); if(!ag) return;
+    const fase = parseInt(ag.corridaFase, 10) || 0; const d = corridaDestino(ag);
+    abrirWaze(fase === 2 && d ? d : ag.partida);
+  });
+  document.getElementById('btnCorridaPasso').addEventListener('click', ()=>{
+    const ag = lerAgendamentos().find(a => a.id === corridaId); if(!ag) return;
+    const fase = parseInt(ag.corridaFase, 10) || 0;
+    if(fase < 2){ gravarFaseCorrida(fase + 1); document.querySelector('.cr-corpo').scrollTop = 0; return; }
+    const id = corridaId; fecharCorrida(); abrirModalPagamento(id);   // o mesmo ecrã de pagamento e nota de sempre
+  });
+  document.getElementById('crWhats').addEventListener('click', ()=>{
+    const ag = lerAgendamentos().find(a => a.id === corridaId); if(!ag || !ag.telefone) return;
+    window.open(`https://wa.me/${normalizarTelefone(ag.telefone)}`, '_blank');
+  });
+  document.getElementById('crPlaca').addEventListener('click', ()=>{
+    const ag = lerAgendamentos().find(a => a.id === corridaId); if(!ag) return;
+    document.getElementById('placarOverlay').classList.add('aberto');
+    mostrarPlaca(ag.nomePlaca || ag.cliente, ag.voo || '', ag.fornecedor || '');
+  });
+  function seloCorrida(ag){
+    if(ag.realizado || ag.tipo === 'hora') return '';
+    const f = parseInt(ag.corridaFase, 10) || 0;
+    return f === 1 ? '<span class="ag-badge-corrida">🚗 A caminho</span>' : f === 2 ? '<span class="ag-badge-corrida">▶ Em viagem</span>' : '';
+  }
+
   // ---------- Placar digital ----------
   let wakeLock = null;
   async function pedirWakeLock(){
@@ -4838,7 +5021,7 @@
     if(!ag) return;
 
     if(btn.dataset.acao === 'buscar'){
-      abrirWaze(ag.partida);
+      abrirCorrida(ag.id);   // v9.20: ecrã de corrida (o Waze abre-se lá, no botão redondo)
     } else if(btn.dataset.acao === 'levar'){
       abrirWaze(ag.chegada);
     } else if(btn.dataset.acao === 'paragem'){
