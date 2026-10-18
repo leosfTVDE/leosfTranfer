@@ -837,7 +837,7 @@
   .cr-tit small{ display:block; font-size:12px; color:#b9c4cc; margin-top:1px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
   .cr-fase{ display:flex; gap:4px; margin-top:12px; } .cr-fase i{ flex:1; height:5px; border-radius:3px; background:rgba(255,255,255,.14); } .cr-fase i.on{ background:#e58b56; }
   .cr-fasetx{ font-size:11px; color:#e8c9a0; margin-top:6px; letter-spacing:.05em; text-transform:uppercase; font-weight:700; }
-  .cr-corpo{ flex:1; overflow-y:auto; -webkit-overflow-scrolling:touch; padding:0 12px 96px; }
+  .cr-corpo{ flex:1; overflow-y:auto; -webkit-overflow-scrolling:touch; padding:0 12px 136px; }
   .cr-end{ display:flex; align-items:center; gap:12px; margin-top:12px; padding:14px; background:#fffdf8; border:1px solid #e9e0ce; border-radius:16px; }
   .cr-end-t{ flex:1; min-width:0; } .cr-end small{ font-size:11.5px; color:var(--azulejo); letter-spacing:.06em; text-transform:uppercase; font-weight:700; }
   .cr-end p{ font-size:19px; line-height:1.25; margin:3px 0 0; font-weight:700; overflow-wrap:anywhere; }
@@ -858,6 +858,8 @@
   .cr-act{ display:block; text-align:center; padding:9px 0; border-radius:12px; background:#fffdf8; border:1px solid #e9e0ce; font:600 12.5px 'Helvetica Neue', Arial, sans-serif; color:var(--azul-noite); text-decoration:none; cursor:pointer; }
   .cr-act b{ display:block; font-size:19px; margin-bottom:1px; } .cr-act.off{ opacity:.4; pointer-events:none; }
   .cr-rodape{ position:absolute; left:0; right:0; bottom:0; padding:10px 12px calc(env(safe-area-inset-bottom, 0px) + 12px); background:linear-gradient(rgba(243,237,225,0), #f3ede1 30%); }
+  .cr-voltar{ display:block; margin:0 auto 6px; min-height:34px; padding:4px 14px; border:none; border-radius:999px; background:rgba(13,27,42,.06); color:var(--azul-noite); font:600 13px 'Helvetica Neue', Arial, sans-serif; cursor:pointer; }
+  .cr-voltar[hidden]{ display:none; }
   .cr-go{ width:100%; min-height:60px; border:none; border-radius:16px; font:700 19px 'Helvetica Neue', Arial, sans-serif; color:#fff; cursor:pointer; box-shadow:0 6px 18px rgba(13,27,42,.18); }
   .cr-go.f0{ background:var(--azulejo); } .cr-go.f1{ background:var(--terracota); } .cr-go.f2{ background:var(--azul-noite); }
   .ag-badge-corrida{ display:inline-block; padding:3px 8px; border-radius:999px; background:#e8f1f2; color:var(--azulejo); font:700 10.5px 'Helvetica Neue', Arial, sans-serif; white-space:nowrap; }
@@ -1813,7 +1815,7 @@
     <p class="nota">Os serviços por hora agendados ficam em "📅 Agendados". Os que estão em andamento aparecem a partir do momento em que tocas em "🚗 Ir buscar cliente" no agendamento. O tempo só começa a contar quando tocas em "▶️ Iniciar" (cliente no carro). Ao finalizar, o valor é calculado pela regra definida em "Minhas tarifas" e podes enviar o resumo ao cliente. O agendamento só sai da lista quando o marcares como "Concluído".</p>
   </div>
 
-  <p style="text-align:center; font-family:'Helvetica Neue', Arial, sans-serif; font-size:11px; color:#8a7f66; margin-top:24px;">Trajeto · v9.20.0</p>
+  <p style="text-align:center; font-family:'Helvetica Neue', Arial, sans-serif; font-size:11px; color:#8a7f66; margin-top:24px;">Trajeto · v9.20.1</p>
 
 </main>
 
@@ -1885,7 +1887,7 @@
       <button type="button" class="cr-act" id="crPlaca"><b>🪧</b>Placa</button>
     </div>
   </div>
-  <div class="cr-rodape"><button type="button" class="cr-go" id="btnCorridaPasso"></button></div>
+  <div class="cr-rodape"><button type="button" class="cr-voltar" id="btnCorridaVoltar" hidden>↩ Voltar ao passo anterior</button><button type="button" class="cr-go" id="btnCorridaPasso"></button></div>
 </div>
 
 <div class="placar-overlay" id="placarOverlay">
@@ -4694,6 +4696,7 @@
     const lig = document.getElementById('crLigar'); lig.href = tel ? 'tel:+' + tel.replace(/^\+/, '') : '#'; lig.classList.toggle('off', !tel);
     document.getElementById('crWhats').classList.toggle('off', !tel);
     const btn = document.getElementById('btnCorridaPasso');
+    document.getElementById('btnCorridaVoltar').hidden = fase === 0;
     btn.className = 'cr-go f' + fase;
     btn.textContent = ['🚗 A caminho', eTour ? '📍 Cheguei · Iniciar tour' : '📍 Cheguei · Iniciar viagem', '🏁 Concluir serviço'][fase];
   }
@@ -4710,8 +4713,19 @@
   document.getElementById('btnCorridaPasso').addEventListener('click', ()=>{
     const ag = lerAgendamentos().find(a => a.id === corridaId); if(!ag) return;
     const fase = parseInt(ag.corridaFase, 10) || 0;
-    if(fase < 2){ gravarFaseCorrida(fase + 1); document.querySelector('.cr-corpo').scrollTop = 0; return; }
+    if(fase < 2){
+      gravarFaseCorrida(fase + 1); document.querySelector('.cr-corpo').scrollTop = 0;
+      // v9.20.1: "A caminho" abre o Waze para a recolha; "Iniciar viagem" abre o Waze para a 1.ª paragem (ou o destino)
+      if(fase === 0) abrirWaze(ag.partida);
+      else { const prox = corridaParagens(ag)[0] || corridaDestino(ag); if(prox) abrirWaze(prox); }
+      return;
+    }
     const id = corridaId; fecharCorrida(); abrirModalPagamento(id);   // o mesmo ecrã de pagamento e nota de sempre
+  });
+  document.getElementById('btnCorridaVoltar').addEventListener('click', ()=>{
+    const ag = lerAgendamentos().find(a => a.id === corridaId); if(!ag) return;
+    const fase = parseInt(ag.corridaFase, 10) || 0;
+    if(fase > 0){ gravarFaseCorrida(fase - 1); document.querySelector('.cr-corpo').scrollTop = 0; }   // só volta o passo; não abre o Waze
   });
   document.getElementById('crWhats').addEventListener('click', ()=>{
     const ag = lerAgendamentos().find(a => a.id === corridaId); if(!ag || !ag.telefone) return;
