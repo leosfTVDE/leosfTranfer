@@ -965,6 +965,11 @@
   /* Faixa da marca em baixo da placa (Trajeto, ou a logo do parceiro registada em Minhas tarifas) */
   #placarDisplay{ position:relative; }
   #placarDisplay.com-faixa{ padding-bottom:calc(24px + clamp(76px, 22vmin, 190px)); }
+  /* v9.21.1: logo de parceiro redonda/quadrada → maior, em círculo e centrada (logos compridas ficam como estavam) */
+  #placarDisplay.com-faixa.faixa-redonda{ padding-bottom:calc(24px + clamp(100px, 30vmin, 240px)); }
+  #placarFaixa.faixa-redonda{ justify-content:center; gap:clamp(12px, 4vmin, 40px); }
+  #placarFaixa .faixa-logo-parceiro.logo-redonda{ height:clamp(70px, 24vmin, 190px); width:auto; aspect-ratio:1/1; object-fit:cover; border-radius:50%; box-shadow:0 0 0 3px #e8c9a0; max-width:none; }
+  #placarFaixa.faixa-redonda .faixa-nome{ font-size:clamp(20px, 6vmin, 48px); }
   #placarFaixa{ position:absolute; left:0; right:0; bottom:0; display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:clamp(8px, 2.5vmin, 24px); padding:clamp(12px, 3.5vmin, 28px) clamp(16px, 5vmin, 40px); background:var(--azul-noite); }
   #placarFaixa[hidden]{ display:none; }
   #placarFaixa .logo-h{ display:flex; align-items:center; gap:clamp(4px, 1vmin, 10px); }
@@ -1847,7 +1852,7 @@
     <p class="nota">Os serviços por hora agendados ficam em "📅 Agendados". Os que estão em andamento aparecem a partir do momento em que tocas em "🚗 Ir buscar cliente" no agendamento. O tempo só começa a contar quando tocas em "▶️ Iniciar" (cliente no carro). Ao finalizar, o valor é calculado pela regra definida em "Minhas tarifas" e podes enviar o resumo ao cliente. O agendamento só sai da lista quando o marcares como "Concluído".</p>
   </div>
 
-  <p style="text-align:center; font-family:'Helvetica Neue', Arial, sans-serif; font-size:11px; color:#8a7f66; margin-top:24px;">Trajeto · v9.21.0</p>
+  <p style="text-align:center; font-family:'Helvetica Neue', Arial, sans-serif; font-size:11px; color:#8a7f66; margin-top:24px;">Trajeto · v9.21.1</p>
 
 </main>
 
@@ -4559,6 +4564,7 @@
   function aplicarFaixaPlaca(fornecedor){
     const disp = document.getElementById('placarDisplay'), faixa = document.getElementById('placarFaixa'), fornEl = document.getElementById('placarFornecedorGrande');
     faixa.innerHTML = '';
+    faixa.classList.remove('faixa-redonda'); disp.classList.remove('faixa-redonda');
     let mostrar = false;
     if(!ehFornecedorParceiro(fornecedor)){
       const logo = document.querySelector('header .logo-h');
@@ -4569,7 +4575,14 @@
     } else {
       const p = acharParceiro(fornecedor);
       if(p && p.logo){
-        const im = document.createElement('img'); im.className = 'faixa-logo-parceiro'; im.src = p.logo; im.alt = p.nome; faixa.appendChild(im);
+        const im = document.createElement('img'); im.className = 'faixa-logo-parceiro'; im.alt = p.nome;
+        // logo quase quadrada (redonda): maior, em círculo e centrada com o nome ao lado
+        im.onload = ()=>{
+          const r = im.naturalWidth && im.naturalHeight ? im.naturalWidth / im.naturalHeight : 0;
+          const redonda = r >= 0.8 && r <= 1.25;
+          im.classList.toggle('logo-redonda', redonda); faixa.classList.toggle('faixa-redonda', redonda); disp.classList.toggle('faixa-redonda', redonda);
+        };
+        im.src = p.logo; faixa.appendChild(im);
         if(p.mostrarNome !== false){ const n = document.createElement('span'); n.className = 'faixa-nome'; n.textContent = p.nome; faixa.appendChild(n); }
         fornEl.textContent = '';
         mostrar = true;
