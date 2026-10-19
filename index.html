@@ -827,6 +827,27 @@
     font-size:28px;
     color:var(--terracota);
   }
+  /* v9.21: estado da ligação ao Finance Drive */
+  .fd-pill{ display:inline-flex; align-items:center; gap:7px; }
+  .fd-pill[hidden]{ display:none; }
+  .fd-pill i{ width:9px; height:9px; border-radius:50%; display:inline-block; flex-shrink:0; }
+  .fd-pill.fd-ok i{ background:#5fd196; box-shadow:0 0 0 3px rgba(95,209,150,.22); }
+  .fd-pill.fd-av i{ background:#f2b63d; box-shadow:0 0 0 3px rgba(242,182,61,.22); }
+  .fd-card{ display:flex; gap:12px; align-items:center; padding:12px; border-radius:14px; margin:4px 0 8px; font-family:'Helvetica Neue', Arial, sans-serif; }
+  .fd-card .fd-ic{ width:40px; height:40px; border-radius:20px; display:flex; align-items:center; justify-content:center; font-size:19px; flex-shrink:0; font-weight:700; }
+  .fd-card b{ display:block; font-size:14.5px; color:var(--azul-noite); } .fd-card span{ display:block; font-size:12.5px; color:#3d4c52; margin-top:2px; line-height:1.45; }
+  .fd-card.ok{ background:#e6f2ea; } .fd-card.ok .fd-ic{ background:#2e8b57; color:#fff; }
+  .fd-card.av{ background:#fff4e0; } .fd-card.av .fd-ic{ background:#c9971c; color:#fff; }
+  .fd-card.nao{ background:#f1ebde; } .fd-card.nao .fd-ic{ background:#d9cdb2; color:var(--azul-noite); }
+  /* v9.21: roteiro do tour */
+  .rot-info{ display:flex; gap:10px; margin:6px 0 8px; padding:10px 12px; border-radius:12px; background:#eef4f4; color:#1f4f55; font:13px/1.5 'Helvetica Neue', Arial, sans-serif; }
+  .rot-prev{ margin-top:8px; display:flex; flex-direction:column; gap:5px; }
+  .rot-prev .rp{ display:flex; align-items:center; gap:8px; font:14px 'Helvetica Neue', Arial, sans-serif; color:var(--azul-noite); overflow-wrap:anywhere; }
+  .rot-prev .rp b{ width:24px; height:24px; border-radius:50%; background:var(--azulejo); color:#fff; display:flex; align-items:center; justify-content:center; font-size:12px; flex-shrink:0; }
+  .rot-prev .rp small{ color:#6a7378; }
+  .rot-tot{ font:600 12.5px 'Helvetica Neue', Arial, sans-serif; color:var(--azulejo); margin-top:2px; }
+  .rot-aviso{ margin-top:8px; padding:9px 11px; border-radius:10px; background:#fff4e0; border:1px solid #f0d6a0; color:#7a5a0e; font:600 13px 'Helvetica Neue', Arial, sans-serif; }
+  .ag-badge-semrot{ display:inline-block; padding:3px 8px; border-radius:999px; background:#fff4e0; color:#7a5a0e; font:700 10.5px 'Helvetica Neue', Arial, sans-serif; white-space:nowrap; }
   /* ===== Ecrã de corrida (v9.20) ===== */
   .corrida-overlay{ display:none; position:fixed; inset:0; z-index:1500; background:#f3ede1; flex-direction:column; color:var(--azul-noite); }
   .corrida-overlay.aberto{ display:flex; }
@@ -1213,6 +1234,7 @@
   <div class="header-botoes">
     <button id="btnConfig" class="btn-config"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09a1.65 1.65 0 0 0-1-1.51 1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09a1.65 1.65 0 0 0 1.51-1 1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>Minhas tarifas</button>
     <button id="btnPlacar" class="btn-config"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="18" height="11" rx="2"/><path d="M12 15v6M8 21h8M7.5 9.5h9"/></svg>Placar</button>
+    <button id="btnEstadoFD" class="btn-config fd-pill" type="button" hidden><i></i><span id="estadoFDTxt">Finance Drive</span></button>
   </div>
 </header>
 
@@ -1448,6 +1470,14 @@
       </div>
 
       <div class="cfg-grupo">
+        <div class="cfg-titulo" data-acordeao="financedrive">📊 Finance Drive <span class="seta">▸</span></div>
+        <div class="cfg-conteudo" data-conteudo="financedrive">
+          <div id="estadoFD"></div>
+          <p class="cli-nota" style="margin-top:4px;">Mostra se o app Finance Drive está a ler os serviços que marcas como recebidos. Atualiza sozinho.</p>
+        </div>
+      </div>
+
+      <div class="cfg-grupo">
         <div class="cfg-titulo" data-acordeao="parceiros">🤝 Parceiros <span class="seta">▸</span></div>
         <div class="cfg-conteudo" data-conteudo="parceiros">
           <p class="cli-nota">O nome tem de ser igual ao que escreves em "Fornecedor" nos agendamentos (maiúsculas e acentos não importam). Com logo, a placa do aeroporto mostra a logo do parceiro; sem logo, a placa fica só com o nome do cliente. A placa dos teus clientes mostra a logo Trajeto.</p>
@@ -1652,8 +1682,10 @@
           <input type="text" id="ag_tourNome" maxlength="60" placeholder="ex: Sintra e Cascais">
           <label for="ag_tourDuracao" style="margin-top:14px;">Duração (opcional)</label>
           <input type="text" id="ag_tourDuracao" maxlength="40" placeholder="ex: Dia inteiro (8 h)">
-          <label for="ag_tourRoteiro" style="margin-top:14px;">Roteiro — uma paragem por linha</label>
-          <textarea id="ag_tourRoteiro" style="min-height:110px;" placeholder="Palácio da Pena, Sintra&#10;Cabo da Roca&#10;Cascais (almoço)"></textarea>
+          <label for="ag_tourRoteiro" style="margin-top:14px;">🗺️ Roteiro do tour — paragens</label>
+          <div class="rot-info"><span>💡</span><span>Escreva <b>uma paragem por linha</b>, pela ordem da visita (até 12). Cada linha vira um ponto no mapa e um botão de Waze. Junte a cidade se o nome for comum (ex: <i>Praia da Ursa, Sintra</i>). O que puser entre parênteses é só nota.</span></div>
+          <textarea id="ag_tourRoteiro" style="min-height:110px;" placeholder="Toque aqui e escreva as paragens…&#10;ex: Palácio da Pena, Sintra&#10;ex: Cabo da Roca"></textarea>
+          <div id="rotPrev"></div>
         </div>
 
         <div id="blocoParagensAg">
@@ -1815,7 +1847,7 @@
     <p class="nota">Os serviços por hora agendados ficam em "📅 Agendados". Os que estão em andamento aparecem a partir do momento em que tocas em "🚗 Ir buscar cliente" no agendamento. O tempo só começa a contar quando tocas em "▶️ Iniciar" (cliente no carro). Ao finalizar, o valor é calculado pela regra definida em "Minhas tarifas" e podes enviar o resumo ao cliente. O agendamento só sai da lista quando o marcares como "Concluído".</p>
   </div>
 
-  <p style="text-align:center; font-family:'Helvetica Neue', Arial, sans-serif; font-size:11px; color:#8a7f66; margin-top:24px;">Trajeto · v9.20.1</p>
+  <p style="text-align:center; font-family:'Helvetica Neue', Arial, sans-serif; font-size:11px; color:#8a7f66; margin-top:24px;">Trajeto · v9.21.0</p>
 
 </main>
 
@@ -2908,6 +2940,7 @@
       renderPedidos(pedidos);
     });
     if(window.TrajetoCloud.ligarOuvinteAvaliacoes) window.TrajetoCloud.ligarOuvinteAvaliacoes(aoReceberAvaliacoes);
+    if(window.TrajetoCloud.ligarOuvinteLigacaoFD) window.TrajetoCloud.ligarOuvinteLigacaoFD((d)=>{ estadoLigacaoFD = d; renderEstadoFD(); });
     renderAvaliacoesConfig();
     if(window.TrajetoCloud.utilizadorAtual.email === EMAIL_ADMIN){
       window.TrajetoCloud.publicarMotoristaPadrao(uid);
@@ -3352,6 +3385,7 @@
     document.getElementById('ag_tourNome').value = ag.tourNome || '';
     document.getElementById('ag_tourDuracao').value = ag.tourDuracao || '';
     document.getElementById('ag_tourRoteiro').value = (Array.isArray(ag.tourRoteiro) ? ag.tourRoteiro : []).join('\n');
+    if(typeof atualizarPreviewRoteiro === 'function') atualizarPreviewRoteiro();
     document.getElementById('ag_partida').value = ag.partida;
     document.getElementById('ag_chegada').value = ag.chegada;
     preencherParagensAgendar(ag.paragens || []);
@@ -4321,14 +4355,23 @@
   function gerarMensagemTour(ag){
     const dataFmt = ag.data.split('-').reverse().join('/');
     const nome = localStorage.getItem('trajeto_nome') || '';
-    const rot = (ag.tourRoteiro || []).map((r, i) => `${i + 1}. ${r}`).join('\n');
+    const roteiro = Array.isArray(ag.tourRoteiro) ? ag.tourRoteiro : [];
+    const rot = roteiro.map((r, i) => `${i + 1}. ${r}`).join('\n');
     const pax = (/^(\d+) passageiro/.exec(ag.observacoes || '') || [])[1];
+    // v9.21: duração numa linha própria; total de paragens; sem roteiro → "a combinar"; "Tour personalizado" em inglês = "Custom tour"
     if(idiomaOrcamento === 'en'){
       const assinaturaEN = nome ? `This is ${nome}` : 'This is your driver';
-      return `Hello ${ag.cliente}! 👋\n\n${assinaturaEN} — confirming the details of your tour:\n\n🗺️ ${ag.tourNome}${ag.tourDuracao ? ' (' + ag.tourDuracao + ')' : ''}\n📍 Pick-up: ${ag.partida}\n📅 Date: ${dataFmt}\n🕐 Start: ${ag.hora}${pax ? '\n👥 ' + pax + ' passengers' : ''}${ehAeroporto(ag.partida) || !linhaCarro(true) ? '' : '\n' + linhaCarro(true).trim()}${rot ? '\n\nItinerary:\n' + rot : ''}\n\n💰 Price: €${ag.valor}\n\nCould you please confirm this service? Thank you! 🚗`;
+      const nomeTourEN = /^tour personalizado$/i.test((ag.tourNome || '').trim()) ? 'Custom tour' : (ag.tourNome || 'Tour');
+      const blocoRotEN = roteiro.length
+        ? `\n\n📌 Itinerary (${roteiro.length} ${roteiro.length === 1 ? 'stop' : 'stops'}):\n${rot}`
+        : `\n\n📌 Itinerary: to be agreed with you — tell me the places you'd like to visit and I'll plan the route.`;
+      return `Hello ${ag.cliente}! 👋\n\n${assinaturaEN} — confirming the details of your tour:\n\n🗺️ ${nomeTourEN}${ag.tourDuracao ? '\n⏱️ Duration: ' + ag.tourDuracao : ''}\n📍 Pick-up: ${ag.partida}\n📅 Date: ${dataFmt}\n🕐 Start: ${ag.hora}${pax ? '\n👥 ' + pax + ' passengers' : ''}${ehAeroporto(ag.partida) || !linhaCarro(true) ? '' : '\n' + linhaCarro(true).trim()}${blocoRotEN}\n\n💰 Price: €${ag.valor}\n\nCould you please confirm this service? Thank you! 🚗`;
     }
     const assinatura = nome ? `Aqui é o ${nome}` : 'Aqui é o teu motorista';
-    return `Olá ${ag.cliente}! 👋\n\n${assinatura} — confirmo os dados do seu tour:\n\n🗺️ ${ag.tourNome}${ag.tourDuracao ? ' (' + ag.tourDuracao + ')' : ''}\n📍 Recolha: ${ag.partida}\n📅 Data: ${dataFmt}\n🕐 Início: ${ag.hora}${pax ? '\n👥 ' + pax + ' passageiros' : ''}${ehAeroporto(ag.partida) || !linhaCarro(false) ? '' : '\n' + linhaCarro(false).trim()}${rot ? '\n\nRoteiro:\n' + rot : ''}\n\n💰 Valor: €${ag.valor}\n\nPode confirmar este serviço, por favor? Obrigado! 🚗`;
+    const blocoRot = roteiro.length
+      ? `\n\n📌 Roteiro (${roteiro.length} ${roteiro.length === 1 ? 'paragem' : 'paragens'}):\n${rot}`
+      : `\n\n📌 Roteiro: a combinar consigo — diga-me os locais que gostaria de visitar e eu monto o percurso.`;
+    return `Olá ${ag.cliente}! 👋\n\n${assinatura} — confirmo os dados do seu tour:\n\n🗺️ ${ag.tourNome}${ag.tourDuracao ? '\n⏱️ Duração: ' + ag.tourDuracao : ''}\n📍 Recolha: ${ag.partida}\n📅 Data: ${dataFmt}\n🕐 Início: ${ag.hora}${pax ? '\n👥 ' + pax + ' passageiros' : ''}${ehAeroporto(ag.partida) || !linhaCarro(false) ? '' : '\n' + linhaCarro(false).trim()}${blocoRot}\n\n💰 Valor: €${ag.valor}\n\nPode confirmar este serviço, por favor? Obrigado! 🚗`;
   }
   function renderTours(){
     const todos = lerAgendamentos().filter(a => a.tipo === 'tour');
@@ -4355,7 +4398,7 @@
       const botoesParagens = rot.map((r, i) => `<button class="ag-btn-paragem" data-acao="tourParagem" data-idx="${i}">📍 ${i + 1} · ${escHtml(paragemParaWaze(r))}</button>`).join('');
       return `
       <div class="ag-item ${ag.realizado ? 'ag-item-realizado' : ''}" data-id="${escHtml(ag.id)}">
-        <div class="ag-trajeto">${colQuando(ag)}<span class="ag-cab"><span class="ag-linha-cliente">${escHtml(ag.cliente)}</span><span class="ag-linha-rota">🗺️ ${escHtml(ag.tourNome || 'Tour')}${ag.tourDuracao ? ' · ' + escHtml(ag.tourDuracao) : ''}</span></span><span class="ag-estado">${ag.realizado ? '<span class="ag-badge-ok">✔ Concluído</span>' : '<span class="ag-badge-agendado">📅 Agendado</span>'}${seloPagamento}${seloPrevisao(ag)}${seloAvaliacao(ag)}</span><span class="ag-seta">▸</span></div>
+        <div class="ag-trajeto">${colQuando(ag)}<span class="ag-cab"><span class="ag-linha-cliente">${escHtml(ag.cliente)}</span><span class="ag-linha-rota">🗺️ ${escHtml(ag.tourNome || 'Tour')}${ag.tourDuracao ? ' · ' + escHtml(ag.tourDuracao) : ''}</span></span><span class="ag-estado">${ag.realizado ? '<span class="ag-badge-ok">✔ Concluído</span>' : (seloCorrida(ag) || '<span class="ag-badge-agendado">📅 Agendado</span>')}${(!ag.realizado && !(Array.isArray(ag.tourRoteiro) && ag.tourRoteiro.length)) ? '<span class="ag-badge-semrot">⚠️ Sem roteiro</span>' : ''}${seloPagamento}${seloPrevisao(ag)}${seloAvaliacao(ag)}</span><span class="ag-seta">▸</span></div>
         <div class="ag-detalhes">
         <div class="ag-meta">
           📅 ${escHtml(ag.data.split('-').reverse().join('/'))} às ${escHtml(ag.hora)}${ag.tourDuracao ? ' · ⏱ ' + escHtml(ag.tourDuracao) : ''}<br>
@@ -4741,6 +4784,82 @@
     const f = parseInt(ag.corridaFase, 10) || 0;
     return f === 1 ? '<span class="ag-badge-corrida">🚗 A caminho</span>' : f === 2 ? '<span class="ag-badge-corrida">▶ Em viagem</span>' : '';
   }
+
+  // =====================================================================
+  //  v9.21: estado da ligação ao Finance Drive (só mostra; nada aqui mexe em dados)
+  //  O Finance Drive grava em trajeto_ligacoes/{uid}: { financeDrive: { ligado, ultimaLeitura, servicosMes, mes } }
+  // =====================================================================
+  let estadoLigacaoFD = null;
+  function infoEstadoFD(){
+    const f = estadoLigacaoFD && estadoLigacaoFD.financeDrive;
+    if(!window.TrajetoCloud || !window.TrajetoCloud.utilizadorAtual) return { estado: 'nao' };   // sem sessão: nada no topo
+    if(!f || f.ligado === false || !f.ultimaLeitura) return { estado: 'nao' };
+    const agora = Date.now(), dias = Math.floor((agora - f.ultimaLeitura) / 86400000);
+    return { estado: dias >= 3 ? 'av' : 'ok', dias, ts: f.ultimaLeitura, servicosMes: (f.mes === hojeISO().slice(0, 7)) ? (parseInt(f.servicosMes, 10) || 0) : 0 };
+  }
+  function textoQuandoFD(ts){
+    const d = new Date(ts), hoje = hojeISO(), iso = `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`, hhmm = `${pad(d.getHours())}:${pad(d.getMinutes())}`;
+    if(iso === hoje) return `hoje às ${hhmm}`;
+    if(iso === somarDias(hoje, -1)) return `ontem às ${hhmm}`;
+    return `${pad(d.getDate())}/${pad(d.getMonth()+1)} às ${hhmm}`;
+  }
+  function renderEstadoFD(){
+    const i = infoEstadoFD();
+    const pill = document.getElementById('btnEstadoFD'), txt = document.getElementById('estadoFDTxt');
+    if(pill){
+      pill.hidden = i.estado === 'nao';
+      pill.classList.toggle('fd-ok', i.estado === 'ok'); pill.classList.toggle('fd-av', i.estado === 'av');
+      txt.textContent = i.estado === 'av' ? `Finance Drive · ${i.dias} dias` : 'Finance Drive';
+      pill.setAttribute('aria-label', i.estado === 'ok' ? 'Ligado ao Finance Drive' : i.estado === 'av' ? `Finance Drive sem leitura há ${i.dias} dias` : '');
+    }
+    const el = document.getElementById('estadoFD'); if(!el) return;
+    if(!window.TrajetoCloud || !window.TrajetoCloud.utilizadorAtual){
+      el.innerHTML = '<div class="fd-card nao"><div class="fd-ic">🔗</div><div><b>Sem sessão</b><span>Entra com a tua conta para ver o estado da ligação ao Finance Drive.</span></div></div>';
+      return;
+    }
+    if(i.estado === 'nao'){
+      el.innerHTML = '<div class="fd-card nao"><div class="fd-ic">🔗</div><div><b>Não ligado</b><span>Para os serviços recebidos entrarem sozinhos no Finance Drive, liga-o em: Finance Drive → Configurações → Ligação ao Trajeto Transfer.</span></div></div>';
+    } else if(i.estado === 'av'){
+      el.innerHTML = `<div class="fd-card av"><div class="fd-ic">!</div><div><b>Sem leitura há ${i.dias} dias</b><span>Abre o Finance Drive para ele buscar os serviços recebidos.<br>Última leitura: ${textoQuandoFD(i.ts)}</span></div></div>`;
+    } else {
+      el.innerHTML = `<div class="fd-card ok"><div class="fd-ic">✓</div><div><b>Ligado ao Finance Drive</b><span>Última leitura: ${textoQuandoFD(i.ts)}<br>${i.servicosMes === 1 ? '1 serviço levado este mês' : `${i.servicosMes} serviços levados este mês`}</span></div></div>`;
+    }
+  }
+  document.getElementById('btnEstadoFD').addEventListener('click', ()=>{
+    document.getElementById('btnConfig').click();
+    setTimeout(()=>{
+      const t = document.querySelector('[data-acordeao="financedrive"]'), c = document.querySelector('[data-conteudo="financedrive"]');
+      if(t && c && !c.classList.contains('aberto') && getComputedStyle(c).display === 'none') t.click();
+      if(t) t.scrollIntoView({ behavior:'smooth', block:'center' });
+    }, 80);
+  });
+  setInterval(renderEstadoFD, 60000);
+  renderEstadoFD();
+
+  // =====================================================================
+  //  v9.21: roteiro do tour mais claro no formulário (só ajuda visual; o que se guarda não muda)
+  // =====================================================================
+  function atualizarPreviewRoteiro(){
+    const ta = document.getElementById('ag_tourRoteiro'), el = document.getElementById('rotPrev'); if(!ta || !el) return;
+    const linhas = lerRoteiroTexto(ta.value);
+    el.innerHTML = '';
+    if(!linhas.length){
+      const a = document.createElement('div'); a.className = 'rot-aviso'; a.textContent = '⚠️ Ainda sem paragens — o mapa e o Waze só terão a recolha.'; el.appendChild(a); return;
+    }
+    const box = document.createElement('div'); box.className = 'rot-prev';
+    linhas.forEach((t, i)=>{
+      const d = document.createElement('div'); d.className = 'rp';
+      const b = document.createElement('b'); b.textContent = String(i + 1); d.appendChild(b);
+      const m = /^(.*?)(\s*\([^)]*\))?\s*$/.exec(t);
+      d.appendChild(document.createTextNode(m && m[1] ? m[1] : t));
+      if(m && m[2]){ const sm = document.createElement('small'); sm.textContent = ' ' + m[2].trim(); d.appendChild(sm); }
+      box.appendChild(d);
+    });
+    const tot = document.createElement('div'); tot.className = 'rot-tot';
+    tot.textContent = `✓ ${linhas.length} ${linhas.length === 1 ? 'paragem' : 'paragens'} · aparecem no mapa e no Waze por esta ordem`;
+    box.appendChild(tot); el.appendChild(box);
+  }
+  document.getElementById('ag_tourRoteiro').addEventListener('input', atualizarPreviewRoteiro);
 
   // ---------- Placar digital ----------
   let wakeLock = null;
@@ -5527,6 +5646,7 @@
     document.getElementById('ag_partida').value = '';
     document.getElementById('ag_chegada').value = '';
     ['ag_tourNome','ag_tourDuracao','ag_tourRoteiro'].forEach(id => { document.getElementById(id).value = ''; });
+    if(typeof atualizarPreviewRoteiro === 'function') atualizarPreviewRoteiro();
     limparParagensAgendar();
     document.getElementById('ag_cliente').value = '';
     document.getElementById('ag_telefone').value = '';
@@ -5546,6 +5666,7 @@
     document.getElementById('ag_partida').value = '';
     document.getElementById('ag_chegada').value = '';
     ['ag_tourNome','ag_tourDuracao','ag_tourRoteiro'].forEach(id => { document.getElementById(id).value = ''; });
+    if(typeof atualizarPreviewRoteiro === 'function') atualizarPreviewRoteiro();
     limparParagensAgendar();
     document.getElementById('ag_cliente').value = '';
     document.getElementById('ag_telefone').value = '';
@@ -5908,6 +6029,17 @@ if ('serviceWorker' in navigator) {
       return { ok: true };
     }catch(e){ return { ok: false, erro: (e && (e.code || e.message)) || 'erro-desconhecido' }; }
   }
+  // v9.21: recibo de leitura deixado pelo Finance Drive (trajeto_ligacoes/{uid}); só leitura aqui
+  let cancelarOuvinteLigacaoFD = null;
+  function ligarOuvinteLigacaoFD(aoReceber){
+    if(!auth.currentUser) return;
+    if(cancelarOuvinteLigacaoFD) cancelarOuvinteLigacaoFD();
+    try{
+      cancelarOuvinteLigacaoFD = onSnapshot(doc(db, 'trajeto_ligacoes', auth.currentUser.uid), (snap)=>{
+        aoReceber(snap.exists() ? snap.data() : null);
+      }, ()=>{ aoReceber(null); /* regra ainda não publicada: mostra "Não ligado" */ });
+    }catch(e){ aoReceber(null); }
+  }
   let cancelarOuvinteAvaliacoes = null;
   function ligarOuvinteAvaliacoes(aoReceber){
     if(!auth.currentUser) return;
@@ -5951,6 +6083,7 @@ if ('serviceWorker' in navigator) {
       if(cancelarOuvinte){ cancelarOuvinte(); cancelarOuvinte = null; }
       if(cancelarOuvintePedidos){ cancelarOuvintePedidos(); cancelarOuvintePedidos = null; }
       if(cancelarOuvinteAvaliacoes){ cancelarOuvinteAvaliacoes(); cancelarOuvinteAvaliacoes = null; }
+      if(cancelarOuvinteLigacaoFD){ cancelarOuvinteLigacaoFD(); cancelarOuvinteLigacaoFD = null; }
       return signOut(auth);
     },
     enviarParaNuvem,
@@ -5968,6 +6101,7 @@ if ('serviceWorker' in navigator) {
     removerApresentacao,
     criarLinkAvaliacao,
     ligarOuvinteAvaliacoes,
+    ligarOuvinteLigacaoFD,
     apagarAvaliacao,
     onAuthChange: (cb) => onAuthStateChanged(auth, cb),
     get utilizadorAtual(){ return auth.currentUser; }
