@@ -155,6 +155,11 @@
   .ver-apresentacao{
     display:block; text-align:center; margin-top:22px; font-size:13.5px; color:var(--azulejo); text-decoration:none; font-weight:600;
   }
+.fotos-extra{ display:flex; flex-wrap:wrap; gap:8px; margin-top:4px; }
+.fotos-extra .fx{ position:relative; width:72px; height:72px; border-radius:10px; overflow:hidden; border:1px solid var(--linha, #d9cdb2); background:#ebe3d3; }
+.fotos-extra .fx img{ width:100%; height:100%; object-fit:cover; display:block; }
+.fotos-extra .fx button{ position:absolute; top:3px; right:3px; width:24px; height:24px; border-radius:50%; border:none; background:rgba(13,27,42,.75); color:#fff; font-size:12px; cursor:pointer; padding:0; }
+.fotos-extra .fx-add{ font-size:26px; color:#6a7378; cursor:pointer; }
 </style>
 </head>
 <body>
@@ -822,6 +827,28 @@
         bt.appendChild(inp); bt.appendChild(esc);
         if(it.foto){ const rm = document.createElement('button'); rm.type = 'button'; rm.className = 'btn-remover'; rm.style.display = 'block'; rm.textContent = '✕'; rm.addEventListener('click', ()=>{ it.foto = ''; desenhar(); }); bt.appendChild(rm); }
         st.appendChild(prev); st.appendChild(bt); card.appendChild(st);
+        if(cfg.fotosExtra){
+          if(!Array.isArray(it.fotosExtra)) it.fotosExtra = [];
+          const lbx = document.createElement('label'); lbx.textContent = `Mais fotos (até ${cfg.fotosExtra}) — aparecem ao abrir o tour no site`; card.appendChild(lbx);
+          const fx = document.createElement('div'); fx.className = 'fotos-extra';
+          it.fotosExtra.forEach((f, k)=>{
+            const t = document.createElement('div'); t.className = 'fx';
+            const im = document.createElement('img'); im.src = f; im.alt = ''; t.appendChild(im);
+            const x = document.createElement('button'); x.type = 'button'; x.textContent = '✕'; x.setAttribute('aria-label', 'Remover foto');
+            x.addEventListener('click', ()=>{ it.fotosExtra.splice(k, 1); desenhar(); }); t.appendChild(x); fx.appendChild(t);
+          });
+          if(it.fotosExtra.length < cfg.fotosExtra){
+            const add = document.createElement('button'); add.type = 'button'; add.className = 'fx fx-add'; add.textContent = '+';
+            const ix = document.createElement('input'); ix.type = 'file'; ix.accept = 'image/*'; ix.style.display = 'none';
+            add.addEventListener('click', ()=> ix.click());
+            ix.addEventListener('change', async (e)=>{
+              const f = e.target.files[0]; e.target.value = ''; if(!f) return;
+              try{ it.fotosExtra.push(await comprimirFotoVitrine(f)); desenhar(); }catch(err){ alert('Não foi possível usar essa imagem. Tenta outra foto.'); }
+            });
+            fx.appendChild(add); fx.appendChild(ix);
+          }
+          card.appendChild(fx);
+        }
 
         cfg.campos.forEach(c=>{
           const lb = document.createElement('label'); lb.textContent = c.rotulo; card.appendChild(lb);
@@ -844,7 +871,7 @@
     }
     document.getElementById(cfg.btnAdd).addEventListener('click', ()=>{
       if(itens.length >= cfg.maximo) return;
-      itens.push({ foto:'', nome:'' }); desenhar();
+      itens.push(cfg.fotosExtra ? { id: novoIdTour(), foto:'', nome:'', fotosExtra:[] } : { foto:'', nome:'' }); desenhar();
       const cards = listaEl.querySelectorAll('.item-vit'); if(cards.length) cards[cards.length - 1].scrollIntoView({ behavior:'smooth', block:'center' });
     });
     document.getElementById(cfg.btnGuardar).addEventListener('click', async ()=>{
@@ -852,6 +879,7 @@
       okEl.style.display = 'none'; avisoEl.style.display = 'none';
       const limpos = itens.map(it => {
         const o = { foto: it.foto || '', nome: (it.nome || '').trim() };
+        if(cfg.fotosExtra){ o.id = it.id || novoIdTour(); it.id = o.id; o.nFotos = (it.fotosExtra || []).length; }
         cfg.campos.forEach(c => { if(c.chave === 'etiquetas') o.etiquetas = (it.etiquetas || []).slice(0, 3); else if(c.chave === 'roteiro') o.roteiro = (Array.isArray(it.roteiro) ? it.roteiro : []).slice(0, 12); else if(c.chave !== 'nome') o[c.chave] = (it[c.chave] || '').trim(); });
         return o;
       });
@@ -861,8 +889,15 @@
       const btn = document.getElementById(cfg.btnGuardar);
       btn.disabled = true; btn.textContent = 'A guardar...';
       try{
+        if(cfg.fotosExtra){
+          // primeiro as fotos extra de cada tour (cada uma no seu documento); tours apagados ficam sem fotos
+          const uidG = auth.currentUser.uid, vivos = new Set();
+          for(const it of itens){ vivos.add(it.id); await setDoc(doc(db, 'trajeto_publico', `${uidG}-tourfotos-${it.id}`), { fotos: (it.fotosExtra || []).slice(0, cfg.fotosExtra), atualizadoEm: Date.now() }); }
+          for(const idv of idsCarregados){ if(!vivos.has(idv)) await setDoc(doc(db, 'trajeto_publico', `${uidG}-tourfotos-${idv}`), { fotos: [], atualizadoEm: Date.now() }); }
+          idsCarregados = vivos;
+        }
         await setDoc(doc(db, 'trajeto_publico', auth.currentUser.uid + cfg.sufixo), { itens: limpos, atualizadoEm: Date.now() });
-        itens = limpos.map(o => Object.assign({}, o));
+        itens = limpos.map((o, k) => Object.assign({}, o, cfg.fotosExtra ? { fotosExtra: itens[k].fotosExtra || [] } : {}));
         okEl.textContent = '✅ Guardado! O site de pedidos já mostra a versão nova.';
         okEl.style.display = 'block';
       }catch(err){
@@ -872,22 +907,35 @@
       btn.disabled = false; btn.textContent = 'Guardar';
       desenhar();
     });
+    let idsCarregados = new Set();
     return {
-      carregar(dados){ itens = (Array.isArray(dados && dados.itens) ? dados.itens : []).map(o => Object.assign({}, o)); desenhar(); }
+      carregar(dados, fotosPorId){
+        itens = (Array.isArray(dados && dados.itens) ? dados.itens : []).map(o => Object.assign({}, o));
+        if(cfg.fotosExtra){ itens.forEach(it => { if(!it.id) it.id = novoIdTour(); it.fotosExtra = (fotosPorId && fotosPorId[it.id]) || []; }); idsCarregados = new Set(itens.map(it => it.id)); }
+        desenhar();
+      },
+      itens(){ return itens; }
     };
   }
+  function novoIdTour(){ return 't' + Date.now().toString(36) + Math.random().toString(36).slice(2, 7); }
   const listaDestinos = criarListaVitrine({ lista:'listaDestinos', btnAdd:'btnAddDestino', btnGuardar:'btnGuardarDestinos', sufixo:'-destinos', maximo:10, rotulo:'Destino',
     campos:[ { chave:'nome', rotulo:'Nome do destino *', max:30, placeholder:'ex: Sintra' }, { chave:'sub', rotulo:'Frase curta (opcional)', max:40, placeholder:'ex: Palácios e serra' } ] });
-  const listaTours = criarListaVitrine({ lista:'listaTours', btnAdd:'btnAddTour', btnGuardar:'btnGuardarTours', sufixo:'-tours', maximo:6, rotulo:'Tour',
-    campos:[ { chave:'nome', rotulo:'Nome do tour *', max:40, placeholder:'ex: Sintra e Cascais' }, { chave:'texto', rotulo:'Frase curta (opcional)', tipo:'area', max:120, placeholder:'ex: Palácios na serra e regresso pela costa.' }, { chave:'etiquetas', rotulo:'Etiquetas, separadas por vírgula (até 3)', max:80, placeholder:'ex: Até 6 pax' },
+  const listaTours = criarListaVitrine({ lista:'listaTours', btnAdd:'btnAddTour', btnGuardar:'btnGuardarTours', sufixo:'-tours', maximo:6, rotulo:'Tour', fotosExtra:3,
+    campos:[ { chave:'nome', rotulo:'Nome do tour * (curto: aparece no cartão)', max:40, placeholder:'ex: Nazaré, Óbidos & Ericeira' }, { chave:'texto', rotulo:'Frase curta (opcional)', tipo:'area', max:120, placeholder:'ex: Ondas gigantes, vila medieval e mar.' }, { chave:'etiquetas', rotulo:'Etiquetas — palavras curtas, separadas por vírgula (até 3)', max:80, placeholder:'ex: Saída de Lisboa, Até 6 pax' },
       { chave:'duracao', rotulo:'Duração (opcional)', max:40, placeholder:'ex: Dia inteiro (8 h)' },
       { chave:'roteiro', rotulo:'Roteiro — uma paragem por linha', tipo:'area', linhas:true, max:900, placeholder:'Palácio da Pena, Sintra\nCabo da Roca\nCascais (almoço)',
-        dica:'Aparece numerado no site e no app, e cada linha vira um botão do Waze. Escreve nomes que o Waze conheça (ex: "Palácio da Pena, Sintra"); o que estiver entre parênteses não entra na pesquisa do Waze, por isso serve para notas como "(almoço)". Até 12 paragens.' } ] });
+        dica:'Aparece numerado no site e no app, e cada linha vira um botão do Waze. Escreve nomes que o Waze conheça (ex: "Palácio da Pena, Sintra"); o que estiver entre parênteses não entra na pesquisa do Waze, por isso serve para notas como "(almoço)". Até 12 paragens.' },
+      { chave:'descricao', rotulo:'Descrição — aparece ao abrir o tour no site', tipo:'area', linhas:true, max:1500, placeholder:'ex: A temporada das ondas gigantes está a chegar! 🌊\n\nDe novembro a março…', dica:'Pode usar emojis e linhas em branco: aparecem tal como escreve. O roteiro e o botão de WhatsApp já aparecem na janela, não precisa de os repetir aqui.' },
+      { chave:'descricaoEn', rotulo:'Descrição em inglês (opcional — sem ela, mostra a portuguesa)', tipo:'area', linhas:true, max:1500, placeholder:'ex: The giant wave season is coming! 🌊' } ] });
   async function carregarVitrine(uid){
     try{
       const [sd, st] = await Promise.all([ getDoc(doc(db, 'trajeto_publico', uid + '-destinos')), getDoc(doc(db, 'trajeto_publico', uid + '-tours')) ]);
       listaDestinos.carregar(sd.exists() ? sd.data() : {});
-      listaTours.carregar(st.exists() ? st.data() : {});
+      const dt = st.exists() ? st.data() : {};
+      const comFotos = (Array.isArray(dt.itens) ? dt.itens : []).filter(t => t && t.id && t.nFotos > 0);
+      const fotosPorId = {};
+      await Promise.all(comFotos.map(async t => { try{ const sf = await getDoc(doc(db, 'trajeto_publico', `${uid}-tourfotos-${t.id}`)); if(sf.exists()) fotosPorId[t.id] = (sf.data().fotos || []).slice(0, 3); }catch(e){} }));
+      listaTours.carregar(dt, fotosPorId);
     }catch(e){ listaDestinos.carregar({}); listaTours.carregar({}); }
   }
 
