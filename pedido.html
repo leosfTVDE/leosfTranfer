@@ -437,6 +437,40 @@
   .rod-pag > span > span{ background:none; border:none; padding:0; }
   .barra{ background:rgba(11,25,44,.96) !important; border-top:1px solid rgba(197,160,89,.4); }
   @media (min-width:760px){ .intro{ padding:40px 20px 34px; } }
+
+  /* ===== v9.17: janela de detalhes do tour ===== */
+  body.sem-scroll{ overflow:hidden; }
+  .tcard .ver-det{ display:inline-block; margin-top:9px; font-size:11.5px; font-weight:800; letter-spacing:.12em; text-transform:uppercase; color:var(--ouro3, #a8823f); }
+  .tdet{ position:fixed; inset:0; z-index:200; display:flex; align-items:flex-end; justify-content:center; }
+  .tdet[hidden]{ display:none !important; }
+  .tdet-fundo{ position:absolute; inset:0; background:rgba(11,25,44,.6); }
+  .tdet-folha{ position:relative; width:100%; max-width:560px; max-height:calc(100% - 24px); display:flex; flex-direction:column; overflow:hidden; background:#FBFAF7; border-radius:20px 20px 0 0; box-shadow:0 -10px 40px rgba(0,0,0,.25); }
+  .tdet-rolo{ flex:1 1 auto; min-height:0; overflow-y:auto; -webkit-overflow-scrolling:touch; overscroll-behavior:contain; }
+  @media (min-width:640px){ .tdet{ align-items:center; } .tdet-folha{ border-radius:20px; max-height:calc(100% - 48px); } }
+  .tdet-fotos{ display:flex; overflow-x:auto; scroll-snap-type:x mandatory; aspect-ratio:16/10; background:#0B192C; scrollbar-width:none; }
+  .tdet-fotos::-webkit-scrollbar{ display:none; }
+  .tdet-fotos img{ flex:0 0 100%; width:100%; height:100%; object-fit:cover; scroll-snap-align:start; display:block; }
+  .tdet-fotos.sem{ aspect-ratio:auto; height:56px; }
+  .tdet-pontos{ display:flex; gap:5px; justify-content:center; margin-top:-22px; position:relative; height:22px; align-items:center; pointer-events:none; }
+  .tdet-pontos i{ width:7px; height:7px; border-radius:4px; background:rgba(255,255,255,.6); transition:width .2s; }
+  .tdet-pontos i.on{ width:18px; background:#fff; }
+  .tdet-x{ position:absolute; z-index:2; top:12px; right:12px; width:38px; height:38px; border-radius:50%; border:none; background:rgba(11,25,44,.7); color:#fff; font-size:17px; cursor:pointer; }
+  .tdet-corpo{ padding:18px 18px 22px; }
+  .tdet-corpo h2{ margin:0; font-family:var(--serif, Georgia, serif); font-weight:500; font-size:25px; line-height:1.2; color:var(--azul-noite); }
+  .tdet-frase{ margin:5px 0 0; color:#5d6873; font-size:14.5px; }
+  .tdet-tags{ display:flex; flex-wrap:wrap; gap:6px; margin-top:12px; }
+  .tdet-tags span{ font-size:12px; padding:5px 10px; border-radius:999px; background:#f6f0e3; border:1px solid var(--borda); color:#7a5d26; font-weight:700; }
+  .tdet-sep{ width:36px; height:1.5px; background:var(--ouro, #C5A059); margin:16px 0; }
+  .tdet-desc{ white-space:pre-line; font-size:14.5px; line-height:1.6; color:#36414c; overflow-wrap:anywhere; }
+  .tdet-rot{ margin-top:18px; background:#fff; border:1px solid var(--borda); border-radius:12px; padding:14px; box-shadow:0 4px 20px rgba(0,0,0,.05); }
+  .tdet-rot b{ font-size:12px; letter-spacing:.14em; text-transform:uppercase; color:var(--ouro3, #a8823f); }
+  .tdet-rot ol{ list-style:none; counter-reset:r; margin:6px 0 0; padding:0; }
+  .tdet-rot li{ counter-increment:r; display:flex; gap:10px; align-items:center; margin-top:9px; font-size:14.5px; color:var(--azul-noite); }
+  .tdet-rot li::before{ content:counter(r); width:24px; height:24px; border-radius:50%; background:var(--azul-noite); color:var(--ouro2, #E2C68A); display:flex; align-items:center; justify-content:center; font-size:12px; flex-shrink:0; }
+  .tdet-acoes{ flex:0 0 auto; display:flex; gap:10px; padding:12px 14px calc(14px + env(safe-area-inset-bottom)); background:#fff; border-top:1px solid var(--borda); }
+  .tdet-cot{ flex:1; padding:15px 10px; border:none; border-radius:12px; background:linear-gradient(135deg,#D9B874,#B88E46); color:#1a1408; font-family:var(--ui); font-weight:800; letter-spacing:.06em; text-transform:uppercase; font-size:13px; cursor:pointer; box-shadow:0 8px 22px rgba(197,160,89,.3); }
+  .tdet-wa{ width:54px; border-radius:12px; background:#25D366; display:flex; align-items:center; justify-content:center; font-size:22px; text-decoration:none; }
+  .tdet-wa[hidden]{ display:none; }
 </style>
 </head>
 <body>
@@ -720,8 +754,31 @@
   <div class="rod-pag" id="rodPag"><span>🔒 <span data-i18n="rod_https">Ligação segura (HTTPS)</span></span></div>
   <p class="rodape-priv"><a href="privacidade.html" data-i18n="priv_link">Política de privacidade</a></p>
   <p class="copy">Trajeto Transfer · Lisboa</p>
-  <p class="versao">v9.16.0</p>
+  <p class="versao">v9.17.0</p>
 </footer>
+
+<div class="tdet" id="tourDet" hidden role="dialog" aria-modal="true" aria-labelledby="tdetNome">
+  <div class="tdet-fundo" data-fechar-tour></div>
+  <div class="tdet-folha">
+    <button type="button" class="tdet-x" data-fechar-tour aria-label="Fechar">✕</button>
+    <div class="tdet-rolo">
+    <div class="tdet-fotos" id="tdetFotos"></div>
+    <div class="tdet-pontos" id="tdetPontos"></div>
+    <div class="tdet-corpo">
+      <h2 id="tdetNome"></h2>
+      <p class="tdet-frase" id="tdetFrase" hidden></p>
+      <div class="tdet-tags" id="tdetTags"></div>
+      <div class="tdet-sep"></div>
+      <div class="tdet-desc" id="tdetDesc" hidden></div>
+      <div class="tdet-rot" id="tdetRot" hidden><b data-i18n="tdet_roteiro">Roteiro</b><ol id="tdetRotLista"></ol></div>
+    </div>
+    </div>
+    <div class="tdet-acoes">
+      <button type="button" class="tdet-cot" id="tdetCotar" data-i18n="tdet_cotar">Pedir cotação deste tour</button>
+      <a class="tdet-wa" id="tdetWa" href="#" target="_blank" rel="noopener" aria-label="WhatsApp" hidden>💬</a>
+    </div>
+  </div>
+</div>
 
 <div class="barra" id="barraFixa">
   <div class="barra-interna">
@@ -779,6 +836,7 @@
       hora_inicio: 'Hora de início',
       recolha_em: 'recolha em {r}',
       priv_nota: 'Os seus dados são usados apenas para tratar o seu pedido.',
+      tdet_roteiro: 'Roteiro', tdet_cotar: 'Pedir cotação deste tour', tdet_ver: 'Ver detalhes', tdet_wa: 'Olá! Tenho interesse no tour "{t}".',
       intro_sub: 'Motorista privado, viatura executiva e preço fechado.',
       rod_https: 'Ligação segura (HTTPS)', aval_cab: '{n} avaliações', aval_cab1: '1 avaliação', aval_verificado: '✓ Cliente verificado', legal_licenca: 'Registo / licença', legal_nif: 'NIF', legal_livro: 'Livro de Reclamações', aval_google: 'Também no Google',
       priv_link: 'Política de privacidade',
@@ -932,6 +990,7 @@
       hora_inicio: 'Start time',
       recolha_em: 'pick-up at {r}',
       priv_nota: 'Your data is only used to handle your request.',
+      tdet_roteiro: 'Itinerary', tdet_cotar: 'Request a quote for this tour', tdet_ver: 'See details', tdet_wa: 'Hello! I am interested in the tour "{t}".',
       intro_sub: 'Private driver, executive car and fixed price.',
       rod_https: 'Secure connection (HTTPS)', aval_cab: '{n} reviews', aval_cab1: '1 review', aval_verificado: '✓ Verified customer', legal_licenca: 'Registration / licence', legal_nif: 'VAT no.', legal_livro: 'Complaints Book', aval_google: 'Also on Google',
       priv_link: 'Privacy policy',
@@ -1469,8 +1528,58 @@
   });
   document.getElementById('toursCarr').addEventListener('click', (e)=>{
     const b = e.target.closest('[data-tour]');
-    if(b) abrirTour(b.dataset.tour);
+    if(b) abrirDetalheTour(b.dataset.tour);
   });
+  // ---- v9.17: janela de detalhes do tour (fotos, descrição, roteiro) ----
+  let tourDetAberto = null, tourDetUltimoFoco = null;
+  function abrirDetalheTour(nome){
+    const t = toursPublicados.find(x => x.nome === nome);
+    if(!t){ abrirTour(nome); return; }
+    tourDetAberto = t; tourDetUltimoFoco = document.activeElement;
+    desenharDetalheTour();
+    const box = document.getElementById('tourDet'); box.hidden = false; document.body.classList.add('sem-scroll');
+    box.querySelector('.tdet-rolo').scrollTop = 0; document.getElementById('tdetFotos').scrollLeft = 0;
+    setTimeout(()=> box.querySelector('.tdet-x').focus(), 30);
+    if(t.id && t.nFotos > 0 && !t.fotosExtra && typeof window.buscarFotosTour === 'function'){
+      window.buscarFotosTour(t.id).then(f => { t.fotosExtra = f; if(tourDetAberto === t) desenharFotosDetalhe(); }).catch(()=>{ t.fotosExtra = []; });
+    }
+  }
+  function fecharDetalheTour(){
+    document.getElementById('tourDet').hidden = true; document.body.classList.remove('sem-scroll'); tourDetAberto = null;
+    if(tourDetUltimoFoco && tourDetUltimoFoco.focus) tourDetUltimoFoco.focus();
+  }
+  function desenharFotosDetalhe(){
+    const t = tourDetAberto; if(!t) return;
+    const fotos = [fotoSegura(t.foto)].concat((t.fotosExtra || []).map(fotoSegura)).filter(Boolean);
+    const cx = document.getElementById('tdetFotos'), pt = document.getElementById('tdetPontos'); cx.innerHTML = ''; pt.innerHTML = '';
+    if(!fotos.length){ cx.classList.add('sem'); return; } cx.classList.remove('sem');
+    fotos.forEach((src, i)=>{ const im = el('img'); im.src = src; im.alt = ''; im.loading = i ? 'lazy' : 'eager'; cx.appendChild(im); if(fotos.length > 1) pt.appendChild(el('i', i ? '' : 'on')); });
+  }
+  function desenharDetalheTour(){
+    const t = tourDetAberto; if(!t) return; const tt = tx();
+    desenharFotosDetalhe();
+    document.getElementById('tdetNome').textContent = t.nome;
+    const fr = document.getElementById('tdetFrase'); fr.textContent = t.texto || ''; fr.hidden = !t.texto;
+    const tg = document.getElementById('tdetTags'); tg.innerHTML = '';
+    if(t.duracao) tg.appendChild(el('span', '', '⏱ ' + t.duracao));
+    (t.etiquetas || []).forEach(x => tg.appendChild(el('span', '', x)));
+    const desc = (idiomaAtual === 'en' && t.descricaoEn) ? t.descricaoEn : t.descricao;
+    const dd = document.getElementById('tdetDesc'); dd.textContent = desc || ''; dd.hidden = !desc;
+    const rl = document.getElementById('tdetRotLista'); rl.innerHTML = '';
+    (t.roteiro || []).forEach(r => rl.appendChild(el('li', '', r)));
+    document.getElementById('tdetRot').hidden = !(t.roteiro || []).length;
+    const fw = document.getElementById('footerWhatsapp'), wa = document.getElementById('tdetWa');
+    const base = fw && fw.style.display !== 'none' ? fw.getAttribute('href') : '';
+    if(base && /^https:\/\/wa\.me\/\d+$/.test(base)){ wa.href = base + '?text=' + encodeURIComponent(tt.tdet_wa.replace('{t}', t.nome)); wa.hidden = false; } else wa.hidden = true;
+  }
+  document.getElementById('tdetFotos').addEventListener('scroll', (e)=>{
+    const c = e.currentTarget, i = Math.round(c.scrollLeft / Math.max(1, c.clientWidth));
+    document.querySelectorAll('#tdetPontos i').forEach((p, k) => p.classList.toggle('on', k === i));
+  }, { passive:true });
+  document.getElementById('tourDet').addEventListener('click', (e)=>{ if(e.target.closest('[data-fechar-tour]')) fecharDetalheTour(); });
+  document.addEventListener('keydown', (e)=>{ if(e.key === 'Escape' && tourDetAberto) fecharDetalheTour(); });
+  document.getElementById('tdetCotar').addEventListener('click', ()=>{ const n = tourDetAberto && tourDetAberto.nome; fecharDetalheTour(); if(n) abrirTour(n); });
+  document.getElementById('langSwitch').querySelectorAll('button').forEach(btn => btn.addEventListener('click', ()=>{ if(tourDetAberto) setTimeout(desenharDetalheTour, 0); }));
   document.getElementById('servicosSecao').addEventListener('click', (e)=>{
     const b = e.target.closest('[data-servico]');
     if(b){ prefillAtual = null; abrirComTipo(b.dataset.servico); }
@@ -1671,6 +1780,9 @@
     }
     const tours = (Array.isArray(docTours.itens) ? docTours.itens : []).filter(t => t && typeof t.nome === 'string' && t.nome.trim());
     toursPublicados = tours.map(t => ({ nome: t.nome.trim().slice(0, 40), texto: typeof t.texto === 'string' ? t.texto : '', foto: t.foto,
+      id: (typeof t.id === 'string' && /^[a-z0-9]{4,24}$/.test(t.id)) ? t.id : '', nFotos: Math.min(3, parseInt(t.nFotos, 10) || 0),
+      descricao: typeof t.descricao === 'string' ? t.descricao.trim().slice(0, 1500) : '', descricaoEn: typeof t.descricaoEn === 'string' ? t.descricaoEn.trim().slice(0, 1500) : '',
+      etiquetas: (Array.isArray(t.etiquetas) ? t.etiquetas : []).filter(x => typeof x === 'string' && x.trim()).slice(0, 3).map(x => x.trim().slice(0, 24)),
       duracao: typeof t.duracao === 'string' ? t.duracao.trim().slice(0, 40) : '',
       roteiro: (Array.isArray(t.roteiro) ? t.roteiro : []).filter(r => typeof r === 'string' && r.trim()).slice(0, 12).map(r => r.trim().slice(0, 60)) }));
     if(tourEscolhido === 'perso' && toursPublicados.length && tipoPedido !== 'tour') tourEscolhido = null;
@@ -1684,6 +1796,7 @@
         const tc = el('div', 'tc'); tc.appendChild(el('b', '', t.nome.trim())); if(t.texto) tc.appendChild(el('p', '', t.texto));
         const etq = (Array.isArray(t.etiquetas) ? t.etiquetas : []).filter(x => typeof x === 'string' && x.trim());
         if(etq.length){ const pl = el('div', 'pills'); etq.forEach(x => pl.appendChild(el('span', '', x.trim()))); tc.appendChild(pl); }
+        const vd = el('span', 'ver-det'); vd.appendChild(el('span', 'txt-vd', tx().tdet_ver)); vd.appendChild(document.createTextNode(' →')); tc.appendChild(vd);
         b.appendChild(ft); b.appendChild(tc); carr.appendChild(b);
       });
       document.getElementById('toursIdeias').hidden = false;
@@ -1868,6 +1981,13 @@
     }catch(e){ /* sem número disponível — o botão fica escondido, sem problema */ }
   })();
 
+  // v9.17: fotos extra de um tour (documento próprio, só lido quando o cliente abre o tour)
+  window.buscarFotosTour = async (id)=>{
+    if(!/^[a-z0-9]{4,24}$/.test(id || '')) return [];
+    const uid = await resolucaoMotorista; if(!uid) return [];
+    const sf = await getDoc(doc(db, 'trajeto_publico', `${uid}-tourfotos-${id}`));
+    return sf.exists() ? (Array.isArray(sf.data().fotos) ? sf.data().fotos : []).slice(0, 3) : [];
+  };
   // ---------- Vitrine: destinos e ideias de tour (geridos no galeria.html) e avaliações ----------
   // Tudo isto é só leitura e corre à parte: se falhar, o resto do site (e o envio de pedidos) continua igual.
   (async ()=>{
