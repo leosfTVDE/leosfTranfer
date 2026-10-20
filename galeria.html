@@ -1047,6 +1047,17 @@
   ];
   let textosAtuais = { pt:{}, en:{} };
   let motoristaAtual = { nome:'', foto:'', bio:{ pt:'', en:'' } };
+  let legalAtual = {};
+  const CAMPOS_LEGAL = [
+    ['licenca', 'Registo / licença', 'ex: RNAAT n.º 000/0000', 80, 'Aparece no rodapé e como selo 🛡 no topo. Só ponha um número que o negócio esteja autorizado a usar.'],
+    ['nif', 'NIF', 'ex: 123 456 789', 30, ''],
+    ['livro', 'Link do Livro de Reclamações', 'https://www.livroreclamacoes.pt', 300, ''],
+    ['googleNota', 'Nota no Google', 'ex: 4,9', 4, 'Só preencha quando o Perfil do Google tiver avaliações. Aparece na secção de avaliações, com o link.'],
+    ['googleTotal', 'N.º de avaliações no Google', 'ex: 25', 6, ''],
+    ['googleLink', 'Link do Perfil do Google', 'https://g.page/…', 300, ''],
+    ['instagram', 'Instagram', '@trajeto.transfer', 40, ''],
+    ['pagamentos', 'Formas de pagamento (separadas por vírgula)', 'ex: MB WAY, Cartão, Dinheiro', 120, 'Aparecem no rodapé, ao lado de "Ligação segura".']
+  ];
   const linguaBloco = {};
   function desenharTextos(){
     const cont = document.getElementById('blocosTextos'); cont.innerHTML = '';
@@ -1095,6 +1106,16 @@
     bio.placeholder = lang === 'pt' ? 'ex: Sou motorista em Lisboa há 3 anos…' : 'e.g. I have been a driver in Lisbon for 3 years…';
     bio.addEventListener('input', ()=>{ motoristaAtual.bio[lang] = bio.value; }); card.appendChild(bio);
     cont.appendChild(card);
+    // ---- v9.16: registo, licença e confiança (o que ficar vazio não aparece no site) ----
+    const cl = document.createElement('div'); cl.className = 'tx-card';
+    cl.innerHTML = '<h3>⚖️ Registo, licença e confiança</h3><p class="onde">Rodapé, selo do topo e avaliações do Google. O que ficar vazio não aparece no site.</p>';
+    CAMPOS_LEGAL.forEach(([k, rot, ph, max, dica])=>{
+      const lb2 = document.createElement('label'); lb2.textContent = rot; cl.appendChild(lb2);
+      const inp2 = document.createElement('input'); inp2.type = 'text'; inp2.maxLength = max; inp2.placeholder = ph; inp2.value = legalAtual[k] || ''; inp2.dataset.legal = k;
+      inp2.addEventListener('input', ()=>{ legalAtual[k] = inp2.value; }); cl.appendChild(inp2);
+      if(dica){ const d = document.createElement('p'); d.className = 'onde'; d.style.margin = '4px 0 0'; d.textContent = dica; cl.appendChild(d); }
+    });
+    cont.appendChild(cl);
   }
   document.getElementById('btnGuardarTextos').addEventListener('click', async ()=>{
     const okEl = document.getElementById('mensagemOk'), avisoEl = document.getElementById('avisoTamanho');
@@ -1103,6 +1124,7 @@
     const dados = {
       blocos: { pt: limpar(textosAtuais.pt), en: limpar(textosAtuais.en) },
       motorista: { nome: (motoristaAtual.nome || '').trim(), foto: motoristaAtual.foto || '', bio: { pt: (motoristaAtual.bio.pt || '').trim(), en: (motoristaAtual.bio.en || '').trim() } },
+      legal: limpar(legalAtual),
       atualizadoEm: Date.now()
     };
     const btn = document.getElementById('btnGuardarTextos'); btn.disabled = true; btn.textContent = 'A guardar...';
@@ -1120,6 +1142,7 @@
         textosAtuais = { pt: Object.assign({}, t.blocos && t.blocos.pt), en: Object.assign({}, t.blocos && t.blocos.en) };
         const m = t.motorista || {};
         motoristaAtual = { nome: m.nome || '', foto: m.foto || '', bio: { pt: (m.bio && m.bio.pt) || '', en: (m.bio && m.bio.en) || '' } };
+        legalAtual = Object.assign({}, t.legal || {});
       } else {
         // Primeira vez: começa com o que o app publicou até agora, para nada se perder
         const perfil = (sp.exists() && sp.data().perfil) || {};
