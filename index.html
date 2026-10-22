@@ -848,6 +848,32 @@
   .rot-tot{ font:600 12.5px 'Helvetica Neue', Arial, sans-serif; color:var(--azulejo); margin-top:2px; }
   .rot-aviso{ margin-top:8px; padding:9px 11px; border-radius:10px; background:#fff4e0; border:1px solid #f0d6a0; color:#7a5a0e; font:600 13px 'Helvetica Neue', Arial, sans-serif; }
   .ag-badge-semrot{ display:inline-block; padding:3px 8px; border-radius:999px; background:#fff4e0; color:#7a5a0e; font:700 10.5px 'Helvetica Neue', Arial, sans-serif; white-space:nowrap; }
+  /* ===== v9.22: Dados do serviço (para mostrar numa fiscalização) ===== */
+  .cr-dados{ display:flex; flex-direction:column; align-items:center; justify-content:center; gap:1px; width:54px; height:46px; margin-left:auto; border:none; border-radius:12px; background:#e8c9a0; color:var(--azul-noite); font:800 10.5px 'Helvetica Neue', Arial, sans-serif; cursor:pointer; flex-shrink:0; }
+  .cr-dados span{ font-size:18px; line-height:1; }
+  .dsv-overlay{ display:none; position:fixed; inset:0; z-index:2500; }
+  .dsv-overlay.aberto{ display:block; }
+  .dsv-fundo{ position:absolute; inset:0; background:rgba(11,25,44,.55); }
+  .dsv-folha{ position:absolute; left:0; right:0; bottom:0; top:calc(env(safe-area-inset-top, 0px) + 28px); max-width:620px; margin:0 auto; background:#fbfaf7; border-radius:20px 20px 0 0; display:flex; flex-direction:column; overflow:hidden; box-shadow:0 -10px 40px rgba(0,0,0,.25); }
+  .dsv-cab{ display:flex; align-items:center; gap:10px; padding:16px 16px 12px; border-bottom:1px solid #e9e0ce; }
+  .dsv-cab b{ display:block; font:700 18px 'Helvetica Neue', Arial, sans-serif; color:var(--azul-noite); }
+  .dsv-ref{ display:block; margin-top:3px; font-size:12px; color:#6a7378; }
+  .dsv-est{ display:inline-block; padding:2px 8px; border-radius:999px; background:#e8f1f2; color:var(--azulejo); font-size:11.5px; font-weight:700; margin-left:4px; }
+  .dsv-x{ width:36px; height:36px; border-radius:50%; border:none; background:#efe7d6; color:var(--azul-noite); font-size:16px; cursor:pointer; flex-shrink:0; }
+  .dsv-rolo{ flex:1; min-height:0; overflow-y:auto; -webkit-overflow-scrolling:touch; padding:2px 16px 16px; }
+  .dsv-sec h4{ margin:14px 0 4px; font:700 11px 'Helvetica Neue', Arial, sans-serif; letter-spacing:.14em; text-transform:uppercase; color:#a8823f; }
+  .dsv-l{ display:flex; justify-content:space-between; gap:14px; padding:8px 0; border-bottom:1px solid #efe7d6; font:14px 'Helvetica Neue', Arial, sans-serif; }
+  .dsv-l span{ color:#6a7378; flex-shrink:0; } .dsv-l b{ text-align:right; color:var(--azul-noite); overflow-wrap:anywhere; }
+  .dsv-acoes{ display:flex; gap:8px; padding:12px 14px calc(14px + env(safe-area-inset-bottom, 0px)); border-top:1px solid #e9e0ce; background:#fff; }
+  .dsv-acoes button{ flex:1; min-height:48px; border:none; border-radius:12px; font:700 14px 'Helvetica Neue', Arial, sans-serif; cursor:pointer; }
+  .dsv-a1{ background:var(--azul-noite); color:#fff; } .dsv-a2{ background:#efe7d6; color:var(--azul-noite); }
+  .dsv-grande{ position:fixed; inset:0; background:#fff; z-index:2; overflow-y:auto; padding:calc(env(safe-area-inset-top, 0px) + 18px) 22px 24px; }
+  .dsv-grande[hidden]{ display:none; }
+  .dsv-x-g{ position:fixed; top:calc(env(safe-area-inset-top, 0px) + 12px); right:14px; width:44px; height:44px; font-size:18px; }
+  .dsv-grande h3{ margin:4px 52px 12px 0; font:700 14px 'Helvetica Neue', Arial, sans-serif; letter-spacing:.12em; color:#a8823f; }
+  .dsv-g{ display:grid; grid-template-columns:repeat(auto-fit, minmax(260px, 1fr)); gap:12px 30px; }
+  .dsv-g div span{ display:block; font:13px 'Helvetica Neue', Arial, sans-serif; color:#6a7378; }
+  .dsv-g div b{ display:block; font:700 clamp(19px, 3.6vw, 26px) 'Helvetica Neue', Arial, sans-serif; color:var(--azul-noite); overflow-wrap:anywhere; line-height:1.25; }
   /* ===== Ecrã de corrida (v9.20) ===== */
   .corrida-overlay{ display:none; position:fixed; inset:0; z-index:1500; background:#f3ede1; flex-direction:column; color:var(--azul-noite); }
   .corrida-overlay.aberto{ display:flex; }
@@ -1305,7 +1331,7 @@
       <div class="cfg-grupo">
         <div class="cfg-titulo" data-acordeao="perfil">👤 Sobre mim (foto e bio) <span class="seta">▸</span></div>
         <div class="cfg-conteudo" data-conteudo="perfil">
-          <p class="cli-nota" style="margin-top:0;">O nome, a foto e a apresentação do site de pedidos ("O seu motorista") passaram a ser geridos no <strong>galeria.html</strong>, na aba <strong>Textos</strong>, em português e inglês.</p>
+          <p class="cli-nota" style="margin-top:0;">O nome, a foto e a apresentação do site de pedidos ("O seu motorista") passaram a ser geridos no <strong>Painel de controlo do site</strong> (trajetotransfer.pt/galeria.html), na aba <strong>Textos</strong>, em português e inglês.</p>
           <div hidden>
           <div style="display:flex; align-items:center; gap:14px; margin-bottom:14px;">
             <div id="perfilFotoPreview" style="width:72px; height:72px; border-radius:50%; background:var(--areia); border:1px solid var(--linha); flex-shrink:0; display:flex; align-items:center; justify-content:center; overflow:hidden; font-size:28px; color:#8a7378;">👤</div>
@@ -1852,7 +1878,7 @@
     <p class="nota">Os serviços por hora agendados ficam em "📅 Agendados". Os que estão em andamento aparecem a partir do momento em que tocas em "🚗 Ir buscar cliente" no agendamento. O tempo só começa a contar quando tocas em "▶️ Iniciar" (cliente no carro). Ao finalizar, o valor é calculado pela regra definida em "Minhas tarifas" e podes enviar o resumo ao cliente. O agendamento só sai da lista quando o marcares como "Concluído".</p>
   </div>
 
-  <p style="text-align:center; font-family:'Helvetica Neue', Arial, sans-serif; font-size:11px; color:#8a7f66; margin-top:24px;">Trajeto · v9.21.1</p>
+  <p style="text-align:center; font-family:'Helvetica Neue', Arial, sans-serif; font-size:11px; color:#8a7f66; margin-top:24px;">Trajeto · v9.22.0</p>
 
 </main>
 
@@ -1897,11 +1923,22 @@
   </div>
 </div>
 
+<div class="dsv-overlay" id="dadosServico" aria-hidden="true" role="dialog" aria-labelledby="dsvTitulo">
+  <div class="dsv-fundo" data-fechar-dsv></div>
+  <div class="dsv-folha">
+    <div class="dsv-cab"><div style="flex:1;min-width:0"><b id="dsvTitulo">📋 Dados do serviço</b><span class="dsv-ref" id="dsvRef"></span></div><button type="button" class="dsv-x" data-fechar-dsv aria-label="Fechar">✕</button></div>
+    <div class="dsv-rolo" id="dsvCorpo"></div>
+    <div class="dsv-acoes"><button type="button" class="dsv-a1" id="dsvGrande">🔍 Letra grande</button><button type="button" class="dsv-a2" id="dsvPartilhar">📤 Partilhar</button></div>
+  </div>
+  <div class="dsv-grande" id="dsvGrandeVista" hidden><button type="button" class="dsv-x dsv-x-g" id="dsvGrandeFechar" aria-label="Fechar">✕</button><h3 id="dsvGrandeTit"></h3><div class="dsv-g" id="dsvGrandeCorpo"></div></div>
+</div>
+
 <div class="corrida-overlay" id="corridaOverlay" aria-hidden="true">
   <div class="cr-top">
     <div class="cr-row">
       <button type="button" class="cr-x" id="btnCorridaFechar" aria-label="Voltar">‹</button>
       <div class="cr-tit"><b id="crCliente"></b><small id="crSub"></small></div>
+      <button type="button" class="cr-dados" id="btnCorridaDados" aria-label="Dados do serviço"><span>📋</span>Dados</button>
     </div>
     <div class="cr-fase" id="crFase"><i></i><i></i><i></i></div>
     <div class="cr-fasetx" id="crFaseTx"></div>
@@ -3270,6 +3307,7 @@
         <div class="ag-acoes">
           ${(ag.realizado && !avaliacaoRecebida(ag)) ? '<button class="ag-btn-av" data-acao="pedirAvaliacao">⭐ Pedir avaliação</button>' : ''}
           ${ag.realizado ? `<button class="ag-btn-cal" data-acao="nota">📝 ${ag.nota ? 'Editar nota' : 'Nota'}</button>` : ''}
+          <button class="ag-btn-cal" data-acao="dados">📋 Dados</button>
           <button class="ag-btn-cal" data-acao="editar">✏️ Editar</button>
           ${ag.realizado ? '<button class="ag-btn-cal" data-acao="refazer">🔁 Refazer</button>' : ''}
           <button class="ag-btn-cal" data-acao="cal">📅 Calendário</button>
@@ -4418,6 +4456,7 @@
         <div class="ag-acoes">
           ${(ag.realizado && !avaliacaoRecebida(ag)) ? '<button class="ag-btn-av" data-acao="pedirAvaliacao">⭐ Pedir avaliação</button>' : ''}
           ${ag.realizado ? `<button class="ag-btn-cal" data-acao="nota">📝 ${ag.nota ? 'Editar nota' : 'Nota'}</button>` : ''}
+          <button class="ag-btn-cal" data-acao="dados">📋 Dados</button>
           <button class="ag-btn-cal" data-acao="editar">✏️ Editar</button>
           ${ag.realizado ? '<button class="ag-btn-cal" data-acao="refazer">🔁 Refazer</button>' : ''}
           <button class="ag-btn-cal" data-acao="cal">📅 Calendário</button>
@@ -4874,6 +4913,107 @@
   }
   document.getElementById('ag_tourRoteiro').addEventListener('input', atualizarPreviewRoteiro);
 
+  // =====================================================================
+  //  v9.22: "Dados do serviço" — resumo para mostrar numa fiscalização (só leitura; funciona sem internet)
+  // =====================================================================
+  function msTempo(c){ if(!c) return 0; if(typeof c === 'number') return c; if(typeof c.toMillis === 'function') return c.toMillis(); if(typeof c.seconds === 'number') return c.seconds * 1000; const t = Date.parse(c); return isNaN(t) ? 0 : t; }
+  function quandoCriado(ag){
+    if(ag.pedidoEm) return ag.pedidoEm;
+    if(ag.criadoEm) return ag.criadoEm;
+    const t = parseInt(String(ag.id || '').slice(0, 8), 36);   // o id começa pela hora da criação
+    return (t > 1577836800000 && t < Date.now() + 864e5) ? t : 0;
+  }
+  function fmtDataHora(ms){ const d = new Date(ms); return `${pad(d.getDate())}/${pad(d.getMonth()+1)}/${d.getFullYear()} às ${pad(d.getHours())}:${pad(d.getMinutes())}`; }
+  function refServico(ag){ const d = (ag.data || '').split('-'); return `TT-${(d[2]||'')}${(d[1]||'')}${(d[0]||'').slice(2)}-${String(ag.id || '').slice(-4).toUpperCase()}`; }
+  let dsvId = null;
+  function dadosDoServico(ag){
+    const eTour = ag.tipo === 'tour', eHora = ag.tipo === 'hora';
+    const forn = (ag.fornecedor || '').trim(), parceiro = forn && ehFornecedorParceiro(forn);
+    const fase = parseInt(ag.corridaFase, 10) || 0;
+    const estado = ag.realizado ? 'Concluído' : fase === 2 ? 'Em viagem' : fase === 1 ? 'A caminho' : 'Agendado';
+    const dt = new Date(ag.data + 'T12:00:00');
+    const dataTxt = `${dt.toLocaleDateString('pt-PT', { weekday:'short' })} ${(ag.data || '').split('-').reverse().join('/')} · ${ag.hora || ''}`;
+    const criado = quandoCriado(ag);
+    const pax = (/(\d+)\s*passageiro/i.exec(ag.observacoes || '') || [])[1];
+    const carro = lerCarro();
+    const roteiro = eTour ? corridaParagens(ag) : (Array.isArray(ag.paragens) ? ag.paragens.filter(Boolean) : []);
+    const valor = parseFloat(String(ag.valor || '').replace(',', '.'));
+    const pag = ag.realizado ? (ag.pagamento === 'recebido' ? 'Recebido' + (ag.recebidoEm ? ' em ' + ag.recebidoEm.split('-').reverse().join('/') : '') : 'A receber') : 'Após o serviço';
+    const secoes = [
+      ['Reserva', [
+        ['Tipo', eTour ? `Tour privado · ${ag.tourNome || ''}` : eHora ? 'Motorista por hora' : 'Transfer privado'],
+        ['Pedido feito em', criado ? fmtDataHora(criado) : '—'],
+        ['Contratado por', parceiro ? `${forn} (parceiro)` : /^site/i.test(forn) ? 'Cliente direto (pedido pelo site)' : 'Cliente direto'],
+      ]],
+      ['Cliente', [['Nome', ag.cliente || '—'], ['Telefone', ag.telefone || '—'], pax ? ['Passageiros', pax] : null, ag.voo ? ['Voo', ag.voo] : null]],
+      ['Viagem', [
+        ['Data e hora', dataTxt],
+        ['Recolha', ag.partida || '—'],
+        roteiro.length ? [eTour ? 'Roteiro' : 'Paragens', roteiro.join(' · ')] : null,
+        eHora ? null : [eTour ? 'Regresso' : 'Destino', (eTour ? (ag.chegada || ag.partida) : ag.chegada) || '—'],
+        eTour && ag.tourDuracao ? ['Duração', ag.tourDuracao] : null,
+      ]],
+      ['Valor', [['Preço acordado', valor > 0 ? '€ ' + valor.toFixed(2).replace('.', ',') : '—'], ['Pagamento', pag]]],
+      ['Motorista e viatura', [
+        ['Motorista', localStorage.getItem('trajeto_nome') || '—'],
+        (carro.modelo || carro.cor) ? ['Viatura', [carro.modelo, carro.cor].filter(Boolean).join(' · ')] : null,
+        carro.matricula ? ['Matrícula', carro.matricula] : null,
+      ]],
+    ].map(([t, ls]) => [t, ls.filter(Boolean)]);
+    return { ref: refServico(ag), estado, secoes, dataTxt, criado, pax, parceiro, forn, valor, carro, roteiro };
+  }
+  function abrirDadosServico(id){
+    const ag = lerAgendamentos().find(a => a.id === id); if(!ag) return;
+    dsvId = id;
+    const d = dadosDoServico(ag);
+    const ref = document.getElementById('dsvRef'); ref.textContent = 'Ref. ' + d.ref + ' ';
+    const est = document.createElement('span'); est.className = 'dsv-est'; est.textContent = d.estado; ref.appendChild(est);
+    const corpo = document.getElementById('dsvCorpo'); corpo.innerHTML = '';
+    d.secoes.forEach(([t, ls])=>{
+      const sec = document.createElement('div'); sec.className = 'dsv-sec';
+      const h = document.createElement('h4'); h.textContent = t; sec.appendChild(h);
+      ls.forEach(([r, v])=>{ const l = document.createElement('div'); l.className = 'dsv-l'; const a = document.createElement('span'); a.textContent = r; const b = document.createElement('b'); b.textContent = v; l.appendChild(a); l.appendChild(b); sec.appendChild(l); });
+      corpo.appendChild(sec);
+    });
+    corpo.scrollTop = 0;
+    document.getElementById('dsvGrandeVista').hidden = true;
+    const ov = document.getElementById('dadosServico'); ov.classList.add('aberto'); ov.setAttribute('aria-hidden', 'false');
+  }
+  function fecharDadosServico(){ dsvId = null; const ov = document.getElementById('dadosServico'); ov.classList.remove('aberto'); ov.setAttribute('aria-hidden', 'true'); document.getElementById('dsvGrandeVista').hidden = true; }
+  function textoDadosServico(ag){
+    const d = dadosDoServico(ag);
+    return `📋 DADOS DO SERVIÇO · Ref. ${d.ref} (${d.estado})\n` + d.secoes.map(([t, ls]) => `\n${t.toUpperCase()}\n` + ls.map(([r, v]) => `${r}: ${v}`).join('\n')).join('\n');
+  }
+  document.getElementById('dadosServico').addEventListener('click', (e)=>{ if(e.target.closest('[data-fechar-dsv]')) fecharDadosServico(); });
+  document.getElementById('btnCorridaDados').addEventListener('click', ()=>{ if(corridaId) abrirDadosServico(corridaId); });
+  document.getElementById('dsvGrande').addEventListener('click', ()=>{
+    const ag = lerAgendamentos().find(a => a.id === dsvId); if(!ag) return;
+    const d = dadosDoServico(ag), v = (sec, rot) => { const s1 = d.secoes.find(x => x[0] === sec); const l = s1 && s1[1].find(x => x[0] === rot); return l ? l[1] : ''; };
+    document.getElementById('dsvGrandeTit').textContent = `DADOS DO SERVIÇO · REF. ${d.ref}`;
+    const itens = [
+      ['Cliente', [ag.cliente, d.pax ? d.pax + ' pax' : ''].filter(Boolean).join(' · ')],
+      ['Contratado por', v('Reserva', 'Contratado por')],
+      ['Data e hora', v('Viagem', 'Data e hora')],
+      ['Pedido feito em', v('Reserva', 'Pedido feito em')],
+      ['Recolha', v('Viagem', 'Recolha')],
+      [ag.tipo === 'tour' ? 'Roteiro' : 'Destino', ag.tipo === 'tour' ? (d.roteiro.join(' · ') || v('Viagem', 'Regresso')) : v('Viagem', 'Destino')],
+      ['Valor', v('Valor', 'Preço acordado')],
+      ['Motorista · Viatura', [v('Motorista e viatura', 'Motorista'), [d.carro.modelo, d.carro.matricula].filter(Boolean).join(' ')].filter(Boolean).join(' · ')],
+    ].filter(x => x[1]);
+    const g = document.getElementById('dsvGrandeCorpo'); g.innerHTML = '';
+    itens.forEach(([r, val])=>{ const c = document.createElement('div'); const a = document.createElement('span'); a.textContent = r; const b = document.createElement('b'); b.textContent = val; c.appendChild(a); c.appendChild(b); g.appendChild(c); });
+    document.getElementById('dsvGrandeVista').hidden = false;
+  });
+  document.getElementById('dsvGrandeFechar').addEventListener('click', ()=>{ document.getElementById('dsvGrandeVista').hidden = true; });
+  document.getElementById('dsvPartilhar').addEventListener('click', async ()=>{
+    const ag = lerAgendamentos().find(a => a.id === dsvId); if(!ag) return;
+    const texto = textoDadosServico(ag);
+    try{ if(navigator.share){ await navigator.share({ text: texto }); return; } }catch(e){ if(e && e.name === 'AbortError') return; }
+    try{ await navigator.clipboard.writeText(texto); alert('Dados copiados. Pode colá-los no WhatsApp ou num email.'); }
+    catch(e){ window.open('https://wa.me/?text=' + encodeURIComponent(texto), '_blank'); }
+  });
+  document.addEventListener('keydown', (e)=>{ if(e.key === 'Escape' && dsvId) fecharDadosServico(); });
+
   // ---------- Placar digital ----------
   let wakeLock = null;
   async function pedirWakeLock(){
@@ -5201,6 +5341,8 @@
       pedirIdiomaEExecutar(()=> enviarMensagem(ag));
     } else if(btn.dataset.acao === 'repassar'){
       repassarAgendamento(ag);
+    } else if(btn.dataset.acao === 'dados'){
+      abrirDadosServico(id);
     } else if(btn.dataset.acao === 'nota'){
       abrirModalNota(id);
     } else if(btn.dataset.acao === 'realizado'){
@@ -5439,6 +5581,7 @@
 
       const ag = {
         id: Date.now().toString(36) + Math.random().toString(36).slice(2,7),
+        criadoEm: Date.now(), pedidoEm: msTempo(p.criadoEm) || Date.now(),
         partida: p.partida, chegada: p.chegada || p.partida, paragens: p.paragens || [], data: p.data, hora: p.hora,
         cliente: p.nome, telefone: p.contacto, nomePlaca: '', voo: p.voo || '',
         fornecedor: 'Site — pedido online',
@@ -5636,6 +5779,7 @@
     } else {
       const ag = {
         id: Date.now().toString(36) + Math.random().toString(36).slice(2,7),
+        criadoEm: Date.now(),
         partida, chegada: chegadaFinal, paragens, data, hora, cliente, telefone, nomePlaca, voo, fornecedor, observacoes,
         valor: valor || (tipo === 'hora' ? String(valorMinimoHora()) : tipo === 'tour' ? '' : document.getElementById('ct_cobrar').value),
         realizado: false, apresentacao, mostrarGaleria: !!apresentacao
