@@ -754,7 +754,7 @@
   <div class="rod-pag" id="rodPag"><span>🔒 <span data-i18n="rod_https">Ligação segura (HTTPS)</span></span></div>
   <p class="rodape-priv"><a href="privacidade.html" data-i18n="priv_link">Política de privacidade</a></p>
   <p class="copy">Trajeto Transfer · Lisboa</p>
-  <p class="versao">v9.17.0</p>
+  <p class="versao">v9.18.0</p>
 </footer>
 
 <div class="tdet" id="tourDet" hidden role="dialog" aria-modal="true" aria-labelledby="tdetNome">
@@ -1536,6 +1536,7 @@
     const t = toursPublicados.find(x => x.nome === nome);
     if(!t){ abrirTour(nome); return; }
     tourDetAberto = t; tourDetUltimoFoco = document.activeElement;
+    if(t.id && window.estatSomar) window.estatSomar([], t.id);
     desenharDetalheTour();
     const box = document.getElementById('tourDet'); box.hidden = false; document.body.classList.add('sem-scroll');
     box.querySelector('.tdet-rolo').scrollTop = 0; document.getElementById('tdetFotos').scrollLeft = 0;
@@ -1895,7 +1896,7 @@
 
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js";
-  import { getFirestore, collection, addDoc, doc, getDoc, getDocs, query, where, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
+  import { getFirestore, collection, addDoc, doc, getDoc, getDocs, query, where, serverTimestamp, setDoc, increment } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
 
   const firebaseConfig = {
     apiKey: "AIzaSyCqJBnzZh5MWP9G3ZP1nOThb4W2KCLf2a4",
@@ -1981,6 +1982,55 @@
     }catch(e){ /* sem número disponível — o botão fica escondido, sem problema */ }
   })();
 
+
+  // =====================================================================
+  //  v9.18: estatísticas de visitas — sem cookies e sem dados pessoais.
+  //  Só soma contagens por dia em trajeto_estatisticas/{uid}-{AAAA-MM-DD}; o painel está na Galeria → 📊 Visitas.
+  // =====================================================================
+  const ESTAT_PAISES = { PT:['Europe/Lisbon','Atlantic/Madeira','Atlantic/Azores'], GB:['Europe/London'], FR:['Europe/Paris'], ES:['Europe/Madrid','Atlantic/Canary','Africa/Ceuta'],
+    DE:['Europe/Berlin'], IT:['Europe/Rome'], NL:['Europe/Amsterdam'], IE:['Europe/Dublin'], CH:['Europe/Zurich'], BE:['Europe/Brussels'] };
+  function estatPais(){
+    let tz = ''; try{ tz = Intl.DateTimeFormat().resolvedOptions().timeZone || ''; }catch(e){}
+    for(const k in ESTAT_PAISES){ if(ESTAT_PAISES[k].includes(tz)) return k; }
+    if(/^America\/(Sao_Paulo|Fortaleza|Recife|Bahia|Belem|Manaus|Cuiaba|Campo_Grande|Porto_Velho|Boa_Vista|Rio_Branco|Araguaina|Maceio|Noronha|Santarem|Eirunepe)$/.test(tz)) return 'BR';
+    if(/^America\/(Toronto|Vancouver|Edmonton|Winnipeg|Halifax|Regina|St_Johns|Moncton|Montreal)$/.test(tz)) return 'CA';
+    if(/^(America\/(New_York|Chicago|Denver|Los_Angeles|Phoenix|Anchorage|Detroit|Boise|Indiana\/.+|Kentucky\/.+|North_Dakota\/.+|Juneau|Sitka|Nome|Menominee)|Pacific\/Honolulu)$/.test(tz)) return 'US';
+    return 'OUTRO';
+  }
+  function estatOrigem(){
+    const utm = (new URLSearchParams(location.search).get('utm_source') || '').toLowerCase(), ua = navigator.userAgent || '';
+    let ref = ''; try{ ref = document.referrer ? new URL(document.referrer).hostname.toLowerCase() : ''; }catch(e){}
+    if(/instagram/.test(utm) || /Instagram/.test(ua) || /instagram\.com$/.test(ref)) return 'instagram';
+    if(/facebook|fb/.test(utm) || /FBAN|FBAV/.test(ua) || /facebook\.com$|fb\.me$/.test(ref)) return 'facebook';
+    if(/whatsapp|wa/.test(utm) || /whatsapp|wa\.me/.test(ref)) return 'whatsapp';
+    if(/google/.test(utm) || /(^|\.)google\.[a-z.]+$/.test(ref)) return 'google';
+    if(!ref) return 'direto';
+    return 'outros';
+  }
+  function estatRobo(){ return navigator.webdriver && !window.__estatTeste || /bot|crawl|spider|slurp|facebookexternalhit|whatsapp\/|headless|lighthouse|preview|embedly|telegram|discord|skype/i.test(navigator.userAgent || ''); }
+  let estatLigado = false;
+  try{ estatLigado = !estatRobo() && localStorage.getItem('trajeto_nao_contar') !== '1'; }catch(e){ estatLigado = !estatRobo(); }
+  const estatJaFeito = {};
+  window.estatSomar = async (campos, tourId, umaVez)=>{
+    if(!estatLigado) return;
+    if(umaVez){ if(estatJaFeito[umaVez]) return; estatJaFeito[umaVez] = true; }
+    try{
+      const uid = await resolucaoMotorista; if(!uid) return;
+      const a = new Date(), dia = `${a.getFullYear()}-${String(a.getMonth()+1).padStart(2,'0')}-${String(a.getDate()).padStart(2,'0')}`;
+      const dados = { uid, dia };
+      (campos || []).forEach(k => { dados[k] = increment(1); });
+      if(tourId && /^[a-z0-9]{4,24}$/.test(tourId)) dados.t = { [tourId]: increment(1) };
+      await setDoc(doc(db, 'trajeto_estatisticas', `${uid}-${dia}`), dados, { merge:true });
+    }catch(e){ /* estatística é opcional: nunca interfere com o site */ }
+  };
+  (function(){
+    let interno = false; try{ interno = !!document.referrer && new URL(document.referrer).hostname === location.hostname; }catch(e){}
+    if(interno) return;   // voltar da política de privacidade, etc., não conta como nova visita
+    const idioma = (typeof idiomaAtual === 'string' && idiomaAtual === 'en') ? 'en' : 'pt';
+    const disp = (window.matchMedia && matchMedia('(pointer:coarse)').matches) || innerWidth < 768 ? 'm' : 'c';
+    window.estatSomar(['v', 'o_' + estatOrigem(), 'pa_' + estatPais(), 'd_' + disp, 'l_' + idioma]);
+  })();
+  document.addEventListener('click', (e)=>{ const a = e.target.closest('a[href*="wa.me"]'); if(a) window.estatSomar(['wa']); }, true);
   // v9.17: fotos extra de um tour (documento próprio, só lido quando o cliente abre o tour)
   window.buscarFotosTour = async (id)=>{
     if(!/^[a-z0-9]{4,24}$/.test(id || '')) return [];
@@ -2026,6 +2076,7 @@
 
   let formNoTopo = false;
   function abrirFormularioCotacao(opcoes){
+    if(window.estatSomar) window.estatSomar(['f'], null, 'form');
     const cardForm = document.getElementById('cardForm');
     const btnAbrir = document.getElementById('btnAbrirForm');
     // aberto pelos botões do topo: o formulário aparece logo abaixo deles;
@@ -2122,6 +2173,7 @@
     try{
       await addDoc(collection(db, 'trajeto_pedidos'), pedido);
       avisarMotoristaNovoPedido();
+      if(window.estatSomar) window.estatSomar(['p']);
       if(ehHora) document.querySelector('#confirmacao p').textContent = textos.confHora;
       if(ehTour) document.querySelector('#confirmacao p').textContent = textos.confTour;
       document.getElementById('cardForm').querySelector('form').style.display = 'none';
