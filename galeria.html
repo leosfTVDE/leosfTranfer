@@ -160,6 +160,24 @@
 .fotos-extra .fx img{ width:100%; height:100%; object-fit:cover; display:block; }
 .fotos-extra .fx button{ position:absolute; top:3px; right:3px; width:24px; height:24px; border-radius:50%; border:none; background:rgba(13,27,42,.75); color:#fff; font-size:12px; cursor:pointer; padding:0; }
 .fotos-extra .fx-add{ font-size:26px; color:#6a7378; cursor:pointer; }
+.intro-aba{ font-size:13.5px; color:#5d6873; line-height:1.5; margin:0 0 12px; }
+.vis-per{ display:flex; gap:4px; background:#ebe3d3; padding:3px; border-radius:10px; margin-bottom:10px; }
+.vis-per button{ flex:1; padding:9px; border:none; border-radius:8px; background:transparent; font:600 13px inherit; font-family:inherit; color:#12242e; cursor:pointer; }
+.vis-per button.ativo{ background:#fff; box-shadow:0 1px 3px rgba(0,0,0,.08); }
+.vis-kpis{ display:grid; grid-template-columns:repeat(3, 1fr); gap:8px; margin-bottom:10px; }
+.vis-k{ background:#fffdf8; border:1px solid #e6dcc8; border-radius:12px; padding:10px; min-width:0; }
+.vis-k small{ font-size:11px; color:#6a7378; } .vis-k b{ display:block; font-size:22px; margin-top:2px; } .vis-k em{ font-style:normal; font-size:11px; color:#2e8b57; font-weight:700; } .vis-k em.baixa{ color:#c1552c; }
+.vis-card{ background:#fffdf8; border:1px solid #e6dcc8; border-radius:12px; padding:12px 14px; margin-bottom:10px; }
+.vis-card h3{ font-size:14px; margin:0 0 10px; } .vis-card h3:empty{ display:none; }
+.vis-graf{ display:flex; align-items:flex-end; gap:6px; height:110px; } .vis-graf.fino{ gap:2px; }
+.vis-b{ flex:1; height:100%; display:flex; flex-direction:column; justify-content:flex-end; align-items:center; min-width:0; }
+.vis-b i{ display:block; width:100%; min-height:2px; background:#2a6f77; border-radius:5px 5px 0 0; } .vis-graf.fino .vis-b i{ border-radius:2px 2px 0 0; }
+.vis-b small{ font-size:10px; color:#6a7378; margin-top:4px; height:12px; }
+.vis-ln{ display:grid; grid-template-columns:1fr auto; gap:2px 8px; margin-bottom:8px; font-size:13.5px; } .vis-ln span{ min-width:0; overflow-wrap:anywhere; }
+.vis-bar{ grid-column:1/3; height:6px; background:#efe7d6; border-radius:3px; } .vis-bar i{ display:block; height:100%; border-radius:3px; }
+.vis-fu{ display:flex; justify-content:space-between; align-items:center; padding:9px 12px; border-radius:10px; margin-bottom:6px; color:#fff; font-size:13.5px; }
+.vis-vazio{ font-size:13px; color:#6a7378; }
+.vis-eu{ display:flex; gap:8px; align-items:center; font-size:13px; color:#3d4c52; margin-top:6px; }
 </style>
 </head>
 <body>
@@ -197,6 +215,7 @@
       <button type="button" class="aba-btn" data-aba="capa">Capa</button>
       <button type="button" class="aba-btn" data-aba="conforto">Conforto</button>
       <button type="button" class="aba-btn" data-aba="textos">Textos</button>
+      <button type="button" class="aba-btn" data-aba="visitas">📊 Visitas</button>
     </div>
 
     <div class="mensagem-ok" id="mensagemOk">✅ Guardado! As fotos já estão atualizadas no site.</div>
@@ -400,6 +419,14 @@
       <button type="button" class="btn-principal" id="btnGuardarConforto">Guardar</button>
     </div>
 
+    <div class="painel-aba" id="painelVisitas" style="display:none;">
+      <p class="intro-aba">Visitas ao <b>site de pedidos</b>, contadas sem cookies e sem dados pessoais (só totais por dia). O país é estimado pelo fuso horário do aparelho. Só conta a partir da versão v9.18 do site.</p>
+      <div class="vis-per" id="visPer"><button type="button" data-p="1">Hoje</button><button type="button" data-p="7" class="ativo">7 dias</button><button type="button" data-p="30">30 dias</button></div>
+      <div id="visCorpo"><p class="vis-vazio">A carregar…</p></div>
+      <label class="vis-eu"><input type="checkbox" id="visNaoContar"> Não contar as minhas visitas neste aparelho</label>
+      <button type="button" class="btn-escolher" id="visAtualizar" style="margin-top:10px;width:100%;padding:12px;border-radius:10px;font-size:14px;">↻ Atualizar</button>
+    </div>
+
     <div class="painel-aba" id="painelTextos" style="display:none;">
       <p class="sub">Os textos do <strong>site de pedidos</strong>. O que ficar vazio usa o texto de sempre (aparece em cinzento dentro do campo). Cada bloco tem versão em português e em inglês.</p>
       <div id="blocosTextos"></div>
@@ -580,6 +607,8 @@
       document.getElementById('painelCapa').style.display = aba==='capa' ? 'block' : 'none';
       document.getElementById('painelConforto').style.display = aba==='conforto' ? 'block' : 'none';
       document.getElementById('painelTextos').style.display = aba==='textos' ? 'block' : 'none';
+      document.getElementById('painelVisitas').style.display = aba==='visitas' ? 'block' : 'none';
+      if(aba === 'visitas' && typeof window.carregarVisitas === 'function') window.carregarVisitas();
       atualizarLinkVer();
       document.getElementById('mensagemOk').style.display = 'none';
       document.getElementById('mensagemOk').textContent = '✅ Guardado! As fotos já estão atualizadas no site.';
@@ -1221,6 +1250,88 @@
       document.getElementById('telaGaleria').style.display = 'none';
     }
   });
+
+  // =====================================================================
+  //  v9.18: painel de visitas do site (lê trajeto_estatisticas, só leitura)
+  // =====================================================================
+  let visDocs = null, visPeriodo = 7;
+  const VIS_PAISES = { PT:'🇵🇹 Portugal', BR:'🇧🇷 Brasil', GB:'🇬🇧 Reino Unido', US:'🇺🇸 Estados Unidos', FR:'🇫🇷 França', ES:'🇪🇸 Espanha', DE:'🇩🇪 Alemanha', IT:'🇮🇹 Itália', NL:'🇳🇱 Países Baixos', CA:'🇨🇦 Canadá', IE:'🇮🇪 Irlanda', CH:'🇨🇭 Suíça', BE:'🇧🇪 Bélgica', OUTRO:'🌍 Outros' };
+  const VIS_ORIG = { instagram:'📸 Instagram', google:'🔎 Google', whatsapp:'💬 WhatsApp', facebook:'👍 Facebook', direto:'🔗 Direto (link guardado, escrito à mão)', outros:'🌐 Outros sites' };
+  function visDia(d){ return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`; }
+  function visDias(n, desvio){ const out = [], h = new Date(); h.setHours(12,0,0,0); for(let i = n - 1 + desvio; i >= desvio; i--){ const d = new Date(h); d.setDate(h.getDate() - i); out.push(visDia(d)); } return out; }
+  function visSomar(dias){
+    const tot = { t:{} }, porDia = {};
+    dias.forEach(dia => {
+      const d = visDocs[dia] || {}; porDia[dia] = d.v || 0;
+      Object.keys(d).forEach(k => {
+        if(k === 'uid' || k === 'dia') return;
+        if(k === 't' && d.t && typeof d.t === 'object'){ Object.keys(d.t).forEach(id => { tot.t[id] = (tot.t[id] || 0) + (d.t[id] || 0); }); return; }
+        if(typeof d[k] === 'number') tot[k] = (tot[k] || 0) + d[k];
+      });
+    });
+    return { tot, porDia };
+  }
+  function visEl(tag, cls, txt){ const e = document.createElement(tag); if(cls) e.className = cls; if(txt != null) e.textContent = txt; return e; }
+  function visLista(titulo, itens, cor){
+    const c = visEl('div', 'vis-card'); c.appendChild(visEl('h3', '', titulo));
+    const soma = itens.reduce((a, x) => a + x[1], 0) || 1;
+    if(!itens.length){ c.appendChild(visEl('p', 'vis-vazio', 'Ainda sem dados.')); return c; }
+    itens.forEach(([nome, v])=>{
+      const l = visEl('div', 'vis-ln'); l.appendChild(visEl('span', '', nome)); l.appendChild(visEl('b', '', String(v)));
+      const bar = visEl('div', 'vis-bar'), i = visEl('i'); i.style.width = Math.round(v / soma * 100) + '%'; i.style.background = cor; bar.appendChild(i); l.appendChild(bar); c.appendChild(l);
+    });
+    return c;
+  }
+  function visDelta(a, b){ if(!b) return a ? 'novo' : ''; const p = Math.round((a - b) / b * 100); return (p >= 0 ? '↑ ' : '↓ ') + Math.abs(p) + '%'; }
+  function desenharVisitas(){
+    const corpo = document.getElementById('visCorpo'); corpo.innerHTML = '';
+    if(!visDocs){ corpo.appendChild(visEl('p', 'vis-vazio', 'A carregar…')); return; }
+    const n = visPeriodo, atual = visSomar(visDias(n, 0)), ant = visSomar(visDias(n, n)), T = atual.tot, A = ant.tot;
+    const v = T.v || 0, f = T.f || 0, pd = T.p || 0;
+    const k = visEl('div', 'vis-kpis');
+    [['Visitas', v, visDelta(v, A.v || 0)], ['Pedidos', pd, visDelta(pd, A.p || 0)], ['Conversão', v ? (pd / v * 100).toFixed(1).replace('.', ',') + '%' : '—', '']].forEach(([r, val, dl])=>{
+      const c = visEl('div', 'vis-k'); c.appendChild(visEl('small', '', r)); c.appendChild(visEl('b', '', String(val)));
+      const e = visEl('em', dl.startsWith('↓') ? 'baixa' : '', dl || ' '); c.appendChild(e); k.appendChild(c);
+    });
+    corpo.appendChild(k);
+    if(n > 1){
+      const g = visEl('div', 'vis-card'); g.appendChild(visEl('h3', '', 'Visitas por dia'));
+      const graf = visEl('div', 'vis-graf' + (n > 7 ? ' fino' : '')), mx = Math.max(1, ...Object.values(atual.porDia));
+      Object.keys(atual.porDia).forEach((dia, i, arr)=>{
+        const b = visEl('div', 'vis-b'), barra = visEl('i'); barra.style.height = Math.round(atual.porDia[dia] / mx * 100) + '%'; barra.title = `${dia.slice(8)}/${dia.slice(5,7)}: ${atual.porDia[dia]}`;
+        b.appendChild(barra); b.appendChild(visEl('small', '', (n <= 7 || i % 5 === 0 || i === arr.length - 1) ? dia.slice(8) : '')); graf.appendChild(b);
+      });
+      g.appendChild(graf); corpo.appendChild(g);
+    }
+    corpo.appendChild(visLista('De onde vêm', Object.keys(VIS_ORIG).map(o => [VIS_ORIG[o], T['o_' + o] || 0]).filter(x => x[1]).sort((a, b) => b[1] - a[1]), '#2a6f77'));
+    const fu = visEl('div', 'vis-card'); fu.appendChild(visEl('h3', '', 'Do caminho ao pedido'));
+    [['Visitaram o site', v, '#0d1b2a', 0], ['Abriram o formulário', f, '#2a6f77', 14], ['Enviaram o pedido', pd, '#c1552c', 28], ['Tocaram no WhatsApp', T.wa || 0, '#25a35a', 14]].forEach(([r, val, cor, m])=>{
+      const d = visEl('div', 'vis-fu'); d.style.background = cor; d.style.marginLeft = m + 'px'; d.appendChild(visEl('span', '', r)); d.appendChild(visEl('b', '', String(val))); fu.appendChild(d);
+    });
+    corpo.appendChild(fu);
+    corpo.appendChild(visLista('Países (aproximado)', Object.keys(VIS_PAISES).map(c => [VIS_PAISES[c], T['pa_' + c] || 0]).filter(x => x[1]).sort((a, b) => b[1] - a[1]), '#a8823f'));
+    const nomesTours = {}; try{ (listaTours.itens() || []).forEach(t => { if(t.id) nomesTours[t.id] = t.nome || 'Tour'; }); }catch(e){}
+    corpo.appendChild(visLista('Tours mais vistos (janela aberta)', Object.keys(T.t).map(id => [nomesTours[id] || 'Tour apagado', T.t[id]]).sort((a, b) => b[1] - a[1]), '#c1552c'));
+    const ap = visLista('Aparelho e idioma', [['📱 Telemóvel', T.d_m || 0], ['💻 Computador', T.d_c || 0]].filter(x => x[1]), '#2a6f77');
+    const id2 = visLista('', [['🇵🇹 Português', T.l_pt || 0], ['🇬🇧 English', T.l_en || 0]].filter(x => x[1]), '#a8823f');
+    Array.from(id2.children).slice(1).forEach(x => ap.appendChild(x)); corpo.appendChild(ap);
+  }
+  window.carregarVisitas = async ()=>{
+    if(!auth.currentUser) return;
+    visDocs = null; desenharVisitas();
+    try{
+      const res = await getDocs(query(collection(db, 'trajeto_estatisticas'), where('uid', '==', auth.currentUser.uid)));
+      const m = {}; res.forEach(d => { const x = d.data(); if(x && x.dia) m[x.dia] = x; }); visDocs = m;
+    }catch(e){ visDocs = {}; }
+    desenharVisitas();
+  };
+  document.querySelectorAll('#visPer button').forEach(b => b.addEventListener('click', ()=>{
+    document.querySelectorAll('#visPer button').forEach(x => x.classList.toggle('ativo', x === b)); visPeriodo = parseInt(b.dataset.p, 10); desenharVisitas();
+  }));
+  document.getElementById('visAtualizar').addEventListener('click', ()=> window.carregarVisitas());
+  const visEu = document.getElementById('visNaoContar');
+  try{ visEu.checked = localStorage.getItem('trajeto_nao_contar') === '1'; }catch(e){}
+  visEu.addEventListener('change', ()=>{ try{ if(visEu.checked) localStorage.setItem('trajeto_nao_contar', '1'); else localStorage.removeItem('trajeto_nao_contar'); }catch(e){} });
 </script>
 </body>
 </html>
