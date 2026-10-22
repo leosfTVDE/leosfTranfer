@@ -754,7 +754,7 @@
   <div class="rod-pag" id="rodPag"><span>🔒 <span data-i18n="rod_https">Ligação segura (HTTPS)</span></span></div>
   <p class="rodape-priv"><a href="privacidade.html" data-i18n="priv_link">Política de privacidade</a></p>
   <p class="copy">Trajeto Transfer · Lisboa</p>
-  <p class="versao">v9.18.0</p>
+  <p class="versao">v9.18.1</p>
 </footer>
 
 <div class="tdet" id="tourDet" hidden role="dialog" aria-modal="true" aria-labelledby="tdetNome">
@@ -2016,7 +2016,10 @@
     if(umaVez){ if(estatJaFeito[umaVez]) return; estatJaFeito[umaVez] = true; }
     try{
       const uid = await resolucaoMotorista; if(!uid) return;
-      const a = new Date(), dia = `${a.getFullYear()}-${String(a.getMonth()+1).padStart(2,'0')}-${String(a.getDate()).padStart(2,'0')}`;
+      // o dia conta sempre pela hora de Lisboa (um visitante no Japão não deve contar para "amanhã")
+      let dia = '';
+      try{ dia = new Intl.DateTimeFormat('en-CA', { timeZone:'Europe/Lisbon', year:'numeric', month:'2-digit', day:'2-digit' }).format(new Date()); }catch(e){}
+      if(!/^\d{4}-\d{2}-\d{2}$/.test(dia)){ const a = new Date(); dia = `${a.getFullYear()}-${String(a.getMonth()+1).padStart(2,'0')}-${String(a.getDate()).padStart(2,'0')}`; }
       const dados = { uid, dia };
       (campos || []).forEach(k => { dados[k] = increment(1); });
       if(tourId && /^[a-z0-9]{4,24}$/.test(tourId)) dados.t = { [tourId]: increment(1) };
