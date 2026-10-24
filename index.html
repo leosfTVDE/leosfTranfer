@@ -862,6 +862,9 @@
   .cr-desl.volta .cr-desl-bola{ transition:transform .25s ease; } .cr-desl.volta .cr-desl-enche{ transition:width .25s ease; }
   .cr-desl-dica{ text-align:center; font:11.5px 'Helvetica Neue', Arial, sans-serif; color:#6a7378; margin-top:6px; }
   .cr-desl-dica.alerta{ color:var(--terracota); font-weight:700; }
+  .cr-waze-agora{ display:flex; align-items:center; justify-content:center; gap:8px; width:100%; min-height:54px; margin:0 0 8px; border:none; border-radius:16px; background:#33ccff; color:#0d1b2a; font:800 17px 'Helvetica Neue', Arial, sans-serif; box-shadow:0 6px 18px rgba(51,204,255,.35); cursor:pointer; animation:crWazePulsa 1.4s ease-in-out 3; }
+  .cr-waze-agora[hidden]{ display:none; }
+  @keyframes crWazePulsa{ 0%,100%{ transform:scale(1); } 50%{ transform:scale(1.03); } }
   #corridaOverlay .cr-corpo{ padding-bottom:150px; }
   .cr-aviso-ov{ position:absolute; inset:0; z-index:5; }
   .cr-aviso-ov[hidden]{ display:none; }
@@ -1906,7 +1909,7 @@
     <p class="nota">Os serviços por hora agendados ficam em "📅 Agendados". Os que estão em andamento aparecem a partir do momento em que tocas em "🚗 Ir buscar cliente" no agendamento. O tempo só começa a contar quando tocas em "▶️ Iniciar" (cliente no carro). Ao finalizar, o valor é calculado pela regra definida em "Minhas tarifas" e podes enviar o resumo ao cliente. O agendamento só sai da lista quando o marcares como "Concluído".</p>
   </div>
 
-  <p style="text-align:center; font-family:'Helvetica Neue', Arial, sans-serif; font-size:11px; color:#8a7f66; margin-top:24px;">Trajeto · v9.23.1</p>
+  <p style="text-align:center; font-family:'Helvetica Neue', Arial, sans-serif; font-size:11px; color:#8a7f66; margin-top:24px;">Trajeto · v9.23.2</p>
 
 </main>
 
@@ -1989,7 +1992,7 @@
       <button type="button" class="cr-act" id="crPlaca"><b>🪧</b>Placa</button>
     </div>
   </div>
-  <div class="cr-rodape"><button type="button" class="cr-voltar" id="btnCorridaVoltar" hidden>↩ Voltar ao passo anterior</button>
+  <div class="cr-rodape"><button type="button" class="cr-waze-agora" id="crWazeAgora" hidden>🧭 Abrir o Waze</button><button type="button" class="cr-voltar" id="btnCorridaVoltar" hidden>↩ Voltar ao passo anterior</button>
     <div class="cr-desl f0" id="btnCorridaPasso" role="slider" tabindex="0" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" aria-label="Deslize para confirmar">
       <div class="cr-desl-enche" id="crDeslEnche"></div>
       <div class="cr-desl-txt" id="crDeslTxt"></div>
@@ -4785,7 +4788,7 @@
     renderCorrida();
   }
   function fecharCorrida(){
-    corridaId = null; if(typeof fecharAviso === 'function') fecharAviso();
+    corridaId = null; if(typeof fecharAviso === 'function') fecharAviso(); if(typeof esconderBotaoWaze === 'function') esconderBotaoWaze();
     document.getElementById('corridaOverlay').classList.remove('aberto');
     document.getElementById('corridaOverlay').setAttribute('aria-hidden', 'true');
   }
@@ -4870,26 +4873,32 @@
   // No iPhone, só um TOQUE deixa abrir outra app; o fim de um arrasto com o dedo é entregue no 'touchend',
   // por isso, com o dedo, o Waze é aberto aí (wazePendente). Com rato/teclado abre logo.
   let wazePendente = '', wazeDicaTimer = null;
+  // v9.23.2: no iPhone, um ARRASTO não autoriza abrir outra app com window.open (só um toque simples).
+  //  - com o dedo: abre a app do Waze pelo endereço próprio dela (waze://), que não depende desse "toque";
+  //  - e mostra logo um botão grande "🧭 Abrir o Waze" (um toque simples funciona sempre) durante 15 s.
+  //  - com rato/teclado (computador): abre como antes.
+  let wazeAgoraAlvo = '', wazeAgoraTimer = null;
+  function urlAppWaze(endereco){ return `waze://?q=${encodeURIComponent(endereco)}&navigate=yes`; }
+  function mostrarBotaoWaze(alvo){
+    const b = document.getElementById('crWazeAgora'); if(!b) return;
+    wazeAgoraAlvo = alvo; b.textContent = '🧭 Abrir o Waze'; b.hidden = false;
+    clearTimeout(wazeAgoraTimer); wazeAgoraTimer = setTimeout(esconderBotaoWaze, 15000);
+  }
+  function esconderBotaoWaze(){ const b = document.getElementById('crWazeAgora'); if(b) b.hidden = true; wazeAgoraAlvo = ''; clearTimeout(wazeAgoraTimer); }
   function abrirWazeDoPasso(comDedo){
     const alvo = enderecoWazeDoPasso(); if(!alvo) return;
     if(comDedo){
-      wazePendente = alvo;
-      setTimeout(()=>{ if(wazePendente){ const a = wazePendente; wazePendente = ''; abrirWaze(a); } }, 80);   // reserva, se não houver 'touchend'
+      try{ (window.__navegarApp || function(u){ window.location.href = u; })(urlAppWaze(alvo)); }catch(e){}
+      mostrarBotaoWaze(alvo);
     } else abrirWaze(alvo);
-    // rede de segurança: se o Waze não abrir, lembra o botão azul do Waze (mesma morada)
-    clearTimeout(wazeDicaTimer);
-    wazeDicaTimer = setTimeout(()=>{
-      const d = document.getElementById('crDeslDica');
-      if(d && corridaId){ d.textContent = 'Se o Waze não abriu, toque no botão azul do Waze, em cima.'; d.classList.add('alerta'); setTimeout(()=>{ d.classList.remove('alerta'); d.textContent = 'Deslize até ao fim para confirmar'; }, 9000); }
-    }, 900);
   }
-  function wazeNoFimDoToque(){ if(wazePendente){ const a = wazePendente; wazePendente = ''; abrirWaze(a); } }
+  function wazeNoFimDoToque(){}
   function avancarPassoCorrida(){
     const ag = lerAgendamentos().find(a => a.id === corridaId); if(!ag) return;
     const fase = passoCorrida(ag);
     if(fase < 3){
       gravarFaseCorrida(fase + 1); document.querySelector('.cr-corpo').scrollTop = 0;
-      if(fase === 1) abrirAvisoChegada(ag.id);                                                // cheguei → perguntar se avisa o cliente
+      if(fase === 1){ esconderBotaoWaze(); abrirAvisoChegada(ag.id); }                        // cheguei → perguntar se avisa o cliente
       return;
     }
     const id = corridaId; fecharCorrida(); abrirModalPagamento(id);   // o mesmo ecrã de pagamento e nota de sempre
@@ -4926,6 +4935,7 @@
     else { desl.classList.add('volta'); deslPor(0); setTimeout(()=>{ deslEnche.style.width = ''; }, 260); }   // largou a meio: volta ao início, nada muda
   }
   deslBola.addEventListener('pointerup', deslLargar);
+  document.getElementById('crWazeAgora').addEventListener('click', ()=>{ const a = wazeAgoraAlvo || enderecoWazeDoPasso(); esconderBotaoWaze(); if(a) abrirWaze(a); });
   deslBola.addEventListener('touchend', wazeNoFimDoToque);
   desl.addEventListener('touchend', wazeNoFimDoToque);
   deslBola.addEventListener('pointercancel', (e)=>{ if(!deslArr) return; deslArr = null; desl.classList.add('volta'); deslPor(0); });
@@ -4975,7 +4985,7 @@
   document.getElementById('btnCorridaVoltar').addEventListener('click', ()=>{
     const ag = lerAgendamentos().find(a => a.id === corridaId); if(!ag) return;
     const fase = passoCorrida(ag);
-    if(fase > 0){ fecharAviso(); gravarFaseCorrida(fase - 1); document.querySelector('.cr-corpo').scrollTop = 0; }   // só volta o passo; não abre o Waze
+    if(fase > 0){ fecharAviso(); esconderBotaoWaze(); gravarFaseCorrida(fase - 1); document.querySelector('.cr-corpo').scrollTop = 0; }   // só volta o passo; não abre o Waze
   });
   document.getElementById('crWhats').addEventListener('click', ()=>{
     const ag = lerAgendamentos().find(a => a.id === corridaId); if(!ag || !ag.telefone) return;
