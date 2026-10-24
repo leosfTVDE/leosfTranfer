@@ -848,6 +848,33 @@
   .rot-tot{ font:600 12.5px 'Helvetica Neue', Arial, sans-serif; color:var(--azulejo); margin-top:2px; }
   .rot-aviso{ margin-top:8px; padding:9px 11px; border-radius:10px; background:#fff4e0; border:1px solid #f0d6a0; color:#7a5a0e; font:600 13px 'Helvetica Neue', Arial, sans-serif; }
   .ag-badge-semrot{ display:inline-block; padding:3px 8px; border-radius:999px; background:#fff4e0; color:#7a5a0e; font:700 10.5px 'Helvetica Neue', Arial, sans-serif; white-space:nowrap; }
+  /* ===== v9.23: deslizar para confirmar + aviso de chegada ===== */
+  .cr-desl{ position:relative; height:64px; border-radius:32px; overflow:hidden; user-select:none; -webkit-user-select:none; touch-action:none; box-shadow:0 6px 18px rgba(13,27,42,.18); outline:none; }
+  .cr-desl:focus-visible{ box-shadow:0 0 0 3px #e8c9a0, 0 6px 18px rgba(13,27,42,.18); }
+  .cr-desl.f0{ background:var(--azulejo); } .cr-desl.f1{ background:var(--terracota); } .cr-desl.f2{ background:#8a5a2b; } .cr-desl.f3{ background:var(--azul-noite); }
+  .cr-desl-enche{ position:absolute; left:0; top:0; bottom:0; width:0; background:rgba(255,255,255,.22); border-radius:32px; }
+  .cr-desl-txt{ position:absolute; inset:0; display:flex; align-items:center; justify-content:center; padding:0 18px 0 66px; color:#fff; font:700 17px 'Helvetica Neue', Arial, sans-serif; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; pointer-events:none; }
+  .cr-desl-txt em{ font-style:normal; opacity:.75; margin-left:6px; letter-spacing:-3px; animation:crSeta 1.6s ease-in-out infinite; }
+  @keyframes crSeta{ 0%,100%{ opacity:.35; } 50%{ opacity:.95; } }
+  .cr-desl.feito .cr-desl-txt{ padding:0 66px 0 18px; }
+  .cr-desl-bola{ position:absolute; left:6px; top:6px; width:52px; height:52px; border-radius:50%; background:#fff; display:flex; align-items:center; justify-content:center; font-size:22px; color:var(--azul-noite); box-shadow:0 3px 10px rgba(0,0,0,.25); cursor:grab; touch-action:none; }
+  .cr-desl.f0 .cr-desl-bola{ color:var(--azulejo); } .cr-desl.f1 .cr-desl-bola{ color:var(--terracota); } .cr-desl.f2 .cr-desl-bola{ color:#8a5a2b; }
+  .cr-desl.volta .cr-desl-bola{ transition:transform .25s ease; } .cr-desl.volta .cr-desl-enche{ transition:width .25s ease; }
+  .cr-desl-dica{ text-align:center; font:11.5px 'Helvetica Neue', Arial, sans-serif; color:#6a7378; margin-top:6px; }
+  #corridaOverlay .cr-corpo{ padding-bottom:150px; }
+  .cr-aviso-ov{ position:absolute; inset:0; z-index:5; }
+  .cr-aviso-ov[hidden]{ display:none; }
+  .cr-aviso-fundo{ position:absolute; inset:0; background:rgba(11,25,44,.55); }
+  .cr-aviso-folha{ position:absolute; left:0; right:0; bottom:0; max-height:calc(100% - 40px); overflow-y:auto; background:#fbfaf7; border-radius:20px 20px 0 0; padding:18px 16px calc(env(safe-area-inset-bottom, 0px) + 18px); box-shadow:0 -10px 40px rgba(0,0,0,.25); }
+  .cr-aviso-folha h3{ margin:0; font:700 19px 'Helvetica Neue', Arial, sans-serif; color:var(--azul-noite); }
+  .cr-aviso-sub{ margin:4px 0 0; font-size:13px; color:#6a7378; }
+  .cr-aviso-lang{ display:flex; gap:3px; padding:3px; background:#ebe3d3; border-radius:10px; margin:14px 0 10px; }
+  .cr-aviso-lang button{ flex:1; padding:9px; border:none; border-radius:8px; background:transparent; font:600 13px 'Helvetica Neue', Arial, sans-serif; color:var(--azul-noite); cursor:pointer; }
+  .cr-aviso-lang button.on{ background:#fff; box-shadow:0 1px 3px rgba(0,0,0,.08); }
+  .cr-aviso-bolha{ background:#dcf8c6; border-radius:12px; padding:12px 14px; font:14.5px/1.5 'Helvetica Neue', Arial, sans-serif; white-space:pre-wrap; color:#111; overflow-wrap:anywhere; }
+  .cr-aviso-ed{ margin:8px 0 0; font-size:12px; color:var(--azulejo); font-weight:700; text-align:right; }
+  .cr-aviso-wa, .cr-aviso-nao{ display:block; width:100%; margin-top:10px; padding:15px; border:none; border-radius:12px; font:700 15px 'Helvetica Neue', Arial, sans-serif; cursor:pointer; }
+  .cr-aviso-wa{ background:#25D366; color:#fff; } .cr-aviso-nao{ background:#efe7d6; color:var(--azul-noite); margin-top:8px; }
   /* ===== v9.22: Dados do serviço (para mostrar numa fiscalização) ===== */
   .cr-dados{ display:flex; flex-direction:column; align-items:center; justify-content:center; gap:1px; width:54px; height:46px; margin-left:auto; border:none; border-radius:12px; background:#e8c9a0; color:var(--azul-noite); font:800 10.5px 'Helvetica Neue', Arial, sans-serif; cursor:pointer; flex-shrink:0; }
   .cr-dados span{ font-size:18px; line-height:1; }
@@ -1878,7 +1905,7 @@
     <p class="nota">Os serviços por hora agendados ficam em "📅 Agendados". Os que estão em andamento aparecem a partir do momento em que tocas em "🚗 Ir buscar cliente" no agendamento. O tempo só começa a contar quando tocas em "▶️ Iniciar" (cliente no carro). Ao finalizar, o valor é calculado pela regra definida em "Minhas tarifas" e podes enviar o resumo ao cliente. O agendamento só sai da lista quando o marcares como "Concluído".</p>
   </div>
 
-  <p style="text-align:center; font-family:'Helvetica Neue', Arial, sans-serif; font-size:11px; color:#8a7f66; margin-top:24px;">Trajeto · v9.22.0</p>
+  <p style="text-align:center; font-family:'Helvetica Neue', Arial, sans-serif; font-size:11px; color:#8a7f66; margin-top:24px;">Trajeto · v9.23.0</p>
 
 </main>
 
@@ -1940,7 +1967,7 @@
       <div class="cr-tit"><b id="crCliente"></b><small id="crSub"></small></div>
       <button type="button" class="cr-dados" id="btnCorridaDados" aria-label="Dados do serviço"><span>📋</span>Dados</button>
     </div>
-    <div class="cr-fase" id="crFase"><i></i><i></i><i></i></div>
+    <div class="cr-fase" id="crFase"><i></i><i></i><i></i><i></i></div>
     <div class="cr-fasetx" id="crFaseTx"></div>
   </div>
   <div class="cr-corpo">
@@ -1961,7 +1988,26 @@
       <button type="button" class="cr-act" id="crPlaca"><b>🪧</b>Placa</button>
     </div>
   </div>
-  <div class="cr-rodape"><button type="button" class="cr-voltar" id="btnCorridaVoltar" hidden>↩ Voltar ao passo anterior</button><button type="button" class="cr-go" id="btnCorridaPasso"></button></div>
+  <div class="cr-rodape"><button type="button" class="cr-voltar" id="btnCorridaVoltar" hidden>↩ Voltar ao passo anterior</button>
+    <div class="cr-desl f0" id="btnCorridaPasso" role="slider" tabindex="0" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" aria-label="Deslize para confirmar">
+      <div class="cr-desl-enche" id="crDeslEnche"></div>
+      <div class="cr-desl-txt" id="crDeslTxt"></div>
+      <div class="cr-desl-bola" id="crDeslBola" aria-hidden="true">➜</div>
+    </div>
+    <div class="cr-desl-dica" id="crDeslDica">Deslize até ao fim para confirmar</div>
+  </div>
+  <div class="cr-aviso-ov" id="avisoChegada" hidden>
+    <div class="cr-aviso-fundo" data-fechar-aviso></div>
+    <div class="cr-aviso-folha" role="dialog" aria-modal="true" aria-labelledby="avisoTit">
+      <h3 id="avisoTit">📍 Avisar o cliente que chegou?</h3>
+      <p class="cr-aviso-sub">Mensagem pronta. Toque para abrir o WhatsApp com ela.</p>
+      <div class="cr-aviso-lang" id="avisoLang"><button type="button" data-l="pt">🇵🇹 Português</button><button type="button" data-l="en">🇬🇧 English</button></div>
+      <div class="cr-aviso-bolha" id="avisoMsg"></div>
+      <p class="cr-aviso-ed">✏️ Pode editar no WhatsApp antes de enviar</p>
+      <button type="button" class="cr-aviso-wa" id="avisoEnviar">💬 Enviar pelo WhatsApp</button>
+      <button type="button" class="cr-aviso-nao" data-fechar-aviso>Agora não</button>
+    </div>
+  </div>
 </div>
 
 <div class="placar-overlay" id="placarOverlay">
@@ -4738,30 +4784,37 @@
     renderCorrida();
   }
   function fecharCorrida(){
-    corridaId = null;
+    corridaId = null; if(typeof fecharAviso === 'function') fecharAviso();
     document.getElementById('corridaOverlay').classList.remove('aberto');
     document.getElementById('corridaOverlay').setAttribute('aria-hidden', 'true');
+  }
+  // v9.23: 4 passos. ag.corridaPasso: 0 antes de sair · 1 a caminho · 2 no local (cheguei) · 3 em viagem.
+  // Agendamentos de versões anteriores só têm corridaFase (0/1/2 = antes/a caminho/em viagem) → lidos como 0/1/3.
+  function passoCorrida(ag){
+    if(ag && ag.corridaPasso != null){ const n = parseInt(ag.corridaPasso, 10); return isNaN(n) ? 0 : Math.min(3, Math.max(0, n)); }
+    const f = parseInt(ag && ag.corridaFase, 10) || 0;
+    return f >= 2 ? 3 : f === 1 ? 1 : 0;
   }
   function renderCorrida(){
     const ag = lerAgendamentos().find(a => a.id === corridaId);
     if(!ag || ag.realizado){ fecharCorrida(); return; }
-    const fase = Math.min(2, Math.max(0, parseInt(ag.corridaFase, 10) || 0));
+    const fase = passoCorrida(ag);
     const eTour = ag.tipo === 'tour';
     const forn = (ag.fornecedor || '').trim();
     const parceiro = forn && ehFornecedorParceiro(forn);
     document.getElementById('crCliente').textContent = ag.cliente || 'Cliente';
     document.getElementById('crSub').textContent = [eTour ? '🗺️ ' + (ag.tourNome || 'Tour') : 'Transfer', parceiro ? forn : '', `${ag.data.split('-').reverse().slice(0, 2).join('/')} · ${ag.hora}`].filter(Boolean).join(' · ');
     document.querySelectorAll('#crFase i').forEach((el, i)=> el.classList.toggle('on', i <= fase));
-    document.getElementById('crFaseTx').textContent = ['Passo 1 de 3 · ir buscar o cliente', 'Passo 2 de 3 · a caminho da recolha', eTour ? 'Passo 3 de 3 · em tour' : 'Passo 3 de 3 · a caminho do destino'][fase];
+    document.getElementById('crFaseTx').textContent = ['Passo 1 de 4 · ir buscar o cliente', 'Passo 2 de 4 · a caminho da recolha', 'Passo 3 de 4 · no local — à espera do cliente', eTour ? 'Passo 4 de 4 · em tour' : 'Passo 4 de 4 · a caminho do destino'][fase];
     const destino = corridaDestino(ag);
-    const emViagem = fase === 2 && !!destino;
+    const emViagem = fase === 3 && !!destino;
     document.getElementById('crRotulo').textContent = emViagem ? (eTour ? 'Fim do tour' : 'Destino') : 'Recolha';
     document.getElementById('crEndereco').textContent = emViagem ? destino : (ag.partida || '—');
     const chip = document.getElementById('crChip'); chip.hidden = !parceiro; chip.textContent = parceiro ? '🏷 ' + forn : '';
     // paragens (Waze em cada uma) — no passo 3
     const pr = document.getElementById('crParagens'); pr.innerHTML = '';
     const lista = corridaParagens(ag);
-    if(fase === 2 && lista.length){
+    if(fase === 3 && lista.length){
       lista.forEach((t, i)=>{ const b = document.createElement('button'); b.type = 'button'; b.textContent = `📍 ${i + 1} · ${t}`; b.addEventListener('click', ()=> abrirWaze(t)); pr.appendChild(b); });
       pr.hidden = false;
     } else pr.hidden = true;
@@ -4790,37 +4843,111 @@
     const tel = ag.telefone ? normalizarTelefone(ag.telefone) : '';
     const lig = document.getElementById('crLigar'); lig.href = tel ? 'tel:+' + tel.replace(/^\+/, '') : '#'; lig.classList.toggle('off', !tel);
     document.getElementById('crWhats').classList.toggle('off', !tel);
-    const btn = document.getElementById('btnCorridaPasso');
     document.getElementById('btnCorridaVoltar').hidden = fase === 0;
-    btn.className = 'cr-go f' + fase;
-    btn.textContent = ['🚗 A caminho', eTour ? '📍 Cheguei · Iniciar tour' : '📍 Cheguei · Iniciar viagem', '🏁 Concluir serviço'][fase];
+    prepararDeslizador(fase, ['Deslize: a caminho', 'Deslize: cheguei', eTour ? 'Deslize: iniciar tour' : 'Deslize: iniciar viagem', 'Deslize: concluir serviço'][fase]);
   }
   function gravarFaseCorrida(fase){
     const lista = lerAgendamentos(); const ag = lista.find(a => a.id === corridaId); if(!ag) return;
-    ag.corridaFase = fase; gravarAgendamentos(lista); renderLista(); renderCorrida();
+    ag.corridaPasso = fase; delete ag.corridaFase; gravarAgendamentos(lista); renderLista(); renderCorrida();
   }
   document.getElementById('btnCorridaFechar').addEventListener('click', fecharCorrida);
   document.getElementById('btnCorridaWaze').addEventListener('click', ()=>{
     const ag = lerAgendamentos().find(a => a.id === corridaId); if(!ag) return;
-    const fase = parseInt(ag.corridaFase, 10) || 0; const d = corridaDestino(ag);
-    abrirWaze(fase === 2 && d ? d : ag.partida);
+    const fase = passoCorrida(ag); const d = corridaDestino(ag);
+    abrirWaze(fase === 3 && d ? d : ag.partida);
   });
-  document.getElementById('btnCorridaPasso').addEventListener('click', ()=>{
+  // Avança um passo (chamado só quando o deslizador chega ao fim, ou Enter no teclado)
+  function avancarPassoCorrida(){
     const ag = lerAgendamentos().find(a => a.id === corridaId); if(!ag) return;
-    const fase = parseInt(ag.corridaFase, 10) || 0;
-    if(fase < 2){
+    const fase = passoCorrida(ag);
+    if(fase < 3){
       gravarFaseCorrida(fase + 1); document.querySelector('.cr-corpo').scrollTop = 0;
-      // v9.20.1: "A caminho" abre o Waze para a recolha; "Iniciar viagem" abre o Waze para a 1.ª paragem (ou o destino)
-      if(fase === 0) abrirWaze(ag.partida);
-      else { const prox = corridaParagens(ag)[0] || corridaDestino(ag); if(prox) abrirWaze(prox); }
+      if(fase === 0) abrirWaze(ag.partida);                                                   // a caminho → Waze para a recolha
+      else if(fase === 1) abrirAvisoChegada(ag.id);                                           // cheguei → perguntar se avisa o cliente
+      else { const prox = corridaParagens(ag)[0] || corridaDestino(ag); if(prox) abrirWaze(prox); }   // iniciar viagem → Waze
       return;
     }
     const id = corridaId; fecharCorrida(); abrirModalPagamento(id);   // o mesmo ecrã de pagamento e nota de sempre
+  }
+  // ---- deslizador ----
+  const desl = document.getElementById('btnCorridaPasso'), deslBola = document.getElementById('crDeslBola'), deslEnche = document.getElementById('crDeslEnche'), deslTxt = document.getElementById('crDeslTxt');
+  let deslArr = null, deslOcupado = false;
+  function prepararDeslizador(fase, rotulo){
+    desl.className = 'cr-desl f' + fase; deslOcupado = false; deslArr = null;
+    deslBola.style.transform = ''; deslEnche.style.width = ''; deslBola.textContent = '➜';
+    deslTxt.textContent = rotulo + ' '; const em = document.createElement('em'); em.textContent = '›››'; deslTxt.appendChild(em);
+    desl.setAttribute('aria-valuenow', '0'); desl.setAttribute('aria-label', rotulo + ' (deslize até ao fim)');
+    document.getElementById('crDeslDica').innerHTML = 'Deslize até ao fim para confirmar';
+  }
+  function deslMax(){ return Math.max(1, desl.clientWidth - deslBola.offsetWidth - 12); }
+  function deslPor(x){ const m = deslMax(), v = Math.max(0, Math.min(m, x)); deslBola.style.transform = `translateX(${v}px)`; deslEnche.style.width = (v + deslBola.offsetWidth + 6) + 'px'; desl.setAttribute('aria-valuenow', String(Math.round(v / m * 100))); return v; }
+  function deslConcluir(){
+    deslOcupado = true; desl.classList.add('feito', 'volta'); deslPor(deslMax()); deslBola.textContent = '✓';
+    deslTxt.textContent = '✓ Feito!';
+    try{ if(navigator.vibrate) navigator.vibrate(30); }catch(e){}
+    setTimeout(()=>{ deslOcupado = false; avancarPassoCorrida(); }, 320);
+  }
+  deslBola.addEventListener('pointerdown', (e)=>{
+    if(deslOcupado) return;
+    e.preventDefault(); deslArr = { x0: e.clientX, id: e.pointerId }; desl.classList.remove('volta');
+    try{ deslBola.setPointerCapture(e.pointerId); }catch(err){}
+  });
+  deslBola.addEventListener('pointermove', (e)=>{ if(!deslArr || e.pointerId !== deslArr.id) return; e.preventDefault(); deslPor(e.clientX - deslArr.x0); });
+  function deslLargar(e){
+    if(!deslArr || (e && e.pointerId !== deslArr.id)) return;
+    const v = e ? e.clientX - deslArr.x0 : 0; deslArr = null;
+    if(v >= deslMax() * 0.88) deslConcluir();
+    else { desl.classList.add('volta'); deslPor(0); setTimeout(()=>{ deslEnche.style.width = ''; }, 260); }   // largou a meio: volta ao início, nada muda
+  }
+  deslBola.addEventListener('pointerup', deslLargar);
+  deslBola.addEventListener('pointercancel', (e)=>{ if(!deslArr) return; deslArr = null; desl.classList.add('volta'); deslPor(0); });
+  desl.addEventListener('keydown', (e)=>{ if((e.key === 'Enter' || e.key === ' ') && !deslOcupado){ e.preventDefault(); deslConcluir(); } });   // teclado / leitores de ecrã
+
+  // ---- aviso de chegada ao cliente (PT/EN) ----
+  let avisoId = null, avisoLingua = 'pt';
+  function linguaCliente(ag){
+    if(ag.idioma === 'en' || ag.idioma === 'pt') return ag.idioma;
+    const t = ag.telefone ? normalizarTelefone(ag.telefone) : '';
+    if(!t || /^(351|55|244|258|238|245|239|670)/.test(t)) return 'pt';   // Portugal, Brasil e países lusófonos
+    return 'en';
+  }
+  function mensagemChegada(ag, lingua){
+    const nome = (ag.cliente || '').trim(), local = (ag.partida || '').trim(), assin = (localStorage.getItem('trajeto_nome') || '').trim();
+    const c = lerCarro(), aer = ehAeroporto(local);
+    const carroPT = [c.modelo, c.cor].filter(Boolean).join(' '), carroEN = [c.corEn || c.cor, c.modelo].filter(Boolean).join(' ');
+    if(lingua === 'en'){
+      const corpo = aer ? `I'm already at the Arrivals of ${local}, holding a sign with your name. 🪧\n\nNo rush: I'll wait while you collect your luggage.`
+                        : `I have arrived — I'm at ${local} and at your disposal. 🚗\n\nCome whenever you are ready — no rush, the time is yours.`;
+      const carro = (carroEN || c.matricula) ? `\n\n${[carroEN, c.matricula].filter(Boolean).join(' · ')}` : '';
+      return `Hello${nome ? ' ' + nome : ''}! 👋\n\n${corpo}${carro}${assin ? '\n' + assin : ''}`;
+    }
+    const corpo = aer ? `Já estou nas Chegadas do ${local}, com uma placa com o seu nome. 🪧\n\nSem pressa: aguardo enquanto recolhe as malas.`
+                      : `Já cheguei — estou em ${local} e à sua disposição. 🚗\n\nPode vir quando estiver pronto(a) — sem pressa, o tempo é seu.`;
+    const carro = (carroPT || c.matricula) ? `\n\n${[carroPT, c.matricula].filter(Boolean).join(' · ')}` : '';
+    return `Olá${nome ? ' ' + nome : ''}! 👋\n\n${corpo}${carro}${assin ? '\n' + assin : ''}`;
+  }
+  function desenharAviso(){
+    const ag = lerAgendamentos().find(a => a.id === avisoId); if(!ag) return;
+    document.querySelectorAll('#avisoLang button').forEach(b => b.classList.toggle('on', b.dataset.l === avisoLingua));
+    document.getElementById('avisoMsg').textContent = mensagemChegada(ag, avisoLingua);
+  }
+  function abrirAvisoChegada(id){
+    const ag = lerAgendamentos().find(a => a.id === id); if(!ag || !ag.telefone) return;   // sem telefone: não pergunta
+    avisoId = id; avisoLingua = linguaCliente(ag); desenharAviso();
+    document.getElementById('avisoChegada').hidden = false;
+  }
+  function fecharAviso(){ avisoId = null; document.getElementById('avisoChegada').hidden = true; }
+  document.querySelectorAll('#avisoLang button').forEach(b => b.addEventListener('click', ()=>{ avisoLingua = b.dataset.l; desenharAviso(); }));
+  document.getElementById('avisoChegada').addEventListener('click', (e)=>{ if(e.target.closest('[data-fechar-aviso]')) fecharAviso(); });
+  document.getElementById('avisoEnviar').addEventListener('click', ()=>{
+    const ag = lerAgendamentos().find(a => a.id === avisoId); if(!ag || !ag.telefone){ fecharAviso(); return; }
+    window.open(`https://wa.me/${normalizarTelefone(ag.telefone)}?text=${encodeURIComponent(mensagemChegada(ag, avisoLingua))}`, '_blank');
+    fecharAviso();
   });
   document.getElementById('btnCorridaVoltar').addEventListener('click', ()=>{
     const ag = lerAgendamentos().find(a => a.id === corridaId); if(!ag) return;
-    const fase = parseInt(ag.corridaFase, 10) || 0;
-    if(fase > 0){ gravarFaseCorrida(fase - 1); document.querySelector('.cr-corpo').scrollTop = 0; }   // só volta o passo; não abre o Waze
+    const fase = passoCorrida(ag);
+    if(fase > 0){ fecharAviso(); gravarFaseCorrida(fase - 1); document.querySelector('.cr-corpo').scrollTop = 0; }   // só volta o passo; não abre o Waze
   });
   document.getElementById('crWhats').addEventListener('click', ()=>{
     const ag = lerAgendamentos().find(a => a.id === corridaId); if(!ag || !ag.telefone) return;
@@ -4833,8 +4960,8 @@
   });
   function seloCorrida(ag){
     if(ag.realizado || ag.tipo === 'hora') return '';
-    const f = parseInt(ag.corridaFase, 10) || 0;
-    return f === 1 ? '<span class="ag-badge-corrida">🚗 A caminho</span>' : f === 2 ? '<span class="ag-badge-corrida">▶ Em viagem</span>' : '';
+    const f = passoCorrida(ag);
+    return f === 1 ? '<span class="ag-badge-corrida">🚗 A caminho</span>' : f === 2 ? '<span class="ag-badge-corrida">📍 No local</span>' : f === 3 ? '<span class="ag-badge-corrida">▶ Em viagem</span>' : '';
   }
 
   // =====================================================================
@@ -4929,8 +5056,8 @@
   function dadosDoServico(ag){
     const eTour = ag.tipo === 'tour', eHora = ag.tipo === 'hora';
     const forn = (ag.fornecedor || '').trim(), parceiro = forn && ehFornecedorParceiro(forn);
-    const fase = parseInt(ag.corridaFase, 10) || 0;
-    const estado = ag.realizado ? 'Concluído' : fase === 2 ? 'Em viagem' : fase === 1 ? 'A caminho' : 'Agendado';
+    const fase = passoCorrida(ag);
+    const estado = ag.realizado ? 'Concluído' : fase === 3 ? 'Em viagem' : fase === 2 ? 'No local' : fase === 1 ? 'A caminho' : 'Agendado';
     const dt = new Date(ag.data + 'T12:00:00');
     const dataTxt = `${dt.toLocaleDateString('pt-PT', { weekday:'short' })} ${(ag.data || '').split('-').reverse().join('/')} · ${ag.hora || ''}`;
     const criado = quandoCriado(ag);
@@ -5585,6 +5712,7 @@
         partida: p.partida, chegada: p.chegada || p.partida, paragens: p.paragens || [], data: p.data, hora: p.hora,
         cliente: p.nome, telefone: p.contacto, nomePlaca: '', voo: p.voo || '',
         fornecedor: 'Site — pedido online',
+        idioma: p.idioma === 'en' ? 'en' : 'pt',
         valor: ehHora ? String(valorMinimoHora()) : '',
         observacoes: obs,
         realizado: false
