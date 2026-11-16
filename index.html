@@ -418,6 +418,25 @@
   .cli-btn-perigo{ background:none; color:#a02f24; border:1px solid rgba(180,59,47,.4); }
   .cli-opcao{ display:block; width:100%; padding:15px 14px; margin:0 0 10px; border:none; border-radius:11px; background:var(--terracota); color:#fff; font-family:'Helvetica Neue', Arial, sans-serif; font-size:15.5px; font-weight:bold; cursor:pointer; text-align:left; }
   .cli-opcao.cli-em-branco{ background:var(--azul-doca); margin-bottom:14px; }
+  .cli-opcao.cli-colar{ background:var(--azulejo); }
+  .colar-titulo{ font-family:'Helvetica Neue', Arial, sans-serif; font-size:13px; font-weight:700; letter-spacing:.12em; color:var(--azulejo); margin:0 0 10px; }
+  #colarTexto{ min-height:220px; font-size:13.5px; line-height:1.45; }
+  .colar-linha-btn{ display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-top:10px; }
+  .colar-linha-btn .cli-btn{ margin-top:0; }
+  .colar-estado{ font-family:'Helvetica Neue', Arial, sans-serif; font-size:12.5px; color:#6a7378; line-height:1.5; min-height:1.2em; margin:8px 0 0; }
+  .colar-estado.erro{ color:#a02f24; }
+  .colar-serv{ border:1.5px solid var(--linha); border-radius:12px; padding:10px 12px 12px; margin:0 0 10px; background:var(--areia); }
+  .colar-serv.falta{ border-color:#c1552c; }
+  .colar-serv-cab{ display:flex; justify-content:space-between; align-items:center; font-family:'Helvetica Neue', Arial, sans-serif; font-size:14px; font-weight:700; color:var(--azul-doca); }
+  .colar-serv-cab button{ border:none; background:none; color:#a02f24; font-size:13px; cursor:pointer; padding:4px 6px; }
+  .colar-serv .colar-2{ display:grid; grid-template-columns:1fr 1fr; gap:8px; }
+  .colar-serv .colar-2>div, #cliPassoRever .colar-2>div{ min-width:0; }
+  .modal-cli .colar-serv input, .modal-cli #cliPassoRever input{ box-sizing:border-box; max-width:100%; min-width:0; }
+  .colar-serv label{ margin:8px 0 3px !important; }
+  .modal-cli .colar-serv input, .modal-cli #cliPassoRever input{ width:100%; padding:9px 10px; border:1.5px solid var(--linha); border-radius:9px; background:#fff; color:var(--texto); font-family:'Helvetica Neue', Arial, sans-serif; font-size:15px; }
+  .colar-aviso{ font-family:'Helvetica Neue', Arial, sans-serif; font-size:12px; font-weight:700; color:#b5651d; margin-top:8px; }
+  .colar-feito{ display:flex; align-items:center; justify-content:space-between; gap:10px; padding:10px 12px; margin:0 0 8px; border:1px solid var(--linha); border-radius:10px; background:var(--areia); font-family:'Helvetica Neue', Arial, sans-serif; font-size:13.5px; color:var(--texto); }
+  .colar-feito .cli-mini{ white-space:nowrap; }
   .cli-em-branco span{ display:block; font-size:12px; font-weight:normal; opacity:.85; margin-top:2px; }
   .ag-cab{ display:flex; flex-direction:column; gap:3px; min-width:0; flex:1; }
   .ag-linha-quando{ font-family:'Helvetica Neue', Arial, sans-serif; font-size:12.5px; font-weight:normal; color:var(--azulejo); display:flex; flex-wrap:wrap; align-items:center; gap:6px; }
@@ -1909,7 +1928,7 @@
     <p class="nota">Os serviços por hora agendados ficam em "📅 Agendados". Os que estão em andamento aparecem a partir do momento em que tocas em "🚗 Ir buscar cliente" no agendamento. O tempo só começa a contar quando tocas em "▶️ Iniciar" (cliente no carro). Ao finalizar, o valor é calculado pela regra definida em "Minhas tarifas" e podes enviar o resumo ao cliente. O agendamento só sai da lista quando o marcares como "Concluído".</p>
   </div>
 
-  <p style="text-align:center; font-family:'Helvetica Neue', Arial, sans-serif; font-size:11px; color:#8a7f66; margin-top:24px;">Trajeto · v9.23.2</p>
+  <p style="text-align:center; font-family:'Helvetica Neue', Arial, sans-serif; font-size:11px; color:#8a7f66; margin-top:24px;">Trajeto · v9.24.0</p>
 
 </main>
 
@@ -2089,11 +2108,48 @@
     <div id="cliPasso1">
       <h2>📅 Novo agendamento</h2>
       <button type="button" class="cli-opcao cli-em-branco" id="btnAgendamentoEmBranco">✏️ Agendamento em branco<span>sem cliente salvo — preenches tudo à mão</span></button>
+      <button type="button" class="cli-opcao cli-em-branco cli-colar" id="btnColarMensagem">📋 Colar mensagem do WhatsApp<span>ou ler de uma foto — a app monta o serviço</span></button>
       <p class="cli-info-passo">Ou escolhe um cliente salvo:</p>
       <input type="text" id="cli_buscaAgendar" placeholder="🔎 Procurar cliente...">
       <div id="listaClientesAgendar"></div>
       <button type="button" class="cli-btn" id="btnNovoClienteAgendar">➕ Novo cliente</button>
       <button type="button" class="cli-btn cli-btn-sec" id="btnFecharAgendarCliente">Fechar</button>
+    </div>
+    <div id="cliPassoColar" style="display:none;">
+      <div class="colar-titulo">📋 COLAR MENSAGEM</div>
+      <p class="cli-info-passo">Copia a mensagem do serviço (no WhatsApp: carrega na mensagem → Copiar) e cola aqui. Funciona em português e em inglês.</p>
+      <textarea id="colarTexto" placeholder="Date: 18/11&#10;Pick up: Hotel Corinthia&#10;Time: 17:30&#10;Drop-off: Palácio do Correio Mor&#10;&#10;Return:&#10;Time: 01:45&#10;Drop off: Hotel Corinthia"></textarea>
+      <div class="colar-linha-btn">
+        <button type="button" class="cli-btn cli-btn-sec" id="btnColarClipboard">📋 Colar</button>
+        <button type="button" class="cli-btn cli-btn-sec" id="btnColarFoto">📷 Ler de uma foto</button>
+      </div>
+      <input type="file" id="colarFotoInput" accept="image/*" style="display:none;">
+      <div class="colar-estado" id="colarEstado"></div>
+      <button type="button" class="cli-opcao cli-em-branco" id="btnColarLer" style="text-align:center;margin-top:12px;">🔎 Ler mensagem</button>
+      <button type="button" class="cli-btn cli-btn-sec" id="btnColarVoltar">Voltar</button>
+    </div>
+    <div id="cliPassoRever" style="display:none;">
+      <div class="colar-titulo" id="colarReverTitulo">✅ SERVIÇOS ENCONTRADOS</div>
+      <div id="colarLista"></div>
+      <label for="colar_fornecedor">Fornecedor do serviço</label>
+      <input type="text" id="colar_fornecedor" placeholder="ex: AeroVip (Ramon)">
+      <div class="colar-2" style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+        <div><label for="colar_cliente">Cliente</label><input type="text" id="colar_cliente" placeholder="opcional"></div>
+        <div><label for="colar_valor">Valor por serviço (€)</label><input type="number" id="colar_valor" min="0" step="0.5" inputmode="decimal" placeholder="opcional" style="width:100%;padding:9px 10px;border:1.5px solid var(--linha);border-radius:9px;background:#fff;font-size:15px;"></div>
+      </div>
+      <label for="colar_telefone">Telefone do cliente</label>
+      <input type="text" id="colar_telefone" placeholder="opcional">
+      <label for="colar_obs">Observações</label>
+      <textarea id="colar_obs" style="min-height:60px;"></textarea>
+      <div class="cli-erro" id="colarErro"></div>
+      <button type="button" class="cli-opcao cli-em-branco" id="btnColarCriar" style="text-align:center;margin-top:10px;">📅 Criar agendamentos</button>
+      <button type="button" class="cli-btn cli-btn-sec" id="btnColarReverVoltar">Voltar ao texto</button>
+    </div>
+    <div id="cliPassoFeito" style="display:none;">
+      <div class="colar-titulo" id="colarFeitoTitulo">✅ AGENDADO</div>
+      <p class="cli-info-passo">Já estão em Meus agendamentos. Se quiseres, adiciona cada um ao calendário do telemóvel:</p>
+      <div id="colarFeitoLista"></div>
+      <button type="button" class="cli-btn" id="btnColarFechar">Fechar</button>
     </div>
     <div id="cliPasso2" style="display:none;">
       <h2 id="cliTituloPasso2"></h2>
@@ -4031,6 +4087,7 @@
     document.getElementById('cli_buscaAgendar').value = '';
     document.getElementById('cliPasso1').style.display = 'block';
     document.getElementById('cliPasso2').style.display = 'none';
+    ['cliPassoColar','cliPassoRever','cliPassoFeito'].forEach(id=>{ const el=document.getElementById(id); if(el) el.style.display='none'; });
     renderClientesAgendar();
     document.getElementById('modalAgendarCliente').classList.add('aberto');
   }
@@ -4179,6 +4236,260 @@
     p.scrollIntoView({behavior: 'smooth', block: 'start'});
     setTimeout(()=> document.getElementById('ag_cliente').focus(), 400);
   }
+  // ===== v9.24: ler mensagens de serviço (WhatsApp / foto) =====
+  function colarSemAcentos(s){ return String(s||'').normalize('NFD').replace(/[̀-ͯ]/g,'').toLowerCase(); }
+  var COLAR_CHAVES=[
+    ['emergencia',/^(emergency( number| contact| phone)?|emergencia|numero de emergencia|contacto de emergencia)$/],
+    ['regresso',/^(return( trip| transfer)?|regresso|volta|retorno|return pick ?up|way back)$/],
+    ['ida',/^(arrival|departure( transfer)?|ida|outbound|transfer)$/],
+    ['data',/^(date|data|dia|day|pick ?-?up date|service date|data do servico)$/],
+    ['hora',/^(time|hora|horario|hour|pick ?-?up time|hora de recolha|hora da recolha|horario de recolha)$/],
+    ['partida',/^(pick ?-?up( location| address| point| place)?|recolha|local de recolha|partida|from|origem|origin|de|meeting point)$/],
+    ['chegada',/^(drop ?-?off( location| address| point| place)?|destino|destination|chegada|to|para|local de destino)$/],
+    ['voo',/^(flight( number| no\.?| n[ºo])?|voo|n[ºo] (do )?voo|numero do voo)$/],
+    ['nome',/^(name|nome|client( name)?|cliente|passenger( name)?|passageiro|guest( name)?|lead passenger|pax name|hospede)$/],
+    ['pax',/^(pax|passengers|passageiros|persons|people|pessoas|n[ºo] (de )?pax|number of passengers)$/],
+    ['telefone',/^(phone|telefone|tel|telemovel|mobile|contact|contacto|contato|whatsapp|phone number|client phone)$/],
+    ['bagagem',/^(luggage|bagagem|bags|malas|suitcases)$/],
+    ['notas',/^(notes?|observacoes|obs|remarks|comments?|info)$/]
+  ];
+  var COLAR_MESES={jan:1,janeiro:1,january:1,fev:2,fevereiro:2,feb:2,february:2,mar:3,marco:3,march:3,abr:4,abril:4,apr:4,april:4,mai:5,maio:5,may:5,jun:6,junho:6,june:6,jul:7,julho:7,july:7,ago:8,agosto:8,aug:8,august:8,set:9,setembro:9,sep:9,sept:9,september:9,out:10,outubro:10,oct:10,october:10,nov:11,novembro:11,november:11,dez:12,dezembro:12,dec:12,december:12};
+  function colarPad(n){ return (n<10?'0':'')+n; }
+  function colarIso(d){ return d.getFullYear()+'-'+colarPad(d.getMonth()+1)+'-'+colarPad(d.getDate()); }
+  function colarMaisDias(iso,n){ var p=iso.split('-'); var d=new Date(+p[0],+p[1]-1,+p[2]+n); return colarIso(d); }
+  // Data sem ano: este ano; se já passou há mais de 30 dias, é do próximo ano.
+  function colarData(v,hoje){
+    var s=colarSemAcentos(v).replace(/(\d)(st|nd|rd|th)\b/g,'$1'), y=null,m=null,d=null,r;
+    if(/\b(hoje|today)\b/.test(s))return colarIso(hoje);
+    if(/\b(amanha|tomorrow)\b/.test(s)){ var t=new Date(hoje); t.setDate(t.getDate()+1); return colarIso(t); }
+    if((r=s.match(/\b(\d{4})[-\/.](\d{1,2})[-\/.](\d{1,2})\b/))){ y=+r[1]; m=+r[2]; d=+r[3]; }
+    else if((r=s.match(/\b(\d{1,2})[-\/.](\d{1,2})(?:[-\/.](\d{2,4}))?\b/))){ d=+r[1]; m=+r[2]; if(r[3])y=+r[3]<100?2000+(+r[3]):+r[3]; }
+    else if((r=s.match(/\b(\d{1,2})\s*(?:de\s+)?([a-z]{3,9})\.?(?:\s*(?:de\s+)?(\d{4}))?/))&&COLAR_MESES[r[2]]){ d=+r[1]; m=COLAR_MESES[r[2]]; if(r[3])y=+r[3]; }
+    else if((r=s.match(/\b([a-z]{3,9})\.?\s+(\d{1,2})(?:,?\s*(\d{4}))?/))&&COLAR_MESES[r[1]]){ m=COLAR_MESES[r[1]]; d=+r[2]; if(r[3])y=+r[3]; }
+    if(!d||!m||m>12||d>31)return '';
+    if(!y){ y=hoje.getFullYear(); var c=new Date(y,m-1,d), lim=new Date(hoje); lim.setDate(lim.getDate()-30); if(c<lim)y++; }
+    var dt=new Date(y,m-1,d); if(dt.getMonth()!==m-1)return '';
+    return colarIso(dt);
+  }
+  function colarHora(v){
+    var s=colarSemAcentos(v).replace(/\s+/g,' '), r, h, mi=0;
+    if((r=s.match(/\b(\d{1,2})(?:[:.h](\d{2}))?\s*(am|pm|a\.m\.|p\.m\.)/))){ h=+r[1]; mi=r[2]?+r[2]:0; var pm=r[3].charAt(0)==='p'; if(h===12)h=pm?12:0; else if(pm)h+=12; }
+    else if((r=s.match(/\b(\d{1,2})\s*[:h.]\s*(\d{2})\b/))){ h=+r[1]; mi=+r[2]; }
+    else if((r=s.match(/\b(\d{1,2})\s*h\b/))){ h=+r[1]; }
+    else if((r=s.match(/\b([01]\d|2[0-3])([0-5]\d)\b/))){ h=+r[1]; mi=+r[2]; }
+    else return '';
+    if(h>23||mi>59)return '';
+    return colarPad(h)+':'+colarPad(mi);
+  }
+  function colarLimparLugar(v){ v=String(v||'').trim().replace(/\s+/g,' ').replace(/[.;,]+$/,''); return v?v.charAt(0).toUpperCase()+v.slice(1):''; }
+  function colarLerMensagem(texto,hoje){
+    hoje=hoje||new Date();
+    var linhas=String(texto||'').replace(/\r/g,'').split('\n');
+    var servicos=[], atual=null, extras={emergencia:'',telefone:'',nome:'',pax:'',bagagem:'',notas:[]}, ultimoCampo=null;
+    function novo(regresso){ atual={data:'',hora:'',partida:'',chegada:'',voo:'',regresso:!!regresso,dataExplicita:false}; servicos.push(atual); return atual; }
+    linhas.forEach(function(bruta){
+      var l=bruta.replace(/[*_~]/g,'').replace(/^[\s\-•·▪►>➡️📍📅⏰🕐🚗✈️👤☎️📞🔁↩️]+/u,'').trim();
+      if(!l){ ultimoCampo=null; return; }
+      var m=l.match(/^([^:]{1,40}?)\s*[:：]\s*(.*)$/), chave=null, valor='';
+      if(m){ var k=colarSemAcentos(m[1]).replace(/[^a-z0-9º ]/g,' ').replace(/\s+/g,' ').trim();
+        for(var i=0;i<COLAR_CHAVES.length;i++){ if(COLAR_CHAVES[i][1].test(k)){ chave=COLAR_CHAVES[i][0]; break; } }
+        valor=m[2].trim(); }
+      else { var k2=colarSemAcentos(l).replace(/[^a-z ]/g,' ').replace(/\s+/g,' ').trim();
+        if(/^(return( trip| transfer)?|regresso|volta|retorno)$/.test(k2)){ chave='regresso'; valor=''; } }
+      if(!chave){ if(ultimoCampo==='notas')extras.notas.push(l); return; }
+      ultimoCampo=chave;
+      if(chave==='emergencia'){ extras.emergencia=valor; return; }
+      if(chave==='telefone'){ extras.telefone=extras.telefone||valor; return; }
+      if(chave==='nome'){ extras.nome=extras.nome||valor; return; }
+      if(chave==='pax'){ extras.pax=extras.pax||valor; return; }
+      if(chave==='bagagem'){ extras.bagagem=extras.bagagem||valor; return; }
+      if(chave==='notas'){ if(valor)extras.notas.push(valor); return; }
+      if(chave==='regresso'||chave==='ida'){
+        if(!atual||atual.data||atual.hora||atual.partida||atual.chegada)novo(chave==='regresso'); else atual.regresso=(chave==='regresso');
+        if(valor){ var dd=colarData(valor,hoje), hh=colarHora(valor); if(dd){atual.data=dd;atual.dataExplicita=true;} if(hh)atual.hora=hh; }
+        return; }
+      if(!atual)novo(false);
+      var campo=chave;
+      if(campo==='data'){ var dv=colarData(valor,hoje); if(!dv)return; if(atual.data&&atual.dataExplicita)novo(false); atual.data=dv; atual.dataExplicita=true;
+        var hv=colarHora(valor.replace(/\b\d{1,2}[\/.-]\d{1,2}([\/.-]\d{2,4})?\b/,'')); if(hv&&!atual.hora)atual.hora=hv; return; }
+      if(campo==='hora'){ var h=colarHora(valor); if(!h)return; if(atual.hora)novo(false); atual.hora=h; return; }
+      if(campo==='partida'){ if(atual.partida)novo(false); atual.partida=colarLimparLugar(valor); return; }
+      if(campo==='chegada'){ if(atual.chegada)novo(false); atual.chegada=colarLimparLugar(valor); return; }
+      if(campo==='voo'){ atual.voo=atual.voo||valor.toUpperCase().replace(/\s+/g,''); return; }
+    });
+    // completar: o regresso herda data e lugares da ida; passa da meia-noite => dia seguinte
+    servicos=servicos.filter(function(s){ return s.data||s.hora||s.partida||s.chegada; });
+    var avisos=[];
+    for(var i=0;i<servicos.length;i++){
+      var s=servicos[i], ant=servicos[i-1];
+      if(ant){
+        if(!s.partida)s.partida=ant.chegada;
+        if(!s.chegada&&s.regresso)s.chegada=ant.partida;
+        if(!s.data&&ant.data){ s.data=ant.data; if(s.hora&&ant.hora&&s.hora<ant.hora){ s.data=colarMaisDias(ant.data,1); s.meiaNoite=true; } }
+      }
+      if(!s.data&&s.hora){ var hj=colarIso(hoje); s.data=hj; s.semData=true; }
+    }
+    return {servicos:servicos.map(function(s){ return {data:s.data,hora:s.hora,partida:s.partida,chegada:s.chegada,voo:s.voo,regresso:s.regresso,meiaNoite:!!s.meiaNoite,semData:!!s.semData}; }),extras:extras};
+  }
+  
+  // ===== v9.24: Colar mensagem do WhatsApp / ler de uma foto =====
+  const COLAR_FORN_KEY = 'trajeto_colar_fornecedor';
+  let colarServicos = [];
+  function colarMostrar(passo){
+    ['cliPasso1','cliPasso2','cliPassoColar','cliPassoRever','cliPassoFeito'].forEach(id=>{ document.getElementById(id).style.display = (id===passo)?'block':'none'; });
+    const card=document.querySelector('#modalAgendarCliente .modal-card'); if(card) card.scrollTop=0;
+  }
+  function colarEstado(txt, erro){ const e=document.getElementById('colarEstado'); e.textContent=txt||''; e.classList.toggle('erro', !!erro); }
+  function colarAbrir(){ colarEstado(''); colarMostrar('cliPassoColar'); }
+  function colarDiaSemana(iso){ if(!iso) return ''; const p=iso.split('-'); const d=new Date(+p[0],+p[1]-1,+p[2]); return ['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'][d.getDay()]; }
+  function colarRenderLista(){
+    const box=document.getElementById('colarLista');
+    box.innerHTML = colarServicos.map((s,i)=>{
+      const falta = !s.data || !s.hora || !s.partida || !s.chegada;
+      const titulo = (s.regresso ? '↩️ Regresso' : (colarServicos.length>1 ? '➡️ Serviço '+(i+1) : '➡️ Serviço'));
+      return `<div class="colar-serv${falta?' falta':''}" data-i="${i}">
+        <div class="colar-serv-cab"><span>${titulo}${s.data?' · '+colarDiaSemana(s.data):''}</span>${colarServicos.length>1?'<button type="button" data-remover="'+i+'">✕ Tirar</button>':''}</div>
+        <div class="colar-2"><div><label>Data</label><input type="date" data-campo="data" value="${escHtml(s.data)}"></div><div><label>Hora</label><input type="time" data-campo="hora" value="${escHtml(s.hora)}"></div></div>
+        <label>📍 Recolha</label><input type="text" data-campo="partida" value="${escHtml(s.partida)}">
+        <label>🏁 Destino</label><input type="text" data-campo="chegada" value="${escHtml(s.chegada)}">
+        ${s.voo ? `<label>✈️ Voo</label><input type="text" data-campo="voo" value="${escHtml(s.voo)}">` : ''}
+        ${s.meiaNoite ? '<div class="colar-aviso">🌙 Passa da meia-noite: ficou no dia seguinte ('+escHtml(s.data.split('-').reverse().join('/'))+'). Confirma.</div>' : ''}
+        ${s.semData ? '<div class="colar-aviso">📅 A mensagem não tinha data: pus hoje. Confirma.</div>' : ''}
+        ${falta ? '<div class="colar-aviso" style="color:#a02f24">Falta preencher: '+[!s.data&&'data',!s.hora&&'hora',!s.partida&&'recolha',!s.chegada&&'destino'].filter(Boolean).join(', ')+'</div>' : ''}
+      </div>`;
+    }).join('');
+    const n=colarServicos.length;
+    document.getElementById('colarReverTitulo').textContent = n===1 ? '✅ ENCONTREI 1 SERVIÇO' : '✅ ENCONTREI '+n+' SERVIÇOS';
+    document.getElementById('btnColarCriar').textContent = n===1 ? '📅 Criar 1 agendamento' : '📅 Criar '+n+' agendamentos';
+  }
+  function colarAnalisar(){
+    const texto=document.getElementById('colarTexto').value;
+    if(!texto.trim()){ colarEstado('Cola primeiro a mensagem do serviço.', true); return; }
+    const r=colarLerMensagem(texto, new Date());
+    if(!r.servicos.length){ colarEstado('Não encontrei nenhum serviço neste texto. Confirma que tem linhas como "Date:", "Time:", "Pick up:" e "Drop off:".', true); return; }
+    colarServicos=r.servicos;
+    const ex=r.extras;
+    let forn=''; try{ forn=localStorage.getItem(COLAR_FORN_KEY)||''; }catch(e){}
+    document.getElementById('colar_fornecedor').value = forn;
+    document.getElementById('colar_cliente').value = ex.nome || '';
+    document.getElementById('colar_telefone').value = ex.telefone || '';
+    document.getElementById('colar_valor').value = '';
+    const obs=[];
+    if(ex.emergencia) obs.push('Emergência: '+ex.emergencia.replace(/^\+\s+/,'+'));
+    if(ex.pax) obs.push('Passageiros: '+ex.pax);
+    if(ex.bagagem) obs.push('Bagagem: '+ex.bagagem);
+    ex.notas.forEach(n=>obs.push(n));
+    document.getElementById('colar_obs').value = obs.join('\n');
+    document.getElementById('colarErro').textContent='';
+    colarRenderLista();
+    colarMostrar('cliPassoRever');
+  }
+  function colarCriar(){
+    // ler o que está nos campos (pode ter sido corrigido à mão)
+    document.querySelectorAll('#colarLista .colar-serv').forEach(el=>{
+      const s=colarServicos[+el.dataset.i]; if(!s) return;
+      el.querySelectorAll('[data-campo]').forEach(inp=>{ s[inp.dataset.campo]=inp.value.trim(); });
+    });
+    const faltam=colarServicos.some(s=>!s.data||!s.hora||!s.partida||!s.chegada);
+    if(faltam){ colarRenderLista(); document.getElementById('colarErro').textContent='Preenche a data, a hora, a recolha e o destino de cada serviço.'; return; }
+    const fornecedor=document.getElementById('colar_fornecedor').value.trim();
+    const clienteCampo=document.getElementById('colar_cliente').value.trim();
+    const cliente=clienteCampo || fornecedor || 'Cliente';
+    const telefone=document.getElementById('colar_telefone').value.trim();
+    const valor=document.getElementById('colar_valor').value;
+    const observacoes=document.getElementById('colar_obs').value.trim();
+    try{ if(fornecedor) localStorage.setItem(COLAR_FORN_KEY, fornecedor); }catch(e){}
+    const lista=lerAgendamentos(), novos=[];
+    colarServicos.forEach((s,i)=>{
+      const ag={
+        id: Date.now().toString(36) + Math.random().toString(36).slice(2,7) + i,
+        criadoEm: Date.now(),
+        partida: s.partida, chegada: s.chegada, paragens: [], data: s.data, hora: s.hora,
+        cliente, telefone, nomePlaca: '', voo: s.voo || '', fornecedor, observacoes,
+        valor: valor || '', realizado: false, apresentacao: '', mostrarGaleria: false
+      };
+      lista.push(ag); novos.push(ag);
+    });
+    gravarAgendamentos(lista);
+    renderLista();
+    renderFaturamento();
+    document.getElementById('colarFeitoTitulo').textContent = novos.length===1 ? '✅ 1 AGENDAMENTO CRIADO' : '✅ '+novos.length+' AGENDAMENTOS CRIADOS';
+    document.getElementById('colarFeitoLista').innerHTML = novos.map(ag=>`<div class="colar-feito"><span><b>${escHtml(ag.data.split('-').reverse().join('/'))} · ${escHtml(ag.hora)}</b><br>${escHtml(ag.partida)} → ${escHtml(ag.chegada)}</span><button type="button" class="cli-mini" data-ics="${escHtml(ag.id)}">📅 Calendário</button></div>`).join('');
+    document.getElementById('colarTexto').value='';
+    colarMostrar('cliPassoFeito');
+  }
+  // ----- Ler de uma foto (no telemóvel, sem enviar a foto para lado nenhum) -----
+  let colarOcrScript=null;
+  function colarCarregarOcr(){
+    if(window.Tesseract) return Promise.resolve();
+    if(colarOcrScript) return colarOcrScript;
+    colarOcrScript=new Promise((ok,falha)=>{
+      const sc=document.createElement('script');
+      sc.src='https://cdn.jsdelivr.net/npm/tesseract.js@5.1.1/dist/tesseract.min.js';
+      sc.onload=()=>ok(); sc.onerror=()=>{ colarOcrScript=null; falha(new Error('script')); };
+      document.head.appendChild(sc);
+    });
+    return colarOcrScript;
+  }
+  function colarPrepararImagem(file){
+    // tons de cinzento, e inverte se o fundo for escuro (ex.: WhatsApp em modo escuro)
+    return new Promise((ok,falha)=>{
+      const url=URL.createObjectURL(file), img=new Image();
+      img.onload=()=>{
+        const esc=Math.min(1, 2000/Math.max(img.width,img.height));
+        const c=document.createElement('canvas'); c.width=Math.round(img.width*esc); c.height=Math.round(img.height*esc);
+        const x=c.getContext('2d'); x.drawImage(img,0,0,c.width,c.height);
+        const d=x.getImageData(0,0,c.width,c.height), p=d.data; let soma=0;
+        for(let i=0;i<p.length;i+=4){ const g=0.299*p[i]+0.587*p[i+1]+0.114*p[i+2]; p[i]=p[i+1]=p[i+2]=g; soma+=g; }
+        const inverter=(soma/(p.length/4))<128;
+        if(inverter) for(let i=0;i<p.length;i+=4){ p[i]=p[i+1]=p[i+2]=255-p[i]; }
+        x.putImageData(d,0,0); URL.revokeObjectURL(url); ok(c);
+      };
+      img.onerror=()=>{ URL.revokeObjectURL(url); falha(new Error('img')); };
+      img.src=url;
+    });
+  }
+  async function colarLerFoto(file){
+    const btn=document.getElementById('btnColarFoto'); btn.disabled=true;
+    try{
+      colarEstado(window.Tesseract ? 'A ler a foto…' : 'A preparar o leitor de fotos (só na primeira vez, cerca de 10 MB)…');
+      await colarCarregarOcr();
+      const tela=await colarPrepararImagem(file);
+      colarEstado('A ler a foto… pode demorar alguns segundos.');
+      const worker=await Tesseract.createWorker(['por','eng'],1,{ logger:m=>{ if(m.status==='recognizing text') colarEstado('A ler a foto… '+Math.round((m.progress||0)*100)+'%'); } });
+      const r=await worker.recognize(tela);
+      await worker.terminate();
+      const texto=(r&&r.data&&r.data.text)||'';
+      if(!texto.trim()){ colarEstado('Não consegui ler texto nesta foto. Tenta uma captura de ecrã mais nítida, ou copia a mensagem.', true); return; }
+      document.getElementById('colarTexto').value=texto.trim();
+      colarEstado('✓ Li a foto. Confere o texto e toca em "Ler mensagem".');
+      colarAnalisar();
+    }catch(e){
+      colarEstado(navigator.onLine===false ? 'Sem internet: o leitor de fotos precisa de internet para funcionar. Copia a mensagem e cola aqui.' : 'Não foi possível ler a foto. Copia a mensagem do WhatsApp e cola aqui.', true);
+    }finally{ btn.disabled=false; document.getElementById('colarFotoInput').value=''; }
+  }
+  document.getElementById('btnColarMensagem').addEventListener('click', colarAbrir);
+  document.getElementById('btnColarVoltar').addEventListener('click', ()=> colarMostrar('cliPasso1'));
+  document.getElementById('btnColarReverVoltar').addEventListener('click', ()=> colarMostrar('cliPassoColar'));
+  document.getElementById('btnColarLer').addEventListener('click', colarAnalisar);
+  document.getElementById('btnColarCriar').addEventListener('click', colarCriar);
+  document.getElementById('btnColarFechar').addEventListener('click', fecharAgendarCliente);
+  document.getElementById('btnColarFoto').addEventListener('click', ()=> document.getElementById('colarFotoInput').click());
+  document.getElementById('colarFotoInput').addEventListener('change', e=>{ const f=e.target.files&&e.target.files[0]; if(f) colarLerFoto(f); });
+  document.getElementById('btnColarClipboard').addEventListener('click', async ()=>{
+    try{ const t=await navigator.clipboard.readText(); if(t){ document.getElementById('colarTexto').value=t; colarEstado('✓ Colado. Toca em "Ler mensagem".'); } else colarEstado('Não há texto copiado.', true); }
+    catch(e){ colarEstado('Toca dentro da caixa, carrega sem largar e escolhe "Colar".'); document.getElementById('colarTexto').focus(); }
+  });
+  document.getElementById('colarLista').addEventListener('click', e=>{
+    const b=e.target.closest('[data-remover]'); if(!b) return;
+    document.querySelectorAll('#colarLista .colar-serv').forEach(el=>{ const s=colarServicos[+el.dataset.i]; if(s) el.querySelectorAll('[data-campo]').forEach(inp=>{ s[inp.dataset.campo]=inp.value.trim(); }); });
+    colarServicos.splice(+b.dataset.remover,1); colarRenderLista();
+  });
+  document.getElementById('colarFeitoLista').addEventListener('click', e=>{
+    const b=e.target.closest('[data-ics]'); if(!b) return;
+    const ag=lerAgendamentos().find(a=>a.id===b.dataset.ics); if(ag){ abrirICS(ag); b.textContent='✓ Enviado'; }
+  });
+
   document.getElementById('btnAgendamentoEmBranco').addEventListener('click', abrirAgendamentoEmBranco);
   document.getElementById('btnAgendarCliente').addEventListener('click', abrirAgendarCliente);
   document.getElementById('btnFecharAgendarCliente').addEventListener('click', fecharAgendarCliente);
