@@ -1306,6 +1306,147 @@
     .logo-h .logo-pin{ height:50px; } .logo-h .logo-txt{ height:56px; }
     header .btn-config{ font-size:13.5px; padding:8px 12px; }
   }
+
+  /* ================= v9.25: versão para tablet e computador (ecrãs a partir de 760 px) ================= */
+  #pcTopo, #pcAgenda, #pcDetalhe, #pcFatGraf, .pc-fundo{ display:none; }
+  @media (min-width: 760px) and (min-height: 560px){
+    :root{ --sb:78px; }
+    body{ padding:0 0 40px var(--sb); }
+    header{ position:fixed; left:0; top:0; bottom:0; width:var(--sb); z-index:60; flex-direction:column; flex-wrap:nowrap; justify-content:flex-start; align-items:stretch; gap:10px; padding:16px 9px 14px; overflow-y:auto; }
+    .logo-h{ justify-content:center; }
+    .logo-h .logo-txt{ display:none; }
+    .logo-h .logo-pin{ height:40px; }
+    .header-botoes{ margin-top:auto; flex-direction:column; align-items:stretch; gap:6px; }
+    header .btn-config{ justify-content:center; padding:10px 6px; font-size:0; gap:0; }
+    header .btn-config .ico{ width:20px; height:20px; }
+    header .fd-pill{ font-size:10px !important; }
+    #btnAgendarCliente{ display:none; }
+    #segModo.seg-4{ position:fixed; left:9px; top:84px; width:calc(var(--sb) - 18px); z-index:61; display:flex; flex-direction:column; gap:6px; background:none; border:none; box-shadow:none; padding:0; margin:0 !important; }
+    #segModo.seg-4 button, #segModo.seg-4 button[data-v]{ min-height:58px; width:100%; flex:none; border-radius:12px; font-size:10.5px; color:#c9d6dd; background:rgba(255,255,255,.04); border:1px solid rgba(255,255,255,.06); position:relative; flex-direction:column; gap:4px; padding:8px 2px; }
+    #segModo.seg-4 button.active{ background:rgba(255,255,255,.14); color:#fff; box-shadow:none; }
+    #segModo .ico{ width:22px; height:22px; }
+    #segModo .selo-contagem{ position:absolute; top:4px; right:4px; }
+    main{ max-width:none; margin:0; padding:18px 22px 0; }
+    #pcTopo{ display:flex; align-items:center; gap:14px; margin:0 0 16px; }
+    .pc-titulo{ min-width:0; }
+    .pc-titulo h1{ font-family:Georgia,'Iowan Old Style',serif; font-size:28px; color:var(--azul-doca); font-weight:600; letter-spacing:-.2px; margin:0; }
+    .pc-titulo span{ display:block; font-size:13px; color:#6a7378; margin-top:2px; }
+    .pc-topo-btns{ margin-left:auto; display:flex; gap:10px; flex-wrap:wrap; justify-content:flex-end; }
+    .pc-btn{ border:none; border-radius:11px; padding:12px 18px; background:linear-gradient(180deg,#cd6438,#b84f28); color:#fff; font:700 14.5px var(--ui); cursor:pointer; white-space:nowrap; }
+    .pc-btn-sec{ background:#fffdf8; color:var(--azul-doca); border:1px solid var(--linha); }
+    .pc-btn:focus-visible, #pcAgenda button:focus-visible, #pcDetalhe button:focus-visible{ outline:3px solid var(--azulejo); outline-offset:2px; }
+    /* Agenda */
+    #pcAgenda{ display:block; padding:0; overflow:hidden; margin-bottom:18px; }
+    .pca-cab{ display:flex; align-items:center; gap:12px; flex-wrap:wrap; padding:14px 16px; border-bottom:1px solid var(--linha); }
+    .pca-cab b{ font-size:16px; color:var(--azul-doca); font-family:var(--ui); }
+    .pca-nav{ display:flex; gap:4px; }
+    .pca-nav button{ min-width:40px; height:38px; border-radius:10px; border:1px solid var(--linha); background:#fff; font:700 15px var(--ui); color:var(--azul-doca); cursor:pointer; padding:0 12px; }
+    .pca-leg{ display:flex; gap:6px; }
+    .pca-l{ font:700 11px var(--ui); border-radius:999px; padding:4px 10px; }
+    .pca-t{ background:rgba(42,111,119,.13); color:var(--azulejo); } .pca-h{ background:rgba(193,85,44,.13); color:var(--terracota); } .pca-r{ background:rgba(27,58,75,.12); color:var(--azul-doca); }
+    .pca-seg{ margin:0 0 0 auto !important; }
+    .pca-seg button{ padding:8px 14px !important; font-size:13px !important; }
+    #pcaCorpo{ font-family:var(--ui); }
+    .pca-semana{ display:grid; grid-template-columns:repeat(7,minmax(0,1fr)); }
+    .pca-col{ border-left:1px solid #efe6d2; min-height:260px; padding:0 6px 10px; display:flex; flex-direction:column; gap:6px; }
+    .pca-col:first-child{ border-left:none; }
+    .pca-dia{ position:sticky; top:0; text-align:center; padding:10px 0 8px; font-size:12px; color:#6a7378; background:#fffdf8; }
+    .pca-dia b{ display:block; font-size:18px; color:var(--texto); margin-top:2px; }
+    .pca-col.hoje .pca-dia b{ width:32px; height:32px; line-height:32px; border-radius:50%; background:var(--terracota); color:#fff; margin:2px auto 0; }
+    .pca-col.passado{ background:repeating-linear-gradient(135deg,transparent 0 8px,rgba(0,0,0,.015) 8px 16px); }
+    .pca-ev{ display:block; width:100%; text-align:left; border:none; border-radius:10px; padding:8px 9px; color:#fff; background:var(--azulejo); cursor:pointer; font:12px/1.3 var(--ui); min-height:48px; }
+    .pca-ev b{ display:block; font-size:13px; }
+    .pca-ev span{ display:block; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; opacity:.92; }
+    .pca-ev.hora{ background:var(--terracota); } .pca-ev.tour{ background:var(--azul-doca); }
+    .pca-ev.feito{ opacity:.55; } .pca-ev.feito b::after{ content:" ✓"; }
+    .pca-ev.sel{ outline:3px solid #d9a441; outline-offset:1px; }
+    .pca-ev .pca-pend{ display:inline-block; margin-top:3px; font-size:10.5px; background:rgba(255,255,255,.22); border-radius:6px; padding:1px 6px; }
+    .pca-vazio{ text-align:center; color:#b3a98f; font-size:12px; padding:10px 0; }
+    .pca-diaview{ padding:14px 16px; display:flex; flex-direction:column; gap:8px; min-height:300px; }
+    .pca-diaview .pca-ev{ display:grid; grid-template-columns:70px 1fr; gap:4px 12px; align-items:center; padding:12px 14px; font-size:13.5px; }
+    .pca-diaview .pca-ev b{ font-size:17px; grid-row:span 2; }
+    .pca-mes{ display:grid; grid-template-columns:repeat(7,minmax(0,1fr)); }
+    .pca-mes-cab{ text-align:center; font-size:11px; font-weight:700; letter-spacing:.08em; color:#6a7378; padding:8px 0; border-bottom:1px solid var(--linha); }
+    .pca-m{ min-height:92px; border-left:1px solid #efe6d2; border-bottom:1px solid #efe6d2; padding:6px; cursor:pointer; background:none; border-top:none; border-right:none; text-align:left; font-family:var(--ui); display:flex; flex-direction:column; gap:3px; }
+    .pca-m:nth-child(7n+1){ border-left:none; }
+    .pca-m.fora{ opacity:.4; } .pca-m.hoje .pca-mn{ background:var(--terracota); color:#fff; }
+    .pca-mn{ font-size:12.5px; font-weight:700; width:24px; height:24px; line-height:24px; text-align:center; border-radius:50%; color:var(--texto); }
+    .pca-mi{ font-size:11px; border-radius:6px; padding:2px 5px; color:#fff; background:var(--azulejo); overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+    .pca-mi.hora{ background:var(--terracota); } .pca-mi.tour{ background:var(--azul-doca); } .pca-mi.feito{ opacity:.55; }
+    .pca-mais{ font-size:11px; color:#6a7378; }
+    /* Detalhe do serviço */
+    #pcDetalhe .ag-item{ border:none; box-shadow:none; background:none; padding:0; margin:0; }
+    .pcd-vazio{ font-family:var(--ui); color:#6a7378; font-size:13.5px; line-height:1.55; text-align:center; padding:26px 16px; }
+    .pcd-cab{ display:flex; justify-content:space-between; align-items:center; gap:8px; font:700 12px var(--ui); letter-spacing:.1em; text-transform:uppercase; color:#6a7378; }
+    .pcd-x{ border:none; background:none; font-size:20px; color:#6a7378; cursor:pointer; padding:4px 8px; }
+    .pcd-rota{ display:grid; grid-template-columns:20px 1fr; gap:6px 10px; margin:14px 0; font-family:var(--ui); font-size:15px; }
+    .pcd-rota i{ font-style:normal; font-weight:800; color:var(--azulejo); } .pcd-rota i.b{ color:var(--terracota); }
+    .pcd-kv{ display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:12px; }
+    .pcd-kv div{ background:#faf6ec; border:1px solid #efe6d2; border-radius:10px; padding:9px 11px; font-family:var(--ui); min-width:0; }
+    .pcd-kv small{ display:block; font-size:11px; color:#6a7378; } .pcd-kv b{ font-size:14px; overflow-wrap:anywhere; }
+    .pcd-obs{ font-family:var(--ui); font-size:13px; color:#3b4a53; background:#faf6ec; border-radius:10px; padding:10px 12px; margin-bottom:12px; white-space:pre-wrap; overflow-wrap:anywhere; }
+    #pcDetalhe .ag-nav, #pcDetalhe .ag-acoes{ display:flex; flex-wrap:wrap; gap:6px; margin-top:8px; }
+    #pcDetalhe .ag-nav button, #pcDetalhe .ag-acoes button{ flex:1 1 46%; min-height:42px; }
+    /* Tablet ao alto: detalhe abre por cima */
+    #pcDetalhe{ display:block; position:fixed; top:0; right:0; bottom:0; width:min(400px,92vw); z-index:900; background:#fffdf8; box-shadow:-10px 0 40px rgba(13,27,42,.25); padding:18px; overflow-y:auto; transform:translateX(105%); transition:transform .22s ease; }
+    #pcDetalhe.aberto{ transform:none; }
+    .pc-fundo.aberto{ display:block; position:fixed; inset:0; background:rgba(13,27,42,.35); z-index:899; }
+    /* Faturamento */
+    #pcFatGraf{ display:block; }
+    .pcf-grid{ display:grid; grid-template-columns:1.4fr 1fr; gap:18px; }
+    .pcf-grid h3{ font:700 12px var(--ui); letter-spacing:.1em; text-transform:uppercase; color:#6a7378; margin:0 0 10px; }
+    .pcf-barra{ display:grid; grid-template-columns:110px 1fr auto; gap:10px; align-items:center; font:13.5px var(--ui); margin-bottom:8px; }
+    .pcf-barra i{ display:block; height:14px; border-radius:7px; background:var(--azulejo); min-width:4px; }
+    .pcf-barra b{ font-variant-numeric:tabular-nums; }
+    .pcf-barra span{ overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  }
+  /* Tablet deitado e computador: menu com nomes, detalhe ao lado da agenda */
+  @media (min-width: 1180px) and (min-height: 560px){
+    :root{ --sb:224px; }
+    header{ padding:22px 14px 16px; }
+    .logo-h{ justify-content:flex-start; padding-left:4px; }
+    .logo-h .logo-txt{ display:block; height:44px; }
+    .logo-h .logo-pin{ height:38px; }
+    header .btn-config{ justify-content:flex-start; font-size:14px; gap:10px; padding:11px 12px; }
+    header .btn-config .ico{ width:18px; height:18px; }
+    #segModo.seg-4{ top:100px; left:14px; width:calc(var(--sb) - 28px); }
+    #segModo.seg-4 button, #segModo.seg-4 button[data-v]{ min-height:46px; flex-direction:row; justify-content:flex-start; gap:12px; padding:10px 14px; font-size:15px; }
+    #segModo .selo-contagem{ position:static; margin-left:auto; }
+    main{ padding:22px 28px 0; max-width:1600px; }
+    #viewTransfer:not([style*="none"]){ display:grid !important; }
+    #viewTransfer{ grid-template-columns:minmax(0,1fr) 400px; grid-template-rows:auto auto auto 1fr; column-gap:20px; row-gap:0; align-items:start; }
+    #viewTransfer > *{ grid-column:1; margin-top:0; }
+    #viewTransfer > #painelAgendar{ grid-column:1; grid-row:1; margin-bottom:18px; }
+    #viewTransfer > #pcAgenda{ grid-row:2; margin-bottom:18px; }
+    #viewTransfer > #cardAgendamentos{ grid-row:3; }
+    #viewTransfer > #pcColB{ grid-column:2; grid-row:2 / span 3; display:flex; flex-direction:column; gap:18px; position:sticky; top:16px; max-height:calc(100vh - 32px); overflow-y:auto; padding-bottom:4px; }
+    #pcColB > *{ margin:0 !important; }
+    #pcDetalhe{ position:static; width:auto; transform:none; transition:none; box-shadow:var(--sombra); border:1px solid var(--borda); border-radius:16px; z-index:1; flex-shrink:0; }
+    #pcDetalhe:empty{ display:none; }
+    .pc-fundo.aberto{ display:none; }
+    .pcd-x{ display:none; }
+    #viewFaturamento:not([style*="none"]){ display:grid !important; }
+    #viewFaturamento{ grid-template-columns:1fr 1fr; gap:18px; align-items:start; }
+    #viewFaturamento[style*="none"]{ display:none !important; }
+    #viewFaturamento > *{ margin-top:0 !important; }
+    #viewFaturamento > .fat-resumo, #viewFaturamento > #pcFatGraf, #viewFaturamento > .card:last-child{ grid-column:1 / -1; }
+    #viewTransfer[style*="none"]{ display:none !important; }
+    #listaTours, #listaHora, #listaPedidos, #listaFaturamento, #listaAReceber{ display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:10px; align-items:start; }
+    #listaTours > .ag-item, #listaHora > *, #listaPedidos > *, #listaFaturamento > .ag-item, #listaAReceber > .ag-item{ margin:0; }
+    #listaTours > .ag-vazio, #listaHora > .ag-vazio, #listaPedidos > .ag-vazio, #listaFaturamento > .ag-vazio, #listaAReceber > .ag-vazio, #listaTours > .ag-sanfona, #listaFaturamento > .ag-sanfona{ grid-column:1 / -1; }
+    #painelConfig{ max-width:820px; }
+    #viewFaturamento .fat-resumo{ grid-template-columns:1.3fr 1fr 1fr; align-items:center; }
+    #viewFaturamento .fat-card-hoje{ grid-column:auto; }
+  }
+
+  @media (min-width: 1180px) and (min-height: 560px){
+    #modalAgendarCliente .modal-card.pc-lado{ max-width:1040px; width:94vw; display:grid; grid-template-columns:1fr 1fr; gap:26px; align-items:start; }
+    #modalAgendarCliente .modal-card.pc-lado #colarTexto{ min-height:420px; }
+    #modalAgendarCliente .modal-card.pc-lado #btnColarVoltar, #modalAgendarCliente .modal-card.pc-lado #btnColarReverVoltar{ display:none; }
+  }
+  @media (min-width: 760px) and (min-height: 560px){
+    #modalAgendarCliente .modal-card.pc-arrastar{ outline:3px dashed var(--azulejo); outline-offset:6px; }
+  }
 </style>
 </head>
 <body>
@@ -1320,6 +1461,13 @@
 </header>
 
 <main>
+  <div id="pcTopo" aria-hidden="true">
+    <div class="pc-titulo"><h1 id="pcTitulo">Agenda</h1><span id="pcSub"></span></div>
+    <div class="pc-topo-btns">
+      <button type="button" class="pc-btn pc-btn-sec" id="pcBtnColar">📋 Colar mensagem</button>
+      <button type="button" class="pc-btn" id="pcBtnNovo">＋ Novo agendamento</button>
+    </div>
+  </div>
 
   <button type="button" id="btnAgendarCliente" class="btn-agendar-cliente"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="2.5"/><path d="M16 3v4M8 3v4M3 10h18M12 13v5M9.5 15.5h5"/></svg><span>Novo agendamento</span></button>
 
@@ -1646,6 +1794,16 @@
   </div>
 
   <div id="viewTransfer">
+    <section class="card" id="pcAgenda">
+      <div class="pca-cab">
+        <div class="pca-nav"><button type="button" id="pcaPrev" aria-label="Anterior">‹</button><button type="button" id="pcaHoje">Hoje</button><button type="button" id="pcaNext" aria-label="Seguinte">›</button></div>
+        <b id="pcaTitulo"></b>
+        <div class="pca-leg"><span class="pca-l pca-t">Transfer</span><span class="pca-l pca-h">Por hora</span><span class="pca-l pca-r">Tour</span></div>
+        <div class="seg pca-seg" id="pcaVista"><button type="button" data-v="dia">Dia</button><button type="button" data-v="semana" class="active">Semana</button><button type="button" data-v="mes">Mês</button></div>
+      </div>
+      <div id="pcaCorpo"></div>
+    </section>
+    <aside id="pcDetalhe" aria-live="polite"></aside>
 
     <div class="card calc-card">
       <h2 id="ct_toggleCalc" style="cursor:pointer; display:flex; align-items:center; justify-content:space-between;"><span class="calc-titulo"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="3" width="14" height="18" rx="2"/><path d="M8 7h8M8.5 11.5h.01M12 11.5h.01M15.5 11.5h.01M8.5 15h.01M12 15h.01M15.5 15h.01"/></svg>Calculadora de Transfer</span> <span class="seta" id="ct_setaCalc" style="font-size:14px; color:var(--azulejo); transition:transform .2s ease;">▸</span></h2>
@@ -1836,7 +1994,7 @@
       </div>
     </div>
 
-    <div class="card">
+    <div class="card" id="cardAgendamentos">
       <h2 class="cab-info">Meus agendamentos <button type="button" class="btn-info" id="btnAjudaAg">ℹ️ Como funciona?</button></h2>
       <div class="seg" id="segFiltroAg" style="margin-bottom:14px;">
         <button data-v="ativos" class="active">Ativos</button>
@@ -1851,6 +2009,7 @@
   </div>
 
   <div id="viewFaturamento" style="display:none;">
+    <section class="card" id="pcFatGraf"></section>
     <div class="fat-resumo">
       <div class="fat-card fat-card-hoje">
         <span class="fat-ico"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20V11M10 20V5M16 20v-7M21 20H3"/></svg></span>
@@ -1928,7 +2087,7 @@
     <p class="nota">Os serviços por hora agendados ficam em "📅 Agendados". Os que estão em andamento aparecem a partir do momento em que tocas em "🚗 Ir buscar cliente" no agendamento. O tempo só começa a contar quando tocas em "▶️ Iniciar" (cliente no carro). Ao finalizar, o valor é calculado pela regra definida em "Minhas tarifas" e podes enviar o resumo ao cliente. O agendamento só sai da lista quando o marcares como "Concluído".</p>
   </div>
 
-  <p style="text-align:center; font-family:'Helvetica Neue', Arial, sans-serif; font-size:11px; color:#8a7f66; margin-top:24px;">Trajeto · v9.24.0</p>
+  <p style="text-align:center; font-family:'Helvetica Neue', Arial, sans-serif; font-size:11px; color:#8a7f66; margin-top:24px;">Trajeto · v9.25.0</p>
 
 </main>
 
@@ -3354,6 +3513,7 @@
   }
   function renderLista(){
     agendarPainelDia();
+    if(typeof agendarAgendaPC === 'function') agendarAgendaPC();
     renderHora();
     renderTours();
     const todos = lerAgendamentos().filter(a => a.tipo !== 'tour');   // os tours têm aba própria
@@ -4084,6 +4244,7 @@
   // ----- janela "Agendar cliente": passo 1 (escolher) e passo 2 (que trajeto?) -----
   let clienteDoPasso2 = null;
   function abrirAgendarCliente(){
+    document.querySelector('#modalAgendarCliente .modal-card').classList.remove('pc-lado');
     document.getElementById('cli_buscaAgendar').value = '';
     document.getElementById('cliPasso1').style.display = 'block';
     document.getElementById('cliPasso2').style.display = 'none';
@@ -4336,7 +4497,9 @@
   const COLAR_FORN_KEY = 'trajeto_colar_fornecedor';
   let colarServicos = [];
   function colarMostrar(passo){
-    ['cliPasso1','cliPasso2','cliPassoColar','cliPassoRever','cliPassoFeito'].forEach(id=>{ document.getElementById(id).style.display = (id===passo)?'block':'none'; });
+    const lado = passo==='cliPassoRever' && window.matchMedia('(min-width: 1180px) and (min-height: 560px)').matches;
+    ['cliPasso1','cliPasso2','cliPassoColar','cliPassoRever','cliPassoFeito'].forEach(id=>{ document.getElementById(id).style.display = (id===passo || (lado && id==='cliPassoColar'))?'block':'none'; });
+    document.querySelector('#modalAgendarCliente .modal-card').classList.toggle('pc-lado', lado);
     const card=document.querySelector('#modalAgendarCliente .modal-card'); if(card) card.scrollTop=0;
   }
   function colarEstado(txt, erro){ const e=document.getElementById('colarEstado'); e.textContent=txt||''; e.classList.toggle('erro', !!erro); }
@@ -4489,6 +4652,195 @@
     const b=e.target.closest('[data-ics]'); if(!b) return;
     const ag=lerAgendamentos().find(a=>a.id===b.dataset.ics); if(ag){ abrirICS(ag); b.textContent='✓ Enviado'; }
   });
+
+
+  // ===== v9.25: versão para tablet e computador =====
+  // Só desenha e arruma; todas as ações usam as funções que já existem (handlerCliqueAgendamento, abrirAgendarCliente, colarAbrir…).
+  const pcMQ = window.matchMedia('(min-width: 760px) and (min-height: 560px)');
+  const pcMQLargo = window.matchMedia('(min-width: 1180px) and (min-height: 560px)');
+  let pcVista = 'semana', pcRef = new Date(), pcSel = null;
+  const PC_DIAS = ['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'];
+  const PC_MESES = ['janeiro','fevereiro','março','abril','maio','junho','julho','agosto','setembro','outubro','novembro','dezembro'];
+  function pcISO(d){ return d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate()); }
+  function pcSegunda(d){ const x=new Date(d.getFullYear(),d.getMonth(),d.getDate()); x.setDate(x.getDate()-((x.getDay()+6)%7)); return x; }
+  function pcTipo(ag){ return ag.tipo==='hora'?'hora':ag.tipo==='tour'?'tour':'transfer'; }
+  function pcTxt(t){ const d=document.createElement('div'); d.innerHTML=t; return d.textContent; }
+  function pcEv(ag){
+    const pend = ag.realizado && ag.pagamento==='pendente' ? '<span class="pca-pend">⏳ a receber</span>' : '';
+    return `<button type="button" class="pca-ev ${pcTipo(ag)}${ag.realizado?' feito':''}${pcSel===ag.id?' sel':''}" data-pcid="${escHtml(ag.id)}"><b>${escHtml(ag.hora||'')}</b><span>${escHtml(pcTxt(tituloAg(ag)))}</span><span>${escHtml(ag.cliente||'')}${ag.fornecedor&&ag.fornecedor!==ag.cliente?' · '+escHtml(ag.fornecedor):''}</span>${pend}</button>`;
+  }
+  function pcPorDia(){
+    const m={}; lerAgendamentos().forEach(a=>{ if(!a.data) return; (m[a.data]=m[a.data]||[]).push(a); });
+    Object.keys(m).forEach(k=> m[k].sort((a,b)=>(a.hora||'').localeCompare(b.hora||'')));
+    return m;
+  }
+  function renderAgendaPC(){
+    const corpo=document.getElementById('pcaCorpo'); if(!corpo) return;
+    const porDia=pcPorDia(), hoje=pcISO(new Date());
+    document.querySelectorAll('#pcaVista button').forEach(b=> b.classList.toggle('active', b.dataset.v===pcVista));
+    let html='', titulo='';
+    if(pcVista==='semana'){
+      const ini=pcSegunda(pcRef), fim=new Date(ini); fim.setDate(fim.getDate()+6);
+      titulo = ini.getMonth()===fim.getMonth() ? `${ini.getDate()} – ${fim.getDate()} ${PC_MESES[fim.getMonth()]} ${fim.getFullYear()}` : `${ini.getDate()} ${PC_MESES[ini.getMonth()].slice(0,3)} – ${fim.getDate()} ${PC_MESES[fim.getMonth()].slice(0,3)} ${fim.getFullYear()}`;
+      html='<div class="pca-semana">';
+      for(let i=0;i<7;i++){
+        const d=new Date(ini); d.setDate(d.getDate()+i); const iso=pcISO(d), evs=porDia[iso]||[];
+        html+=`<div class="pca-col${iso===hoje?' hoje':''}${iso<hoje?' passado':''}"><div class="pca-dia">${PC_DIAS[d.getDay()]}<b>${d.getDate()}</b></div>${evs.length?evs.map(pcEv).join(''):'<div class="pca-vazio">—</div>'}</div>`;
+      }
+      html+='</div>';
+    } else if(pcVista==='dia'){
+      const iso=pcISO(pcRef), evs=porDia[iso]||[];
+      titulo = `${PC_DIAS[pcRef.getDay()]}, ${pcRef.getDate()} de ${PC_MESES[pcRef.getMonth()]} ${pcRef.getFullYear()}`;
+      html=`<div class="pca-diaview">${evs.length?evs.map(pcEv).join(''):'<div class="pcd-vazio">Sem serviços neste dia.</div>'}</div>`;
+    } else {
+      const ini=new Date(pcRef.getFullYear(),pcRef.getMonth(),1), g=pcSegunda(ini);
+      titulo = `${PC_MESES[ini.getMonth()].charAt(0).toUpperCase()+PC_MESES[ini.getMonth()].slice(1)} ${ini.getFullYear()}`;
+      html='<div class="pca-mes">'+['Seg','Ter','Qua','Qui','Sex','Sáb','Dom'].map(x=>`<div class="pca-mes-cab">${x}</div>`).join('');
+      for(let i=0;i<42;i++){
+        const d=new Date(g); d.setDate(d.getDate()+i); const iso=pcISO(d), evs=porDia[iso]||[];
+        if(i>=35 && d.getMonth()!==ini.getMonth()) break;
+        html+=`<button type="button" class="pca-m${d.getMonth()!==ini.getMonth()?' fora':''}${iso===hoje?' hoje':''}" data-pcdia="${iso}"><span class="pca-mn">${d.getDate()}</span>${evs.slice(0,3).map(a=>`<span class="pca-mi ${pcTipo(a)}${a.realizado?' feito':''}">${escHtml(a.hora||'')} ${escHtml(pcTxt(tituloAg(a)))}</span>`).join('')}${evs.length>3?`<span class="pca-mais">+${evs.length-3} mais</span>`:''}</button>`;
+      }
+      html+='</div>';
+    }
+    document.getElementById('pcaTitulo').textContent=titulo;
+    corpo.innerHTML=html;
+    renderDetalhePC();
+  }
+  function renderDetalhePC(){
+    const box=document.getElementById('pcDetalhe'); if(!box) return;
+    const ag = pcSel ? lerAgendamentos().find(a=>a.id===pcSel) : null;
+    if(!ag){
+      pcSel=null;
+      box.innerHTML = pcMQLargo.matches ? '<div class="pcd-vazio">👈 Toca num serviço da agenda para ver os detalhes e as ações aqui.</div>' : '';
+      pcFecharDetalhe(true); return;
+    }
+    const tp=pcTipo(ag), eHora=tp==='hora', eTour=tp==='tour';
+    const data=(ag.data||'').split('-').reverse().join('/');
+    const estado = ag.realizado ? (ag.pagamento==='recebido'?'💰 Recebido':ag.pagamento==='pendente'?'⏳ A receber':'✅ Concluído') : '📅 Agendado';
+    const kv=[['Cliente',ag.cliente],['Valor',ag.valor!==''&&ag.valor!=null?'€'+ag.valor:'—'],['Fornecedor',ag.fornecedor],['Telefone',ag.telefone],['Voo',ag.voo],['Placa',ag.nomePlaca]].filter(x=>x[1]);
+    const rota = eTour
+      ? `<i>🗺️</i><div><b>${escHtml(ag.tourNome||'Tour')}</b>${ag.tourDuracao?'<br><small>'+escHtml(ag.tourDuracao)+'</small>':''}<br><small>Recolha: ${escHtml(ag.partida||'')}</small></div>`
+      : `<i>A</i><div><b>${escHtml(ag.partida||'')}</b></div>${(ag.paragens||[]).map((p,i)=>`<i>${i+1}</i><div>${escHtml(p)}</div>`).join('')}${(ag.chegada&&(!eHora||ag.chegada!==ag.partida))?`<i class="b">B</i><div><b>${escHtml(ag.chegada)}</b></div>`:''}`;
+    let nav='';
+    if(!ag.realizado){
+      if(eHora) nav = (!ag.hEstado||ag.hEstado==='agendado') ? '<button class="ag-btn-buscar" data-acao="horaBuscar">🚗 Ir buscar cliente</button>' : '<button class="ag-btn-hora" data-acao="horaAbrirAba">⏱ Abrir em "Por hora"</button>';
+      else if(eTour) nav = '<button class="ag-btn-buscar" data-acao="buscar">🚗 Ir buscar cliente</button>';
+      else nav = `<button class="ag-btn-buscar" data-acao="buscar">🚗 Ir buscar cliente</button>${(ag.paragens||[]).map((p,i)=>`<button class="ag-btn-paragem" data-acao="paragem" data-idx="${i}">📍 Paragem ${i+1}</button>`).join('')}<button class="ag-btn-levar" data-acao="levar">🏁 Iniciar viagem</button>`;
+    }
+    box.innerHTML = `<div class="ag-item" data-id="${escHtml(ag.id)}">
+      <div class="pcd-cab"><span>${escHtml(PC_DIAS[new Date(ag.data+'T00:00:00').getDay()]||'')} ${escHtml(data)} · ${escHtml(ag.hora||'')}</span><span>${estado}</span><button type="button" class="pcd-x" data-pcfechar aria-label="Fechar">✕</button></div>
+      <div class="pcd-rota">${rota}</div>
+      <div class="pcd-kv">${kv.map(x=>`<div><small>${x[0]}</small><b>${escHtml(String(x[1]))}</b></div>`).join('')}</div>
+      ${ag.observacoes?`<div class="pcd-obs">📝 ${escHtml(ag.observacoes)}</div>`:''}
+      ${nav?`<div class="ag-nav">${nav}</div>`:''}
+      <div class="ag-acoes">
+        ${(ag.realizado && typeof avaliacaoRecebida==='function' && !avaliacaoRecebida(ag)) ? '<button class="ag-btn-av" data-acao="pedirAvaliacao">⭐ Pedir avaliação</button>' : ''}
+        ${ag.realizado ? `<button class="ag-btn-cal" data-acao="nota">📝 ${ag.nota?'Editar nota':'Nota'}</button>` : ''}
+        <button class="ag-btn-cal" data-acao="dados">📋 Dados</button>
+        <button class="ag-btn-cal" data-acao="editar">✏️ Editar</button>
+        ${ag.realizado ? '<button class="ag-btn-cal" data-acao="refazer">🔁 Refazer</button>' : ''}
+        <button class="ag-btn-cal" data-acao="cal">📅 Calendário</button>
+        ${ag.voo ? '<button class="ag-btn-cal" data-acao="voo">✈️ Ver voo</button>' : ''}
+        <button class="ag-btn-wpp" data-acao="wpp">✉️ Mensagem</button>
+        ${eHora ? (ag.hFim ? '<button class="ag-btn-wpp" data-acao="horaResumo">🧾 Enviar resumo</button>' : '') : '<button class="ag-btn-wpp" data-acao="repassar">↗️ Repassar</button>'}
+        <button class="ag-btn-ok" data-acao="realizado">${ag.realizado ? '↩️ Desfazer' : '✅ Concluído'}</button>
+        ${(ag.realizado && ag.pagamento==='pendente') ? '<button class="ag-btn-ok" data-acao="marcarRecebido">💰 Marcar como recebido</button>' : ''}
+        <button class="ag-btn-del" data-acao="del">🗑 Remover</button>
+      </div></div>`;
+  }
+  function pcAbrirDetalhe(id){
+    pcSel=id; renderAgendaPC();
+    if(!pcMQLargo.matches){ document.getElementById('pcDetalhe').classList.add('aberto'); document.getElementById('pcFundo').classList.add('aberto'); }
+  }
+  function pcFecharDetalhe(soVisual){
+    const d=document.getElementById('pcDetalhe'), f=document.getElementById('pcFundo');
+    if(d) d.classList.remove('aberto'); if(f) f.classList.remove('aberto');
+    if(!soVisual){ pcSel=null; renderAgendaPC(); }
+  }
+  let pcAgendado=false;
+  function agendarAgendaPC(){ if(pcAgendado) return; pcAgendado=true; setTimeout(()=>{ pcAgendado=false; try{ renderAgendaPC(); renderFatPC(); }catch(e){ console.warn('pc',e); } },0); }
+  // Faturamento: semanas e fornecedores (mesmas regras do resumo: serviços concluídos, pela data do serviço)
+  function renderFatPC(){
+    const box=document.getElementById('pcFatGraf'); if(!box) return;
+    const feitos=lerAgendamentos().filter(a=>a.realizado);
+    const seg0=pcSegunda(new Date()), semanas=[];
+    for(let i=7;i>=0;i--){ const ini=new Date(seg0); ini.setDate(ini.getDate()-7*i); const fim=new Date(ini); fim.setDate(fim.getDate()+7);
+      const a=pcISO(ini), b=pcISO(fim); let t=0; feitos.forEach(ag=>{ if(ag.data>=a && ag.data<b) t+=parseFloat(ag.valor)||0; });
+      semanas.push({ini, t}); }
+    const max=Math.max(1,...semanas.map(s=>s.t));
+    const W=560,H=200,base=160,bw=46,gap=(W-40-8*bw)/8;
+    const barras=semanas.map((s,i)=>{ const h=Math.round((s.t/max)*120), x=40+i*(bw+gap)+gap/2, y=base-h, atual=i===7;
+      return `<rect x="${x}" y="${y}" width="${bw}" height="${Math.max(h,2)}" rx="7" fill="${atual?'#c1552c':'#2a6f77'}"/><text x="${x+bw/2}" y="${y-6}" text-anchor="middle" font-size="11.5" font-weight="700" fill="#1d2a33">€${s.t.toFixed(0)}</text><text x="${x+bw/2}" y="${base+16}" text-anchor="middle" font-size="10.5" fill="#6a7378">${atual?'esta':pad(s.ini.getDate())+'/'+pad(s.ini.getMonth()+1)}</text>`; }).join('');
+    const mes=pcISO(new Date()).slice(0,7), porF={};
+    feitos.filter(a=>(a.data||'').slice(0,7)===mes).forEach(a=>{ const k=(a.fornecedor||'').trim()||'Particular'; porF[k]=(porF[k]||0)+(parseFloat(a.valor)||0); });
+    const lf=Object.entries(porF).sort((a,b)=>b[1]-a[1]), mf=Math.max(1,...lf.map(x=>x[1]));
+    box.innerHTML=`<div class="pcf-grid"><div><h3>Faturado por semana (8 semanas)</h3><svg viewBox="0 0 ${W} ${H}" width="100%" role="img" aria-label="Faturado por semana"><line x1="36" y1="${base}" x2="${W}" y2="${base}" stroke="#e2d8c3"/>${barras}</svg></div>
+      <div><h3>Este mês por fornecedor</h3>${lf.length?lf.map(([n,v])=>`<div class="pcf-barra"><span title="${escHtml(n)}">${escHtml(n)}</span><i style="width:${Math.round(v/mf*100)}%"></i><b>€${v.toFixed(0)}</b></div>`).join(''):'<p class="ag-vazio">Ainda sem serviços concluídos este mês.</p>'}</div></div>`;
+  }
+  function pcAtualizarTopo(){
+    const cfg=document.getElementById('painelConfig'), cfgAberto = cfg && getComputedStyle(cfg).display!=='none';
+    const v=document.querySelector('#segModo button.active')?.dataset.v || 'transfer';
+    const nomes={transfer:['Agenda','Os teus serviços, a calculadora e o teu dia'],hora:['Por hora','Serviços à hora'],tours:['Tours','Tours agendados e concluídos'],faturamento:['Faturamento','O que já faturaste e o que falta receber'],pedidos:['Pedidos','Pedidos que chegam do teu site']};
+    const n = cfgAberto ? ['Minhas tarifas','Tarifas, perfil, site e cópias de segurança'] : (nomes[v]||nomes.transfer);
+    document.getElementById('pcTitulo').textContent=n[0]; document.getElementById('pcSub').textContent=n[1];
+  }
+  document.getElementById('pcaPrev').addEventListener('click',()=>{ if(pcVista==='mes') pcRef=new Date(pcRef.getFullYear(),pcRef.getMonth()-1,1); else pcRef.setDate(pcRef.getDate()-(pcVista==='semana'?7:1)); renderAgendaPC(); });
+  document.getElementById('pcaNext').addEventListener('click',()=>{ if(pcVista==='mes') pcRef=new Date(pcRef.getFullYear(),pcRef.getMonth()+1,1); else pcRef.setDate(pcRef.getDate()+(pcVista==='semana'?7:1)); renderAgendaPC(); });
+  document.getElementById('pcaHoje').addEventListener('click',()=>{ pcRef=new Date(); renderAgendaPC(); });
+  document.getElementById('pcaVista').addEventListener('click',e=>{ const b=e.target.closest('button[data-v]'); if(!b) return; pcVista=b.dataset.v; renderAgendaPC(); });
+  document.getElementById('pcaCorpo').addEventListener('click',e=>{
+    const ev=e.target.closest('[data-pcid]'); if(ev){ pcAbrirDetalhe(ev.dataset.pcid); return; }
+    const dia=e.target.closest('[data-pcdia]'); if(dia){ const p=dia.dataset.pcdia.split('-'); pcRef=new Date(+p[0],+p[1]-1,+p[2]); pcVista='dia'; renderAgendaPC(); }
+  });
+  document.getElementById('pcDetalhe').addEventListener('click',e=>{ if(e.target.closest('[data-pcfechar]')){ pcFecharDetalhe(); return; } handlerCliqueAgendamento(e); if(e.target.closest('button[data-acao="editar"]')) pcFecharDetalhe(true); });
+  (function(){ const f=document.createElement('div'); f.className='pc-fundo'; f.id='pcFundo'; f.addEventListener('click',()=>pcFecharDetalhe()); document.body.appendChild(f); })();
+  document.getElementById('pcBtnNovo').addEventListener('click',()=> document.getElementById('btnAgendarCliente').click());
+  document.getElementById('pcBtnColar').addEventListener('click',()=>{ abrirAgendarCliente(); colarAbrir(); setTimeout(()=>{ const t=document.getElementById('colarTexto'); if(t) t.focus(); },60); });
+  document.getElementById('segModo').addEventListener('click',()=> setTimeout(pcAtualizarTopo,0));
+  document.getElementById('btnConfig').addEventListener('click',()=> setTimeout(pcAtualizarTopo,0));
+  document.addEventListener('keydown',e=>{ if(e.key==='Escape' && document.getElementById('pcDetalhe').classList.contains('aberto')) pcFecharDetalhe(true); });
+  // Computador: colar (⌘V / Ctrl+V) em qualquer sítio abre logo "Colar mensagem"
+  document.addEventListener('paste',e=>{
+    if(!pcMQ.matches) return;
+    const alvo=e.target; if(alvo && (alvo.closest('input, textarea, [contenteditable]'))) return;
+    if(document.querySelector('.modal-overlay.aberto')) return;
+    const t=(e.clipboardData&&e.clipboardData.getData('text'))||''; if(!t.trim()) return;
+    e.preventDefault(); abrirAgendarCliente(); colarAbrir(); document.getElementById('colarTexto').value=t; colarAnalisar();
+  });
+  // Arrastar uma foto ou texto para a caixa da mensagem
+  (function(){
+    const zona=document.querySelector('#modalAgendarCliente .modal-card');
+    ['dragover','dragenter'].forEach(ev=> zona.addEventListener(ev,e=>{ if(document.getElementById('cliPassoColar').style.display!=='none'){ e.preventDefault(); zona.classList.add('pc-arrastar'); } }));
+    ['dragleave','drop'].forEach(ev=> zona.addEventListener(ev,()=> zona.classList.remove('pc-arrastar')));
+    zona.addEventListener('drop',e=>{
+      if(document.getElementById('cliPassoColar').style.display==='none') return;
+      e.preventDefault();
+      const f=e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files[0];
+      if(f && /^image\//.test(f.type)){ colarLerFoto(f); return; }
+      const t=e.dataTransfer && e.dataTransfer.getData('text'); if(t){ document.getElementById('colarTexto').value=t; colarAnalisar(); }
+    });
+  })();
+  // No ecrã largo, a calculadora, o detalhe e "O seu dia" ficam numa coluna à direita (no telemóvel nada se mexe)
+  function pcArrumar(){
+    const vt=document.getElementById('viewTransfer'), card=document.getElementById('cardAgendamentos');
+    const calc=vt.querySelector('.calc-card'), dia=document.getElementById('painelDia'), det=document.getElementById('pcDetalhe'), ag=document.getElementById('pcAgenda');
+    let colB=document.getElementById('pcColB');
+    if(pcMQLargo.matches){
+      if(!colB){ colB=document.createElement('div'); colB.id='pcColB'; }
+      if(colB.parentNode!==vt) vt.insertBefore(colB, ag.nextSibling);
+      [det, calc, dia].forEach(el=>{ if(el && el.parentNode!==colB) colB.appendChild(el); });
+    } else if(colB && colB.parentNode){
+      const pa=document.getElementById('painelAgendar');
+      vt.insertBefore(det, ag.nextSibling);
+      if(calc) vt.insertBefore(calc, (pa && pa.parentNode===vt) ? pa : card);
+      if(dia) vt.insertBefore(dia, card.nextSibling);
+      colB.parentNode.removeChild(colB);
+    }
+  }
+  pcArrumar();
+  pcMQ.addEventListener && pcMQ.addEventListener('change',()=>{ pcFecharDetalhe(true); renderAgendaPC(); pcAtualizarTopo(); });
+  pcMQLargo.addEventListener && pcMQLargo.addEventListener('change',()=>{ pcArrumar(); pcFecharDetalhe(true); renderAgendaPC(); });
 
   document.getElementById('btnAgendamentoEmBranco').addEventListener('click', abrirAgendamentoEmBranco);
   document.getElementById('btnAgendarCliente').addEventListener('click', abrirAgendarCliente);
@@ -6091,6 +6443,7 @@
 
   function renderFaturamento(){
     agendarPainelDia();
+    if(typeof agendarAgendaPC === 'function') agendarAgendaPC();
     const todos = lerAgendamentos().filter(a => a.realizado);
     const hoje = new Date();
     const hojeStr = `${hoje.getFullYear()}-${pad(hoje.getMonth()+1)}-${pad(hoje.getDate())}`;
