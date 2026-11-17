@@ -425,6 +425,10 @@
   .colar-linha-btn .cli-btn{ margin-top:0; }
   .colar-estado{ font-family:'Helvetica Neue', Arial, sans-serif; font-size:12.5px; color:#6a7378; line-height:1.5; min-height:1.2em; margin:8px 0 0; }
   .colar-estado.erro{ color:#a02f24; }
+  .colar-chips{ display:flex; flex-wrap:wrap; gap:6px; margin:6px 0 2px; }
+  .colar-chip{ border:1.5px solid var(--linha); background:#fff; color:var(--azul-doca); border-radius:999px; padding:6px 12px; font:600 13px 'Helvetica Neue', Arial, sans-serif; cursor:pointer; }
+  .colar-chip.on{ background:var(--azulejo); border-color:var(--azulejo); color:#fff; }
+  .colar-chip-nota{ font:700 12px 'Helvetica Neue', Arial, sans-serif; color:var(--azulejo); align-self:center; margin-right:4px; }
   .colar-serv{ border:1.5px solid var(--linha); border-radius:12px; padding:10px 12px 12px; margin:0 0 10px; background:var(--areia); }
   .colar-serv.falta{ border-color:#c1552c; }
   .colar-serv-cab{ display:flex; justify-content:space-between; align-items:center; font-family:'Helvetica Neue', Arial, sans-serif; font-size:14px; font-weight:700; color:var(--azul-doca); }
@@ -2087,7 +2091,7 @@
     <p class="nota">Os serviços por hora agendados ficam em "📅 Agendados". Os que estão em andamento aparecem a partir do momento em que tocas em "🚗 Ir buscar cliente" no agendamento. O tempo só começa a contar quando tocas em "▶️ Iniciar" (cliente no carro). Ao finalizar, o valor é calculado pela regra definida em "Minhas tarifas" e podes enviar o resumo ao cliente. O agendamento só sai da lista quando o marcares como "Concluído".</p>
   </div>
 
-  <p style="text-align:center; font-family:'Helvetica Neue', Arial, sans-serif; font-size:11px; color:#8a7f66; margin-top:24px;">Trajeto · v9.25.0</p>
+  <p style="text-align:center; font-family:'Helvetica Neue', Arial, sans-serif; font-size:11px; color:#8a7f66; margin-top:24px;">Trajeto · v9.25.1</p>
 
 </main>
 
@@ -2291,7 +2295,8 @@
       <div class="colar-titulo" id="colarReverTitulo">✅ SERVIÇOS ENCONTRADOS</div>
       <div id="colarLista"></div>
       <label for="colar_fornecedor">Fornecedor do serviço</label>
-      <input type="text" id="colar_fornecedor" placeholder="ex: AeroVip (Ramon)">
+      <input type="text" id="colar_fornecedor" placeholder="escreve ou toca num abaixo">
+      <div class="colar-chips" id="colarFornChips"></div>
       <div class="colar-2" style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
         <div><label for="colar_cliente">Cliente</label><input type="text" id="colar_cliente" placeholder="opcional"></div>
         <div><label for="colar_valor">Valor por serviço (€)</label><input type="number" id="colar_valor" min="0" step="0.5" inputmode="decimal" placeholder="opcional" style="width:100%;padding:9px 10px;border:1.5px solid var(--linha);border-radius:9px;background:#fff;font-size:15px;"></div>
@@ -4412,7 +4417,9 @@
     ['pax',/^(pax|passengers|passageiros|persons|people|pessoas|n[ºo] (de )?pax|number of passengers)$/],
     ['telefone',/^(phone|telefone|tel|telemovel|mobile|contact|contacto|contato|whatsapp|phone number|client phone)$/],
     ['bagagem',/^(luggage|bagagem|bags|malas|suitcases)$/],
-    ['notas',/^(notes?|observacoes|obs|remarks|comments?|info)$/]
+    ['notas',/^(notes?|observacoes|obs|remarks|comments?|info)$/],
+    ['fornecedor',/^(fornecedor|supplier|provider|empresa|company|agencia|agency|operador|operator|parceiro|partner|booked by|reservado por)$/],
+    ['valor',/^(valor|preco|price|value|amount|total|fee|rate|tarifa|custo|cost|pagamento|payment|precario)$/]
   ];
   var COLAR_MESES={jan:1,janeiro:1,january:1,fev:2,fevereiro:2,feb:2,february:2,mar:3,marco:3,march:3,abr:4,abril:4,apr:4,april:4,mai:5,maio:5,may:5,jun:6,junho:6,june:6,jul:7,julho:7,july:7,ago:8,agosto:8,aug:8,august:8,set:9,setembro:9,sep:9,sept:9,september:9,out:10,outubro:10,oct:10,october:10,nov:11,novembro:11,november:11,dez:12,dezembro:12,dec:12,december:12};
   function colarPad(n){ return (n<10?'0':'')+n; }
@@ -4442,11 +4449,14 @@
     if(h>23||mi>59)return '';
     return colarPad(h)+':'+colarPad(mi);
   }
-  function colarLimparLugar(v){ v=String(v||'').trim().replace(/\s+/g,' ').replace(/[.;,]+$/,''); return v?v.charAt(0).toUpperCase()+v.slice(1):''; }
+  function colarLimparLugar(v){ v=String(v||'').trim().replace(/\s+/g,' ').replace(/[.;,]+$/,''); if(!v) return '';
+    if(v===v.toLowerCase()){ var pequenas={de:1,da:1,do:1,das:1,dos:1,e:1,em:1,a:1,o:1,the:1,of:1,and:1};
+      return v.split(' ').map(function(w,i){ return (i>0&&pequenas[w])?w:w.charAt(0).toUpperCase()+w.slice(1); }).join(' '); }
+    return v.charAt(0).toUpperCase()+v.slice(1); }
   function colarLerMensagem(texto,hoje){
     hoje=hoje||new Date();
     var linhas=String(texto||'').replace(/\r/g,'').split('\n');
-    var servicos=[], atual=null, extras={emergencia:'',telefone:'',nome:'',pax:'',bagagem:'',notas:[]}, ultimoCampo=null;
+    var servicos=[], atual=null, extras={emergencia:'',telefone:'',nome:'',pax:'',bagagem:'',notas:[],fornecedor:'',valor:''}, ultimoCampo=null;
     function novo(regresso){ atual={data:'',hora:'',partida:'',chegada:'',voo:'',regresso:!!regresso,dataExplicita:false}; servicos.push(atual); return atual; }
     linhas.forEach(function(bruta){
       var l=bruta.replace(/[*_~]/g,'').replace(/^[\s\-•·▪►>➡️📍📅⏰🕐🚗✈️👤☎️📞🔁↩️]+/u,'').trim();
@@ -4464,6 +4474,8 @@
       if(chave==='nome'){ extras.nome=extras.nome||valor; return; }
       if(chave==='pax'){ extras.pax=extras.pax||valor; return; }
       if(chave==='bagagem'){ extras.bagagem=extras.bagagem||valor; return; }
+      if(chave==='fornecedor'){ extras.fornecedor=extras.fornecedor||valor.trim(); return; }
+      if(chave==='valor'){ var vm=valor.replace(/\s/g,'').match(/(\d+(?:[.,]\d{1,2})?)/); if(vm&&!extras.valor) extras.valor=vm[1].replace(',','.'); return; }
       if(chave==='notas'){ if(valor)extras.notas.push(valor); return; }
       if(chave==='regresso'||chave==='ida'){
         if(!atual||atual.data||atual.hora||atual.partida||atual.chegada)novo(chave==='regresso'); else atual.regresso=(chave==='regresso');
@@ -4495,6 +4507,17 @@
   
   // ===== v9.24: Colar mensagem do WhatsApp / ler de uma foto =====
   const COLAR_FORN_KEY = 'trajeto_colar_fornecedor';
+  // fornecedores já usados (dos agendamentos, do mais recente para o mais antigo)
+  function colarFornecedoresConhecidos(){
+    const vistos={}, lista=[];
+    lerAgendamentos().slice().sort((a,b)=>(b.criadoEm||0)-(a.criadoEm||0)).forEach(a=>{ const f=(a.fornecedor||'').trim(); const k=colarSemAcentos(f); if(f && !vistos[k]){ vistos[k]=1; lista.push(f); } });
+    return lista.slice(0,8);
+  }
+  function colarRenderChips(lista, nota){
+    const box=document.getElementById('colarFornChips'); if(!box) return;
+    const atual=colarSemAcentos(document.getElementById('colar_fornecedor').value.trim());
+    box.innerHTML=(nota?`<span class="colar-chip-nota">${escHtml(nota)}</span>`:'')+lista.map(f=>`<button type="button" class="colar-chip${colarSemAcentos(f)===atual?' on':''}" data-forn="${escHtml(f)}">${escHtml(f)}</button>`).join('');
+  }
   let colarServicos = [];
   function colarMostrar(passo){
     const lado = passo==='cliPassoRever' && window.matchMedia('(min-width: 1180px) and (min-height: 560px)').matches;
@@ -4532,11 +4555,15 @@
     if(!r.servicos.length){ colarEstado('Não encontrei nenhum serviço neste texto. Confirma que tem linhas como "Date:", "Time:", "Pick up:" e "Drop off:".', true); return; }
     colarServicos=r.servicos;
     const ex=r.extras;
-    let forn=''; try{ forn=localStorage.getItem(COLAR_FORN_KEY)||''; }catch(e){}
+    const conhecidos=colarFornecedoresConhecidos();
+    let forn=ex.fornecedor||'', fornNota='';
+    if(forn){ fornNota='✓ da mensagem'; }
+    else { const tN=colarSemAcentos(texto).replace(/[^a-z0-9]/g,''); const achado=conhecidos.find(f=>{ const base=colarSemAcentos(f.replace(/\(.*\)/,'')).replace(/[^a-z0-9]/g,''); return base.length>=4 && tN.indexOf(base)>=0; }); if(achado){ forn=achado; fornNota='✓ reconhecido na mensagem'; } }
     document.getElementById('colar_fornecedor').value = forn;
+    colarRenderChips(conhecidos, fornNota);
     document.getElementById('colar_cliente').value = ex.nome || '';
     document.getElementById('colar_telefone').value = ex.telefone || '';
-    document.getElementById('colar_valor').value = '';
+    document.getElementById('colar_valor').value = ex.valor || '';
     const obs=[];
     if(ex.emergencia) obs.push('Emergência: '+ex.emergencia.replace(/^\+\s+/,'+'));
     if(ex.pax) obs.push('Passageiros: '+ex.pax);
@@ -4632,6 +4659,8 @@
     }finally{ btn.disabled=false; document.getElementById('colarFotoInput').value=''; }
   }
   document.getElementById('btnColarMensagem').addEventListener('click', colarAbrir);
+  document.getElementById('colarFornChips').addEventListener('click', e=>{ const b=e.target.closest('[data-forn]'); if(!b) return; document.getElementById('colar_fornecedor').value=b.dataset.forn; colarRenderChips(colarFornecedoresConhecidos(), ''); });
+  document.getElementById('colar_fornecedor').addEventListener('input', ()=> colarRenderChips(colarFornecedoresConhecidos(), ''));
   document.getElementById('btnColarVoltar').addEventListener('click', ()=> colarMostrar('cliPasso1'));
   document.getElementById('btnColarReverVoltar').addEventListener('click', ()=> colarMostrar('cliPassoColar'));
   document.getElementById('btnColarLer').addEventListener('click', colarAnalisar);
