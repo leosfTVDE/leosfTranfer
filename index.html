@@ -1058,6 +1058,22 @@
   #placarFaixa .faixa-site{ color:#e8c9a0; font:600 clamp(15px, 5.2vmin, 42px) 'Helvetica Neue', Arial, sans-serif; letter-spacing:.04em; }
   #placarFaixa .faixa-logo-parceiro{ height:clamp(44px, 15vmin, 120px); max-width:62%; object-fit:contain; display:block; }
   #placarFaixa .faixa-nome{ color:#fff; font:700 clamp(18px, 5vmin, 40px) Georgia, 'Times New Roman', serif; }
+  /* v9.27: logo só para um serviço (agência de fora) — num cartão branco, centrada */
+  #placarFaixa.faixa-servico{ justify-content:center; }
+  #placarFaixa .faixa-logo-servico{ height:clamp(48px, 14vmin, 116px); max-width:86%; object-fit:contain; display:block; background:#fff; border-radius:12px; padding:clamp(6px, 1.4vmin, 12px) clamp(10px, 3vmin, 24px); box-sizing:content-box; }
+  .lgs-overlay{ position:fixed; inset:0; z-index:3600; background:rgba(13,27,42,.55); display:flex; align-items:flex-end; justify-content:center; padding:16px; }
+  .lgs-overlay[hidden]{ display:none; }
+  .lgs-card{ background:#fdf9f1; color:#1b2b3a; width:100%; max-width:440px; border-radius:20px; padding:20px 18px 16px; box-shadow:0 10px 40px rgba(0,0,0,.3); font-family:'Helvetica Neue', Arial, sans-serif; }
+  .lgs-card h3{ margin:0 0 4px; font-size:19px; }
+  .lgs-sub{ margin:0 0 12px; color:#6b6450; font-size:14px; }
+  .lgs-prev{ background:#0d1b2a; border-radius:14px; min-height:96px; display:flex; align-items:center; justify-content:center; padding:14px; margin-bottom:10px; color:#c9d6da; font-size:14px; text-align:center; }
+  .lgs-prev img{ max-width:88%; max-height:110px; background:#fff; border-radius:10px; padding:8px 14px; object-fit:contain; }
+  .lgs-nota{ font-size:13px; color:#6b6450; margin:0 0 12px; line-height:1.4; }
+  .lgs-btn{ display:block; width:100%; padding:13px; margin-top:8px; border-radius:12px; border:1px solid #d9cfb8; background:#fff; color:#1b2b3a; font:600 16px 'Helvetica Neue', Arial, sans-serif; }
+  .lgs-btn.lgs-pri{ background:#1b3a4b; color:#fff; border-color:#1b3a4b; }
+  .lgs-btn.lgs-del{ color:#a02f24; }
+  .lgs-btn[hidden]{ display:none; }
+  .lgs-estado{ font-size:13px; min-height:18px; margin:6px 0 0; color:#a02f24; }
   .placar-nome{
     font-family: Georgia, 'Times New Roman', serif;
     font-weight:bold;
@@ -2091,7 +2107,7 @@
     <p class="nota">Os serviços por hora agendados ficam em "📅 Agendados". Os que estão em andamento aparecem a partir do momento em que tocas em "🚗 Ir buscar cliente" no agendamento. O tempo só começa a contar quando tocas em "▶️ Iniciar" (cliente no carro). Ao finalizar, o valor é calculado pela regra definida em "Minhas tarifas" e podes enviar o resumo ao cliente. O agendamento só sai da lista quando o marcares como "Concluído".</p>
   </div>
 
-  <p style="text-align:center; font-family:'Helvetica Neue', Arial, sans-serif; font-size:11px; color:#8a7f66; margin-top:24px;">Trajeto · v9.25.1</p>
+  <p style="text-align:center; font-family:'Helvetica Neue', Arial, sans-serif; font-size:11px; color:#8a7f66; margin-top:24px;">Trajeto · v9.27.0</p>
 
 </main>
 
@@ -2196,6 +2212,20 @@
   </div>
 </div>
 
+<div class="lgs-overlay" id="logoServOverlay" hidden>
+  <div class="lgs-card" role="dialog" aria-modal="true" aria-labelledby="logoServTitulo">
+    <h3 id="logoServTitulo">🖼️ Logo na placa</h3>
+    <p class="lgs-sub" id="logoServSub"></p>
+    <div class="lgs-prev" id="logoServPrev"></div>
+    <p class="lgs-nota">Só para este serviço: aparece em baixo da placa, no lugar da logo normal. Não fica guardada nos parceiros e apaga-se sozinha quando marcares o serviço como concluído.</p>
+    <input type="file" id="logoServFicheiro" accept="image/*" hidden>
+    <button type="button" class="lgs-btn lgs-pri" id="logoServEscolher">📷 Escolher imagem</button>
+    <button type="button" class="lgs-btn" id="logoServVer">👀 Ver a placa</button>
+    <button type="button" class="lgs-btn lgs-del" id="logoServTirar">Tirar logo</button>
+    <button type="button" class="lgs-btn" id="logoServFechar">Fechar</button>
+    <p class="lgs-estado" id="logoServEstado"></p>
+  </div>
+</div>
 <div class="placar-overlay" id="placarOverlay">
   <div class="placar-picker" id="placarPicker">
     <button class="btn-fechar-placar" id="btnFecharPlacar">✕</button>
@@ -3059,6 +3089,7 @@
     catch(e){ return []; }
   }
   function gravarAgendamentos(lista){
+    (lista || []).forEach(a => { if(a && a.realizado && a.logoPlaca) delete a.logoPlaca; });
     localStorage.setItem(AG_KEY, JSON.stringify(lista));
     sincronizarNuvem();
   }
@@ -3578,7 +3609,7 @@
         <div class="ag-acoes">
           ${(ag.realizado && !avaliacaoRecebida(ag)) ? '<button class="ag-btn-av" data-acao="pedirAvaliacao">⭐ Pedir avaliação</button>' : ''}
           ${ag.realizado ? `<button class="ag-btn-cal" data-acao="nota">📝 ${ag.nota ? 'Editar nota' : 'Nota'}</button>` : ''}
-          <button class="ag-btn-cal" data-acao="dados">📋 Dados</button>
+          <button class="ag-btn-cal" data-acao="dados">📋 Dados</button>${ag.realizado ? '' : `<button class="ag-btn-cal" data-acao="logoPlaca">🖼️ ${ag.logoPlaca ? 'Logo da placa ✓' : 'Logo na placa'}</button>`}
           <button class="ag-btn-cal" data-acao="editar">✏️ Editar</button>
           ${ag.realizado ? '<button class="ag-btn-cal" data-acao="refazer">🔁 Refazer</button>' : ''}
           <button class="ag-btn-cal" data-acao="cal">📅 Calendário</button>
@@ -4415,7 +4446,7 @@
     ['voo',/^(flight( number| no\.?| n[ºo])?|voo|n[ºo] (do )?voo|numero do voo)$/],
     ['nome',/^(name|nome|client( name)?|cliente|passenger( name)?|passageiro|guest( name)?|lead passenger|pax name|hospede)$/],
     ['pax',/^(pax|passengers|passageiros|persons|people|pessoas|n[ºo] (de )?pax|number of passengers)$/],
-    ['telefone',/^(phone|telefone|tel|telemovel|mobile|contact|contacto|contato|whatsapp|phone number|client phone)$/],
+    ['telefone',/^(phone|telefone|tel|tlm|tlf|telm|cell|celular|telemovel|mobile|contact|contacto|contato|whatsapp|phone number|client phone)$/],
     ['bagagem',/^(luggage|bagagem|bags|malas|suitcases)$/],
     ['notas',/^(notes?|observacoes|obs|remarks|comments?|info)$/],
     ['fornecedor',/^(fornecedor|supplier|provider|empresa|company|agencia|agency|operador|operator|parceiro|partner|booked by|reservado por)$/],
@@ -4456,7 +4487,7 @@
   function colarLerMensagem(texto,hoje){
     hoje=hoje||new Date();
     var linhas=String(texto||'').replace(/\r/g,'').split('\n');
-    var servicos=[], atual=null, extras={emergencia:'',telefone:'',nome:'',pax:'',bagagem:'',notas:[],fornecedor:'',valor:''}, ultimoCampo=null;
+    var servicos=[], atual=null, extras={emergencia:'',telefone:'',nome:'',pax:'',bagagem:'',notas:[],fornecedor:'',valor:'',organizador:''}, ultimoCampo=null, pendente=null;
     function novo(regresso){ atual={data:'',hora:'',partida:'',chegada:'',voo:'',regresso:!!regresso,dataExplicita:false}; servicos.push(atual); return atual; }
     linhas.forEach(function(bruta){
       var l=bruta.replace(/[*_~]/g,'').replace(/^[\s\-•·▪►>➡️📍📅⏰🕐🚗✈️👤☎️📞🔁↩️]+/u,'').trim();
@@ -4466,7 +4497,12 @@
         for(var i=0;i<COLAR_CHAVES.length;i++){ if(COLAR_CHAVES[i][1].test(k)){ chave=COLAR_CHAVES[i][0]; break; } }
         valor=m[2].trim(); }
       else { var k2=colarSemAcentos(l).replace(/[^a-z ]/g,' ').replace(/\s+/g,' ').trim();
-        if(/^(return( trip| transfer)?|regresso|volta|retorno)$/.test(k2)){ chave='regresso'; valor=''; } }
+        if(/^(return( trip| transfer)?|regresso|volta|retorno)$/.test(k2)){ chave='regresso'; valor=''; }
+        else if(/^(when|quando)$/.test(k2)){ pendente='data'; ultimoCampo=null; return; }
+        else { var org=l.match(/^(.{2,60}?)\s+[-–—]\s+(organizer|organiser|organizador|organizadora)$/i); if(org){ extras.organizador=extras.organizador||org[1].trim(); return; } } }
+      if(!chave&&pendente){ chave=pendente; valor=l; }
+      pendente=null;
+      if(chave&&!valor&&/^(data|hora|partida|chegada|voo|nome|telefone|valor|fornecedor|pax|bagagem)$/.test(chave)){ pendente=chave; ultimoCampo=chave; return; }
       if(!chave){ if(ultimoCampo==='notas')extras.notas.push(l); return; }
       ultimoCampo=chave;
       if(chave==='emergencia'){ extras.emergencia=valor; return; }
@@ -4483,12 +4519,12 @@
         return; }
       if(!atual)novo(false);
       var campo=chave;
-      if(campo==='data'){ var dv=colarData(valor,hoje); if(!dv)return; if(atual.data&&atual.dataExplicita)novo(false); atual.data=dv; atual.dataExplicita=true;
+      if(campo==='data'){ valor=valor.split(/\s[–—]\s/)[0]; var dv=colarData(valor,hoje); if(!dv)return; if(atual.data&&atual.dataExplicita)novo(false); atual.data=dv; atual.dataExplicita=true;
         var hv=colarHora(valor.replace(/\b\d{1,2}[\/.-]\d{1,2}([\/.-]\d{2,4})?\b/,'')); if(hv&&!atual.hora)atual.hora=hv; return; }
       if(campo==='hora'){ var h=colarHora(valor); if(!h)return; if(atual.hora)novo(false); atual.hora=h; return; }
       if(campo==='partida'){ if(atual.partida)novo(false); atual.partida=colarLimparLugar(valor); return; }
       if(campo==='chegada'){ if(atual.chegada)novo(false); atual.chegada=colarLimparLugar(valor); return; }
-      if(campo==='voo'){ atual.voo=atual.voo||valor.toUpperCase().replace(/\s+/g,''); return; }
+      if(campo==='voo'){ if(!atual.voo){ var vu=valor.toUpperCase(), fc=vu.match(/\b([A-Z]{2}|[A-Z]\d|\d[A-Z])\s?-?(\d{1,4}[A-Z]?)\b/); atual.voo=fc?fc[1]+fc[2]:vu.replace(/\s+/g,''); } return; }
     });
     // completar: o regresso herda data e lugares da ida; passa da meia-noite => dia seguinte
     servicos=servicos.filter(function(s){ return s.data||s.hora||s.partida||s.chegada; });
@@ -4500,9 +4536,11 @@
         if(!s.chegada&&s.regresso)s.chegada=ant.partida;
         if(!s.data&&ant.data){ s.data=ant.data; if(s.hora&&ant.hora&&s.hora<ant.hora){ s.data=colarMaisDias(ant.data,1); s.meiaNoite=true; } }
       }
+      if(s.voo&&!s.partida&&s.chegada&&!/aeroporto|airport/i.test(s.chegada)){ s.partida='Aeroporto de Lisboa'; s.aeroDeduzido=true; }
+      else if(s.voo&&!s.chegada&&s.partida&&!/aeroporto|airport/i.test(s.partida)){ s.chegada='Aeroporto de Lisboa'; s.aeroDeduzido=true; }
       if(!s.data&&s.hora){ var hj=colarIso(hoje); s.data=hj; s.semData=true; }
     }
-    return {servicos:servicos.map(function(s){ return {data:s.data,hora:s.hora,partida:s.partida,chegada:s.chegada,voo:s.voo,regresso:s.regresso,meiaNoite:!!s.meiaNoite,semData:!!s.semData}; }),extras:extras};
+    return {servicos:servicos.map(function(s){ return {data:s.data,hora:s.hora,partida:s.partida,chegada:s.chegada,voo:s.voo,regresso:s.regresso,meiaNoite:!!s.meiaNoite,semData:!!s.semData,aeroDeduzido:!!s.aeroDeduzido}; }),extras:extras};
   }
   
   // ===== v9.24: Colar mensagem do WhatsApp / ler de uma foto =====
@@ -4541,6 +4579,7 @@
         ${s.voo ? `<label>✈️ Voo</label><input type="text" data-campo="voo" value="${escHtml(s.voo)}">` : ''}
         ${s.meiaNoite ? '<div class="colar-aviso">🌙 Passa da meia-noite: ficou no dia seguinte ('+escHtml(s.data.split('-').reverse().join('/'))+'). Confirma.</div>' : ''}
         ${s.semData ? '<div class="colar-aviso">📅 A mensagem não tinha data: pus hoje. Confirma.</div>' : ''}
+        ${s.aeroDeduzido ? '<div class="colar-aviso">✈️ Tem número de voo e não dizia o aeroporto: pus o Aeroporto de Lisboa. Confirma.</div>' : ''}
         ${falta ? '<div class="colar-aviso" style="color:#a02f24">Falta preencher: '+[!s.data&&'data',!s.hora&&'hora',!s.partida&&'recolha',!s.chegada&&'destino'].filter(Boolean).join(', ')+'</div>' : ''}
       </div>`;
     }).join('');
@@ -4559,6 +4598,7 @@
     let forn=ex.fornecedor||'', fornNota='';
     if(forn){ fornNota='✓ da mensagem'; }
     else { const tN=colarSemAcentos(texto).replace(/[^a-z0-9]/g,''); const achado=conhecidos.find(f=>{ const base=colarSemAcentos(f.replace(/\(.*\)/,'')).replace(/[^a-z0-9]/g,''); return base.length>=4 && tN.indexOf(base)>=0; }); if(achado){ forn=achado; fornNota='✓ reconhecido na mensagem'; } }
+    if(!forn&&ex.organizador){ forn=ex.organizador; fornNota='✓ quem enviou o convite'; }
     document.getElementById('colar_fornecedor').value = forn;
     colarRenderChips(conhecidos, fornNota);
     document.getElementById('colar_cliente').value = ex.nome || '';
@@ -4766,7 +4806,7 @@
       <div class="ag-acoes">
         ${(ag.realizado && typeof avaliacaoRecebida==='function' && !avaliacaoRecebida(ag)) ? '<button class="ag-btn-av" data-acao="pedirAvaliacao">⭐ Pedir avaliação</button>' : ''}
         ${ag.realizado ? `<button class="ag-btn-cal" data-acao="nota">📝 ${ag.nota?'Editar nota':'Nota'}</button>` : ''}
-        <button class="ag-btn-cal" data-acao="dados">📋 Dados</button>
+        <button class="ag-btn-cal" data-acao="dados">📋 Dados</button>${ag.realizado ? '' : `<button class="ag-btn-cal" data-acao="logoPlaca">🖼️ ${ag.logoPlaca ? 'Logo da placa ✓' : 'Logo na placa'}</button>`}
         <button class="ag-btn-cal" data-acao="editar">✏️ Editar</button>
         ${ag.realizado ? '<button class="ag-btn-cal" data-acao="refazer">🔁 Refazer</button>' : ''}
         <button class="ag-btn-cal" data-acao="cal">📅 Calendário</button>
@@ -5198,7 +5238,7 @@
         <div class="ag-acoes">
           ${(ag.realizado && !avaliacaoRecebida(ag)) ? '<button class="ag-btn-av" data-acao="pedirAvaliacao">⭐ Pedir avaliação</button>' : ''}
           ${ag.realizado ? `<button class="ag-btn-cal" data-acao="nota">📝 ${ag.nota ? 'Editar nota' : 'Nota'}</button>` : ''}
-          <button class="ag-btn-cal" data-acao="dados">📋 Dados</button>
+          <button class="ag-btn-cal" data-acao="dados">📋 Dados</button>${ag.realizado ? '' : `<button class="ag-btn-cal" data-acao="logoPlaca">🖼️ ${ag.logoPlaca ? 'Logo da placa ✓' : 'Logo na placa'}</button>`}
           <button class="ag-btn-cal" data-acao="editar">✏️ Editar</button>
           ${ag.realizado ? '<button class="ag-btn-cal" data-acao="refazer">🔁 Refazer</button>' : ''}
           <button class="ag-btn-cal" data-acao="cal">📅 Calendário</button>
@@ -5342,10 +5382,17 @@
   renderParceirosConfig();
 
   // Faixa da placa: cliente teu → logo Trajeto + site; parceiro com logo → logo (e nome) do parceiro; parceiro sem logo → sem faixa (como antes)
-  function aplicarFaixaPlaca(fornecedor){
+  function aplicarFaixaPlaca(fornecedor, logoServico){
     const disp = document.getElementById('placarDisplay'), faixa = document.getElementById('placarFaixa'), fornEl = document.getElementById('placarFornecedorGrande');
     faixa.innerHTML = '';
     faixa.classList.remove('faixa-redonda'); disp.classList.remove('faixa-redonda');
+    faixa.classList.remove('faixa-servico');
+    if(logoServico){   // v9.27: logo escolhida só para este serviço
+      const im = document.createElement('img'); im.className = 'faixa-logo-servico'; im.alt = fornecedor || ''; im.src = logoServico; faixa.appendChild(im);
+      faixa.classList.add('faixa-servico'); fornEl.textContent = '';
+      faixa.hidden = false; disp.classList.add('com-faixa');
+      return;
+    }
     let mostrar = false;
     if(!ehFornecedorParceiro(fornecedor)){
       const logo = document.querySelector('header .logo-h');
@@ -5377,6 +5424,108 @@
   //  Painel "O seu dia" (por baixo de "Meus agendamentos"). Só lê dados que o app já tem; não muda nada.
   //  Faturado e "A receber" vêm do Faturamento (os mesmos números); o olho esconde-os só aqui (escolha guardada no aparelho).
   // =====================================================================
+  // ===== v9.27: logo na placa só para um serviço =====
+  // Corta as margens brancas/transparentes e reduz (PNG; se ficar grande, JPEG em fundo branco).
+  function comprimirLogoServico(file){
+    return new Promise((resolve, reject)=>{
+      const url0 = URL.createObjectURL(file), img = new Image();
+      img.onload = ()=>{
+        try{
+          const W = img.naturalWidth, H = img.naturalHeight, f0 = Math.min(1, 1600 / Math.max(W, H));
+          const a = document.createElement('canvas'); a.width = Math.max(1, Math.round(W * f0)); a.height = Math.max(1, Math.round(H * f0));
+          const ax = a.getContext('2d'); ax.drawImage(img, 0, 0, a.width, a.height);
+          const p = ax.getImageData(0, 0, a.width, a.height).data;
+          // o que conta como "desenho": em imagens transparentes, tudo o que não é transparente;
+          // senão, o que é escuro ou colorido (ignora o branco e as sombras cinzentas claras de uma captura de ecrã)
+          const AW = a.width, AH = a.height, cantos = [0, AW - 1, (AH - 1) * AW, AH * AW - 1];
+          const transp = cantos.filter(k => p[k * 4 + 3] < 24).length >= 2;
+          if(!transp){ const im2 = ax.getImageData(0, 0, AW, AH), q = im2.data;   // sombras e bordas quase brancas -> branco
+            for(let i = 0; i < q.length; i += 4){ const mn = Math.min(q[i], q[i+1], q[i+2]), mx = Math.max(q[i], q[i+1], q[i+2]); if(mn > 215 && mx - mn < 20){ q[i] = q[i+1] = q[i+2] = 255; } }
+            ax.putImageData(im2, 0, 0); for(let i = 0; i < q.length; i++) p[i] = q[i]; }
+          const tinta = i => p[i+3] > 24 && (transp || Math.min(p[i], p[i+1], p[i+2]) < 200 || (Math.max(p[i], p[i+1], p[i+2]) - Math.min(p[i], p[i+1], p[i+2])) > 45);
+          const porLinha = new Array(AH).fill(0);
+          for(let y = 0; y < AH; y++){ let c = 0; for(let x = 0; x < AW; x++) if(tinta((y * AW + x) * 4)) c++; porLinha[y] = c; }
+          // blocos de linhas com desenho (junta os que estão perto); fica o bloco com mais desenho = a logo
+          const salto = Math.max(4, Math.round(AH * 0.10)), blocos = [];
+          let ini = -1, fim = -1, soma = 0, vazio = 0;
+          for(let y = 0; y <= AH; y++){
+            const v = y < AH ? porLinha[y] : 0;
+            if(v > 0){ if(ini < 0){ ini = y; soma = 0; } fim = y; soma += v; vazio = 0; }
+            else if(ini >= 0){ vazio++; if(vazio > salto || y === AH){ blocos.push({ ini, fim, soma }); ini = -1; vazio = 0; } }
+          }
+          let x0 = 0, y0 = 0, x1 = AW - 1, y1 = AH - 1;
+          if(blocos.length){
+            const bl = blocos.reduce((m, b) => b.soma > m.soma ? b : m);
+            y0 = bl.ini; y1 = bl.fim; x0 = AW; x1 = -1;
+            for(let y = y0; y <= y1; y++) for(let x = 0; x < AW; x++) if(tinta((y * AW + x) * 4)){ if(x < x0) x0 = x; if(x > x1) x1 = x; }
+            if(x1 < 0){ x0 = 0; x1 = AW - 1; }
+          }
+          const mg = Math.round(Math.max(x1 - x0, y1 - y0) * 0.03);
+          x0 = Math.max(0, x0 - mg); y0 = Math.max(0, y0 - mg); x1 = Math.min(a.width - 1, x1 + mg); y1 = Math.min(a.height - 1, y1 + mg);
+          const cw = x1 - x0 + 1, ch = y1 - y0 + 1;
+          let esc = Math.min(1, 720 / cw, 280 / ch), url = '';
+          for(let k = 0; k < 7; k++){
+            const c = document.createElement('canvas'); c.width = Math.max(1, Math.round(cw * esc)); c.height = Math.max(1, Math.round(ch * esc));
+            const cx = c.getContext('2d'); cx.drawImage(a, x0, y0, cw, ch, 0, 0, c.width, c.height);
+            url = c.toDataURL('image/png');
+            if(url.length > 120000){ const j = document.createElement('canvas'); j.width = c.width; j.height = c.height; const jx = j.getContext('2d'); jx.fillStyle = '#fff'; jx.fillRect(0, 0, j.width, j.height); jx.drawImage(c, 0, 0); url = j.toDataURL('image/jpeg', 0.86); }
+            if(url.length <= 120000) break;
+            esc *= 0.8;
+          }
+          URL.revokeObjectURL(url0); resolve(url);
+        }catch(err){ URL.revokeObjectURL(url0); reject(err); }
+      };
+      img.onerror = ()=>{ URL.revokeObjectURL(url0); reject(new Error('imagem inválida')); };
+      img.src = url0;
+    });
+  }
+  let logoServId = null;
+  function logoServRender(){
+    const ag = lerAgendamentos().find(a => a.id === logoServId); if(!ag){ fecharLogoServico(); return; }
+    document.getElementById('logoServSub').textContent = `${ag.data ? ag.data.split('-').reverse().join('/') : ''} ${ag.hora || ''} · ${ag.nomePlaca || ag.cliente || ''}`.trim();
+    const pv = document.getElementById('logoServPrev'); pv.innerHTML = '';
+    if(ag.logoPlaca){ const im = document.createElement('img'); im.src = ag.logoPlaca; im.alt = ''; pv.appendChild(im); }
+    else pv.textContent = 'Sem logo própria: a placa usa a logo normal.';
+    document.getElementById('logoServEscolher').textContent = ag.logoPlaca ? '📷 Trocar imagem' : '📷 Escolher imagem';
+    document.getElementById('logoServTirar').hidden = !ag.logoPlaca;
+  }
+  function logoServAtualizarListas(){
+    renderLista();
+    document.querySelectorAll('.ag-item[data-id="' + (window.CSS && CSS.escape ? CSS.escape(logoServId) : logoServId) + '"]').forEach(el => el.classList.add('ag-aberto'));
+    try{ if(typeof pcAbrirDetalhe === 'function' && document.querySelector('#pcDetalhe .ag-item[data-id]')) pcAbrirDetalhe(logoServId); }catch(e){}
+  }
+  function abrirLogoServico(id){
+    logoServId = id; document.getElementById('logoServEstado').textContent = '';
+    logoServRender(); document.getElementById('logoServOverlay').hidden = false;
+  }
+  function fecharLogoServico(){ document.getElementById('logoServOverlay').hidden = true; }
+  document.getElementById('logoServEscolher').addEventListener('click', ()=> document.getElementById('logoServFicheiro').click());
+  document.getElementById('logoServFicheiro').addEventListener('change', async (e)=>{
+    const f = e.target.files && e.target.files[0]; e.target.value = ''; if(!f) return;
+    const est = document.getElementById('logoServEstado'); est.style.color = '#6b6450'; est.textContent = 'A preparar a imagem…';
+    try{
+      const url = await comprimirLogoServico(f);
+      const lista = lerAgendamentos(), ag = lista.find(a => a.id === logoServId); if(!ag) return;
+      ag.logoPlaca = url; gravarAgendamentos(lista);
+      est.style.color = '#2e7d4f'; est.textContent = '✓ Logo pronta. Toca em "Ver a placa" para veres como fica.';
+      logoServRender(); logoServAtualizarListas();
+    }catch(err){ est.style.color = '#a02f24'; est.textContent = 'Não foi possível usar essa imagem. Tenta outra (foto ou captura de ecrã).'; }
+  });
+  document.getElementById('logoServTirar').addEventListener('click', ()=>{
+    const lista = lerAgendamentos(), ag = lista.find(a => a.id === logoServId); if(!ag) return;
+    delete ag.logoPlaca; gravarAgendamentos(lista);
+    const est = document.getElementById('logoServEstado'); est.style.color = '#6b6450'; est.textContent = 'Logo tirada: a placa volta à logo normal.';
+    logoServRender(); logoServAtualizarListas();
+  });
+  document.getElementById('logoServVer').addEventListener('click', ()=>{
+    const ag = lerAgendamentos().find(a => a.id === logoServId); if(!ag) return;
+    fecharLogoServico();
+    document.getElementById('placarOverlay').classList.add('aberto');
+    mostrarPlaca(ag.nomePlaca || ag.cliente, ag.voo || '', ag.fornecedor || '', ag.logoPlaca || '');
+  });
+  document.getElementById('logoServFechar').addEventListener('click', fecharLogoServico);
+  document.getElementById('logoServOverlay').addEventListener('click', e=>{ if(e.target.id === 'logoServOverlay') fecharLogoServico(); });
+
   const PAINEL_OCULTO_KEY = 'trajeto_painel_valores_ocultos';
   function painelValoresOcultos(){ try{ return localStorage.getItem(PAINEL_OCULTO_KEY) === '1'; }catch(e){ return false; } }
   function criarPainelDia(){
@@ -5686,7 +5835,7 @@
   document.getElementById('crPlaca').addEventListener('click', ()=>{
     const ag = lerAgendamentos().find(a => a.id === corridaId); if(!ag) return;
     document.getElementById('placarOverlay').classList.add('aberto');
-    mostrarPlaca(ag.nomePlaca || ag.cliente, ag.voo || '', ag.fornecedor || '');
+    mostrarPlaca(ag.nomePlaca || ag.cliente, ag.voo || '', ag.fornecedor || '', ag.logoPlaca || '');
   });
   function seloCorrida(ag){
     if(ag.realizado || ag.tipo === 'hora') return '';
@@ -5903,11 +6052,11 @@
     `).join('');
   }
 
-  function mostrarPlaca(nome, voo, fornecedor){
+  function mostrarPlaca(nome, voo, fornecedor, logoServico){
     document.getElementById('placarNomeGrande').textContent = nome;
     document.getElementById('placarVooGrande').textContent = voo ? `✈️ Voo ${voo}` : '';
     document.getElementById('placarFornecedorGrande').textContent = fornecedor || '';
-    aplicarFaixaPlaca(fornecedor || '');
+    aplicarFaixaPlaca(fornecedor || '', logoServico || '');
     document.getElementById('placarPicker').style.display = 'none';
     document.getElementById('placarDisplay').style.display = 'flex';
     pedirWakeLock();
@@ -5936,7 +6085,7 @@
     if(!btn) return;
     const ag = lerAgendamentos().find(a => a.id === btn.dataset.id);
     if(!ag) return;
-    mostrarPlaca(ag.nomePlaca || ag.cliente, ag.voo || '', ag.fornecedor || '');
+    mostrarPlaca(ag.nomePlaca || ag.cliente, ag.voo || '', ag.fornecedor || '', ag.logoPlaca || '');
   });
 
   document.getElementById('btnMostrarPlacar').addEventListener('click', ()=>{
@@ -6187,6 +6336,8 @@
     } else if(btn.dataset.acao === 'tourParagem'){
       const idx = parseInt(btn.dataset.idx, 10);
       if(Array.isArray(ag.tourRoteiro) && ag.tourRoteiro[idx]) abrirWaze(paragemParaWaze(ag.tourRoteiro[idx]));
+    } else if(btn.dataset.acao === 'logoPlaca'){
+      abrirLogoServico(ag.id);
     } else if(btn.dataset.acao === 'editar'){
       abrirEdicao(ag);
     } else if(btn.dataset.acao === 'cal'){
