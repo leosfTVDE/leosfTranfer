@@ -1060,7 +1060,8 @@
   #placarFaixa .faixa-nome{ color:#fff; font:700 clamp(18px, 5vmin, 40px) Georgia, 'Times New Roman', serif; }
   /* v9.27: logo só para um serviço (agência de fora) — num cartão branco, centrada */
   #placarFaixa.faixa-servico{ justify-content:center; }
-  #placarFaixa .faixa-logo-servico{ height:clamp(48px, 14vmin, 116px); max-width:86%; object-fit:contain; display:block; background:#fff; border-radius:12px; padding:clamp(6px, 1.4vmin, 12px) clamp(10px, 3vmin, 24px); box-sizing:content-box; }
+  #placarFaixa .faixa-logo-servico{ height:clamp(80px, 30vmin, 280px); max-width:94%; object-fit:contain; display:block; background:#fff; border-radius:14px; padding:clamp(6px, 1.2vmin, 12px) clamp(10px, 2.5vmin, 24px); box-sizing:content-box; }
+  #placarDisplay.com-faixa.faixa-servico-disp{ padding-bottom:calc(24px + clamp(110px, 40vmin, 360px)); }
   .lgs-overlay{ position:fixed; inset:0; z-index:3600; background:rgba(13,27,42,.55); display:flex; align-items:flex-end; justify-content:center; padding:16px; }
   .lgs-overlay[hidden]{ display:none; }
   .lgs-card{ background:#fdf9f1; color:#1b2b3a; width:100%; max-width:440px; border-radius:20px; padding:20px 18px 16px; box-shadow:0 10px 40px rgba(0,0,0,.3); font-family:'Helvetica Neue', Arial, sans-serif; }
@@ -2107,7 +2108,7 @@
     <p class="nota">Os serviços por hora agendados ficam em "📅 Agendados". Os que estão em andamento aparecem a partir do momento em que tocas em "🚗 Ir buscar cliente" no agendamento. O tempo só começa a contar quando tocas em "▶️ Iniciar" (cliente no carro). Ao finalizar, o valor é calculado pela regra definida em "Minhas tarifas" e podes enviar o resumo ao cliente. O agendamento só sai da lista quando o marcares como "Concluído".</p>
   </div>
 
-  <p style="text-align:center; font-family:'Helvetica Neue', Arial, sans-serif; font-size:11px; color:#8a7f66; margin-top:24px;">Trajeto · v9.27.0</p>
+  <p style="text-align:center; font-family:'Helvetica Neue', Arial, sans-serif; font-size:11px; color:#8a7f66; margin-top:24px;">Trajeto · v9.27.1</p>
 
 </main>
 
@@ -4446,7 +4447,7 @@
     ['voo',/^(flight( number| no\.?| n[ºo])?|voo|n[ºo] (do )?voo|numero do voo)$/],
     ['nome',/^(name|nome|client( name)?|cliente|passenger( name)?|passageiro|guest( name)?|lead passenger|pax name|hospede)$/],
     ['pax',/^(pax|passengers|passageiros|persons|people|pessoas|n[ºo] (de )?pax|number of passengers)$/],
-    ['telefone',/^(phone|telefone|tel|tlm|tlf|telm|cell|celular|telemovel|mobile|contact|contacto|contato|whatsapp|phone number|client phone)$/],
+    ['telefone',/^(phone|telefone|tel|tlm|tim|tlf|telm|cell|celular|telemovel|mobile|contact|contacto|contato|whatsapp|phone number|client phone)$/],
     ['bagagem',/^(luggage|bagagem|bags|malas|suitcases)$/],
     ['notas',/^(notes?|observacoes|obs|remarks|comments?|info)$/],
     ['fornecedor',/^(fornecedor|supplier|provider|empresa|company|agencia|agency|operador|operator|parceiro|partner|booked by|reservado por)$/],
@@ -4487,7 +4488,7 @@
   function colarLerMensagem(texto,hoje){
     hoje=hoje||new Date();
     var linhas=String(texto||'').replace(/\r/g,'').split('\n');
-    var servicos=[], atual=null, extras={emergencia:'',telefone:'',nome:'',pax:'',bagagem:'',notas:[],fornecedor:'',valor:'',organizador:''}, ultimoCampo=null, pendente=null;
+    var servicos=[], atual=null, extras={emergencia:'',telefone:'',nome:'',pax:'',bagagem:'',notas:[],fornecedor:'',valor:'',organizador:''}, ultimoCampo=null, pendente=null, telTalvez='';
     function novo(regresso){ atual={data:'',hora:'',partida:'',chegada:'',voo:'',regresso:!!regresso,dataExplicita:false}; servicos.push(atual); return atual; }
     linhas.forEach(function(bruta){
       var l=bruta.replace(/[*_~]/g,'').replace(/^[\s\-•·▪►>➡️📍📅⏰🕐🚗✈️👤☎️📞🔁↩️]+/u,'').trim();
@@ -4503,7 +4504,7 @@
       if(!chave&&pendente){ chave=pendente; valor=l; }
       pendente=null;
       if(chave&&!valor&&/^(data|hora|partida|chegada|voo|nome|telefone|valor|fornecedor|pax|bagagem)$/.test(chave)){ pendente=chave; ultimoCampo=chave; return; }
-      if(!chave){ if(ultimoCampo==='notas')extras.notas.push(l); return; }
+      if(!chave){ if(!telTalvez){ var tm=l.match(/(?:\+|\b00)\s?\d[\d\s().\-]{6,}\d/); if(tm) telTalvez=tm[0].replace(/\s+/g,' ').trim(); } if(ultimoCampo==='notas')extras.notas.push(l); return; }
       ultimoCampo=chave;
       if(chave==='emergencia'){ extras.emergencia=valor; return; }
       if(chave==='telefone'){ extras.telefone=extras.telefone||valor; return; }
@@ -4526,6 +4527,7 @@
       if(campo==='chegada'){ if(atual.chegada)novo(false); atual.chegada=colarLimparLugar(valor); return; }
       if(campo==='voo'){ if(!atual.voo){ var vu=valor.toUpperCase(), fc=vu.match(/\b([A-Z]{2}|[A-Z]\d|\d[A-Z])\s?-?(\d{1,4}[A-Z]?)\b/); atual.voo=fc?fc[1]+fc[2]:vu.replace(/\s+/g,''); } return; }
     });
+    if(!extras.telefone&&telTalvez) extras.telefone=telTalvez;
     // completar: o regresso herda data e lugares da ida; passa da meia-noite => dia seguinte
     servicos=servicos.filter(function(s){ return s.data||s.hora||s.partida||s.chegada; });
     var avisos=[];
@@ -5386,10 +5388,10 @@
     const disp = document.getElementById('placarDisplay'), faixa = document.getElementById('placarFaixa'), fornEl = document.getElementById('placarFornecedorGrande');
     faixa.innerHTML = '';
     faixa.classList.remove('faixa-redonda'); disp.classList.remove('faixa-redonda');
-    faixa.classList.remove('faixa-servico');
+    faixa.classList.remove('faixa-servico'); disp.classList.remove('faixa-servico-disp');
     if(logoServico){   // v9.27: logo escolhida só para este serviço
       const im = document.createElement('img'); im.className = 'faixa-logo-servico'; im.alt = fornecedor || ''; im.src = logoServico; faixa.appendChild(im);
-      faixa.classList.add('faixa-servico'); fornEl.textContent = '';
+      faixa.classList.add('faixa-servico'); disp.classList.add('faixa-servico-disp'); fornEl.textContent = '';
       faixa.hidden = false; disp.classList.add('com-faixa');
       return;
     }
