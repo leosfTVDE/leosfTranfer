@@ -1175,6 +1175,44 @@
   .modal-btn:last-child{margin-bottom:0;}
   .modal-btn-recebido{background:#2e8b57; color:#fff;}
   .modal-btn-pendente{background:var(--terracota); color:#fff;}
+  /* v9.29: formas de pagamento e cobrança online */
+  .modal-btn-forma{background:#fff; color:#1b2b3a; border:1px solid var(--linha) !important;}
+  .modal-btn-online{background:#635bff; color:#fff;}
+  .modal-btn[hidden]{display:none;}
+  .pag-aviso-online{background:#eef0ff; color:#3b35a8; border-radius:12px; padding:10px 12px; font:600 13.5px var(--ui); margin:10px 0 4px;}
+  .pag-aviso-online[hidden]{display:none;}
+  .ag-btn-cobrar{background:#635bff !important; color:#fff !important;}
+  .cob-linha{font:600 13px var(--ui); color:#3b35a8; margin-top:6px;}
+  .cob-linha.paga{color:#23704a;}
+  .cob-lb{display:block; font:600 12px 'Helvetica Neue', Arial, sans-serif; color:#8a8270; margin:10px 0 4px;}
+  .cob-in{width:100%; box-sizing:border-box; padding:12px; border-radius:12px; border:1px solid #d9cfb8; font:600 17px 'Helvetica Neue', Arial, sans-serif; background:#fff; color:#1b2b3a;}
+  .cob-taxa{font-size:13px; color:#6b6450; line-height:1.45; margin:10px 0 2px;}
+  .cob-qr{background:#fff; border-radius:14px; padding:12px; width:230px; margin:6px auto 8px; box-shadow:0 2px 10px rgba(0,0,0,.08);}
+  .cob-qr svg{display:block; width:100%; height:auto;}
+  .cob-metodos{text-align:center; font-size:12.5px; color:#6b6450; margin:0 0 8px;}
+  .cob-estado{text-align:center; border-radius:12px; padding:10px; font:700 14px 'Helvetica Neue', Arial, sans-serif; background:#fff6e5; color:#9a5b00;}
+  .cob-estado.paga{background:#e8f6ee; color:#23704a;}
+  .cob-valor{text-align:center; font:800 30px 'Helvetica Neue', Arial, sans-serif; margin:2px 0 0;}
+  .lgs-card.cob-card, .lgs-card.pag-card{max-height:92vh; overflow-y:auto;}
+  .pag-card h4{margin:16px 0 6px; font-size:15px;}
+  .pag-card p, .pag-card li{font-size:14px; line-height:1.45; color:#2f3b46;}
+  .pag-card ul, .pag-card ol{margin:4px 0 8px 20px; padding:0;}
+  .pag-estado{border-radius:14px; padding:12px 14px; font:600 14px 'Helvetica Neue', Arial, sans-serif; margin:8px 0;}
+  .pag-estado.ok{background:#e8f6ee; color:#23704a;} .pag-estado.nao{background:#fff6e5; color:#9a5b00;} .pag-estado.info{background:#eef0ff; color:#3b35a8;}
+  .pag-planos{display:grid; grid-template-columns:1fr 1fr; gap:8px; margin:8px 0;}
+  .pag-plano{background:#fff; border:1px solid #d9cfb8; border-radius:14px; padding:10px 12px;}
+  .pag-plano.atual{border:2px solid #2e8b57;}
+  .pag-plano b{display:block; font-size:15px;} .pag-plano .preco{font:800 20px 'Helvetica Neue', Arial, sans-serif; margin:4px 0;} .pag-plano small{font-size:12.5px; color:#6b6450; line-height:1.35; display:block;}
+  .pag-tab{width:100%; border-collapse:collapse; font-size:13px; margin:6px 0 4px;}
+  .pag-tab th, .pag-tab td{padding:6px 4px; border-bottom:1px solid #eadfc8; text-align:right;}
+  .pag-tab th:first-child, .pag-tab td:first-child{text-align:left;}
+  .pag-tab th{font-size:11.5px; color:#8a8270; font-weight:700;}
+  .pag-nota{font-size:12.5px !important; color:#6b6450 !important;}
+  .pag-config summary{cursor:pointer; font:600 14px 'Helvetica Neue', Arial, sans-serif; margin-top:14px;}
+  .fat-formas{margin-top:10px; border-top:1px solid var(--linha); padding-top:8px;}
+  .fat-formas .ff-linha{display:flex; justify-content:space-between; font:500 14px var(--ui); padding:4px 0;}
+  .fat-formas .ff-linha b{font-weight:700;}
+  .fat-formas .ff-pend{color:var(--terracota);}
   .modal-btn-secundario{background:#fff; color:var(--texto); border:1px solid var(--linha); margin-bottom:0;}
   .nota{
     font-family:'Helvetica Neue', Arial, sans-serif;
@@ -1533,6 +1571,11 @@
       <label for="cfg_whatsapp" style="margin-top:14px;">O teu número de WhatsApp (para o site de pedidos)</label>
       <input type="text" id="cfg_whatsapp" placeholder="ex: 351969698927">
 
+      <div class="cfg-grupo" style="margin-top:16px; border-top:1px solid var(--linha); padding-top:12px; padding-bottom:12px;">
+        <div class="cfg-titulo cfg-titulo-fixo">💳 Pagamentos online</div>
+        <div id="pagResumoCfg" style="font-family:'Helvetica Neue', Arial, sans-serif; font-size:13px; color:#6a7378; margin:6px 0 10px;">Cobra os clientes por cartão, Apple Pay, MB WAY e Klarna.</div>
+        <button type="button" class="btn-config" id="btnAbrirPagamentos" style="background:#635bff;color:#fff;border-color:#635bff;">💳 Pagamentos online</button>
+      </div>
       <div class="cfg-grupo" style="margin-top:16px; border-top:1px solid var(--linha); padding-top:2px;">
         <div class="cfg-titulo cfg-titulo-fixo">☁️ Sincronização entre aparelhos</div>
         <div style="padding-bottom:14px;">
@@ -2082,6 +2125,7 @@
         <button id="fatNext">▶</button>
       </div>
       <div class="fat-periodo-total" id="fatPeriodoTotal">€0</div>
+      <div class="fat-formas" id="fatFormas" hidden></div>
     </div>
 
     <div class="card">
@@ -2121,7 +2165,7 @@
     <p class="nota">Os serviços por hora agendados ficam em "📅 Agendados". Os que estão em andamento aparecem a partir do momento em que tocas em "🚗 Ir buscar cliente" no agendamento. O tempo só começa a contar quando tocas em "▶️ Iniciar" (cliente no carro). Ao finalizar, o valor é calculado pela regra definida em "Minhas tarifas" e podes enviar o resumo ao cliente. O agendamento só sai da lista quando o marcares como "Concluído".</p>
   </div>
 
-  <p style="text-align:center; font-family:'Helvetica Neue', Arial, sans-serif; font-size:11px; color:#8a7f66; margin-top:24px;">Trajeto · v9.28.0</p>
+  <p style="text-align:center; font-family:'Helvetica Neue', Arial, sans-serif; font-size:11px; color:#8a7f66; margin-top:24px;">Trajeto · v9.29.0</p>
 
 </main>
 
@@ -2240,6 +2284,1307 @@
     <p class="lgs-estado" id="logoServEstado"></p>
   </div>
 </div>
+<script>
+/* QR Code — Kazuhiko Arase (MIT), via qrcode-terminal (Apache-2.0). Empacotado para o Trajeto. */
+(function(){var M={},C={};function R(n){if(C[n])return C[n].exports;var m={exports:{}};C[n]=m;M[n](m,m.exports,R);return m.exports;}
+M['./QRMode']=function(module,exports,require){
+module.exports = {
+    MODE_NUMBER :       1 << 0,
+    MODE_ALPHA_NUM :    1 << 1,
+    MODE_8BIT_BYTE :    1 << 2,
+    MODE_KANJI :        1 << 3
+};
+
+};
+M['./QRMath']=function(module,exports,require){
+var QRMath = {
+
+	glog : function(n) {
+	
+		if (n < 1) {
+			throw new Error("glog(" + n + ")");
+		}
+		
+		return QRMath.LOG_TABLE[n];
+	},
+	
+	gexp : function(n) {
+	
+		while (n < 0) {
+			n += 255;
+		}
+	
+		while (n >= 256) {
+			n -= 255;
+		}
+	
+		return QRMath.EXP_TABLE[n];
+	},
+	
+	EXP_TABLE : new Array(256),
+	
+	LOG_TABLE : new Array(256)
+
+};
+	
+for (var i = 0; i < 8; i++) {
+	QRMath.EXP_TABLE[i] = 1 << i;
+}
+for (var i = 8; i < 256; i++) {
+	QRMath.EXP_TABLE[i] = QRMath.EXP_TABLE[i - 4]
+		^ QRMath.EXP_TABLE[i - 5]
+		^ QRMath.EXP_TABLE[i - 6]
+		^ QRMath.EXP_TABLE[i - 8];
+}
+for (var i = 0; i < 255; i++) {
+	QRMath.LOG_TABLE[QRMath.EXP_TABLE[i] ] = i;
+}
+
+module.exports = QRMath;
+
+};
+M['./QRPolynomial']=function(module,exports,require){
+var QRMath = require('./QRMath');
+
+function QRPolynomial(num, shift) {
+	if (num.length === undefined) {
+		throw new Error(num.length + "/" + shift);
+	}
+
+	var offset = 0;
+
+	while (offset < num.length && num[offset] === 0) {
+		offset++;
+	}
+
+	this.num = new Array(num.length - offset + shift);
+	for (var i = 0; i < num.length - offset; i++) {
+		this.num[i] = num[i + offset];
+	}
+}
+
+QRPolynomial.prototype = {
+
+	get : function(index) {
+		return this.num[index];
+	},
+	
+	getLength : function() {
+		return this.num.length;
+	},
+	
+	multiply : function(e) {
+	
+		var num = new Array(this.getLength() + e.getLength() - 1);
+	
+		for (var i = 0; i < this.getLength(); i++) {
+			for (var j = 0; j < e.getLength(); j++) {
+				num[i + j] ^= QRMath.gexp(QRMath.glog(this.get(i) ) + QRMath.glog(e.get(j) ) );
+			}
+		}
+	
+		return new QRPolynomial(num, 0);
+	},
+	
+	mod : function(e) {
+	
+		if (this.getLength() - e.getLength() < 0) {
+			return this;
+		}
+	
+		var ratio = QRMath.glog(this.get(0) ) - QRMath.glog(e.get(0) );
+	
+		var num = new Array(this.getLength() );
+		
+		for (var i = 0; i < this.getLength(); i++) {
+			num[i] = this.get(i);
+		}
+		
+		for (var x = 0; x < e.getLength(); x++) {
+			num[x] ^= QRMath.gexp(QRMath.glog(e.get(x) ) + ratio);
+		}
+	
+		// recursive call
+		return new QRPolynomial(num, 0).mod(e);
+	}
+};
+
+module.exports = QRPolynomial;
+
+};
+M['./QRMaskPattern']=function(module,exports,require){
+module.exports = {
+	PATTERN000 : 0,
+	PATTERN001 : 1,
+	PATTERN010 : 2,
+	PATTERN011 : 3,
+	PATTERN100 : 4,
+	PATTERN101 : 5,
+	PATTERN110 : 6,
+	PATTERN111 : 7
+};
+
+};
+M['./QRErrorCorrectLevel']=function(module,exports,require){
+module.exports = {
+	L : 1,
+	M : 0,
+	Q : 3,
+	H : 2
+};
+
+
+};
+M['./QRRSBlock']=function(module,exports,require){
+var QRErrorCorrectLevel = require('./QRErrorCorrectLevel');
+
+function QRRSBlock(totalCount, dataCount) {
+	this.totalCount = totalCount;
+	this.dataCount  = dataCount;
+}
+
+QRRSBlock.RS_BLOCK_TABLE = [
+
+	// L
+	// M
+	// Q
+	// H
+
+	// 1
+	[1, 26, 19],
+	[1, 26, 16],
+	[1, 26, 13],
+	[1, 26, 9],
+	
+	// 2
+	[1, 44, 34],
+	[1, 44, 28],
+	[1, 44, 22],
+	[1, 44, 16],
+
+	// 3
+	[1, 70, 55],
+	[1, 70, 44],
+	[2, 35, 17],
+	[2, 35, 13],
+
+	// 4		
+	[1, 100, 80],
+	[2, 50, 32],
+	[2, 50, 24],
+	[4, 25, 9],
+	
+	// 5
+	[1, 134, 108],
+	[2, 67, 43],
+	[2, 33, 15, 2, 34, 16],
+	[2, 33, 11, 2, 34, 12],
+	
+	// 6
+	[2, 86, 68],
+	[4, 43, 27],
+	[4, 43, 19],
+	[4, 43, 15],
+	
+	// 7		
+	[2, 98, 78],
+	[4, 49, 31],
+	[2, 32, 14, 4, 33, 15],
+	[4, 39, 13, 1, 40, 14],
+	
+	// 8
+	[2, 121, 97],
+	[2, 60, 38, 2, 61, 39],
+	[4, 40, 18, 2, 41, 19],
+	[4, 40, 14, 2, 41, 15],
+	
+	// 9
+	[2, 146, 116],
+	[3, 58, 36, 2, 59, 37],
+	[4, 36, 16, 4, 37, 17],
+	[4, 36, 12, 4, 37, 13],
+	
+	// 10		
+	[2, 86, 68, 2, 87, 69],
+	[4, 69, 43, 1, 70, 44],
+	[6, 43, 19, 2, 44, 20],
+	[6, 43, 15, 2, 44, 16],
+
+	// 11
+	[4, 101, 81],
+	[1, 80, 50, 4, 81, 51],
+	[4, 50, 22, 4, 51, 23],
+	[3, 36, 12, 8, 37, 13],
+
+	// 12
+	[2, 116, 92, 2, 117, 93],
+	[6, 58, 36, 2, 59, 37],
+	[4, 46, 20, 6, 47, 21],
+	[7, 42, 14, 4, 43, 15],
+
+	// 13
+	[4, 133, 107],
+	[8, 59, 37, 1, 60, 38],
+	[8, 44, 20, 4, 45, 21],
+	[12, 33, 11, 4, 34, 12],
+
+	// 14
+	[3, 145, 115, 1, 146, 116],
+	[4, 64, 40, 5, 65, 41],
+	[11, 36, 16, 5, 37, 17],
+	[11, 36, 12, 5, 37, 13],
+
+	// 15
+	[5, 109, 87, 1, 110, 88],
+	[5, 65, 41, 5, 66, 42],
+	[5, 54, 24, 7, 55, 25],
+	[11, 36, 12],
+
+	// 16
+	[5, 122, 98, 1, 123, 99],
+	[7, 73, 45, 3, 74, 46],
+	[15, 43, 19, 2, 44, 20],
+	[3, 45, 15, 13, 46, 16],
+
+	// 17
+	[1, 135, 107, 5, 136, 108],
+	[10, 74, 46, 1, 75, 47],
+	[1, 50, 22, 15, 51, 23],
+	[2, 42, 14, 17, 43, 15],
+
+	// 18
+	[5, 150, 120, 1, 151, 121],
+	[9, 69, 43, 4, 70, 44],
+	[17, 50, 22, 1, 51, 23],
+	[2, 42, 14, 19, 43, 15],
+
+	// 19
+	[3, 141, 113, 4, 142, 114],
+	[3, 70, 44, 11, 71, 45],
+	[17, 47, 21, 4, 48, 22],
+	[9, 39, 13, 16, 40, 14],
+
+	// 20
+	[3, 135, 107, 5, 136, 108],
+	[3, 67, 41, 13, 68, 42],
+	[15, 54, 24, 5, 55, 25],
+	[15, 43, 15, 10, 44, 16],
+
+	// 21
+	[4, 144, 116, 4, 145, 117],
+	[17, 68, 42],
+	[17, 50, 22, 6, 51, 23],
+	[19, 46, 16, 6, 47, 17],
+
+	// 22
+	[2, 139, 111, 7, 140, 112],
+	[17, 74, 46],
+	[7, 54, 24, 16, 55, 25],
+	[34, 37, 13],
+
+	// 23
+	[4, 151, 121, 5, 152, 122],
+	[4, 75, 47, 14, 76, 48],
+	[11, 54, 24, 14, 55, 25],
+	[16, 45, 15, 14, 46, 16],
+
+	// 24
+	[6, 147, 117, 4, 148, 118],
+	[6, 73, 45, 14, 74, 46],
+	[11, 54, 24, 16, 55, 25],
+	[30, 46, 16, 2, 47, 17],
+
+	// 25
+	[8, 132, 106, 4, 133, 107],
+	[8, 75, 47, 13, 76, 48],
+	[7, 54, 24, 22, 55, 25],
+	[22, 45, 15, 13, 46, 16],
+
+	// 26
+	[10, 142, 114, 2, 143, 115],
+	[19, 74, 46, 4, 75, 47],
+	[28, 50, 22, 6, 51, 23],
+	[33, 46, 16, 4, 47, 17],
+
+	// 27
+	[8, 152, 122, 4, 153, 123],
+	[22, 73, 45, 3, 74, 46],
+	[8, 53, 23, 26, 54, 24],
+	[12, 45, 15, 28, 46, 16],
+
+	// 28
+	[3, 147, 117, 10, 148, 118],
+	[3, 73, 45, 23, 74, 46],
+	[4, 54, 24, 31, 55, 25],
+	[11, 45, 15, 31, 46, 16],
+
+	// 29
+	[7, 146, 116, 7, 147, 117],
+	[21, 73, 45, 7, 74, 46],
+	[1, 53, 23, 37, 54, 24],
+	[19, 45, 15, 26, 46, 16],
+
+	// 30
+	[5, 145, 115, 10, 146, 116],
+	[19, 75, 47, 10, 76, 48],
+	[15, 54, 24, 25, 55, 25],
+	[23, 45, 15, 25, 46, 16],
+
+	// 31
+	[13, 145, 115, 3, 146, 116],
+	[2, 74, 46, 29, 75, 47],
+	[42, 54, 24, 1, 55, 25],
+	[23, 45, 15, 28, 46, 16],
+
+	// 32
+	[17, 145, 115],
+	[10, 74, 46, 23, 75, 47],
+	[10, 54, 24, 35, 55, 25],
+	[19, 45, 15, 35, 46, 16],
+
+	// 33
+	[17, 145, 115, 1, 146, 116],
+	[14, 74, 46, 21, 75, 47],
+	[29, 54, 24, 19, 55, 25],
+	[11, 45, 15, 46, 46, 16],
+
+	// 34
+	[13, 145, 115, 6, 146, 116],
+	[14, 74, 46, 23, 75, 47],
+	[44, 54, 24, 7, 55, 25],
+	[59, 46, 16, 1, 47, 17],
+
+	// 35
+	[12, 151, 121, 7, 152, 122],
+	[12, 75, 47, 26, 76, 48],
+	[39, 54, 24, 14, 55, 25],
+	[22, 45, 15, 41, 46, 16],
+
+	// 36
+	[6, 151, 121, 14, 152, 122],
+	[6, 75, 47, 34, 76, 48],
+	[46, 54, 24, 10, 55, 25],
+	[2, 45, 15, 64, 46, 16],
+
+	// 37
+	[17, 152, 122, 4, 153, 123],
+	[29, 74, 46, 14, 75, 47],
+	[49, 54, 24, 10, 55, 25],
+	[24, 45, 15, 46, 46, 16],
+
+	// 38
+	[4, 152, 122, 18, 153, 123],
+	[13, 74, 46, 32, 75, 47],
+	[48, 54, 24, 14, 55, 25],
+	[42, 45, 15, 32, 46, 16],
+
+	// 39
+	[20, 147, 117, 4, 148, 118],
+	[40, 75, 47, 7, 76, 48],
+	[43, 54, 24, 22, 55, 25],
+	[10, 45, 15, 67, 46, 16],
+
+	// 40
+	[19, 148, 118, 6, 149, 119],
+	[18, 75, 47, 31, 76, 48],
+	[34, 54, 24, 34, 55, 25],
+	[20, 45, 15, 61, 46, 16]
+];
+
+QRRSBlock.getRSBlocks = function(typeNumber, errorCorrectLevel) {
+	
+	var rsBlock = QRRSBlock.getRsBlockTable(typeNumber, errorCorrectLevel);
+	
+	if (rsBlock === undefined) {
+		throw new Error("bad rs block @ typeNumber:" + typeNumber + "/errorCorrectLevel:" + errorCorrectLevel);
+	}
+
+	var length = rsBlock.length / 3;
+	
+	var list = [];
+	
+	for (var i = 0; i < length; i++) {
+
+		var count = rsBlock[i * 3 + 0];
+		var totalCount = rsBlock[i * 3 + 1];
+		var dataCount  = rsBlock[i * 3 + 2];
+
+		for (var j = 0; j < count; j++) {
+			list.push(new QRRSBlock(totalCount, dataCount) );	
+		}
+	}
+	
+	return list;
+};
+
+QRRSBlock.getRsBlockTable = function(typeNumber, errorCorrectLevel) {
+
+	switch(errorCorrectLevel) {
+	case QRErrorCorrectLevel.L :
+		return QRRSBlock.RS_BLOCK_TABLE[(typeNumber - 1) * 4 + 0];
+	case QRErrorCorrectLevel.M :
+		return QRRSBlock.RS_BLOCK_TABLE[(typeNumber - 1) * 4 + 1];
+	case QRErrorCorrectLevel.Q :
+		return QRRSBlock.RS_BLOCK_TABLE[(typeNumber - 1) * 4 + 2];
+	case QRErrorCorrectLevel.H :
+		return QRRSBlock.RS_BLOCK_TABLE[(typeNumber - 1) * 4 + 3];
+	default :
+		return undefined;
+	}
+};
+
+module.exports = QRRSBlock;
+
+};
+M['./QRBitBuffer']=function(module,exports,require){
+function QRBitBuffer() {
+	this.buffer = [];
+	this.length = 0;
+}
+
+QRBitBuffer.prototype = {
+
+	get : function(index) {
+		var bufIndex = Math.floor(index / 8);
+		return ( (this.buffer[bufIndex] >>> (7 - index % 8) ) & 1) == 1;
+	},
+	
+	put : function(num, length) {
+		for (var i = 0; i < length; i++) {
+			this.putBit( ( (num >>> (length - i - 1) ) & 1) == 1);
+		}
+	},
+	
+	getLengthInBits : function() {
+		return this.length;
+	},
+	
+	putBit : function(bit) {
+	
+		var bufIndex = Math.floor(this.length / 8);
+		if (this.buffer.length <= bufIndex) {
+			this.buffer.push(0);
+		}
+	
+		if (bit) {
+			this.buffer[bufIndex] |= (0x80 >>> (this.length % 8) );
+		}
+	
+		this.length++;
+	}
+};
+
+module.exports = QRBitBuffer;
+
+};
+M['./QR8bitByte']=function(module,exports,require){
+var QRMode = require('./QRMode');
+
+function QR8bitByte(data) {
+	this.mode = QRMode.MODE_8BIT_BYTE;
+	this.data = data;
+}
+
+QR8bitByte.prototype = {
+
+	getLength : function() {
+		return this.data.length;
+	},
+	
+	write : function(buffer) {
+		for (var i = 0; i < this.data.length; i++) {
+			// not JIS ...
+			buffer.put(this.data.charCodeAt(i), 8);
+		}
+	}
+};
+
+module.exports = QR8bitByte;
+
+};
+M['./QRUtil']=function(module,exports,require){
+var QRMode = require('./QRMode');
+var QRPolynomial = require('./QRPolynomial');
+var QRMath = require('./QRMath');
+var QRMaskPattern = require('./QRMaskPattern');
+
+var QRUtil = {
+
+    PATTERN_POSITION_TABLE : [
+        [],
+        [6, 18],
+        [6, 22],
+        [6, 26],
+        [6, 30],
+        [6, 34],
+        [6, 22, 38],
+        [6, 24, 42],
+        [6, 26, 46],
+        [6, 28, 50],
+        [6, 30, 54],        
+        [6, 32, 58],
+        [6, 34, 62],
+        [6, 26, 46, 66],
+        [6, 26, 48, 70],
+        [6, 26, 50, 74],
+        [6, 30, 54, 78],
+        [6, 30, 56, 82],
+        [6, 30, 58, 86],
+        [6, 34, 62, 90],
+        [6, 28, 50, 72, 94],
+        [6, 26, 50, 74, 98],
+        [6, 30, 54, 78, 102],
+        [6, 28, 54, 80, 106],
+        [6, 32, 58, 84, 110],
+        [6, 30, 58, 86, 114],
+        [6, 34, 62, 90, 118],
+        [6, 26, 50, 74, 98, 122],
+        [6, 30, 54, 78, 102, 126],
+        [6, 26, 52, 78, 104, 130],
+        [6, 30, 56, 82, 108, 134],
+        [6, 34, 60, 86, 112, 138],
+        [6, 30, 58, 86, 114, 142],
+        [6, 34, 62, 90, 118, 146],
+        [6, 30, 54, 78, 102, 126, 150],
+        [6, 24, 50, 76, 102, 128, 154],
+        [6, 28, 54, 80, 106, 132, 158],
+        [6, 32, 58, 84, 110, 136, 162],
+        [6, 26, 54, 82, 110, 138, 166],
+        [6, 30, 58, 86, 114, 142, 170]
+    ],
+
+    G15 : (1 << 10) | (1 << 8) | (1 << 5) | (1 << 4) | (1 << 2) | (1 << 1) | (1 << 0),
+    G18 : (1 << 12) | (1 << 11) | (1 << 10) | (1 << 9) | (1 << 8) | (1 << 5) | (1 << 2) | (1 << 0),
+    G15_MASK : (1 << 14) | (1 << 12) | (1 << 10)    | (1 << 4) | (1 << 1),
+
+    getBCHTypeInfo : function(data) {
+        var d = data << 10;
+        while (QRUtil.getBCHDigit(d) - QRUtil.getBCHDigit(QRUtil.G15) >= 0) {
+            d ^= (QRUtil.G15 << (QRUtil.getBCHDigit(d) - QRUtil.getBCHDigit(QRUtil.G15) ) );    
+        }
+        return ( (data << 10) | d) ^ QRUtil.G15_MASK;
+    },
+
+    getBCHTypeNumber : function(data) {
+        var d = data << 12;
+        while (QRUtil.getBCHDigit(d) - QRUtil.getBCHDigit(QRUtil.G18) >= 0) {
+            d ^= (QRUtil.G18 << (QRUtil.getBCHDigit(d) - QRUtil.getBCHDigit(QRUtil.G18) ) );    
+        }
+        return (data << 12) | d;
+    },
+
+    getBCHDigit : function(data) {
+
+        var digit = 0;
+
+        while (data !== 0) {
+            digit++;
+            data >>>= 1;
+        }
+
+        return digit;
+    },
+
+    getPatternPosition : function(typeNumber) {
+        return QRUtil.PATTERN_POSITION_TABLE[typeNumber - 1];
+    },
+
+    getMask : function(maskPattern, i, j) {
+        
+        switch (maskPattern) {
+            
+        case QRMaskPattern.PATTERN000 : return (i + j) % 2 === 0;
+        case QRMaskPattern.PATTERN001 : return i % 2 === 0;
+        case QRMaskPattern.PATTERN010 : return j % 3 === 0;
+        case QRMaskPattern.PATTERN011 : return (i + j) % 3 === 0;
+        case QRMaskPattern.PATTERN100 : return (Math.floor(i / 2) + Math.floor(j / 3) ) % 2 === 0;
+        case QRMaskPattern.PATTERN101 : return (i * j) % 2 + (i * j) % 3 === 0;
+        case QRMaskPattern.PATTERN110 : return ( (i * j) % 2 + (i * j) % 3) % 2 === 0;
+        case QRMaskPattern.PATTERN111 : return ( (i * j) % 3 + (i + j) % 2) % 2 === 0;
+
+        default :
+            throw new Error("bad maskPattern:" + maskPattern);
+        }
+    },
+
+    getErrorCorrectPolynomial : function(errorCorrectLength) {
+
+        var a = new QRPolynomial([1], 0);
+
+        for (var i = 0; i < errorCorrectLength; i++) {
+            a = a.multiply(new QRPolynomial([1, QRMath.gexp(i)], 0) );
+        }
+
+        return a;
+    },
+
+    getLengthInBits : function(mode, type) {
+
+        if (1 <= type && type < 10) {
+
+            // 1 - 9
+
+            switch(mode) {
+            case QRMode.MODE_NUMBER     : return 10;
+            case QRMode.MODE_ALPHA_NUM  : return 9;
+            case QRMode.MODE_8BIT_BYTE  : return 8;
+            case QRMode.MODE_KANJI      : return 8;
+            default :
+                throw new Error("mode:" + mode);
+            }
+
+        } else if (type < 27) {
+
+            // 10 - 26
+
+            switch(mode) {
+            case QRMode.MODE_NUMBER     : return 12;
+            case QRMode.MODE_ALPHA_NUM  : return 11;
+            case QRMode.MODE_8BIT_BYTE  : return 16;
+            case QRMode.MODE_KANJI      : return 10;
+            default :
+                throw new Error("mode:" + mode);
+            }
+
+        } else if (type < 41) {
+
+            // 27 - 40
+
+            switch(mode) {
+            case QRMode.MODE_NUMBER     : return 14;
+            case QRMode.MODE_ALPHA_NUM  : return 13;
+            case QRMode.MODE_8BIT_BYTE  : return 16;
+            case QRMode.MODE_KANJI      : return 12;
+            default :
+                throw new Error("mode:" + mode);
+            }
+
+        } else {
+            throw new Error("type:" + type);
+        }
+    },
+
+    getLostPoint : function(qrCode) {
+        
+        var moduleCount = qrCode.getModuleCount();
+        var lostPoint = 0;
+        var row = 0; 
+        var col = 0;
+
+        
+        // LEVEL1
+        
+        for (row = 0; row < moduleCount; row++) {
+
+            for (col = 0; col < moduleCount; col++) {
+
+                var sameCount = 0;
+                var dark = qrCode.isDark(row, col);
+
+                for (var r = -1; r <= 1; r++) {
+
+                    if (row + r < 0 || moduleCount <= row + r) {
+                        continue;
+                    }
+
+                    for (var c = -1; c <= 1; c++) {
+
+                        if (col + c < 0 || moduleCount <= col + c) {
+                            continue;
+                        }
+
+                        if (r === 0 && c === 0) {
+                            continue;
+                        }
+
+                        if (dark === qrCode.isDark(row + r, col + c) ) {
+                            sameCount++;
+                        }
+                    }
+                }
+
+                if (sameCount > 5) {
+                    lostPoint += (3 + sameCount - 5);
+                }
+            }
+        }
+
+        // LEVEL2
+
+        for (row = 0; row < moduleCount - 1; row++) {
+            for (col = 0; col < moduleCount - 1; col++) {
+                var count = 0;
+                if (qrCode.isDark(row,     col    ) ) count++;
+                if (qrCode.isDark(row + 1, col    ) ) count++;
+                if (qrCode.isDark(row,     col + 1) ) count++;
+                if (qrCode.isDark(row + 1, col + 1) ) count++;
+                if (count === 0 || count === 4) {
+                    lostPoint += 3;
+                }
+            }
+        }
+
+        // LEVEL3
+
+        for (row = 0; row < moduleCount; row++) {
+            for (col = 0; col < moduleCount - 6; col++) {
+                if (qrCode.isDark(row, col) && 
+                        !qrCode.isDark(row, col + 1) && 
+                         qrCode.isDark(row, col + 2) && 
+                         qrCode.isDark(row, col + 3) && 
+                         qrCode.isDark(row, col + 4) && 
+                        !qrCode.isDark(row, col + 5) && 
+                         qrCode.isDark(row, col + 6) ) {
+                    lostPoint += 40;
+                }
+            }
+        }
+
+        for (col = 0; col < moduleCount; col++) {
+            for (row = 0; row < moduleCount - 6; row++) {
+                if (qrCode.isDark(row, col) &&
+                        !qrCode.isDark(row + 1, col) &&
+                         qrCode.isDark(row + 2, col) &&
+                         qrCode.isDark(row + 3, col) &&
+                         qrCode.isDark(row + 4, col) &&
+                        !qrCode.isDark(row + 5, col) &&
+                         qrCode.isDark(row + 6, col) ) {
+                    lostPoint += 40;
+                }
+            }
+        }
+
+        // LEVEL4
+        
+        var darkCount = 0;
+
+        for (col = 0; col < moduleCount; col++) {
+            for (row = 0; row < moduleCount; row++) {
+                if (qrCode.isDark(row, col) ) {
+                    darkCount++;
+                }
+            }
+        }
+        
+        var ratio = Math.abs(100 * darkCount / moduleCount / moduleCount - 50) / 5;
+        lostPoint += ratio * 10;
+
+        return lostPoint;       
+    }
+
+};
+
+module.exports = QRUtil;
+
+};
+M['./index']=function(module,exports,require){
+//---------------------------------------------------------------------
+// QRCode for JavaScript
+//
+// Copyright (c) 2009 Kazuhiko Arase
+//
+// URL: http://www.d-project.com/
+//
+// Licensed under the MIT license:
+//   http://www.opensource.org/licenses/mit-license.php
+//
+// The word "QR Code" is registered trademark of 
+// DENSO WAVE INCORPORATED
+//   http://www.denso-wave.com/qrcode/faqpatent-e.html
+//
+//---------------------------------------------------------------------
+// Modified to work in node for this project (and some refactoring)
+//---------------------------------------------------------------------
+
+var QR8bitByte = require('./QR8bitByte');
+var QRUtil = require('./QRUtil');
+var QRPolynomial = require('./QRPolynomial');
+var QRRSBlock = require('./QRRSBlock');
+var QRBitBuffer = require('./QRBitBuffer');
+
+function QRCode(typeNumber, errorCorrectLevel) {
+	this.typeNumber = typeNumber;
+	this.errorCorrectLevel = errorCorrectLevel;
+	this.modules = null;
+	this.moduleCount = 0;
+	this.dataCache = null;
+	this.dataList = [];
+}
+
+QRCode.prototype = {
+	
+	addData : function(data) {
+		var newData = new QR8bitByte(data);
+		this.dataList.push(newData);
+		this.dataCache = null;
+	},
+	
+	isDark : function(row, col) {
+		if (row < 0 || this.moduleCount <= row || col < 0 || this.moduleCount <= col) {
+			throw new Error(row + "," + col);
+		}
+		return this.modules[row][col];
+	},
+
+	getModuleCount : function() {
+		return this.moduleCount;
+	},
+	
+	make : function() {
+		// Calculate automatically typeNumber if provided is < 1
+		if (this.typeNumber < 1 ){
+			var typeNumber = 1;
+			for (typeNumber = 1; typeNumber < 40; typeNumber++) {
+				var rsBlocks = QRRSBlock.getRSBlocks(typeNumber, this.errorCorrectLevel);
+
+				var buffer = new QRBitBuffer();
+				var totalDataCount = 0;
+				for (var i = 0; i < rsBlocks.length; i++) {
+					totalDataCount += rsBlocks[i].dataCount;
+				}
+
+				for (var x = 0; x < this.dataList.length; x++) {
+					var data = this.dataList[x];
+					buffer.put(data.mode, 4);
+					buffer.put(data.getLength(), QRUtil.getLengthInBits(data.mode, typeNumber) );
+					data.write(buffer);
+				}
+				if (buffer.getLengthInBits() <= totalDataCount * 8)
+					break;
+			}
+			this.typeNumber = typeNumber;
+		}
+		this.makeImpl(false, this.getBestMaskPattern() );
+	},
+	
+	makeImpl : function(test, maskPattern) {
+		
+		this.moduleCount = this.typeNumber * 4 + 17;
+		this.modules = new Array(this.moduleCount);
+		
+		for (var row = 0; row < this.moduleCount; row++) {
+			
+			this.modules[row] = new Array(this.moduleCount);
+			
+			for (var col = 0; col < this.moduleCount; col++) {
+				this.modules[row][col] = null;//(col + row) % 3;
+			}
+		}
+	
+		this.setupPositionProbePattern(0, 0);
+		this.setupPositionProbePattern(this.moduleCount - 7, 0);
+		this.setupPositionProbePattern(0, this.moduleCount - 7);
+		this.setupPositionAdjustPattern();
+		this.setupTimingPattern();
+		this.setupTypeInfo(test, maskPattern);
+		
+		if (this.typeNumber >= 7) {
+			this.setupTypeNumber(test);
+		}
+	
+		if (this.dataCache === null) {
+			this.dataCache = QRCode.createData(this.typeNumber, this.errorCorrectLevel, this.dataList);
+		}
+	
+		this.mapData(this.dataCache, maskPattern);
+	},
+
+	setupPositionProbePattern : function(row, col)  {
+		
+		for (var r = -1; r <= 7; r++) {
+			
+			if (row + r <= -1 || this.moduleCount <= row + r) continue;
+			
+			for (var c = -1; c <= 7; c++) {
+				
+				if (col + c <= -1 || this.moduleCount <= col + c) continue;
+				
+				if ( (0 <= r && r <= 6 && (c === 0 || c === 6) ) || 
+                     (0 <= c && c <= 6 && (r === 0 || r === 6) ) || 
+                     (2 <= r && r <= 4 && 2 <= c && c <= 4) ) {
+					this.modules[row + r][col + c] = true;
+				} else {
+					this.modules[row + r][col + c] = false;
+				}
+			}		
+		}		
+	},
+	
+	getBestMaskPattern : function() {
+	
+		var minLostPoint = 0;
+		var pattern = 0;
+	
+		for (var i = 0; i < 8; i++) {
+			
+			this.makeImpl(true, i);
+	
+			var lostPoint = QRUtil.getLostPoint(this);
+	
+			if (i === 0 || minLostPoint >  lostPoint) {
+				minLostPoint = lostPoint;
+				pattern = i;
+			}
+		}
+	
+		return pattern;
+	},
+	
+	createMovieClip : function(target_mc, instance_name, depth) {
+	
+		var qr_mc = target_mc.createEmptyMovieClip(instance_name, depth);
+		var cs = 1;
+	
+		this.make();
+
+		for (var row = 0; row < this.modules.length; row++) {
+			
+			var y = row * cs;
+			
+			for (var col = 0; col < this.modules[row].length; col++) {
+	
+				var x = col * cs;
+				var dark = this.modules[row][col];
+			
+				if (dark) {
+					qr_mc.beginFill(0, 100);
+					qr_mc.moveTo(x, y);
+					qr_mc.lineTo(x + cs, y);
+					qr_mc.lineTo(x + cs, y + cs);
+					qr_mc.lineTo(x, y + cs);
+					qr_mc.endFill();
+				}
+			}
+		}
+		
+		return qr_mc;
+	},
+
+	setupTimingPattern : function() {
+		
+		for (var r = 8; r < this.moduleCount - 8; r++) {
+			if (this.modules[r][6] !== null) {
+				continue;
+			}
+			this.modules[r][6] = (r % 2 === 0);
+		}
+	
+		for (var c = 8; c < this.moduleCount - 8; c++) {
+			if (this.modules[6][c] !== null) {
+				continue;
+			}
+			this.modules[6][c] = (c % 2 === 0);
+		}
+	},
+	
+	setupPositionAdjustPattern : function() {
+	
+		var pos = QRUtil.getPatternPosition(this.typeNumber);
+		
+		for (var i = 0; i < pos.length; i++) {
+		
+			for (var j = 0; j < pos.length; j++) {
+			
+				var row = pos[i];
+				var col = pos[j];
+				
+				if (this.modules[row][col] !== null) {
+					continue;
+				}
+				
+				for (var r = -2; r <= 2; r++) {
+				
+					for (var c = -2; c <= 2; c++) {
+					
+						if (Math.abs(r) === 2 || 
+                            Math.abs(c) === 2 ||
+                            (r === 0 && c === 0) ) {
+							this.modules[row + r][col + c] = true;
+						} else {
+							this.modules[row + r][col + c] = false;
+						}
+					}
+				}
+			}
+		}
+	},
+	
+	setupTypeNumber : function(test) {
+	
+		var bits = QRUtil.getBCHTypeNumber(this.typeNumber);
+        var mod;
+	
+		for (var i = 0; i < 18; i++) {
+			mod = (!test && ( (bits >> i) & 1) === 1);
+			this.modules[Math.floor(i / 3)][i % 3 + this.moduleCount - 8 - 3] = mod;
+		}
+	
+		for (var x = 0; x < 18; x++) {
+			mod = (!test && ( (bits >> x) & 1) === 1);
+			this.modules[x % 3 + this.moduleCount - 8 - 3][Math.floor(x / 3)] = mod;
+		}
+	},
+	
+	setupTypeInfo : function(test, maskPattern) {
+	
+		var data = (this.errorCorrectLevel << 3) | maskPattern;
+		var bits = QRUtil.getBCHTypeInfo(data);
+        var mod;
+	
+		// vertical		
+		for (var v = 0; v < 15; v++) {
+	
+			mod = (!test && ( (bits >> v) & 1) === 1);
+	
+			if (v < 6) {
+				this.modules[v][8] = mod;
+			} else if (v < 8) {
+				this.modules[v + 1][8] = mod;
+			} else {
+				this.modules[this.moduleCount - 15 + v][8] = mod;
+			}
+		}
+	
+		// horizontal
+		for (var h = 0; h < 15; h++) {
+	
+			mod = (!test && ( (bits >> h) & 1) === 1);
+			
+			if (h < 8) {
+				this.modules[8][this.moduleCount - h - 1] = mod;
+			} else if (h < 9) {
+				this.modules[8][15 - h - 1 + 1] = mod;
+			} else {
+				this.modules[8][15 - h - 1] = mod;
+			}
+		}
+	
+		// fixed module
+		this.modules[this.moduleCount - 8][8] = (!test);
+	
+	},
+	
+	mapData : function(data, maskPattern) {
+		
+		var inc = -1;
+		var row = this.moduleCount - 1;
+		var bitIndex = 7;
+		var byteIndex = 0;
+		
+		for (var col = this.moduleCount - 1; col > 0; col -= 2) {
+	
+			if (col === 6) col--;
+	
+			while (true) {
+	
+				for (var c = 0; c < 2; c++) {
+					
+					if (this.modules[row][col - c] === null) {
+						
+						var dark = false;
+	
+						if (byteIndex < data.length) {
+							dark = ( ( (data[byteIndex] >>> bitIndex) & 1) === 1);
+						}
+	
+						var mask = QRUtil.getMask(maskPattern, row, col - c);
+	
+						if (mask) {
+							dark = !dark;
+						}
+						
+						this.modules[row][col - c] = dark;
+						bitIndex--;
+	
+						if (bitIndex === -1) {
+							byteIndex++;
+							bitIndex = 7;
+						}
+					}
+				}
+								
+				row += inc;
+	
+				if (row < 0 || this.moduleCount <= row) {
+					row -= inc;
+					inc = -inc;
+					break;
+				}
+			}
+		}
+		
+	}
+
+};
+
+QRCode.PAD0 = 0xEC;
+QRCode.PAD1 = 0x11;
+
+QRCode.createData = function(typeNumber, errorCorrectLevel, dataList) {
+	
+	var rsBlocks = QRRSBlock.getRSBlocks(typeNumber, errorCorrectLevel);
+	
+	var buffer = new QRBitBuffer();
+	
+	for (var i = 0; i < dataList.length; i++) {
+		var data = dataList[i];
+		buffer.put(data.mode, 4);
+		buffer.put(data.getLength(), QRUtil.getLengthInBits(data.mode, typeNumber) );
+		data.write(buffer);
+	}
+
+	// calc num max data.
+	var totalDataCount = 0;
+	for (var x = 0; x < rsBlocks.length; x++) {
+		totalDataCount += rsBlocks[x].dataCount;
+	}
+
+	if (buffer.getLengthInBits() > totalDataCount * 8) {
+		throw new Error("code length overflow. (" + 
+            buffer.getLengthInBits() + 
+            ">" +  
+            totalDataCount * 8 + 
+            ")");
+	}
+
+	// end code
+	if (buffer.getLengthInBits() + 4 <= totalDataCount * 8) {
+		buffer.put(0, 4);
+	}
+
+	// padding
+	while (buffer.getLengthInBits() % 8 !== 0) {
+		buffer.putBit(false);
+	}
+
+	// padding
+	while (true) {
+		
+		if (buffer.getLengthInBits() >= totalDataCount * 8) {
+			break;
+		}
+		buffer.put(QRCode.PAD0, 8);
+		
+		if (buffer.getLengthInBits() >= totalDataCount * 8) {
+			break;
+		}
+		buffer.put(QRCode.PAD1, 8);
+	}
+
+	return QRCode.createBytes(buffer, rsBlocks);
+};
+
+QRCode.createBytes = function(buffer, rsBlocks) {
+
+	var offset = 0;
+	
+	var maxDcCount = 0;
+	var maxEcCount = 0;
+	
+	var dcdata = new Array(rsBlocks.length);
+	var ecdata = new Array(rsBlocks.length);
+	
+	for (var r = 0; r < rsBlocks.length; r++) {
+
+		var dcCount = rsBlocks[r].dataCount;
+		var ecCount = rsBlocks[r].totalCount - dcCount;
+
+		maxDcCount = Math.max(maxDcCount, dcCount);
+		maxEcCount = Math.max(maxEcCount, ecCount);
+		
+		dcdata[r] = new Array(dcCount);
+		
+		for (var i = 0; i < dcdata[r].length; i++) {
+			dcdata[r][i] = 0xff & buffer.buffer[i + offset];
+		}
+		offset += dcCount;
+		
+		var rsPoly = QRUtil.getErrorCorrectPolynomial(ecCount);
+		var rawPoly = new QRPolynomial(dcdata[r], rsPoly.getLength() - 1);
+
+		var modPoly = rawPoly.mod(rsPoly);
+		ecdata[r] = new Array(rsPoly.getLength() - 1);
+		for (var x = 0; x < ecdata[r].length; x++) {
+            var modIndex = x + modPoly.getLength() - ecdata[r].length;
+			ecdata[r][x] = (modIndex >= 0)? modPoly.get(modIndex) : 0;
+		}
+
+	}
+	
+	var totalCodeCount = 0;
+	for (var y = 0; y < rsBlocks.length; y++) {
+		totalCodeCount += rsBlocks[y].totalCount;
+	}
+
+	var data = new Array(totalCodeCount);
+	var index = 0;
+
+	for (var z = 0; z < maxDcCount; z++) {
+		for (var s = 0; s < rsBlocks.length; s++) {
+			if (z < dcdata[s].length) {
+				data[index++] = dcdata[s][z];
+			}
+		}
+	}
+
+	for (var xx = 0; xx < maxEcCount; xx++) {
+		for (var t = 0; t < rsBlocks.length; t++) {
+			if (xx < ecdata[t].length) {
+				data[index++] = ecdata[t][xx];
+			}
+		}
+	}
+
+	return data;
+
+};
+
+module.exports = QRCode;
+
+};
+var QRCode=R('./index'),EC=R('./QRErrorCorrectLevel');
+window.TJQR=function(texto){var q=new QRCode(-1,EC.M);q.addData(texto);q.make();var n=q.getModuleCount(),m=[];for(var r=0;r<n;r++){var l=[];for(var c=0;c<n;c++)l.push(q.isDark(r,c));m.push(l);}return m;};
+})();
+</script>
+<div class="lgs-overlay" id="cobOverlay" hidden>
+  <div class="lgs-card cob-card" role="dialog" aria-modal="true" aria-labelledby="cobTitulo">
+    <h3 id="cobTitulo">💳 Cobrar este serviço</h3>
+    <p class="lgs-sub" id="cobSub"></p>
+    <div id="cobPasso1">
+      <label class="cob-lb" for="cobValor">Valor (€)</label>
+      <input id="cobValor" class="cob-in" inputmode="decimal" autocomplete="off">
+      <label class="cob-lb" for="cobDesc">Descrição (o cliente vê no pagamento)</label>
+      <input id="cobDesc" class="cob-in" maxlength="120" autocomplete="off" style="font-weight:500;font-size:15px;">
+      <p class="cob-taxa" id="cobTaxa"></p>
+      <button type="button" class="lgs-btn lgs-pri" id="cobCriar" style="background:#635bff;border-color:#635bff;">Criar link de pagamento</button>
+    </div>
+    <div id="cobPasso2" hidden>
+      <p class="cob-valor" id="cobValorGrande"></p>
+      <div class="cob-qr" id="cobQR"></div>
+      <p class="cob-metodos">O cliente aponta a câmara e paga no telemóvel dele:<br>cartão · Apple Pay · Google Pay · MB WAY · Klarna</p>
+      <div class="cob-estado" id="cobEstado">⏳ À espera do pagamento…</div>
+      <button type="button" class="lgs-btn lgs-pri" id="cobWpp" style="background:#25b35a;border-color:#25b35a;">💬 Enviar o link por WhatsApp</button>
+      <button type="button" class="lgs-btn" id="cobCopiar">📋 Copiar o link</button>
+      <button type="button" class="lgs-btn" id="cobNovo">↺ Criar um link novo</button>
+    </div>
+    <p class="lgs-estado" id="cobMsg"></p>
+    <button type="button" class="lgs-btn" id="cobFechar">Fechar</button>
+  </div>
+</div>
+<div class="lgs-overlay" id="pagOverlay" hidden>
+  <div class="lgs-card pag-card" role="dialog" aria-modal="true" aria-labelledby="pagTitulo">
+    <h3 id="pagTitulo">💳 Pagamentos online</h3>
+    <div id="pagCorpo"></div>
+    <details class="pag-config" id="pagConfig">
+      <summary>⚙️ Ligação ao serviço de pagamentos</summary>
+      <p class="pag-nota">Só para quem gere a app: o endereço do serviço de pagamentos (Cloudflare Worker).</p>
+      <input id="pagUrl" class="cob-in" placeholder="https://trajeto-pagamentos.….workers.dev" autocomplete="off" style="font-size:14px;font-weight:500;">
+      <button type="button" class="lgs-btn" id="pagGuardarUrl">Guardar e testar a ligação</button>
+    </details>
+    <p class="lgs-estado" id="pagMsg"></p>
+    <button type="button" class="lgs-btn" id="pagFechar">Fechar</button>
+  </div>
+</div>
 <div class="placar-overlay" id="placarOverlay">
   <div class="placar-picker" id="placarPicker">
     <button class="btn-fechar-placar" id="btnFecharPlacar">✕</button>
@@ -2290,8 +3635,12 @@
     <p>O pagamento desta corrida já foi recebido?</p>
     <label class="nota-lb" for="notaConcluir">📝 Nota (opcional)</label>
     <textarea id="notaConcluir" class="nota-tx" maxlength="500" placeholder="ex: voo atrasou 1 h · pagou portagem · deixou gorjeta"></textarea>
-    <button class="modal-btn modal-btn-recebido" id="btnModalRecebido">💰 Sim, já recebi</button>
-    <button class="modal-btn modal-btn-pendente" id="btnModalPendente">⏳ Ainda não recebi</button>
+    <p class="pag-aviso-online" id="pagAvisoOnline" hidden></p>
+    <button class="modal-btn modal-btn-online" id="btnModalOnline" hidden>💳 Concluir: já foi pago online</button>
+    <button class="modal-btn modal-btn-recebido" id="btnModalRecebido">💵 Recebi em dinheiro</button>
+    <button class="modal-btn modal-btn-recebido modal-btn-forma" id="btnModalTransf">🏦 Recebi por transferência / MB WAY</button>
+    <button class="modal-btn modal-btn-recebido modal-btn-forma" id="btnModalCartao">💳 Recebi por cartão / outro link</button>
+    <button class="modal-btn modal-btn-pendente" id="btnModalPendente">⏳ Ainda não recebi (ex.: paga o parceiro)</button>
     <p id="notaParceiroPag" style="display:none; font-size:12px; color:#6a7378; margin:12px 0 0;"></p>
   </div>
 </div>
@@ -3624,12 +4973,12 @@
           ${(ag.paragens && ag.paragens.length) ? `<br>📍 Paragens: ${ag.paragens.map(escHtml).join(' → ')}` : ''}
           ${ag.observacoes ? `<br>📝 ${escHtml(ag.observacoes)}` : ''}
         </div>
-        ${htmlNota(ag)}
+        ${htmlNota(ag)}${htmlCobranca(ag)}
         ${navHtml ? `<div class="ag-nav">${navHtml}</div>` : ''}
         <div class="ag-acoes">
           ${(ag.realizado && !avaliacaoRecebida(ag)) ? '<button class="ag-btn-av" data-acao="pedirAvaliacao">⭐ Pedir avaliação</button>' : ''}
           ${ag.realizado ? `<button class="ag-btn-cal" data-acao="nota">📝 ${ag.nota ? 'Editar nota' : 'Nota'}</button>` : ''}
-          <button class="ag-btn-cal" data-acao="dados">📋 Dados</button>${ag.realizado ? '' : `<button class="ag-btn-cal" data-acao="logoPlaca">🖼️ ${ag.logoPlaca ? 'Logo da placa ✓' : 'Logo na placa'}</button>`}
+          <button class="ag-btn-cal" data-acao="dados">📋 Dados</button>${ag.realizado ? '' : `<button class="ag-btn-cal" data-acao="logoPlaca">🖼️ ${ag.logoPlaca ? 'Logo da placa ✓' : 'Logo na placa'}</button>`}${podeCobrar(ag) ? '<button class="ag-btn-cal ag-btn-cobrar" data-acao="cobrar">💳 Cobrar</button>' : ''}
           <button class="ag-btn-cal" data-acao="editar">✏️ Editar</button>
           ${ag.realizado ? '<button class="ag-btn-cal" data-acao="refazer">🔁 Refazer</button>' : ''}
           <button class="ag-btn-cal" data-acao="cal">📅 Calendário</button>
@@ -4827,7 +6176,7 @@
       <div class="ag-acoes">
         ${(ag.realizado && typeof avaliacaoRecebida==='function' && !avaliacaoRecebida(ag)) ? '<button class="ag-btn-av" data-acao="pedirAvaliacao">⭐ Pedir avaliação</button>' : ''}
         ${ag.realizado ? `<button class="ag-btn-cal" data-acao="nota">📝 ${ag.nota?'Editar nota':'Nota'}</button>` : ''}
-        <button class="ag-btn-cal" data-acao="dados">📋 Dados</button>${ag.realizado ? '' : `<button class="ag-btn-cal" data-acao="logoPlaca">🖼️ ${ag.logoPlaca ? 'Logo da placa ✓' : 'Logo na placa'}</button>`}
+        <button class="ag-btn-cal" data-acao="dados">📋 Dados</button>${ag.realizado ? '' : `<button class="ag-btn-cal" data-acao="logoPlaca">🖼️ ${ag.logoPlaca ? 'Logo da placa ✓' : 'Logo na placa'}</button>`}${podeCobrar(ag) ? '<button class="ag-btn-cal ag-btn-cobrar" data-acao="cobrar">💳 Cobrar</button>' : ''}
         <button class="ag-btn-cal" data-acao="editar">✏️ Editar</button>
         ${ag.realizado ? '<button class="ag-btn-cal" data-acao="refazer">🔁 Refazer</button>' : ''}
         <button class="ag-btn-cal" data-acao="cal">📅 Calendário</button>
@@ -5254,12 +6603,12 @@
           ${ag.fornecedor ? `🏷 Fornecedor: ${escHtml(ag.fornecedor)}<br>` : ''}
           ${ag.observacoes ? `📝 ${escHtml(ag.observacoes)}` : ''}
         </div>
-        ${htmlNota(ag)}
+        ${htmlNota(ag)}${htmlCobranca(ag)}
         ${ag.realizado ? '' : `<div class="ag-nav"><button class="ag-btn-buscar" data-acao="buscar">🚗 Ir buscar cliente</button>${botoesParagens}<button class="ag-btn-levar" data-acao="levar">🏁 Regressar à recolha</button></div>`}
         <div class="ag-acoes">
           ${(ag.realizado && !avaliacaoRecebida(ag)) ? '<button class="ag-btn-av" data-acao="pedirAvaliacao">⭐ Pedir avaliação</button>' : ''}
           ${ag.realizado ? `<button class="ag-btn-cal" data-acao="nota">📝 ${ag.nota ? 'Editar nota' : 'Nota'}</button>` : ''}
-          <button class="ag-btn-cal" data-acao="dados">📋 Dados</button>${ag.realizado ? '' : `<button class="ag-btn-cal" data-acao="logoPlaca">🖼️ ${ag.logoPlaca ? 'Logo da placa ✓' : 'Logo na placa'}</button>`}
+          <button class="ag-btn-cal" data-acao="dados">📋 Dados</button>${ag.realizado ? '' : `<button class="ag-btn-cal" data-acao="logoPlaca">🖼️ ${ag.logoPlaca ? 'Logo da placa ✓' : 'Logo na placa'}</button>`}${podeCobrar(ag) ? '<button class="ag-btn-cal ag-btn-cobrar" data-acao="cobrar">💳 Cobrar</button>' : ''}
           <button class="ag-btn-cal" data-acao="editar">✏️ Editar</button>
           ${ag.realizado ? '<button class="ag-btn-cal" data-acao="refazer">🔁 Refazer</button>' : ''}
           <button class="ag-btn-cal" data-acao="cal">📅 Calendário</button>
@@ -5546,6 +6895,331 @@
   });
   document.getElementById('logoServFechar').addEventListener('click', fecharLogoServico);
   document.getElementById('logoServOverlay').addEventListener('click', e=>{ if(e.target.id === 'logoServOverlay') fecharLogoServico(); });
+
+  // ===== v9.29: pagamentos — fase 1 (a tua conta Stripe) e fase 2 (outros motoristas, com taxa da app) =====
+  // O endereço do serviço de pagamentos (Cloudflare Worker). Fase 2: fica escrito aqui para os motoristas não terem de configurar nada.
+  const PAG_URL_PADRAO = '';
+  const PAG_CFG_KEY = 'trajeto_pagamentos';
+  const FORMAS_PAG = {
+    dinheiro: { ic:'💵', nome:'Dinheiro' },
+    transferencia: { ic:'🏦', nome:'Transferência / MB WAY' },
+    cartao: { ic:'💳', nome:'Cartão / outro link' },
+    online: { ic:'💳', nome:'Pago online (Stripe)' },
+    parceiro: { ic:'🤝', nome:'Pago pelo parceiro' }
+  };
+  function pagLer(){ let c = {}; try{ c = JSON.parse(localStorage.getItem(PAG_CFG_KEY) || '{}') || {}; }catch(e){} return c; }
+  function pagGravar(c){ try{ localStorage.setItem(PAG_CFG_KEY, JSON.stringify(c)); }catch(e){} }
+  function pagUrl(){ return String(pagLer().url || PAG_URL_PADRAO || '').trim().replace(/\/+$/, ''); }
+  function cent(v){ const n = parseFloat(String(v == null ? '' : v).replace(',', '.')); return isFinite(n) ? Math.round(n * 100) : 0; }
+  function euroC(c){ return '€' + (c / 100).toFixed(2).replace('.', ','); }
+  // Taxa da app (fase 2): percentagem do valor, com mínimo e máximo — em cêntimos
+  function taxaAppCent(valorC, t){
+    if(!t || !(t.pct > 0) || !(valorC > 0)) return 0;
+    let x = Math.round(valorC * t.pct / 100);
+    if(t.minC) x = Math.max(t.minC, x);
+    if(t.maxC) x = Math.min(t.maxC, x);
+    return Math.min(x, valorC);
+  }
+  function taxaStripeEstC(valorC){ return Math.round(valorC * 0.015) + 25; }   // cartões europeus (estimativa)
+  function formaProvavel(ag){ if(ag.cobranca && ag.cobranca.estado === 'paga') return 'online'; if(ag.fornecedor) return 'parceiro'; return ''; }
+  function podeCobrar(ag){
+    if(!ag || (ag.realizado && ag.pagamento === 'recebido')) return false;
+    if(ag.cobranca && ag.cobranca.estado === 'paga') return false;
+    return cent(ag.valor) >= 50;
+  }
+  function htmlCobranca(ag){
+    if(!ag || !ag.cobranca) return '';
+    if(ag.cobranca.estado === 'paga') return `<div class="cob-linha paga">💳 Pago online · ${euroC(ag.cobranca.valorC)} ✓</div>`;
+    if(ag.cobranca.estado === 'aberta' && !(ag.realizado && ag.pagamento === 'recebido')) return `<div class="cob-linha">💳 Link de pagamento de ${euroC(ag.cobranca.valorC)} enviado · à espera</div>`;
+    return '';
+  }
+  function renderFormasPeriodo(lista){
+    const el = document.getElementById('fatFormas'); if(!el) return;
+    if(!lista.length){ el.hidden = true; el.innerHTML = ''; return; }
+    const tot = {}; let pend = 0, outros = 0;
+    lista.forEach(ag => {
+      const v = Math.round((parseFloat(ag.valor) || 0) * 100);
+      if(ag.pagamento !== 'recebido'){ pend += v; return; }
+      if(FORMAS_PAG[ag.formaPagamento]) tot[ag.formaPagamento] = (tot[ag.formaPagamento] || 0) + v; else outros += v;
+    });
+    let h = '';
+    ['dinheiro', 'online', 'cartao', 'transferencia', 'parceiro'].forEach(k => { if(tot[k]) h += `<div class="ff-linha"><span>${FORMAS_PAG[k].ic} ${FORMAS_PAG[k].nome}</span><b>${euroC(tot[k])}</b></div>`; });
+    if(outros) h += `<div class="ff-linha"><span>💰 Recebido (sem forma indicada)</span><b>${euroC(outros)}</b></div>`;
+    if(pend) h += `<div class="ff-linha ff-pend"><span>⏳ Ainda a receber</span><b>${euroC(pend)}</b></div>`;
+    el.innerHTML = h; el.hidden = !h;
+  }
+
+  async function pagPedido(caminho, corpo){
+    const url = pagUrl(); if(!url) throw new Error('Os pagamentos online ainda não estão ligados.');
+    const tc = window.TrajetoCloud;
+    if(!tc || !tc.utilizadorAtual) throw new Error('Inicia sessão em "Minhas tarifas" para usar os pagamentos online.');
+    const tk = await tc.obterToken();
+    const r = await fetch(url + caminho, { method: corpo ? 'POST' : 'GET', headers: { 'Content-Type':'application/json', 'Authorization':'Bearer ' + tk }, body: corpo ? JSON.stringify(corpo) : undefined });
+    let j = {}; try{ j = await r.json(); }catch(e){}
+    if(!r.ok) throw new Error(j.erro || ('O serviço de pagamentos respondeu com erro ' + r.status + '.'));
+    return j;
+  }
+  // informação da conta (modo, taxa, plano, conta do motorista) — guardada neste aparelho
+  async function pagAtualizarInfo(){
+    const c = pagLer(); const contaLocal = c.conta && c.conta.id ? c.conta.id : '';
+    const info = await pagPedido('/eu' + (contaLocal ? '?conta=' + encodeURIComponent(contaLocal) : ''));
+    const n = pagLer(); n.info = info; n.infoEm = Date.now();
+    if(info.conta && info.conta.id) n.conta = { id: info.conta.id };
+    pagGravar(n); pagResumoCfg(); return info;
+  }
+  function pagResumoCfg(){
+    const el = document.getElementById('pagResumoCfg'); if(!el) return;
+    const c = pagLer(), i = c.info;
+    if(!pagUrl()) { el.textContent = 'Cobra os clientes por cartão, Apple Pay, MB WAY e Klarna. (Ainda não está ligado.)'; return; }
+    if(!i) { el.textContent = 'Ligado. Inicia sessão para confirmar a tua conta.'; return; }
+    if(i.dono) el.textContent = '✅ Ligado à tua conta Stripe. Sem taxa da app.';
+    else if(i.conta && i.conta.ativa) el.textContent = '✅ Pagamentos ativos' + (i.pro && i.pro.ativo ? ' · Plano PRO' : ' · Plano Grátis');
+    else if(i.modo === 'plataforma') el.textContent = 'Ainda não ativaste os pagamentos online.';
+    else el.textContent = 'Os pagamentos online ainda não estão disponíveis para a tua conta.';
+  }
+  function contaParaCobrar(){ const c = pagLer(); return c.info && !c.info.dono && c.conta ? c.conta.id : ''; }
+
+  // ---- QR code (desenhado no aparelho, sem internet) ----
+  function desenharQR(el, texto){
+    const m = window.TJQR(texto), n = m.length, q = 2;
+    let r = '';
+    for(let y = 0; y < n; y++) for(let x = 0; x < n; x++) if(m[y][x]) r += `M${x + q} ${y + q}h1v1h-1z`;
+    el.innerHTML = `<svg viewBox="0 0 ${n + 2 * q} ${n + 2 * q}" shape-rendering="crispEdges" role="img" aria-label="QR code do pagamento"><rect width="100%" height="100%" fill="#fff"/><path d="${r}" fill="#0d1b2a"/></svg>`;
+  }
+
+  // ---- Cobrar ----
+  let cobId = null, cobTimer = null, cobFim = 0;
+  function cobDescricao(ag){
+    const d = (ag.data || '').split('-').reverse().slice(0, 2).join('/');
+    const base = ag.tipo === 'tour' ? `Tour ${ag.tourNome || ''}` : ag.tipo === 'hora' ? 'Motorista por hora' : `Transfer ${ag.partida || ''} → ${ag.chegada || ''}`;
+    return `${base.trim()} · ${d} ${ag.hora || ''}`.replace(/\s+/g, ' ').trim().slice(0, 120);
+  }
+  function cobTaxaTexto(){
+    const c = pagLer(), i = c.info || {}, v = cent(document.getElementById('cobValor').value);
+    const el = document.getElementById('cobTaxa');
+    if(!(v >= 50)) { el.textContent = 'Valor mínimo: €0,50.'; return; }
+    const st = taxaStripeEstC(v);
+    if(i.dono || !(i.modo === 'plataforma') || (i.pro && i.pro.ativo)) {
+      el.innerHTML = `Sem taxa da app. A Stripe desconta a sua taxa (≈ ${euroC(st)} num cartão europeu). Recebes ≈ <b>${euroC(v - st)}</b>.`;
+    } else {
+      const t = taxaAppCent(v, i.taxa);
+      el.innerHTML = `Taxa da app: <b>${euroC(t)}</b> (${String(i.taxa.pct).replace('.', ',')}%, mín. ${euroC(i.taxa.minC)}, máx. ${euroC(i.taxa.maxC)}) · Stripe ≈ ${euroC(st)}.<br>Recebes ≈ <b>${euroC(v - t - st)}</b>.`;
+    }
+  }
+  function abrirCobrar(id){
+    const ag = lerAgendamentos().find(a => a.id === id); if(!ag) return;
+    cobId = id;
+    document.getElementById('cobSub').textContent = `${(ag.data || '').split('-').reverse().join('/')} ${ag.hora || ''} · ${ag.nomePlaca || ag.cliente || ''}`.trim();
+    document.getElementById('cobMsg').textContent = '';
+    const aberta = ag.cobranca && ag.cobranca.estado === 'aberta' && (Date.now() - ag.cobranca.criadoEm) < 23 * 3600 * 1000;
+    document.getElementById('cobOverlay').hidden = false;
+    if(aberta) cobMostrarLink(ag);
+    else {
+      document.getElementById('cobPasso1').hidden = false; document.getElementById('cobPasso2').hidden = true;
+      document.getElementById('cobValor').value = String(ag.valor || '').replace('.', ',');
+      document.getElementById('cobDesc').value = cobDescricao(ag);
+      cobTaxaTexto();
+      if(!pagUrl()) document.getElementById('cobMsg').textContent = 'Os pagamentos online ainda não estão ligados: vê em Minhas tarifas → 💳 Pagamentos online.';
+    }
+  }
+  function fecharCobrar(){ document.getElementById('cobOverlay').hidden = true; cobId = null; if(cobTimer){ clearTimeout(cobTimer); cobTimer = null; } }
+  function cobMostrarLink(ag){
+    document.getElementById('cobPasso1').hidden = true; document.getElementById('cobPasso2').hidden = false;
+    document.getElementById('cobValorGrande').textContent = euroC(ag.cobranca.valorC);
+    desenharQR(document.getElementById('cobQR'), ag.cobranca.url);
+    cobEstadoUI(ag.cobranca.estado === 'paga');
+    if(ag.cobranca.estado !== 'paga'){ cobFim = Date.now() + 15 * 60 * 1000; cobAgendarVerificacao(); }
+  }
+  function cobEstadoUI(paga){
+    const e = document.getElementById('cobEstado');
+    e.classList.toggle('paga', !!paga);
+    e.textContent = paga ? '✅ Pago! O serviço fica marcado como pago online.' : '⏳ À espera do pagamento…';
+  }
+  function cobAgendarVerificacao(){
+    if(cobTimer) clearTimeout(cobTimer);
+    cobTimer = setTimeout(async ()=>{
+      cobTimer = null;
+      if(!cobId || document.getElementById('cobOverlay').hidden) return;
+      const ag = lerAgendamentos().find(a => a.id === cobId);
+      if(!ag || !ag.cobranca) return;
+      try{ await cobVerificar(ag); }catch(e){}
+      const ag2 = lerAgendamentos().find(a => a.id === cobId);
+      if(ag2 && ag2.cobranca && ag2.cobranca.estado === 'paga') cobEstadoUI(true);
+      else if(Date.now() < cobFim) cobAgendarVerificacao();
+    }, 4000);
+  }
+  async function cobVerificar(ag){
+    const c = ag.cobranca; if(!c || c.estado !== 'aberta') return false;
+    const r = await pagPedido('/estado?id=' + encodeURIComponent(c.id) + (c.conta ? '&conta=' + encodeURIComponent(c.conta) : ''));
+    if(r.pago){ marcarPagoOnline(ag.id); return true; }
+    if(r.estado === 'expirada'){ const l = lerAgendamentos(), a = l.find(x => x.id === ag.id); if(a && a.cobranca){ a.cobranca.estado = 'expirada'; gravarAgendamentos(l); renderLista(); } }
+    return false;
+  }
+  function marcarPagoOnline(id){
+    const lista = lerAgendamentos(), ag = lista.find(a => a.id === id); if(!ag || !ag.cobranca) return;
+    ag.cobranca.estado = 'paga'; ag.cobranca.pagoEm = Date.now();
+    if(ag.realizado){ ag.pagamento = 'recebido'; ag.formaPagamento = 'online'; marcarDataRecebimento(ag); }
+    gravarAgendamentos(lista); renderLista(); renderFaturamento();
+  }
+  async function pagVerificarAbertas(){
+    if(!pagUrl()) return;
+    const abertas = lerAgendamentos().filter(a => a.cobranca && a.cobranca.estado === 'aberta' && (Date.now() - a.cobranca.criadoEm) < 25 * 3600 * 1000);
+    for(const ag of abertas){ try{ await cobVerificar(ag); }catch(e){ break; } }
+  }
+  document.getElementById('cobValor').addEventListener('input', cobTaxaTexto);
+  document.getElementById('cobCriar').addEventListener('click', async ()=>{
+    const ag = lerAgendamentos().find(a => a.id === cobId); if(!ag) return;
+    const msg = document.getElementById('cobMsg'), bt = document.getElementById('cobCriar');
+    const valorC = cent(document.getElementById('cobValor').value), descricao = document.getElementById('cobDesc').value.trim() || cobDescricao(ag);
+    if(!(valorC >= 50)){ msg.textContent = 'Escreve um valor de pelo menos €0,50.'; return; }
+    bt.disabled = true; msg.style.color = '#6b6450'; msg.textContent = 'A criar o link…';
+    try{
+      const conta = contaParaCobrar();
+      const r = await pagPedido('/cobrar', { valorC, descricao, servicoId: ag.id, idioma: idiomaOrcamento === 'en' ? 'en' : 'pt', conta: conta || undefined });
+      const lista = lerAgendamentos(), a = lista.find(x => x.id === ag.id);
+      if(a){ a.cobranca = { id: r.id, url: r.url, valorC, taxaC: r.taxaC || 0, conta: r.conta || '', estado: 'aberta', criadoEm: Date.now() }; gravarAgendamentos(lista); renderLista(); }
+      msg.textContent = '';
+      cobMostrarLink(a);
+    }catch(e){ msg.style.color = '#a02f24'; msg.textContent = e.message; }
+    bt.disabled = false;
+  });
+  document.getElementById('cobWpp').addEventListener('click', ()=>{
+    const ag = lerAgendamentos().find(a => a.id === cobId); if(!ag || !ag.cobranca) return;
+    const nome = (ag.cliente || '').trim(), en = idiomaOrcamento === 'en';
+    const t = en ? `Hello${nome ? ' ' + nome : ''}! Here is the secure link to pay for your ${ag.tipo === 'tour' ? 'tour' : 'transfer'} (${euroC(ag.cobranca.valorC)}). You can pay by card, Apple Pay, Google Pay or Klarna:\n${ag.cobranca.url}`
+                 : `Olá${nome ? ' ' + nome : ''}! Segue o link seguro para o pagamento do seu ${ag.tipo === 'tour' ? 'tour' : 'transfer'} (${euroC(ag.cobranca.valorC)}). Pode pagar com cartão, Apple Pay, Google Pay, MB WAY ou Klarna:\n${ag.cobranca.url}`;
+    const tel = ag.telefone ? normalizarTelefone(ag.telefone) : '';
+    window.open(`https://wa.me/${tel}?text=${encodeURIComponent(t)}`, '_blank');
+  });
+  document.getElementById('cobCopiar').addEventListener('click', ()=>{
+    const ag = lerAgendamentos().find(a => a.id === cobId); if(!ag || !ag.cobranca) return;
+    const msg = document.getElementById('cobMsg');
+    const ok = ()=>{ msg.style.color = '#2e7d4f'; msg.textContent = '✓ Link copiado.'; };
+    if(navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(ag.cobranca.url).then(ok, ()=>{ msg.textContent = ag.cobranca.url; });
+    else msg.textContent = ag.cobranca.url;
+  });
+  document.getElementById('cobNovo').addEventListener('click', ()=>{
+    const lista = lerAgendamentos(), a = lista.find(x => x.id === cobId); if(!a) return;
+    if(a.cobranca && a.cobranca.estado !== 'paga'){ delete a.cobranca; gravarAgendamentos(lista); renderLista(); }
+    const id = cobId; fecharCobrar(); abrirCobrar(id);
+  });
+  document.getElementById('cobFechar').addEventListener('click', fecharCobrar);
+  document.getElementById('cobOverlay').addEventListener('click', e=>{ if(e.target.id === 'cobOverlay') fecharCobrar(); });
+
+  // ---- Painel "Pagamentos online" (explica tudo ao motorista) ----
+  function pagExemplosHtml(i){
+    const t = i.taxa, pro = i.pro || {};
+    const linhas = [1000, 2500, 4000, 10000].map(v => { const ta = taxaAppCent(v, t), st = taxaStripeEstC(v); return `<tr><td>${euroC(v)}</td><td>${euroC(ta)}</td><td>≈ ${euroC(st)}</td><td><b>≈ ${euroC(v - ta - st)}</b></td></tr>`; }).join('');
+    const nPro = pro.precoC && t.maxC ? Math.ceil(pro.precoC / t.maxC) : 0;
+    return `<table class="pag-tab"><tr><th>Serviço</th><th>Taxa da app</th><th>Stripe*</th><th>Recebes</th></tr>${linhas}</table>
+      <p class="pag-nota">* Taxa da Stripe num cartão europeu (≈ 1,5% + €0,25). Klarna e cartões de fora da Europa têm taxa mais alta.${nPro ? ` Com o PRO não pagas a taxa da app: compensa a partir de ~${nPro} pagamentos online de €${Math.ceil(t.maxC * 100 / t.pct / 100)} ou mais por mês.` : ''}</p>`;
+  }
+  function pagPlanoHtml(i){
+    const t = i.taxa, pro = i.pro || {}, emPro = !!pro.ativo;
+    return `<h4>Quanto custa</h4>
+      <p>💵 <b>Dinheiro, transferência e pagamentos de parceiros: sempre grátis.</b> A app só cobra nos pagamentos online.</p>
+      <div class="pag-planos">
+        <div class="pag-plano ${emPro ? '' : 'atual'}"><b>Grátis</b><div class="preco">${String(t.pct).replace('.', ',')}%</div><small>por pagamento online<br>mínimo ${euroC(t.minC)} · máximo ${euroC(t.maxC)}</small></div>
+        <div class="pag-plano ${emPro ? 'atual' : ''}"><b>PRO</b><div class="preco">${pro.texto || '—'}</div><small>sem taxa da app<br>em nenhum pagamento</small></div>
+      </div>
+      ${pagExemplosHtml(i)}`;
+  }
+  function pagMotoristaHtml(i, demo){
+    const conta = i.conta || {}, pro = i.pro || {};
+    let estado, botoes = '';
+    if(conta.ativa){ estado = `<div class="pag-estado ok">✅ Pagamentos ativos${pro.ativo ? ' · Plano PRO' : ' · Plano Grátis'}<br><span style="font-weight:500">O dinheiro vai direto para a tua conta bancária.</span></div>`;
+      botoes = `<button type="button" class="lgs-btn" data-pag="painel">🏦 Ver pagamentos e transferências (Stripe)</button>`; }
+    else if(conta.id){ estado = `<div class="pag-estado nao">⏳ Falta terminar a ativação na Stripe.</div>`;
+      botoes = `<button type="button" class="lgs-btn lgs-pri" data-pag="ativar" style="background:#635bff;border-color:#635bff;">Continuar a ativação</button>`; }
+    else { estado = `<div class="pag-estado info">Recebe dos teus clientes por cartão, Apple Pay, Google Pay, MB WAY e Klarna. O dinheiro vai direto para a tua conta bancária: o Trajeto nunca lhe toca.</div>`;
+      botoes = `<button type="button" class="lgs-btn lgs-pri" data-pag="ativar" style="background:#635bff;border-color:#635bff;">Ativar pagamentos</button>`; }
+    if(pro.disponivel) botoes += pro.ativo ? `<button type="button" class="lgs-btn" data-pag="pro-gerir">⭐ Gerir o plano PRO</button>` : `<button type="button" class="lgs-btn" data-pag="pro">⭐ Mudar para PRO (${pro.texto})</button>`;
+    if(demo) botoes = `<div class="pag-estado info" style="font-weight:500">👀 Pré-visualização: é isto que os outros motoristas veem. Os botões estão desligados.</div>`;
+    return `${estado}
+      <h4>Como ativar (uma vez, ±10 minutos)</h4>
+      <ol><li>Tocas em <b>Ativar pagamentos</b> e abre-se a página segura da Stripe.</li>
+      <li>Preenches nome, NIF, IBAN e a foto do documento. Estes dados ficam só na Stripe: o Trajeto não os vê.</li>
+      <li>Voltas à app e o botão <b>💳 Cobrar</b> aparece em cada serviço.</li></ol>
+      <h4>Como cobras</h4>
+      <p>Em cada serviço tocas em <b>💳 Cobrar</b>: o cliente lê o QR code no carro ou recebe o link pelo WhatsApp e paga no telemóvel dele. Quando paga, o serviço fica marcado como pago sozinho.</p>
+      ${pagPlanoHtml(i)}
+      <p class="pag-nota">A Stripe transfere o teu dinheiro para o teu banco automaticamente. As faturas e os impostos dos teus serviços continuam a ser da tua responsabilidade.</p>
+      ${botoes}`;
+  }
+  function pagRender(){
+    const corpo = document.getElementById('pagCorpo'), c = pagLer(), i = c.info;
+    document.getElementById('pagUrl').value = c.url || '';
+    if(!pagUrl()){
+      corpo.innerHTML = `<div class="pag-estado nao">Os pagamentos online ainda não estão ligados.</div>
+        <p>Quando estiverem ligados, cada serviço passa a ter o botão <b>💳 Cobrar</b>: o cliente paga por cartão, Apple Pay, Google Pay, MB WAY ou Klarna, pelo QR code no carro ou por um link no WhatsApp.</p>
+        <p>💵 Dinheiro, transferência e parceiros já funcionam: escolhes a forma ao concluir cada serviço.</p>`;
+      document.getElementById('pagConfig').open = true; return;
+    }
+    if(!i){ corpo.innerHTML = `<div class="pag-estado nao">Inicia sessão em "Minhas tarifas" para ligar os pagamentos à tua conta.</div>`; return; }
+    if(i.dono){
+      corpo.innerHTML = `<div class="pag-estado ok">✅ Ligado à tua conta Stripe (${escHtml(i.nomeConta || 'conta principal')}).<br><span style="font-weight:500">Sem taxa da app: só a taxa normal da Stripe.</span></div>
+        <p>Em cada serviço tens o botão <b>💳 Cobrar</b>. O QR code e o link aceitam cartão, Apple Pay, Google Pay, MB WAY e Klarna (os que tiveres ligados na Stripe).</p>
+        <p class="pag-nota">Modo atual: <b>${i.modo === 'plataforma' ? 'plataforma (outros motoristas podem ativar)' : 'só a tua conta'}</b>.</p>
+        <button type="button" class="lgs-btn" data-pag="demo">👀 Ver como os outros motoristas vão ver</button>`;
+      return;
+    }
+    if(i.modo !== 'plataforma'){ corpo.innerHTML = `<div class="pag-estado nao">Os pagamentos online ainda não estão disponíveis para a tua conta.</div><p>💵 Dinheiro, transferência e parceiros funcionam normalmente.</p>`; return; }
+    corpo.innerHTML = pagMotoristaHtml(i, false);
+  }
+  async function abrirPagamentos(){
+    document.getElementById('pagMsg').textContent = '';
+    document.getElementById('pagOverlay').hidden = false; pagRender();
+    if(pagUrl() && window.TrajetoCloud && TrajetoCloud.utilizadorAtual){
+      try{ await pagAtualizarInfo(); pagRender(); }catch(e){ const m = document.getElementById('pagMsg'); m.style.color = '#a02f24'; m.textContent = e.message; }
+    }
+  }
+  function fecharPagamentos(){ document.getElementById('pagOverlay').hidden = true; }
+  document.getElementById('btnAbrirPagamentos').addEventListener('click', abrirPagamentos);
+  document.getElementById('pagFechar').addEventListener('click', fecharPagamentos);
+  document.getElementById('pagOverlay').addEventListener('click', e=>{ if(e.target.id === 'pagOverlay') fecharPagamentos(); });
+  document.getElementById('pagGuardarUrl').addEventListener('click', async ()=>{
+    const m = document.getElementById('pagMsg'), v = document.getElementById('pagUrl').value.trim();
+    if(v && !/^https:\/\/[^\s]+$/i.test(v)){ m.style.color = '#a02f24'; m.textContent = 'O endereço tem de começar por https://'; return; }
+    const c = pagLer(); c.url = v; delete c.info; pagGravar(c); pagResumoCfg();
+    if(!v){ pagRender(); m.textContent = 'Ligação removida.'; return; }
+    m.style.color = '#6b6450'; m.textContent = 'A testar…';
+    try{ await pagAtualizarInfo(); m.style.color = '#2e7d4f'; m.textContent = '✓ Ligação a funcionar.'; }
+    catch(e){ m.style.color = '#a02f24'; m.textContent = e.message; }
+    pagRender();
+  });
+  document.getElementById('pagCorpo').addEventListener('click', async e=>{
+    const b = e.target.closest('[data-pag]'); if(!b) return;
+    const m = document.getElementById('pagMsg'), acao = b.dataset.pag, c = pagLer();
+    if(acao === 'demo'){
+      const i = c.info || {}, demo = { modo:'plataforma', taxa: i.taxaPlataforma || i.taxa || { pct:5, minC:30, maxC:150 }, pro: i.proPlataforma || { disponivel:true, texto:'€9,99/mês', precoC:999 }, conta:{} };
+      document.getElementById('pagCorpo').innerHTML = pagMotoristaHtml(demo, true) + '<button type="button" class="lgs-btn" data-pag="voltar">← Voltar</button>'; return;
+    }
+    if(acao === 'voltar'){ pagRender(); return; }
+    b.disabled = true; m.style.color = '#6b6450'; m.textContent = 'A abrir…';
+    try{
+      const conta = c.conta && c.conta.id ? c.conta.id : undefined;
+      const caminho = acao === 'ativar' ? '/connect/ativar' : acao === 'painel' ? '/connect/painel' : acao === 'pro' ? '/pro/assinar' : '/pro/gerir';
+      const r = await pagPedido(caminho, { conta, voltar: location.origin + location.pathname });
+      if(r.conta){ const n = pagLer(); n.conta = { id: r.conta }; pagGravar(n); }
+      m.textContent = ''; window.location.href = r.url;
+    }catch(err){ m.style.color = '#a02f24'; m.textContent = err.message; }
+    b.disabled = false;
+  });
+  // ao voltar da Stripe (?pagamentos=…) abre o painel; e ao entrar confirma as cobranças em aberto
+  (function pagArranque(){
+    let tentativas = 0;
+    const iniciar = ()=>{
+      if(!window.TrajetoCloud || !TrajetoCloud.onAuthChange){ if(++tentativas < 40) setTimeout(iniciar, 500); return; }
+      TrajetoCloud.onAuthChange(u => { if(u && pagUrl()){ pagAtualizarInfo().catch(()=>{}); pagVerificarAbertas(); } });
+    };
+    iniciar();
+    pagResumoCfg();
+    try{
+      const p = new URLSearchParams(location.search);
+      if(p.get('pagamentos')){ history.replaceState(null, '', location.pathname + location.hash); setTimeout(abrirPagamentos, 1200); }
+    }catch(e){}
+    document.addEventListener('visibilitychange', ()=>{ if(document.visibilityState === 'visible' && window.TrajetoCloud && TrajetoCloud.utilizadorAtual) pagVerificarAbertas(); });
+  })();
 
   const PAINEL_OCULTO_KEY = 'trajeto_painel_valores_ocultos';
   function painelValoresOcultos(){ try{ return localStorage.getItem(PAINEL_OCULTO_KEY) === '1'; }catch(e){ return false; } }
@@ -5965,7 +7639,7 @@
     const carro = lerCarro();
     const roteiro = eTour ? corridaParagens(ag) : (Array.isArray(ag.paragens) ? ag.paragens.filter(Boolean) : []);
     const valor = parseFloat(String(ag.valor || '').replace(',', '.'));
-    const pag = ag.realizado ? (ag.pagamento === 'recebido' ? 'Recebido' + (ag.recebidoEm ? ' em ' + ag.recebidoEm.split('-').reverse().join('/') : '') : 'A receber') : 'Após o serviço';
+    const pag = ag.realizado ? (ag.pagamento === 'recebido' ? 'Recebido' + (FORMAS_PAG[ag.formaPagamento] ? ' (' + FORMAS_PAG[ag.formaPagamento].nome + ')' : '') + (ag.recebidoEm ? ' em ' + ag.recebidoEm.split('-').reverse().join('/') : '') : 'A receber') : (ag.cobranca && ag.cobranca.estado === 'paga' ? 'Pago online (antes do serviço)' : 'Após o serviço');
     const secoes = [
       ['Reserva', [
         ['Tipo', eTour ? `Tour privado · ${ag.tourNome || ''}` : eHora ? 'Motorista por hora' : 'Transfer privado'],
@@ -6175,19 +7849,24 @@
     } else {
       nota.style.display = 'none';
     }
+    const pagoOnline = !!(ag && ag.cobranca && ag.cobranca.estado === 'paga');
+    const av = document.getElementById('pagAvisoOnline');
+    av.hidden = !pagoOnline; document.getElementById('btnModalOnline').hidden = !pagoOnline;
+    if(pagoOnline) av.textContent = `💳 Este serviço já foi pago online (${euroC(ag.cobranca.valorC)}).`;
     document.getElementById('modalPagamento').classList.add('aberto');
   }
   function fecharModalPagamento(){
     idPendenteModal = null;
     document.getElementById('modalPagamento').classList.remove('aberto');
   }
-  function concluirComPagamento(status){
+  function concluirComPagamento(status, forma){
     if(!idPendenteModal) return;
     const lista = lerAgendamentos();
     const ag = lista.find(a => a.id === idPendenteModal);
     if(ag){
       ag.realizado = true;
       ag.pagamento = status;
+      if(status === 'recebido' && forma) ag.formaPagamento = forma; else delete ag.formaPagamento;
       marcarDataRecebimento(ag);
       const nota = document.getElementById('notaConcluir').value.trim();
       if(nota) ag.nota = nota.slice(0, 500); else delete ag.nota;
@@ -6309,7 +7988,10 @@
   document.getElementById('modalPedirAvaliacao').addEventListener('click', (e)=>{
     if(e.target.id === 'modalPedirAvaliacao') fecharModalPedirAvaliacao();
   });
-  document.getElementById('btnModalRecebido').addEventListener('click', ()=> concluirComPagamento('recebido'));
+  document.getElementById('btnModalRecebido').addEventListener('click', ()=> concluirComPagamento('recebido', 'dinheiro'));
+  document.getElementById('btnModalTransf').addEventListener('click', ()=> concluirComPagamento('recebido', 'transferencia'));
+  document.getElementById('btnModalCartao').addEventListener('click', ()=> concluirComPagamento('recebido', 'cartao'));
+  document.getElementById('btnModalOnline').addEventListener('click', ()=> concluirComPagamento('recebido', 'online'));
   document.getElementById('btnModalPendente').addEventListener('click', ()=> concluirComPagamento('pendente'));
   document.getElementById('modalPagamento').addEventListener('click', (e)=>{
     if(e.target.id === 'modalPagamento') fecharModalPagamento();
@@ -6392,6 +8074,8 @@
     } else if(btn.dataset.acao === 'tourParagem'){
       const idx = parseInt(btn.dataset.idx, 10);
       if(Array.isArray(ag.tourRoteiro) && ag.tourRoteiro[idx]) abrirWaze(paragemParaWaze(ag.tourRoteiro[idx]));
+    } else if(btn.dataset.acao === 'cobrar'){
+      abrirCobrar(ag.id);
     } else if(btn.dataset.acao === 'logoPlaca'){
       abrirLogoServico(ag.id);
     } else if(btn.dataset.acao === 'editar'){
@@ -6419,12 +8103,14 @@
       } else {
         ag.realizado = false;
         delete ag.recebidoEm;   // ao desfazer, deixa de contar como recebido (também no Finance Drive)
+        if(ag.formaPagamento !== 'online') delete ag.formaPagamento;
         gravarAgendamentos(lista);
         renderLista();
         renderFaturamento();
       }
     } else if(btn.dataset.acao === 'marcarRecebido'){
       ag.pagamento = 'recebido';
+      if(!ag.formaPagamento) { const f = formaProvavel(ag); if(f) ag.formaPagamento = f; }
       marcarDataRecebimento(ag);
       gravarAgendamentos(lista);
       renderLista();
@@ -6731,7 +8417,7 @@
           <div class="ag-trajeto fat-cab">${colQuando(ag)}<span class="ag-cab"><span class="ag-linha-cliente">${escHtml(ag.cliente)}</span><span class="ag-linha-rota">${tituloAg(ag)}</span></span><span class="ag-estado"><span class="fat-valor-item">€${ag.valor}</span><span class="ag-badge-pendente">⏳ A receber</span></span></div>
           ${extra ? `<div class="ag-meta fat-extra">${extra}</div>` : ''}
           ${linhaPrev}
-          ${htmlNota(ag)}
+          ${htmlNota(ag)}${htmlCobranca(ag)}
           <div class="ag-acoes">
             <button class="ag-btn-ok" data-acao="marcarRecebido">💰 Marcar como recebido</button>
             <button class="ag-btn-cal" data-acao="previsao">📅 Data prevista</button>
@@ -6747,6 +8433,7 @@
     const doPeriodo = todos.filter(ag => ag.data >= periodo.inicio && ag.data <= periodo.fim);
     const totalPeriodo = doPeriodo.reduce((s,ag)=> s + (parseFloat(ag.valor)||0), 0);
     document.getElementById('fatPeriodoTotal').textContent = `€${totalPeriodo.toFixed(2)}`;
+    renderFormasPeriodo(doPeriodo);
 
     const el = document.getElementById('listaFaturamento');
     const ordenada = [...doPeriodo].sort((a,b)=> (b.data+b.hora).localeCompare(a.data+a.hora));
@@ -6766,7 +8453,7 @@
           ${linhaHoraMeta(ag)}
           ${ag.fornecedor ? `<br>🏷 Fornecedor: ${escHtml(ag.fornecedor)}` : ''}
         </div>
-        ${htmlNota(ag)}
+        ${htmlNota(ag)}${htmlCobranca(ag)}
         <div class="ag-acoes">
           <button class="ag-btn-cal" data-acao="refazer">🔁 Refazer</button>
         </div>
@@ -6917,6 +8604,7 @@
     const ag = lista.find(a => a.id === id);
     if(!ag) return;
     ag.pagamento = 'recebido';
+    if(!ag.formaPagamento) { const f = formaProvavel(ag); if(f) ag.formaPagamento = f; }
     marcarDataRecebimento(ag);
     gravarAgendamentos(lista);
     renderLista();
@@ -7327,6 +9015,7 @@ if ('serviceWorker' in navigator) {
     ligarOuvinteLigacaoFD,
     apagarAvaliacao,
     onAuthChange: (cb) => onAuthStateChanged(auth, cb),
+    obterToken: () => auth.currentUser ? auth.currentUser.getIdToken() : Promise.resolve(null),
     get utilizadorAtual(){ return auth.currentUser; }
   };
 </script>
