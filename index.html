@@ -2165,7 +2165,7 @@
     <p class="nota">Os serviços por hora agendados ficam em "📅 Agendados". Os que estão em andamento aparecem a partir do momento em que tocas em "🚗 Ir buscar cliente" no agendamento. O tempo só começa a contar quando tocas em "▶️ Iniciar" (cliente no carro). Ao finalizar, o valor é calculado pela regra definida em "Minhas tarifas" e podes enviar o resumo ao cliente. O agendamento só sai da lista quando o marcares como "Concluído".</p>
   </div>
 
-  <p style="text-align:center; font-family:'Helvetica Neue', Arial, sans-serif; font-size:11px; color:#8a7f66; margin-top:24px;">Trajeto · v9.29.0</p>
+  <p style="text-align:center; font-family:'Helvetica Neue', Arial, sans-serif; font-size:11px; color:#8a7f66; margin-top:24px;">Trajeto · v9.29.1</p>
 
 </main>
 
@@ -4491,7 +4491,8 @@ window.TJQR=function(texto){var q=new QRCode(-1,EC.M);q.addData(texto);q.make();
       msgCustom: localStorage.getItem('trajeto_msg_custom') || '',
       bio: localStorage.getItem('trajeto_bio') || '',
       foto: localStorage.getItem('trajeto_foto') || '',
-      clientes: lerClientes()
+      clientes: lerClientes(),
+      pagConta: (function(){ try{ const c = JSON.parse(localStorage.getItem('trajeto_pag_online') || '{}') || {}; return c.conta && c.conta.id ? c.conta.id : ''; }catch(e){ return ''; } })()
     };
   }
   function sincronizarNuvem(){
@@ -4530,8 +4531,12 @@ window.TJQR=function(texto){var q=new QRCode(-1,EC.M);q.addData(texto);q.make();
       document.getElementById('cfg_whatsapp').value = dados.whatsapp;
     }
     if(dados.pagamentos){
-      localStorage.setItem('trajeto_pagamentos', JSON.stringify(dados.pagamentos));
-      aplicarPagamentosUI(dados.pagamentos);
+      const pg = { ...dados.pagamentos }; ['url', 'info', 'infoEm', 'conta'].forEach(k => delete pg[k]);
+      localStorage.setItem('trajeto_pagamentos', JSON.stringify(pg));
+      aplicarPagamentosUI(pg);
+    }
+    if(typeof dados.pagConta === 'string' && /^acct_[A-Za-z0-9]+$/.test(dados.pagConta)){
+      try{ const c = JSON.parse(localStorage.getItem('trajeto_pag_online') || '{}') || {}; if(!c.conta || c.conta.id !== dados.pagConta){ c.conta = { id: dados.pagConta }; localStorage.setItem('trajeto_pag_online', JSON.stringify(c)); } }catch(e){}
     }
     if(dados.msgTipo || typeof dados.msgCustom === 'string'){
       if(dados.msgTipo) localStorage.setItem('trajeto_msg_tipo', dados.msgTipo);
@@ -6898,8 +6903,21 @@ window.TJQR=function(texto){var q=new QRCode(-1,EC.M);q.addData(texto);q.make();
 
   // ===== v9.29: pagamentos — fase 1 (a tua conta Stripe) e fase 2 (outros motoristas, com taxa da app) =====
   // O endereço do serviço de pagamentos (Cloudflare Worker). Fase 2: fica escrito aqui para os motoristas não terem de configurar nada.
-  const PAG_URL_PADRAO = '';
-  const PAG_CFG_KEY = 'trajeto_pagamentos';
+  const PAG_URL_PADRAO = 'https://trajeto-pagamentos.leonardospinasse.workers.dev';
+  // v9.29.1: chave própria (a v9.29.0 usava 'trajeto_pagamentos', que já era das "Formas de pagamento" e a sincronização apagava a ligação)
+  const PAG_CFG_KEY = 'trajeto_pag_online';
+  (function migrarPagOnline(){
+    try{
+      const velho = JSON.parse(localStorage.getItem('trajeto_pagamentos') || 'null');
+      if(!velho || typeof velho !== 'object') return;
+      const campos = ['url', 'info', 'infoEm', 'conta'];
+      if(!campos.some(k => k in velho)) return;
+      let novo = {}; try{ novo = JSON.parse(localStorage.getItem(PAG_CFG_KEY) || '{}') || {}; }catch(e){}
+      campos.forEach(k => { if(k in velho){ if(!(k in novo)) novo[k] = velho[k]; delete velho[k]; } });
+      localStorage.setItem(PAG_CFG_KEY, JSON.stringify(novo));
+      localStorage.setItem('trajeto_pagamentos', JSON.stringify(velho));
+    }catch(e){}
+  })();
   const FORMAS_PAG = {
     dinheiro: { ic:'💵', nome:'Dinheiro' },
     transferencia: { ic:'🏦', nome:'Transferência / MB WAY' },
@@ -7148,7 +7166,7 @@ window.TJQR=function(texto){var q=new QRCode(-1,EC.M);q.addData(texto);q.make();
   }
   function pagRender(){
     const corpo = document.getElementById('pagCorpo'), c = pagLer(), i = c.info;
-    document.getElementById('pagUrl').value = c.url || '';
+    document.getElementById('pagUrl').value = c.url || PAG_URL_PADRAO || '';
     if(!pagUrl()){
       corpo.innerHTML = `<div class="pag-estado nao">Os pagamentos online ainda não estão ligados.</div>
         <p>Quando estiverem ligados, cada serviço passa a ter o botão <b>💳 Cobrar</b>: o cliente paga por cartão, Apple Pay, Google Pay, MB WAY ou Klarna, pelo QR code no carro ou por um link no WhatsApp.</p>
