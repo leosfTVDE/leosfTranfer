@@ -696,6 +696,10 @@ footer .rodape-titulo{ font-family:var(--serif); font-size:32px !important; font
 .atalho[style*="display: none"], .atalho[style*="display:none"],
 .li[style*="display: none"], .li[style*="display:none"],
 .tours-btn[style*="display: none"], .tours-btn[style*="display:none"]{ display:none !important; }
+/* tipo de serviço no formulário: os botões ficam lado a lado (2 ou 3, conforme o que ofereces) */
+.tipo-switch{ display:flex !important; gap:8px !important; }
+.tipo-switch button{ flex:1 1 0 !important; min-width:0 !important; padding:13px 6px !important; font-size:15px !important; line-height:1.2 !important; }
+.tipo-switch button:last-child{ grid-column:auto !important; }
 </style>
 </head>
 <body>
