@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="pt">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Trajeto · Ligar a Agenda Google</title>
+<style>
+  *{box-sizing:border-box}
+  html{background:#1B2646}
+  body{margin:0;min-height:100vh;display:flex;align-items:center;justify-content:center;background:#F9F7F3;font-family:-apple-system,'Helvetica Neue',Arial,sans-serif;color:#1B2646;padding:24px}
+  .c{background:#fff;border:1px solid #E9E2D6;border-radius:22px;padding:30px 24px;max-width:400px;width:100%;text-align:center;box-shadow:0 18px 40px -24px rgba(27,38,70,.35)}
+  .marca{font:600 26px Georgia,serif;color:#1B2646}.marca small{display:block;font:600 10px Arial;letter-spacing:.4em;color:#A88452;margin-top:2px}
+  .i{font-size:52px;margin:18px 0 6px}
+  h1{font-size:21px;margin:6px 0 8px}
+  p{color:#6B7180;line-height:1.5;margin:0 0 6px;font-size:15px}
+  a.b{display:block;margin-top:18px;padding:14px;border-radius:999px;background:linear-gradient(90deg,#DCC496,#C9A774);color:#1B2646;text-decoration:none;font-weight:800}
+  .n{font-size:12.5px;color:#8a8f9c;margin-top:14px}
+</style>
+</head>
+<body>
+<div class="c">
+  <div class="marca">Trajeto<small>TRANSFER</small></div>
+  <div class="i" id="ic">⏳</div>
+  <h1 id="tit">A ligar a tua agenda…</h1>
+  <p id="txt">Só um momento.</p>
+  <a class="b" id="btn" href="/?agenda=ligada" hidden>Voltar ao Trajeto</a>
+  <p class="n">O Trajeto só consegue ver os eventos do calendário que escolheres. Não altera nada na tua agenda e nunca vê a tua senha.</p>
+</div>
+<script>
+(function(){
+  var SERVICO = 'https://trajeto-pagamentos.leonardospinasse.workers.dev';
+  var q = new URLSearchParams(location.search);
+  var ic = document.getElementById('ic'), tit = document.getElementById('tit'), txt = document.getElementById('txt'), btn = document.getElementById('btn');
+  function fim(ok, t, m){ ic.textContent = ok ? '✅' : '⚠️'; tit.textContent = t; txt.textContent = m; btn.hidden = false; if(!ok) btn.href = '/'; }
+  // limpa o código do endereço (não fica no histórico)
+  try{ history.replaceState(null, '', location.pathname); }catch(e){}
+  if(q.get('error')){ fim(false, 'A ligação foi cancelada', 'Não deste permissão na Google. Podes tentar outra vez quando quiseres, no Trajeto.'); return; }
+  var code = q.get('code'), state = q.get('state');
+  if(!code || !state){ fim(false, 'Página aberta sem pedido', 'Abre o Trajeto e toca em "Ligar a minha Agenda Google".'); return; }
+  fetch(SERVICO + '/agenda/callback', { method:'POST', headers:{ 'Content-Type':'application/json' }, body: JSON.stringify({ code: code, state: state }) })
+    .then(function(r){ return r.json().then(function(j){ return { ok: r.ok, j: j }; }); })
+    .then(function(x){
+      if(x.ok) fim(true, 'Agenda ligada', (x.j.email ? 'Conta ' + x.j.email + '. ' : '') + 'Volta ao Trajeto para escolheres o calendário dos serviços.');
+      else fim(false, 'Não foi possível ligar', x.j.erro || 'Tenta outra vez.');
+    })
+    .catch(function(){ fim(false, 'Sem ligação à internet', 'Verifica a internet e tenta outra vez no Trajeto.'); });
+})();
+</script>
+</body>
+</html>
