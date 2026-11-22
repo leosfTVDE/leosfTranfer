@@ -1528,6 +1528,36 @@ header{background:#1B2646 !important;}
 .btn-agendar-cliente{background:linear-gradient(90deg,#DCC496 0%,#C9A774 100%) !important;color:#1B2646 !important;border-radius:999px !important;box-shadow:0 10px 24px -12px rgba(27,38,70,.35) !important;}
 .btn-agendar-cliente svg,.btn-agendar-cliente .ico{stroke:#1B2646 !important;color:#1B2646 !important;}
 </style>
+<style id="agenda-v931">
+#agendaFaixa{margin:-4px 0 12px}
+.agf{display:block;width:100%;text-align:left;border:1px dashed #E3CFA6;background:#FBF6EC;color:#1B2646;border-radius:12px;padding:10px 12px;font:500 13.5px 'Helvetica Neue',Arial,sans-serif;cursor:pointer}
+.agf u{color:#A88452;font-weight:700}
+.agf-novo{border-style:solid;background:linear-gradient(90deg,#F4EFE7,#FBF6EC);border-color:#D9BF8F}
+.ag-badge-gcal{background:#F4EFE7;color:#A88452;border-radius:10px;padding:1px 8px;font-size:11px;font-weight:700}
+.lgs-card.agd-card{max-height:92vh;overflow-y:auto}
+.agd-hero{font-size:40px;text-align:center;margin:4px 0}
+.agd-t{font:800 17px 'Helvetica Neue',Arial,sans-serif;margin:6px 0;text-align:center}
+.agd-p{font-size:14px;color:#4A5370;line-height:1.5;margin:6px 0 10px}
+.agd-nota{font-size:12px;color:#6B7180;text-align:center;line-height:1.45;margin:8px 0}
+.agd-btn-ouro{display:block;width:100%;padding:14px;margin-top:10px;border:none;border-radius:999px;background:linear-gradient(90deg,#DCC496,#C9A774);color:#1B2646;font:800 16px 'Helvetica Neue',Arial,sans-serif;cursor:pointer}
+.agd-load{padding:26px 8px;text-align:center;font-size:15px;color:#4A5370}
+.agd-ia{display:flex;gap:8px;background:#F4EFE7;border-radius:12px;padding:11px 12px;font-size:13.5px;line-height:1.4;margin-bottom:10px}
+.agd-aviso{background:#fff6e5;color:#9a5b00;border-radius:10px;padding:9px 11px;font-size:12.5px;margin:0 0 10px}
+.agd-lista{border:1px solid #E9E2D6;border-radius:14px;padding:2px 10px;background:#fff}
+.agd-it{display:flex;gap:10px;align-items:flex-start;padding:11px 0;border-top:1px solid #F0EBE2;font-size:13px;line-height:1.4;color:#4A5370}
+.agd-it:first-child{border-top:none}
+.agd-it input{width:20px;height:20px;margin-top:2px;flex:none;accent-color:#1B2646}
+.agd-q{font:800 13px 'Helvetica Neue',Arial,sans-serif;color:#1B2646;min-width:44px}
+.agd-d b{display:block;color:#1B2646;font-size:14px}
+.agd-tag{display:inline-block;background:#F4EFE7;color:#A88452;font-size:11px;font-weight:700;padding:1px 7px;border-radius:999px}
+.agd-falta{color:#9a5b00;font-size:12px}
+.agd-ign{border:none;background:none;color:#6B7180;text-decoration:underline;font-size:12px;padding:4px 0 0;cursor:pointer}
+.agd-cal{display:flex;align-items:center;gap:10px;width:100%;text-align:left;padding:12px;margin:6px 0;border:1px solid #E9E2D6;border-radius:12px;background:#fff;color:#1B2646;font:600 15px 'Helvetica Neue',Arial,sans-serif;cursor:pointer}
+.agd-cal small{color:#6B7180;font-weight:400}
+.agd-cor{width:14px;height:14px;border-radius:50%;flex:none}
+.agd-rodape{font-size:12px;color:#6B7180;text-align:center;margin-top:12px}
+.agd-rodape button{border:none;background:none;color:#1B2646;text-decoration:underline;font-size:12px;padding:0;cursor:pointer}
+</style>
 </head>
 <body>
 
@@ -1583,6 +1613,11 @@ header{background:#1B2646 !important;}
         <div class="cfg-titulo cfg-titulo-fixo">💳 Pagamentos online</div>
         <div id="pagResumoCfg" style="font-family:'Helvetica Neue', Arial, sans-serif; font-size:13px; color:#6B7180; margin:6px 0 10px;">Cobra os clientes por cartão, Apple Pay, MB WAY e Klarna.</div>
         <button type="button" class="btn-config" id="btnAbrirPagamentos" style="background:#635bff;color:#fff;border-color:#635bff;">💳 Pagamentos online</button>
+      </div>
+      <div class="cfg-grupo" style="margin-top:16px; border-top:1px solid var(--linha); padding-top:12px; padding-bottom:12px;">
+        <div class="cfg-titulo cfg-titulo-fixo">📅 Agenda Google</div>
+        <div id="agendaResumoCfg" style="font-family:'Helvetica Neue', Arial, sans-serif; font-size:13px; color:#6B7180; margin:6px 0 10px;">Traz os serviços da tua Agenda Google para o Trajeto, com IA.</div>
+        <button type="button" class="btn-config" id="btnAbrirAgenda">📅 Agenda Google</button>
       </div>
       <div class="cfg-grupo" style="margin-top:16px; border-top:1px solid var(--linha); padding-top:2px;">
         <div class="cfg-titulo cfg-titulo-fixo">☁️ Sincronização entre aparelhos</div>
@@ -2081,6 +2116,7 @@ header{background:#1B2646 !important;}
 
     <div class="card" id="cardAgendamentos">
       <h2 class="cab-info">Meus agendamentos <button type="button" class="btn-info" id="btnAjudaAg">ℹ️ Como funciona?</button></h2>
+      <div id="agendaFaixa" hidden></div>
       <div class="seg" id="segFiltroAg" style="margin-bottom:14px;">
         <button data-v="ativos" class="active">Ativos</button>
         <button data-v="concluidos">Concluídos</button>
@@ -2173,7 +2209,7 @@ header{background:#1B2646 !important;}
     <p class="nota">Os serviços por hora agendados ficam em "📅 Agendados". Os que estão em andamento aparecem a partir do momento em que tocas em "🚗 Ir buscar cliente" no agendamento. O tempo só começa a contar quando tocas em "▶️ Iniciar" (cliente no carro). Ao finalizar, o valor é calculado pela regra definida em "Minhas tarifas" e podes enviar o resumo ao cliente. O agendamento só sai da lista quando o marcares como "Concluído".</p>
   </div>
 
-  <p style="text-align:center; font-family:'Helvetica Neue', Arial, sans-serif; font-size:11px; color:#8a7f66; margin-top:24px;">Trajeto · v9.30.0</p>
+  <p style="text-align:center; font-family:'Helvetica Neue', Arial, sans-serif; font-size:11px; color:#8a7f66; margin-top:24px;">Trajeto · v9.31.0</p>
 
 </main>
 
@@ -3579,6 +3615,13 @@ window.TJQR=function(texto){var q=new QRCode(-1,EC.M);q.addData(texto);q.make();
     <button type="button" class="lgs-btn" id="cobFechar">Fechar</button>
   </div>
 </div>
+<div class="lgs-overlay" id="agendaOverlay" hidden>
+  <div class="lgs-card agd-card" role="dialog" aria-modal="true" aria-labelledby="agendaTitulo">
+    <h3 id="agendaTitulo">📅 Agenda Google</h3>
+    <div id="agendaCorpo"></div>
+    <button type="button" class="lgs-btn" id="agendaFechar">Fechar</button>
+  </div>
+</div>
 <div class="lgs-overlay" id="pagOverlay" hidden>
   <div class="lgs-card pag-card" role="dialog" aria-modal="true" aria-labelledby="pagTitulo">
     <h3 id="pagTitulo">💳 Pagamentos online</h3>
@@ -4976,7 +5019,7 @@ window.TJQR=function(texto){var q=new QRCode(-1,EC.M);q.addData(texto);q.make();
       }
       return `
       <div class="ag-item ${ag.realizado ? 'ag-item-realizado' : ''}" data-id="${ag.id}">
-        <div class="ag-trajeto">${colQuando(ag)}<span class="ag-cab"><span class="ag-linha-cliente">${escHtml(ag.cliente)}</span><span class="ag-linha-rota">${tituloAg(ag)}</span></span><span class="ag-estado">${seloAgendado}${ag.realizado ? '<span class="ag-badge-ok">✔ Concluído</span>' : ''}${seloPagamento}${seloPrevisao(ag)}${seloEstadoHora}${seloAvaliacao(ag)}</span><span class="ag-seta">▸</span></div>
+        <div class="ag-trajeto">${colQuando(ag)}<span class="ag-cab"><span class="ag-linha-cliente">${escHtml(ag.cliente)}</span><span class="ag-linha-rota">${tituloAg(ag)}</span></span><span class="ag-estado">${seloAgendado}${ag.origem === 'agenda' ? '<span class="ag-badge-gcal">📅 da agenda</span>' : ''}${ag.realizado ? '<span class="ag-badge-ok">✔ Concluído</span>' : ''}${seloPagamento}${seloPrevisao(ag)}${seloEstadoHora}${seloAvaliacao(ag)}</span><span class="ag-seta">▸</span></div>
         <div class="ag-detalhes">
         <div class="ag-meta">
           📅 ${escHtml(ag.data.split('-').reverse().join('/'))} às ${escHtml(ag.hora)}<br>
@@ -8795,6 +8838,239 @@ if ('serviceWorker' in navigator) {
     });
   });
 }
+</script>
+
+<script>
+/* ====== v9.31.0 · Agenda Google + IA ======
+   Lê (só leitura) o calendário que o motorista escolher, a IA monta os serviços
+   e nada entra no Trajeto sem o motorista confirmar. Não mexe em cálculos nem
+   noutras ligações: só cria agendamentos novos, iguais aos criados à mão. */
+(function(){
+  const AGI_KEY = 'trajeto_agenda_info', AGIGN_KEY = 'trajeto_agenda_ignorados';
+  let agLeitura = null, agCalendarios = null, agOcupado = false, agMsg = '';
+  const $ = id => document.getElementById(id);
+  function agInfo(){ try{ return JSON.parse(localStorage.getItem(AGI_KEY)) || {}; }catch(e){ return {}; } }
+  function agGravarInfo(i){ try{ localStorage.setItem(AGI_KEY, JSON.stringify(i)); }catch(e){} }
+  function agIgnorados(){ try{ return JSON.parse(localStorage.getItem(AGIGN_KEY)) || []; }catch(e){ return []; } }
+  function agIgnorar(id){ const l = agIgnorados(); if(l.indexOf(id) < 0) l.push(id); try{ localStorage.setItem(AGIGN_KEY, JSON.stringify(l.slice(-500))); }catch(e){} }
+  function agLogado(){ return !!(window.TrajetoCloud && window.TrajetoCloud.utilizadorAtual); }
+  function dataPt(d){ return d ? d.split('-').reverse().join('/') : ''; }
+  async function agPedido(caminho, corpo){
+    const base = (typeof pagUrl === 'function' ? pagUrl() : '') || 'https://trajeto-pagamentos.leonardospinasse.workers.dev';
+    if(!agLogado()) throw new Error('Inicia sessão no Trajeto (Minhas tarifas → Sincronização) para ligar a agenda.');
+    const tk = await window.TrajetoCloud.obterToken();
+    const r = await fetch(base + caminho, { method: corpo ? 'POST' : 'GET', headers: { 'Content-Type':'application/json', 'Authorization':'Bearer ' + tk }, body: corpo ? JSON.stringify(corpo) : undefined });
+    let j = {}; try{ j = await r.json(); }catch(e){}
+    if(!r.ok){ const e = new Error(j.erro || ('Erro ' + r.status)); e.status = r.status; e.desligado = !!j.desligado; throw e; }
+    return j;
+  }
+  async function agAtualizarEstado(){
+    try{
+      const e = await agPedido('/agenda/estado');
+      const i = agInfo(); Object.assign(i, { ligado: e.ligado, email: e.email, cal: e.cal, ia: e.ia, indisponivel: false, verificado: Date.now() });
+      if(!e.ligado){ delete i.novos; }
+      agGravarInfo(i); return i;
+    }catch(err){
+      if(err.status === 403){ const i = agInfo(); i.indisponivel = true; agGravarInfo(i); }
+      throw err;
+    }
+  }
+  // ---- classificar o que a agenda devolveu ----
+  function agJaImportados(){ const m = {}; lerAgendamentos().forEach(a => { if(a && a.gcal && a.gcal.id) m[a.gcal.id] = a; }); return m; }
+  function agSemIa(e){
+    try{
+      const t = 'Date: ' + dataPt(e.data) + '\n' + (e.hora ? 'Time: ' + e.hora + '\n' : '') + (e.titulo || '') + '\n' + (e.local ? 'Pick up: ' + e.local + '\n' : '') + (e.descricao || '');
+      const r = colarLerMensagem(t, new Date());
+      if(!r || !r.servicos || !r.servicos.length) return null;
+      const s = r.servicos[0], x = r.extras || {};
+      return { servico: true, cliente: x.nome || '', telefone: x.telefone || '', voo: s.voo || '', partida: s.partida || '', chegada: s.chegada || '', fornecedor: x.fornecedor || '', valor: x.valor ? parseFloat(String(x.valor).replace(',', '.')) || null : null, pax: x.pax ? parseInt(x.pax, 10) || null : null, notas: (x.notas || []).join(' · '), semIa: true };
+    }catch(err){ return null; }
+  }
+  function agClassificar(leitura){
+    const ja = agJaImportados(), ign = agIgnorados(), out = { servicos: [], ja: 0, ignorados: 0, pessoais: [] };
+    (leitura && leitura.eventos || []).forEach(e => {
+      if(e.saltado || ja[e.id]){ out.ja++; return; }
+      if(ign.indexOf(e.id) >= 0){ out.ignorados++; return; }
+      let ia = e.ia;
+      if(!ia) ia = agSemIa(e);
+      if(!ia || !ia.servico){ out.pessoais.push(e); return; }
+      const s = { e, cliente: ia.cliente || '', telefone: ia.telefone || '', voo: ia.voo || '', partida: ia.partida || '', chegada: ia.chegada || '',
+        fornecedor: ia.fornecedor || e.organizador || '', valor: ia.valor, pax: ia.pax, notas: ia.notas || '', semIa: !!ia.semIa };
+      s.falta = [!e.data && 'data', !e.hora && 'hora', !s.partida && 'recolha', !s.chegada && 'destino'].filter(Boolean);
+      s.marcado = !!(e.data && e.hora && (s.partida || s.chegada));
+      out.servicos.push(s);
+    });
+    return out;
+  }
+  // ---- ler a agenda ----
+  async function agLer(silencioso){
+    if(agOcupado) return; agOcupado = true; agMsg = '';
+    if(!silencioso) agRender('a_ler');
+    try{
+      const saltar = lerAgendamentos().filter(a => a && a.gcal && a.gcal.id).map(a => a.gcal.id + '|' + (a.gcal.upd || ''));
+      agLeitura = await agPedido('/agenda/ler', { saltar });
+      const c = agClassificar(agLeitura), i = agInfo();
+      i.ultima = Date.now(); i.novos = c.servicos.length; i.iaOk = agLeitura.iaOk; agGravarInfo(i);
+    }catch(err){
+      if(err.desligado){ const i = agInfo(); i.ligado = false; delete i.novos; agGravarInfo(i); }
+      agMsg = err.message;
+    }finally{ agOcupado = false; }
+    agRenderFaixa(); agResumoCfg();
+    if(!$('agendaOverlay').hidden) agRender();
+  }
+  function agImportar(){
+    if(!agLeitura) return;
+    const c = agClassificar(agLeitura), marc = [];
+    document.querySelectorAll('#agendaCorpo [data-agi]').forEach(el => { if(el.checked) marc.push(c.servicos[+el.dataset.agi]); });
+    if(!marc.length){ agMsg = 'Marca pelo menos um serviço.'; agRender(); return; }
+    const lista = lerAgendamentos();
+    marc.forEach((s, k) => {
+      const e = s.e;
+      const obs = [s.notas, s.pax ? 'Passageiros: ' + s.pax : '', e.titulo ? 'Da agenda: ' + e.titulo : ''].filter(Boolean).join('\n');
+      lista.push({
+        id: Date.now().toString(36) + Math.random().toString(36).slice(2, 7) + k, criadoEm: Date.now(),
+        partida: s.partida, chegada: s.chegada, paragens: [], data: e.data, hora: e.hora,
+        cliente: s.cliente || s.fornecedor || e.titulo || 'Cliente', telefone: s.telefone, nomePlaca: '', voo: s.voo,
+        fornecedor: s.fornecedor, observacoes: obs, valor: (s.valor != null && s.valor > 0) ? String(s.valor) : '',
+        realizado: false, apresentacao: '', mostrarGaleria: false, origem: 'agenda', gcal: { id: e.id, upd: e.upd || '' }
+      });
+    });
+    gravarAgendamentos(lista);
+    try{ renderLista(); }catch(e){} try{ renderFaturamento(); }catch(e){}
+    const i = agInfo(); i.novos = Math.max(0, (i.novos || 0) - marc.length); agGravarInfo(i);
+    agMsg = ''; agRender('feito', marc.length); agRenderFaixa();
+  }
+  // ---- desenhar ----
+  function agRender(modo, n){
+    const el = $('agendaCorpo'); if(!el) return;
+    const i = agInfo(), msg = agMsg ? `<p class="lgs-estado">${escHtml(agMsg)}</p>` : '';
+    let h = '';
+    if(!agLogado()){
+      h = `<p class="agd-p">Para ligar a tua Agenda Google, entra primeiro na tua conta do Trajeto (Minhas tarifas → ☁️ Sincronização).</p>`;
+    } else if(modo === 'a_verificar'){
+      h = `<div class="agd-load">⏳ A verificar a ligação…</div>`;
+    } else if(i.indisponivel){
+      h = `<p class="agd-p">A ligação à agenda ainda não está disponível para a tua conta.</p>`;
+    } else if(!i.ligado){
+      h = `<div class="agd-hero">📅</div><p class="agd-t">Já tens os serviços numa agenda?</p>
+        <p class="agd-p">Traz tudo para o Trajeto em 1 minuto. A IA lê os teus eventos e monta os agendamentos por ti.</p>
+        <button type="button" class="agd-btn-ouro" id="agdLigar">Ligar a minha Agenda Google</button>
+        <p class="agd-nota">Só leitura · escolhes o calendário · desligas quando quiseres. A tua senha fica só com a Google.</p>`;
+    } else if(!i.cal || modo === 'trocar'){
+      if(!agCalendarios){ h = `<div class="agd-load">⏳ A buscar os teus calendários…</div>`; setTimeout(agBuscarCalendarios, 0); }
+      else h = `<p class="agd-t">Qual é o calendário dos serviços?</p><p class="agd-p">O Trajeto só vai ler este calendário. Os outros (pessoais) ficam de fora.</p>` +
+        agCalendarios.map((c, k) => `<button type="button" class="agd-cal" data-cal="${k}"><span class="agd-cor" style="background:${escHtml(c.cor || '#C9A774')}"></span>${escHtml(c.nome)}${c.principal ? ' <small>(principal)</small>' : ''}</button>`).join('') +
+        `<p class="agd-nota">Dica: cria na Agenda Google um calendário só para os serviços (ex.: "Serviços").</p>`;
+    } else if(modo === 'a_ler' || agOcupado){
+      h = `<div class="agd-load">✨ A IA está a ler o calendário “${escHtml(i.cal.nome)}”…</div>`;
+    } else if(modo === 'feito'){
+      h = `<div class="agd-hero">✅</div><p class="agd-t">${n === 1 ? '1 serviço importado' : n + ' serviços importados'}</p><p class="agd-p">Já estão em "Meus agendamentos", com a etiqueta 📅 da agenda. Confirma os detalhes de cada um.</p>
+        <button type="button" class="agd-btn-ouro" id="agdFechar2">Ver os agendamentos</button>`;
+    } else if(agLeitura){
+      const c = agClassificar(agLeitura);
+      h = `<div class="agd-ia">✨ <span><b>A IA leu ${agLeitura.eventos.length} eventos</b> do calendário “${escHtml(i.cal.nome)}” e encontrou <b>${c.servicos.length} ${c.servicos.length === 1 ? 'serviço novo' : 'serviços novos'}</b>.</span></div>`;
+      if(!agLeitura.iaOk) h += `<p class="agd-aviso">A IA não respondeu desta vez: li os eventos com o leitor do Trajeto. Confirma bem cada um.</p>`;
+      if(c.servicos.length){
+        h += '<div class="agd-lista">' + c.servicos.map((s, k) => `<label class="agd-it"><input type="checkbox" data-agi="${k}" ${s.marcado ? 'checked' : ''}>
+          <span class="agd-q">${escHtml(dataPt(s.e.data).slice(0, 5))}<br>${escHtml(s.e.hora || '—')}</span>
+          <span class="agd-d"><b>${escHtml(s.cliente || s.e.titulo || 'Cliente')}</b>${escHtml(s.partida || '?')} → ${escHtml(s.chegada || '?')}${s.voo ? ' · voo ' + escHtml(s.voo) : ''}${s.valor ? ' · €' + escHtml(String(s.valor)) : ''}${s.fornecedor ? ` <span class="agd-tag">${escHtml(s.fornecedor)}</span>` : ''}
+          ${s.falta.length ? `<br><span class="agd-falta">Falta: ${s.falta.join(', ')} · completas depois no agendamento</span>` : ''}
+          <br><button type="button" class="agd-ign" data-ign="${escHtml(s.e.id)}">Não é serviço · ignorar</button></span></label>`).join('') + '</div>';
+        h += `<button type="button" class="agd-btn-ouro" id="agdImportar">Importar os marcados</button>`;
+      } else h += `<p class="agd-p">Não há serviços novos. Quando puseres um serviço novo nesse calendário, aparece aqui.</p>`;
+      const res = [c.ja && `${c.ja} já ${c.ja === 1 ? 'está' : 'estão'} no Trajeto`, c.pessoais.length && `${c.pessoais.length} ${c.pessoais.length === 1 ? 'evento pessoal ignorado' : 'eventos pessoais ignorados'}`, c.ignorados && `${c.ignorados} que marcaste para ignorar`].filter(Boolean).join(' · ');
+      if(res) h += `<p class="agd-nota">${res}</p>`;
+      h += `<button type="button" class="lgs-btn" id="agdLer">🔄 Ler outra vez</button>`;
+    } else {
+      h = `<p class="agd-p">Calendário: <b>${escHtml(i.cal.nome)}</b>${i.ultima ? '<br>Última leitura: ' + new Date(i.ultima).toLocaleString('pt-PT', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' }) : ''}</p>
+        <button type="button" class="agd-btn-ouro" id="agdLer">✨ Ler a agenda agora</button>`;
+    }
+    if(agLogado() && i.ligado && !i.indisponivel && modo !== 'a_verificar')
+      h += `<div class="agd-rodape">${i.email ? escHtml(i.email) + ' · ' : ''}${i.cal ? '<button type="button" id="agdTrocar">trocar calendário</button> · ' : ''}<button type="button" id="agdDesligar">desligar</button></div>`;
+    el.innerHTML = h + msg;
+    const on = (id, f) => { const b = $(id); if(b) b.onclick = f; };
+    on('agdLigar', agLigar); on('agdLer', () => agLer(false)); on('agdImportar', agImportar);
+    on('agdTrocar', () => { agCalendarios = null; agRender('trocar'); });
+    on('agdDesligar', agDesligar); on('agdFechar2', agFechar);
+    el.querySelectorAll('[data-cal]').forEach(b => b.onclick = () => agEscolher(agCalendarios[+b.dataset.cal]));
+    el.querySelectorAll('[data-ign]').forEach(b => b.onclick = ev => { ev.preventDefault(); agIgnorar(b.dataset.ign); const i2 = agInfo(); i2.novos = Math.max(0, (i2.novos || 1) - 1); agGravarInfo(i2); agRender(); agRenderFaixa(); });
+  }
+  async function agLigar(){
+    agMsg = '';
+    try{ const r = await agPedido('/agenda/iniciar', {}); location.href = r.url; }
+    catch(err){ agMsg = err.message; agRender(); }
+  }
+  async function agBuscarCalendarios(){
+    try{ const r = await agPedido('/agenda/calendarios'); agCalendarios = r.calendarios || []; }
+    catch(err){ agCalendarios = []; agMsg = err.message; if(err.desligado){ const i = agInfo(); i.ligado = false; agGravarInfo(i); } }
+    agRender('trocar');
+  }
+  async function agEscolher(c){
+    if(!c) return;
+    try{ const r = await agPedido('/agenda/escolher', { id: c.id, nome: c.nome }); const i = agInfo(); i.cal = r.cal; delete i.novos; agGravarInfo(i); agLeitura = null; agLer(false); }
+    catch(err){ agMsg = err.message; agRender('trocar'); }
+  }
+  async function agDesligar(){
+    const b = $('agdDesligar');
+    if(b && !b.dataset.conf){ b.dataset.conf = '1'; b.textContent = 'tocar outra vez para desligar'; return; }
+    try{ await agPedido('/agenda/desligar', {}); }catch(err){}
+    agGravarInfo({ ligado: false }); agLeitura = null; agCalendarios = null; agMsg = ''; agRender(); agRenderFaixa(); agResumoCfg();
+  }
+  async function agAbrir(){
+    $('agendaOverlay').hidden = false; agMsg = '';
+    if(!agLogado()){ agRender(); return; }
+    agRender(agLeitura ? undefined : 'a_verificar');
+    try{ await agAtualizarEstado(); }catch(err){ if(err.status !== 403) agMsg = err.message; }
+    const i = agInfo();
+    if(i.ligado && i.cal && !agLeitura) { agLer(false); return; }
+    agRender();
+  }
+  function agFechar(){ $('agendaOverlay').hidden = true; }
+  // faixa por cima da lista de agendamentos
+  function agRenderFaixa(){
+    const f = $('agendaFaixa'); if(!f) return;
+    const i = agInfo();
+    if(!agLogado() || i.indisponivel){ f.innerHTML = ''; f.hidden = true; return; }
+    f.hidden = false;
+    if(i.ligado && i.cal){
+      f.innerHTML = i.novos > 0 ? `<button type="button" class="agf agf-novo" id="agfBtn">✨ <b>${i.novos} ${i.novos === 1 ? 'serviço novo' : 'serviços novos'}</b> na tua agenda · <u>ver e importar</u></button>`
+                                : `<button type="button" class="agf" id="agfBtn">📅 Agenda ligada · ${escHtml(i.cal.nome)} <u>ler agora</u></button>`;
+    } else f.innerHTML = `<button type="button" class="agf" id="agfBtn">📅 Tens os serviços numa Agenda Google? <u>Trazer para o Trajeto</u></button>`;
+    $('agfBtn').onclick = agAbrir;
+  }
+  function agResumoCfg(){
+    const el = $('agendaResumoCfg'); if(!el) return;
+    const i = agInfo();
+    el.textContent = i.ligado ? ('Ligada' + (i.email ? ' (' + i.email + ')' : '') + (i.cal ? ' · calendário “' + i.cal.nome + '”' : ' · falta escolher o calendário')) : 'Traz os serviços da tua Agenda Google para o Trajeto, com IA.';
+  }
+  // ---- arranque ----
+  function agArranque(){
+    const b = $('btnAbrirAgenda'); if(b) b.addEventListener('click', agAbrir);
+    $('agendaFechar').addEventListener('click', agFechar);
+    $('agendaOverlay').addEventListener('click', ev => { if(ev.target.id === 'agendaOverlay') agFechar(); });
+    agRenderFaixa(); agResumoCfg();
+    const voltou = /[?&]agenda=ligada/.test(location.search);
+    if(voltou){ try{ history.replaceState(null, '', location.pathname); }catch(e){} }
+    let tent = 0;
+    const esperar = setInterval(async () => {
+      tent++;
+      if(!agLogado()){ if(tent > 40) clearInterval(esperar); return; }
+      clearInterval(esperar);
+      if(voltou){ agCalendarios = null; agAbrir(); return; }
+      try{ await agAtualizarEstado(); }catch(e){}
+      agRenderFaixa(); agResumoCfg(); agVerificarNovos();
+    }, 500);
+    document.addEventListener('visibilitychange', () => { if(document.visibilityState === 'visible') agVerificarNovos(); });
+  }
+  function agVerificarNovos(){
+    const i = agInfo();
+    if(!agLogado() || !i.ligado || !i.cal || i.indisponivel) return;
+    if(i.ultima && Date.now() - i.ultima < 20 * 60 * 1000) { agRenderFaixa(); return; }
+    agLer(true);
+  }
+  window.TrajetoAgenda = { abrir: agAbrir, ler: agLer, classificar: agClassificar, _info: agInfo };
+  if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', agArranque); else agArranque();
+})();
 </script>
 
 <script type="module">
