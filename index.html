@@ -921,6 +921,7 @@
   .dsv-acoes{ display:flex; gap:8px; padding:12px 14px calc(14px + env(safe-area-inset-bottom, 0px)); border-top:1px solid #E9E2D6; background:#fff; }
   .dsv-acoes button{ flex:1; min-height:48px; border:none; border-radius:12px; font:700 14px 'Helvetica Neue', Arial, sans-serif; cursor:pointer; }
   .dsv-a1{ background:var(--azul-noite); color:#fff; } .dsv-a2{ background:#F4EFE7; color:var(--azul-noite); }
+.dsv-a3{ background:linear-gradient(135deg,#DCC496,#C9A774); color:var(--azul-noite); }
   .dsv-grande{ position:fixed; inset:0; background:#fff; z-index:2; overflow-y:auto; padding:calc(env(safe-area-inset-top, 0px) + 18px) 22px 24px; }
   .dsv-grande[hidden]{ display:none; }
   .dsv-x-g{ position:fixed; top:calc(env(safe-area-inset-top, 0px) + 12px); right:14px; width:44px; height:44px; font-size:18px; }
@@ -1608,6 +1609,18 @@ header{background:#1B2646 !important;}
         <div><label for="cfg_carro_cor_en">Cor (inglês)</label><input type="text" id="cfg_carro_cor_en" maxlength="20" placeholder="ex: black"></div>
       </div>
 
+      <label style="margin-top:14px;">📄 Dados legais do serviço (aparecem nos Dados do serviço e na Guia PDF; úteis numa fiscalização)</label>
+      <label for="cfg_leg_empresa">Empresa / operador</label><input type="text" id="cfg_leg_empresa" maxlength="80" placeholder="ex: Trajeto Transfer · o teu nome">
+      <div class="cfg-row">
+        <div><label for="cfg_leg_nif">NIF</label><input type="text" id="cfg_leg_nif" maxlength="20" inputmode="numeric" placeholder="ex: 123456789"></div>
+        <div><label for="cfg_leg_lugares">Lugares da viatura</label><input type="text" id="cfg_leg_lugares" maxlength="20" placeholder="ex: 4 passageiros"></div>
+      </div>
+      <label for="cfg_leg_licenca">Licença (RNAVT / RNAAT / alvará)</label><input type="text" id="cfg_leg_licenca" maxlength="80" placeholder="ex: RNAAT nº 1234/2024">
+      <div class="cfg-row">
+        <div><label for="cfg_leg_carta">Carta de condução nº</label><input type="text" id="cfg_leg_carta" maxlength="30" placeholder="ex: L-1234567"></div>
+        <div><label for="cfg_leg_cert">Certificado de motorista</label><input type="text" id="cfg_leg_cert" maxlength="40" placeholder="ex: CAM / TVDE nº"></div>
+      </div>
+
       <label for="cfg_whatsapp" style="margin-top:14px;">O teu número de WhatsApp (para o site de pedidos)</label>
       <input type="text" id="cfg_whatsapp" placeholder="ex: 351969698927">
 
@@ -2073,6 +2086,19 @@ header{background:#1B2646 !important;}
             <input type="text" id="ag_voo" placeholder="opcional">
           </div>
         </div>
+        <div class="ag-secao">👥 Passageiros e bagagem</div>
+        <div class="ag-row2">
+          <div>
+            <label for="ag_pax">Nº de passageiros</label>
+            <input type="text" id="ag_pax" maxlength="40" placeholder="ex: 4 adultos">
+          </div>
+          <div>
+            <label for="ag_malas">Malas</label>
+            <input type="text" id="ag_malas" maxlength="40" placeholder="ex: 2 grandes">
+          </div>
+        </div>
+        <label for="ag_paxNomes">Nomes dos passageiros <span style="font-weight:400;color:#6B7180">(opcional)</span></label>
+        <textarea id="ag_paxNomes" rows="2" maxlength="400" placeholder="ex: John Smith, Mary Smith"></textarea>
         <div class="ag-guardar-cliente" id="agGuardarClienteWrap">
           <label class="chk"><input type="checkbox" id="ag_guardarCliente"> 💾 Guardar este cliente</label>
           <div id="agMoradaWrap" style="display:none;">
@@ -2096,6 +2122,8 @@ header{background:#1B2646 !important;}
             <input type="time" id="ag_hora">
           </div>
         </div>
+        <label for="ag_fim">Fim previsto <span style="font-weight:400;color:#6B7180">(opcional)</span></label>
+        <input type="time" id="ag_fim">
         <label for="ag_fornecedor">Fornecedor do serviço</label>
         <input type="text" id="ag_fornecedor" placeholder="ex: particular / nome da empresa">
         <label for="ag_valor" id="ag_labelValor">Valor (€)</label>
@@ -2211,7 +2239,7 @@ header{background:#1B2646 !important;}
     <p class="nota">Os serviços por hora agendados ficam em "📅 Agendados". Os que estão em andamento aparecem a partir do momento em que tocas em "🚗 Ir buscar cliente" no agendamento. O tempo só começa a contar quando tocas em "▶️ Iniciar" (cliente no carro). Ao finalizar, o valor é calculado pela regra definida em "Minhas tarifas" e podes enviar o resumo ao cliente. O agendamento só sai da lista quando o marcares como "Concluído".</p>
   </div>
 
-  <p style="text-align:center; font-family:'Helvetica Neue', Arial, sans-serif; font-size:11px; color:#8a7f66; margin-top:24px;">Trajeto · v9.32.0</p>
+  <p style="text-align:center; font-family:'Helvetica Neue', Arial, sans-serif; font-size:11px; color:#8a7f66; margin-top:24px;">Trajeto · v9.33.0</p>
 
 </main>
 
@@ -2261,7 +2289,7 @@ header{background:#1B2646 !important;}
   <div class="dsv-folha">
     <div class="dsv-cab"><div style="flex:1;min-width:0"><b id="dsvTitulo">📋 Dados do serviço</b><span class="dsv-ref" id="dsvRef"></span></div><button type="button" class="dsv-x" data-fechar-dsv aria-label="Fechar">✕</button></div>
     <div class="dsv-rolo" id="dsvCorpo"></div>
-    <div class="dsv-acoes"><button type="button" class="dsv-a1" id="dsvGrande">🔍 Letra grande</button><button type="button" class="dsv-a2" id="dsvPartilhar">📤 Partilhar</button></div>
+    <div class="dsv-acoes"><button type="button" class="dsv-a1" id="dsvGrande">🔍 Letra grande</button><button type="button" class="dsv-a2" id="dsvPartilhar">📤 Partilhar</button><button type="button" class="dsv-a3" id="dsvPdf">📄 Guia PDF</button></div>
   </div>
   <div class="dsv-grande" id="dsvGrandeVista" hidden><button type="button" class="dsv-x dsv-x-g" id="dsvGrandeFechar" aria-label="Fechar">✕</button><h3 id="dsvGrandeTit"></h3><div class="dsv-g" id="dsvGrandeCorpo"></div></div>
 </div>
@@ -3873,6 +3901,81 @@ window.TJQR=function(texto){var q=new QRCode(-1,EC.M);q.addData(texto);q.make();
   preencherPainel(cfg);
   document.getElementById('cfg_nome').value = localStorage.getItem('trajeto_nome') || '';
   // ---------- O carro do motorista (opcional; usado nas mensagens) ----------
+  // ── v9.33: dados legais do motorista (cada motorista trata dos seus, em Minhas tarifas) ──
+  const LEGAL_CAMPOS = ['empresa', 'nif', 'licenca', 'carta', 'cert', 'lugares'];
+  function lerLegal(){
+    try{ const c = JSON.parse(localStorage.getItem('trajeto_legal') || 'null') || {}; const o = {}; LEGAL_CAMPOS.forEach(k => { o[k] = String(c[k] || '').trim(); }); return o; }
+    catch(e){ const o = {}; LEGAL_CAMPOS.forEach(k => { o[k] = ''; }); return o; }
+  }
+  function gravarLegal(c){
+    const limpo = {}; let algum = false;
+    LEGAL_CAMPOS.forEach(k => { limpo[k] = String((c && c[k]) || '').trim().slice(0, 80); if(limpo[k]) algum = true; });
+    if(algum) localStorage.setItem('trajeto_legal', JSON.stringify(limpo)); else localStorage.removeItem('trajeto_legal');
+  }
+  function lerLegalUI(){ const o = {}; LEGAL_CAMPOS.forEach(k => { const el = document.getElementById('cfg_leg_' + k); o[k] = el ? el.value : ''; }); return o; }
+  function preencherLegalUI(c){ LEGAL_CAMPOS.forEach(k => { const el = document.getElementById('cfg_leg_' + k); if(el) el.value = (c && c[k]) || ''; }); }
+  // ── v9.33: fim previsto, passageiros e bagagem no agendamento ──
+  const EXTRAS_AG = { fim: 'ag_fim', pax: 'ag_pax', malas: 'ag_malas', paxNomes: 'ag_paxNomes' };
+  function lerExtrasAgForm(){ const o = {}; Object.keys(EXTRAS_AG).forEach(k => { const el = document.getElementById(EXTRAS_AG[k]); o[k] = el ? el.value.trim() : ''; }); return o; }
+  function aplicarExtrasAg(ag, ex){ Object.keys(EXTRAS_AG).forEach(k => { if(ex[k]) ag[k] = ex[k]; else delete ag[k]; }); }
+  function limparExtrasAgForm(){ Object.keys(EXTRAS_AG).forEach(k => { const el = document.getElementById(EXTRAS_AG[k]); if(el) el.value = ''; }); }
+  function preencherExtrasAgForm(ag){ Object.keys(EXTRAS_AG).forEach(k => { const el = document.getElementById(EXTRAS_AG[k]); if(el) el.value = ag[k] || ''; }); }
+  // ── v9.33: Guia PDF (gerada no telemóvel, sem servidor) ──
+  let _tjPdfCtx = null;
+  function tjPdfLarg(t, sz, b){ if(!_tjPdfCtx) _tjPdfCtx = document.createElement('canvas').getContext('2d'); _tjPdfCtx.font = (b ? 'bold ' : '') + '100px Helvetica, Arial, "Liberation Sans", sans-serif'; return _tjPdfCtx.measureText(t).width * sz / 100; }
+  const TJ_PDF_WIN = {'€':128,'‚':130,'„':132,'…':133,'†':134,'‡':135,'‰':137,'‹':139,'‘':145,'’':146,'“':147,'”':148,'•':149,'–':150,'—':151,'™':153,'›':155};
+  function tjPdfTxt(t){ let o = ''; t = String(t).replace(/[   ]/g, ' ').replace(/→/g, '>'); for(let i = 0; i < t.length; i++){ const ch = t[i]; let c = t.charCodeAt(i); if(TJ_PDF_WIN[ch]) c = TJ_PDF_WIN[ch]; else if(c > 255) c = 63; else if(c >= 128 && c < 160) c = 63; let x = String.fromCharCode(c); if(x === '\\' || x === '(' || x === ')') x = '\\' + x; o += x; } return o; }
+  function tjPdfCor(h){ h = h.replace('#', ''); return [0, 2, 4].map(i => (parseInt(h.substr(i, 2), 16) / 255).toFixed(3)).join(' '); }
+  function tjQuebrar(t, sz, b, max){ const out = []; String(t).split('\n').forEach(par => { let lin = ''; par.split(/\s+/).forEach(w => { if(!w) return; const tent = lin ? lin + ' ' + w : w; if(tjPdfLarg(tent, sz, b) <= max || !lin){ lin = tent; } else { out.push(lin); lin = w; } }); if(lin) out.push(lin); }); return out.length ? out : ['']; }
+  function gerarGuiaPDF(ag){
+    const d = dadosDoServico(ag), W = 595.28, H = 841.89, M = 44, CW = W - 2 * M, NAVY = '#1B2646', GOLD = '#C9A774', MUT = '#6B7180', LINE = '#E9E2D6';
+    const pags = []; let ops = null, y = 0;
+    const rect = (x, yy, w, h, cor) => ops.push(tjPdfCor(cor) + ' rg ' + x.toFixed(2) + ' ' + (H - yy - h).toFixed(2) + ' ' + w.toFixed(2) + ' ' + h.toFixed(2) + ' re f');
+    const linha = (x1, yy, x2, cor) => ops.push(tjPdfCor(cor) + ' RG 0.6 w ' + x1.toFixed(2) + ' ' + (H - yy).toFixed(2) + ' m ' + x2.toFixed(2) + ' ' + (H - yy).toFixed(2) + ' l S');
+    const texto = (t, x, yy, sz, o) => { o = o || {}; const b = !!o.b; if(o.al === 'r') x -= tjPdfLarg(String(t), sz, b); ops.push('BT ' + tjPdfCor(o.cor || NAVY) + ' rg /' + (b ? 'F2' : 'F1') + ' ' + sz + ' Tf ' + x.toFixed(2) + ' ' + (H - yy).toFixed(2) + ' Td (' + tjPdfTxt(t) + ') Tj ET'); };
+    const emp = (lerLegal().empresa || localStorage.getItem('trajeto_nome') || 'Guia de serviço').trim(); let cab = emp; while(cab.length > 1 && tjPdfLarg(cab, 15, true) > CW - 170) cab = cab.slice(0, -1); if(cab !== emp) cab = cab.trim() + '…';
+    const novaPag = () => { ops = []; pags.push(ops); rect(0, 0, W, 64, NAVY); texto(cab, M, 30, 15, { b: 1, cor: '#FFFFFF' }); texto('Guia de serviço', M, 47, 9.5, { cor: '#DCC496' }); texto('Nº ' + d.ref, W - M, 30, 12, { b: 1, cor: '#FFFFFF', al: 'r' }); texto(d.estado, W - M, 47, 9.5, { cor: '#DCC496', al: 'r' }); y = 92; };
+    novaPag();
+    const COL = 150;
+    d.secoes.forEach(([t, ls]) => {
+      if(y > H - 120) novaPag();
+      texto(String(t).toUpperCase(), M, y, 9, { b: 1, cor: GOLD }); y += 8; linha(M, y, W - M, LINE); y += 14;
+      ls.forEach(([r, v]) => {
+        const lins = tjQuebrar(v, 10.5, true, CW - COL);
+        if(y + lins.length * 13.5 > H - 60) novaPag();
+        texto(r, M, y, 10, { cor: MUT });
+        lins.forEach((l, i) => texto(l, M + COL, y + i * 13.5, 10.5, { b: 1 }));
+        y += lins.length * 13.5 + 4;
+      });
+      y += 6;
+    });
+    pags.forEach((p, i) => { ops = p; linha(M, H - 44, W - M, LINE); texto('Gerado no Trajeto em ' + new Date().toLocaleString('pt-PT', { dateStyle: 'short', timeStyle: 'short' }), M, H - 30, 8, { cor: MUT }); texto('Página ' + (i + 1) + ' de ' + pags.length, W - M, H - 30, 8, { cor: MUT, al: 'r' }); });
+    const objs = [], add = s => { objs.push(s); return objs.length; };
+    add('<< /Type /Catalog /Pages 2 0 R >>'); add('PAGES');
+    add('<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica /Encoding /WinAnsiEncoding >>');
+    add('<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Bold /Encoding /WinAnsiEncoding >>');
+    const info = add('<< /Title (' + tjPdfTxt('Guia ' + d.ref) + ') /Producer (Trajeto) >>'), kids = [];
+    pags.forEach(p => { const c = p.join('\n'); const ci = add('<< /Length ' + c.length + ' >>\nstream\n' + c + '\nendstream'); kids.push(add('<< /Type /Page /Parent 2 0 R /MediaBox [0 0 ' + W + ' ' + H + '] /Resources << /Font << /F1 3 0 R /F2 4 0 R >> >> /Contents ' + ci + ' 0 R >>') + ' 0 R'); });
+    objs[1] = '<< /Type /Pages /Kids [' + kids.join(' ') + '] /Count ' + kids.length + ' >>';
+    let out = '%PDF-1.4\n%\xE2\xE3\xCF\xD3\n'; const offs = [];
+    objs.forEach((o, i) => { offs.push(out.length); out += (i + 1) + ' 0 obj\n' + o + '\nendobj\n'; });
+    const xref = out.length; out += 'xref\n0 ' + (objs.length + 1) + '\n0000000000 65535 f \n';
+    offs.forEach(n => { out += ('0000000000' + n).slice(-10) + ' 00000 n \n'; });
+    out += 'trailer\n<< /Size ' + (objs.length + 1) + ' /Root 1 0 R /Info ' + info + ' 0 R >>\nstartxref\n' + xref + '\n%%EOF';
+    const u = new Uint8Array(out.length); for(let i = 0; i < out.length; i++) u[i] = out.charCodeAt(i) & 255;
+    return { bytes: u, nome: 'Guia-' + d.ref + '.pdf' };
+  }
+  async function partilharGuiaPDF(ag){
+    const g = gerarGuiaPDF(ag), blob = new Blob([g.bytes], { type: 'application/pdf' });
+    try{
+      const f = new File([blob], g.nome, { type: 'application/pdf' });
+      if(navigator.canShare && navigator.canShare({ files: [f] })){ await navigator.share({ files: [f], title: g.nome }); return; }
+    }catch(e){ if(e && e.name === 'AbortError') return; }
+    const url = URL.createObjectURL(blob), a = document.createElement('a');
+    a.href = url; a.download = g.nome; document.body.appendChild(a); a.click(); document.body.removeChild(a);
+    setTimeout(() => URL.revokeObjectURL(url), 30000);
+  }
+
   function lerCarro(){
     try{ const c = JSON.parse(localStorage.getItem('trajeto_carro') || 'null') || {}; return { modelo: String(c.modelo || ''), matricula: String(c.matricula || ''), cor: String(c.cor || ''), corEn: String(c.corEn || '') }; }
     catch(e){ return { modelo:'', matricula:'', cor:'', corEn:'' }; }
@@ -3899,6 +4002,7 @@ window.TJQR=function(texto){var q=new QRCode(-1,EC.M);q.addData(texto);q.make();
   }
   function ehAeroporto(t){ return /aeroporto|airport/i.test(t || ''); }
   preencherCarroUI(lerCarro());
+  preencherLegalUI(lerLegal());
   document.getElementById('cfg_whatsapp').value = localStorage.getItem('trajeto_whatsapp') || '';
   document.getElementById('cfg_bio').value = localStorage.getItem('trajeto_bio') || '';
   document.getElementById('bioContador').textContent = document.getElementById('cfg_bio').value.length + ' / 300';
@@ -4128,6 +4232,7 @@ window.TJQR=function(texto){var q=new QRCode(-1,EC.M);q.addData(texto);q.make();
     cfg = lerPainel();
     localStorage.setItem('trajeto_nome', document.getElementById('cfg_nome').value.trim());
     gravarCarro({ modelo: document.getElementById('cfg_carro_modelo').value, matricula: document.getElementById('cfg_carro_matricula').value, cor: document.getElementById('cfg_carro_cor').value, corEn: document.getElementById('cfg_carro_cor_en').value });
+    gravarLegal(lerLegalUI());
     const numeroWhatsapp = document.getElementById('cfg_whatsapp').value.trim();
     localStorage.setItem('trajeto_whatsapp', numeroWhatsapp);
     if(window.TrajetoCloud && window.TrajetoCloud.utilizadorAtual){
@@ -4537,6 +4642,7 @@ window.TJQR=function(texto){var q=new QRCode(-1,EC.M);q.addData(texto);q.make();
       cfg: cfg,
       nome: localStorage.getItem('trajeto_nome') || '',
       carro: lerCarro(),
+      legal: lerLegal(),
       parceiros: lerParceiros(),
       whatsapp: localStorage.getItem('trajeto_whatsapp') || '',
       pagamentos: JSON.parse(localStorage.getItem('trajeto_pagamentos') || 'null') || { mbway:true, dinheiro:true, cartao:true },
@@ -4574,6 +4680,10 @@ window.TJQR=function(texto){var q=new QRCode(-1,EC.M);q.addData(texto);q.make();
     if(dados.carro && typeof dados.carro === 'object'){
       gravarCarro(dados.carro);
       preencherCarroUI(lerCarro());
+    }
+    if(dados.legal && typeof dados.legal === 'object'){
+      gravarLegal(dados.legal);
+      preencherLegalUI(lerLegal());
     }
     if(Array.isArray(dados.parceiros)){
       localStorage.setItem(PARCEIROS_KEY, JSON.stringify(dados.parceiros));
@@ -4857,7 +4967,7 @@ window.TJQR=function(texto){var q=new QRCode(-1,EC.M);q.addData(texto);q.make();
     document.getElementById('ag_partida').value = document.getElementById('ct_origem').value;
     document.getElementById('ag_chegada').value = document.getElementById('ct_destino').value;
     preencherParagensAgendar(lerParagens());
-    document.getElementById('ag_observacoes').value = '';
+    document.getElementById('ag_observacoes').value = ''; limparExtrasAgForm();
     if(!document.getElementById('ag_data').value){
       const amanha = new Date();
       amanha.setDate(amanha.getDate()+1);
@@ -5169,7 +5279,7 @@ window.TJQR=function(texto){var q=new QRCode(-1,EC.M);q.addData(texto);q.make();
     document.getElementById('ag_voo').value = ag.voo || '';
     document.getElementById('ag_fornecedor').value = ag.fornecedor || '';
     document.getElementById('ag_valor').value = ag.valor;
-    document.getElementById('ag_observacoes').value = ag.observacoes || '';
+    document.getElementById('ag_observacoes').value = ag.observacoes || ''; preencherExtrasAgForm(ag);
     document.getElementById('ag_apresentacao').value = ag.apresentacao || '';
     limparOpcaoGuardarCliente();
   }
@@ -7445,8 +7555,10 @@ window.TJQR=function(texto){var q=new QRCode(-1,EC.M);q.addData(texto);q.make();
     document.getElementById('crHora').textContent = `${new Date(ag.data + 'T12:00:00').toLocaleDateString('pt-PT', { weekday:'short', day:'numeric', month:'short' })} · ${ag.hora}`;
     const linhas = [];
     if(ag.voo) linhas.push(['✈️', 'Voo ' + ag.voo]);
-    const pax = (/(\d+)\s*passageiro/i.exec(ag.observacoes || '') || [])[1];
-    if(pax) linhas.push(['👥', pax + (pax === '1' ? ' passageiro' : ' passageiros')]);
+    const paxN = (/(\d+)\s*passageiro/i.exec(ag.observacoes || '') || [])[1];
+    if(ag.pax) linhas.push(['👥', /^\d+$/.test(String(ag.pax).trim()) ? ag.pax + (String(ag.pax).trim() === '1' ? ' passageiro' : ' passageiros') : ag.pax]);
+    else if(paxN) linhas.push(['👥', paxN + (paxN === '1' ? ' passageiro' : ' passageiros')]);
+    if(ag.malas) linhas.push(['🧳', ag.malas]);
     if(ag.nomePlaca && ag.nomePlaca !== ag.cliente) linhas.push(['🪧', 'Placa: ' + ag.nomePlaca]);
     if(eTour && ag.tourDuracao) linhas.push(['⏱', ag.tourDuracao]);
     const el = document.getElementById('crLinhas'); el.innerHTML = '';
@@ -7706,7 +7818,8 @@ window.TJQR=function(texto){var q=new QRCode(-1,EC.M);q.addData(texto);q.make();
     const dt = new Date(ag.data + 'T12:00:00');
     const dataTxt = `${dt.toLocaleDateString('pt-PT', { weekday:'short' })} ${(ag.data || '').split('-').reverse().join('/')} · ${ag.hora || ''}`;
     const criado = quandoCriado(ag);
-    const pax = (/(\d+)\s*passageiro/i.exec(ag.observacoes || '') || [])[1];
+    const pax = (ag.pax && String(ag.pax).trim()) || (/(\d+)\s*passageiro/i.exec(ag.observacoes || '') || [])[1];
+    const legal = lerLegal();
     const carro = lerCarro();
     const roteiro = eTour ? corridaParagens(ag) : (Array.isArray(ag.paragens) ? ag.paragens.filter(Boolean) : []);
     const valor = parseFloat(String(ag.valor || '').replace(',', '.'));
@@ -7717,28 +7830,34 @@ window.TJQR=function(texto){var q=new QRCode(-1,EC.M);q.addData(texto);q.make();
         ['Pedido feito em', criado ? fmtDataHora(criado) : '—'],
         ['Contratado por', parceiro ? `${forn} (parceiro)` : /^site/i.test(forn) ? 'Cliente direto (pedido pelo site)' : 'Cliente direto'],
       ]],
-      ['Cliente', [['Nome', ag.cliente || '—'], ['Telefone', ag.telefone || '—'], pax ? ['Passageiros', pax] : null, ag.voo ? ['Voo', ag.voo] : null]],
+      ['Operador', [legal.empresa ? ['Empresa', legal.empresa] : null, legal.nif ? ['NIF', legal.nif] : null, legal.licenca ? ['Licença', legal.licenca] : null]],
+      ['Cliente e passageiros', [['Nome', ag.cliente || '—'], ['Telefone', ag.telefone || '—'], pax ? ['Passageiros', pax] : null, ag.paxNomes ? ['Nomes', ag.paxNomes] : null, ag.malas ? ['Bagagem', ag.malas] : null, ag.voo ? ['Voo', ag.voo] : null]],
       ['Viagem', [
         ['Data e hora', dataTxt],
+        ag.fim ? ['Fim previsto', ag.fim] : null,
         ['Recolha', ag.partida || '—'],
         roteiro.length ? [eTour ? 'Roteiro' : 'Paragens', roteiro.join(' · ')] : null,
         eHora ? null : [eTour ? 'Regresso' : 'Destino', (eTour ? (ag.chegada || ag.partida) : ag.chegada) || '—'],
         eTour && ag.tourDuracao ? ['Duração', ag.tourDuracao] : null,
       ]],
+      ['Observações', [ag.observacoes ? ['Notas', ag.observacoes] : null]],
       ['Valor', [['Preço acordado', valor > 0 ? '€ ' + valor.toFixed(2).replace('.', ',') : '—'], ['Pagamento', pag]]],
       ['Motorista e viatura', [
         ['Motorista', localStorage.getItem('trajeto_nome') || '—'],
+        legal.carta ? ['Carta de condução', legal.carta] : null,
+        legal.cert ? ['Certificado de motorista', legal.cert] : null,
         (carro.modelo || carro.cor) ? ['Viatura', [carro.modelo, carro.cor].filter(Boolean).join(' · ')] : null,
+        legal.lugares ? ['Lugares', legal.lugares] : null,
         carro.matricula ? ['Matrícula', carro.matricula] : null,
       ]],
-    ].map(([t, ls]) => [t, ls.filter(Boolean)]);
+    ].map(([t, ls]) => [t, ls.filter(Boolean)]).filter(([t, ls]) => ls.length);
     return { ref: refServico(ag), estado, secoes, dataTxt, criado, pax, parceiro, forn, valor, carro, roteiro };
   }
   function abrirDadosServico(id){
     const ag = lerAgendamentos().find(a => a.id === id); if(!ag) return;
     dsvId = id;
     const d = dadosDoServico(ag);
-    const ref = document.getElementById('dsvRef'); ref.textContent = 'Ref. ' + d.ref + ' ';
+    const ref = document.getElementById('dsvRef'); ref.textContent = 'Guia nº ' + d.ref + ' ';
     const est = document.createElement('span'); est.className = 'dsv-est'; est.textContent = d.estado; ref.appendChild(est);
     const corpo = document.getElementById('dsvCorpo'); corpo.innerHTML = '';
     d.secoes.forEach(([t, ls])=>{
@@ -7754,14 +7873,14 @@ window.TJQR=function(texto){var q=new QRCode(-1,EC.M);q.addData(texto);q.make();
   function fecharDadosServico(){ dsvId = null; const ov = document.getElementById('dadosServico'); ov.classList.remove('aberto'); ov.setAttribute('aria-hidden', 'true'); document.getElementById('dsvGrandeVista').hidden = true; }
   function textoDadosServico(ag){
     const d = dadosDoServico(ag);
-    return `📋 DADOS DO SERVIÇO · Ref. ${d.ref} (${d.estado})\n` + d.secoes.map(([t, ls]) => `\n${t.toUpperCase()}\n` + ls.map(([r, v]) => `${r}: ${v}`).join('\n')).join('\n');
+    return `📋 DADOS DO SERVIÇO · Guia nº ${d.ref} (${d.estado})\n` + d.secoes.map(([t, ls]) => `\n${t.toUpperCase()}\n` + ls.map(([r, v]) => `${r}: ${v}`).join('\n')).join('\n');
   }
   document.getElementById('dadosServico').addEventListener('click', (e)=>{ if(e.target.closest('[data-fechar-dsv]')) fecharDadosServico(); });
   document.getElementById('btnCorridaDados').addEventListener('click', ()=>{ if(corridaId) abrirDadosServico(corridaId); });
   document.getElementById('dsvGrande').addEventListener('click', ()=>{
     const ag = lerAgendamentos().find(a => a.id === dsvId); if(!ag) return;
     const d = dadosDoServico(ag), v = (sec, rot) => { const s1 = d.secoes.find(x => x[0] === sec); const l = s1 && s1[1].find(x => x[0] === rot); return l ? l[1] : ''; };
-    document.getElementById('dsvGrandeTit').textContent = `DADOS DO SERVIÇO · REF. ${d.ref}`;
+    document.getElementById('dsvGrandeTit').textContent = `DADOS DO SERVIÇO · GUIA Nº ${d.ref}`;
     const itens = [
       ['Cliente', [ag.cliente, d.pax ? d.pax + ' pax' : ''].filter(Boolean).join(' · ')],
       ['Contratado por', v('Reserva', 'Contratado por')],
@@ -7776,6 +7895,7 @@ window.TJQR=function(texto){var q=new QRCode(-1,EC.M);q.addData(texto);q.make();
     itens.forEach(([r, val])=>{ const c = document.createElement('div'); const a = document.createElement('span'); a.textContent = r; const b = document.createElement('b'); b.textContent = val; c.appendChild(a); c.appendChild(b); g.appendChild(c); });
     document.getElementById('dsvGrandeVista').hidden = false;
   });
+  document.getElementById('dsvPdf').addEventListener('click', ()=>{ const ag = lerAgendamentos().find(a => a.id === dsvId); if(ag) partilharGuiaPDF(ag); });
   document.getElementById('dsvGrandeFechar').addEventListener('click', ()=>{ document.getElementById('dsvGrandeVista').hidden = true; });
   document.getElementById('dsvPartilhar').addEventListener('click', async ()=>{
     const ag = lerAgendamentos().find(a => a.id === dsvId); if(!ag) return;
@@ -8585,6 +8705,7 @@ window.TJQR=function(texto){var q=new QRCode(-1,EC.M);q.addData(texto);q.make();
         ag.fornecedor = fornecedor;
         ag.valor = valor || ag.valor;
         ag.observacoes = observacoes;
+        aplicarExtrasAg(ag, lerExtrasAgForm());
         ag.apresentacao = apresentacao;
         ag.mostrarGaleria = !!apresentacao;
         if(tipo === 'hora'){ ag.tipo = 'hora'; if(!ag.hEstado) ag.hEstado = 'agendado'; }
@@ -8610,6 +8731,7 @@ window.TJQR=function(texto){var q=new QRCode(-1,EC.M);q.addData(texto);q.make();
       };
       if(tipo === 'hora'){ ag.tipo = 'hora'; ag.hEstado = 'agendado'; }
       if(tipo === 'tour'){ ag.tipo = 'tour'; ag.tourNome = tourNome; ag.tourDuracao = tourDuracao; ag.tourRoteiro = tourRoteiro; }
+      aplicarExtrasAg(ag, lerExtrasAgForm());
       lista.push(ag);
       gravarAgendamentos(lista);
       renderLista();
@@ -8634,7 +8756,7 @@ window.TJQR=function(texto){var q=new QRCode(-1,EC.M);q.addData(texto);q.make();
     document.getElementById('ag_nomeplaca').value = '';
     document.getElementById('ag_voo').value = '';
     document.getElementById('ag_fornecedor').value = '';
-    document.getElementById('ag_observacoes').value = '';
+    document.getElementById('ag_observacoes').value = ''; limparExtrasAgForm();
     document.getElementById('ag_apresentacao').value = '';
     limparOpcaoGuardarCliente();
     document.getElementById('painelAgendar').style.display = 'none';
@@ -8657,7 +8779,7 @@ window.TJQR=function(texto){var q=new QRCode(-1,EC.M);q.addData(texto);q.make();
     document.getElementById('ag_valor').value = '';
     document.getElementById('ag_data').value = '';
     document.getElementById('ag_hora').value = '';
-    document.getElementById('ag_observacoes').value = '';
+    document.getElementById('ag_observacoes').value = ''; limparExtrasAgForm();
     document.getElementById('ag_apresentacao').value = '';
     limparOpcaoGuardarCliente();
     document.getElementById('painelAgendar').style.display = 'none';
@@ -8694,6 +8816,7 @@ window.TJQR=function(texto){var q=new QRCode(-1,EC.M);q.addData(texto);q.make();
       cfg: cfg,
       nome: localStorage.getItem('trajeto_nome') || '',
       carro: lerCarro(),
+      legal: lerLegal(),
       parceiros: lerParceiros(),
       pagamentos: JSON.parse(localStorage.getItem('trajeto_pagamentos') || 'null') || { mbway:true, dinheiro:true, cartao:true },
       msgTipo: localStorage.getItem('trajeto_msg_tipo') || 'auto',
@@ -8739,6 +8862,10 @@ window.TJQR=function(texto){var q=new QRCode(-1,EC.M);q.addData(texto);q.make();
         if(dados.carro && typeof dados.carro === 'object'){
           gravarCarro(dados.carro);
           preencherCarroUI(lerCarro());
+        }
+        if(dados.legal && typeof dados.legal === 'object'){
+          gravarLegal(dados.legal);
+          preencherLegalUI(lerLegal());
         }
         if(Array.isArray(dados.parceiros)){
           localStorage.setItem(PARCEIROS_KEY, JSON.stringify(dados.parceiros));
@@ -8843,7 +8970,7 @@ if ('serviceWorker' in navigator) {
 </script>
 
 <script>
-/* ====== v9.32.0 · Agenda Google + IA (vários calendários) ======
+/* ====== v9.33.0 · Guia de serviço (dados legais, passageiros, PDF) ======
    Lê (só leitura) o calendário que o motorista escolher, a IA monta os serviços
    e nada entra no Trajeto sem o motorista confirmar. Não mexe em cálculos nem
    noutras ligações: só cria agendamentos novos, iguais aos criados à mão. */
