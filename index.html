@@ -1614,27 +1614,34 @@ header{background:#1B2646 !important;}
     <div class="card">
       <h2>Minhas tarifas</h2>
 
-      <label for="cfg_nome">O teu nome (para as mensagens ao cliente)</label>
-      <input type="text" id="cfg_nome" placeholder="ex: Carlos">
 
-      <div class="cfg-grupo" style="margin-top:16px; border-top:1px solid var(--linha); padding-top:12px;">
-        <div class="cfg-titulo cfg-titulo-fixo">🏢 Empresa / operador</div>
+      <div class="cfg-grupo">
+        <div class="cfg-titulo" data-acordeao="empresa">🏢 Empresa / operador <span class="seta">▸</span></div>
+        <div class="cfg-conteudo" data-conteudo="empresa">
         <div style="font-family:'Helvetica Neue', Arial, sans-serif; font-size:12.5px; color:#6B7180; margin:4px 0 8px; line-height:1.45;">Quem presta o serviço. Aparece no topo da Guia PDF e nos Dados do serviço.</div>
         <label for="cfg_leg_empresa">Nome da empresa</label><input type="text" id="cfg_leg_empresa" maxlength="80" placeholder="ex: Trajeto Transfer, Lda.">
         <label for="cfg_leg_nif">NIF da empresa</label><input type="text" id="cfg_leg_nif" maxlength="20" inputmode="numeric" placeholder="ex: 512345678">
         <label for="cfg_leg_licenca">Licença (RNAVT / RNAAT / alvará)</label><input type="text" id="cfg_leg_licenca" maxlength="80" placeholder="ex: RNAVT nº 1234/2024">
+        </div>
       </div>
-      <div class="cfg-grupo" style="margin-top:16px; border-top:1px solid var(--linha); padding-top:12px;">
-        <div class="cfg-titulo cfg-titulo-fixo">👤 Motorista</div>
+      <div class="cfg-grupo">
+        <div class="cfg-titulo" data-acordeao="motorista">👤 Motorista <span class="seta">▸</span></div>
+        <div class="cfg-conteudo" data-conteudo="motorista">
+        <label for="cfg_nome">O teu nome (para as mensagens ao cliente)</label>
+        <input type="text" id="cfg_nome" placeholder="ex: Carlos">
+        <label for="cfg_whatsapp">O teu número de WhatsApp (para o site de pedidos)</label>
+        <input type="text" id="cfg_whatsapp" placeholder="ex: 351969698927">
         <label for="cfg_leg_motorista">Nome completo do motorista</label><input type="text" id="cfg_leg_motorista" maxlength="80" placeholder="ex: Carlos Manuel Silva">
         <div class="cfg-row">
           <div><label for="cfg_leg_carta">Carta de condução nº</label><input type="text" id="cfg_leg_carta" maxlength="30" placeholder="ex: L-1234567"></div>
           <div><label for="cfg_leg_cert">Certificado de motorista</label><input type="text" id="cfg_leg_cert" maxlength="40" placeholder="ex: CMTVDE nº"></div>
         </div>
         <label for="cfg_leg_nifMot">NIF do motorista <span style="font-weight:400;color:#6B7180">(só se for diferente da empresa)</span></label><input type="text" id="cfg_leg_nifMot" maxlength="20" inputmode="numeric" placeholder="opcional">
+        </div>
       </div>
-      <div class="cfg-grupo" style="margin-top:16px; border-top:1px solid var(--linha); padding-top:12px;">
-        <div class="cfg-titulo cfg-titulo-fixo">🚗 Viatura</div>
+      <div class="cfg-grupo">
+        <div class="cfg-titulo" data-acordeao="viatura">🚗 Viatura <span class="seta">▸</span></div>
+        <div class="cfg-conteudo" data-conteudo="viatura">
         <div style="font-family:'Helvetica Neue', Arial, sans-serif; font-size:12.5px; color:#6B7180; margin:4px 0 8px; line-height:1.45;">Se preencheres, o modelo, a cor e a matrícula aparecem nas mensagens ao cliente (nas recolhas no aeroporto não aparecem).</div>
         <div class="cfg-row">
           <div><label for="cfg_carro_modelo">Modelo</label><input type="text" id="cfg_carro_modelo" maxlength="40" placeholder="ex: Tesla Model Y"></div>
@@ -1645,25 +1652,36 @@ header{background:#1B2646 !important;}
           <div><label for="cfg_carro_cor_en">Cor (inglês)</label><input type="text" id="cfg_carro_cor_en" maxlength="20" placeholder="ex: black"></div>
         </div>
         <label for="cfg_leg_lugares" style="margin-top:10px;">Lugares (passageiros)</label><input type="text" id="cfg_leg_lugares" maxlength="20" inputmode="numeric" placeholder="ex: 4">
+        </div>
       </div>
 
-      <label for="cfg_whatsapp" style="margin-top:14px;">O teu número de WhatsApp (para o site de pedidos)</label>
-      <input type="text" id="cfg_whatsapp" placeholder="ex: 351969698927">
 
-      <div class="cfg-grupo" style="margin-top:16px; border-top:1px solid var(--linha); padding-top:12px; padding-bottom:12px;">
-        <div class="cfg-titulo cfg-titulo-fixo">💳 Pagamentos online</div>
+      <div class="cfg-grupo">
+        <div class="cfg-titulo" data-acordeao="pagonline">💳 Pagamentos <span class="seta">▸</span></div>
+        <div class="cfg-conteudo" data-conteudo="pagonline">
         <div id="pagResumoCfg" style="font-family:'Helvetica Neue', Arial, sans-serif; font-size:13px; color:#6B7180; margin:6px 0 10px;">Cobra os clientes por cartão, Apple Pay, MB WAY e Klarna.</div>
         <button type="button" class="btn-config" id="btnAbrirPagamentos" style="background:#635bff;color:#fff;border-color:#635bff;">💳 Pagamentos online</button>
+        <div style="font-family:'Helvetica Neue', Arial, sans-serif; font-size:12.5px; font-weight:bold; color:var(--texto); margin:16px 0 6px;">Formas de pagamento aceites</div>
+        <div class="checks">
+            <label class="chk"><input type="checkbox" id="cfg_pag_mbway" checked> MB WAY</label>
+            <label class="chk"><input type="checkbox" id="cfg_pag_dinheiro" checked> Dinheiro</label>
+            <label class="chk"><input type="checkbox" id="cfg_pag_cartao" checked> Cartão bancário</label>
+          </div>
+        </div>
       </div>
-      <div class="cfg-grupo" style="margin-top:16px; border-top:1px solid var(--linha); padding-top:12px; padding-bottom:12px;">
-        <div class="cfg-titulo cfg-titulo-fixo">📅 Agenda Google</div>
+      <div class="cfg-grupo">
+        <div class="cfg-titulo" data-acordeao="agendag">📅 Agenda Google <span class="seta">▸</span></div>
+        <div class="cfg-conteudo" data-conteudo="agendag">
         <div id="agendaResumoCfg" style="font-family:'Helvetica Neue', Arial, sans-serif; font-size:13px; color:#6B7180; margin:6px 0 10px;">Traz os serviços da tua Agenda Google para o Trajeto, com IA.</div>
         <button type="button" class="btn-config" id="btnAbrirAgenda">📅 Agenda Google</button>
+        </div>
       </div>
-      <div class="cfg-grupo" style="margin-top:16px; border-top:1px solid var(--linha); padding-top:12px; padding-bottom:12px;">
-        <div class="cfg-titulo cfg-titulo-fixo">🔗 Integrações</div>
+      <div class="cfg-grupo">
+        <div class="cfg-titulo" data-acordeao="integracoes">🔗 Integrações <span class="seta">▸</span></div>
+        <div class="cfg-conteudo" data-conteudo="integracoes">
         <div id="intResumoCfg" style="font-family:'Helvetica Neue', Arial, sans-serif; font-size:13px; color:#6B7180; margin:6px 0 10px;">Liga o Trajeto a outra app: clientes e serviços nos dois sentidos.</div>
         <button type="button" class="btn-config" id="btnAbrirIntegracoes">🔗 Integrações</button>
+        </div>
       </div>
       <div class="cfg-grupo" style="margin-top:16px; border-top:1px solid var(--linha); padding-top:2px;">
         <div class="cfg-titulo cfg-titulo-fixo">☁️ Sincronização entre aparelhos</div>
@@ -1780,16 +1798,6 @@ header{background:#1B2646 !important;}
         </div>
       </div>
 
-      <div class="cfg-grupo">
-        <div class="cfg-titulo" data-acordeao="pagamento">💳 Formas de pagamento aceites <span class="seta">▸</span></div>
-        <div class="cfg-conteudo" data-conteudo="pagamento">
-          <div class="checks">
-            <label class="chk"><input type="checkbox" id="cfg_pag_mbway" checked> MB WAY</label>
-            <label class="chk"><input type="checkbox" id="cfg_pag_dinheiro" checked> Dinheiro</label>
-            <label class="chk"><input type="checkbox" id="cfg_pag_cartao" checked> Cartão bancário</label>
-          </div>
-        </div>
-      </div>
 
       <div class="cfg-grupo">
         <div class="cfg-titulo" data-acordeao="mensagem">✉️ Mensagem de orçamento <span class="seta">▸</span></div>
@@ -2270,7 +2278,7 @@ header{background:#1B2646 !important;}
     <p class="nota">Os serviços por hora agendados ficam em "📅 Agendados". Os que estão em andamento aparecem a partir do momento em que tocas em "🚗 Ir buscar cliente" no agendamento. O tempo só começa a contar quando tocas em "▶️ Iniciar" (cliente no carro). Ao finalizar, o valor é calculado pela regra definida em "Minhas tarifas" e podes enviar o resumo ao cliente. O agendamento só sai da lista quando o marcares como "Concluído".</p>
   </div>
 
-  <p style="text-align:center; font-family:'Helvetica Neue', Arial, sans-serif; font-size:11px; color:#8a7f66; margin-top:24px;">Trajeto · v9.34.0</p>
+  <p style="text-align:center; font-family:'Helvetica Neue', Arial, sans-serif; font-size:11px; color:#8a7f66; margin-top:24px;">Trajeto · v9.35.0</p>
 
 </main>
 
