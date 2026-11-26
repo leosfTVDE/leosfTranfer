@@ -257,6 +257,8 @@
     cursor:pointer;
   }
   .btn-config:hover{background:rgba(255,255,255,.18);}
+  #painelConfig .btn-config{background:#fff;border:1.5px solid #C9A774;color:#1B2646;font-weight:700;font-size:14px;letter-spacing:0;padding:10px 16px;border-radius:12px;}
+  #painelConfig .btn-config:hover{background:#FBF6EC;}
   #painelConfig{display:none;}
   #painelConfig .card{border-color:var(--terracota);}
   .cfg-grupo{
@@ -2278,7 +2280,7 @@ header{background:#1B2646 !important;}
     <p class="nota">Os serviços por hora agendados ficam em "📅 Agendados". Os que estão em andamento aparecem a partir do momento em que tocas em "🚗 Ir buscar cliente" no agendamento. O tempo só começa a contar quando tocas em "▶️ Iniciar" (cliente no carro). Ao finalizar, o valor é calculado pela regra definida em "Minhas tarifas" e podes enviar o resumo ao cliente. O agendamento só sai da lista quando o marcares como "Concluído".</p>
   </div>
 
-  <p style="text-align:center; font-family:'Helvetica Neue', Arial, sans-serif; font-size:11px; color:#8a7f66; margin-top:24px;">Trajeto · v9.35.0</p>
+  <p style="text-align:center; font-family:'Helvetica Neue', Arial, sans-serif; font-size:11px; color:#8a7f66; margin-top:24px;">Trajeto · v9.36.0 · <a href="privacidade.html" style="color:#8a7f66;">Política de privacidade</a></p>
 
 </main>
 
@@ -2306,6 +2308,7 @@ header{background:#1B2646 !important;}
     <button class="modal-btn modal-btn-recebido" id="btnAbrirLoginGate">🔑 Entrar</button>
     <p style="text-align:center; font-family:'Helvetica Neue', Arial, sans-serif; font-size:13px; color:#4A5370; margin:18px 0 10px;">Procuras pedir um transfer?</p>
     <a class="modal-btn modal-btn-pendente" href="https://trajetotransfer.pt/pedido.html" style="display:block; text-align:center; text-decoration:none; box-sizing:border-box;">👉 Ir para o site de pedidos</a>
+    <p style="text-align:center; font-family:'Helvetica Neue', Arial, sans-serif; font-size:12px; margin:16px 0 0;"><a href="privacidade.html" style="color:#4A5370;">Política de privacidade · Privacy policy</a></p>
   </div>
 </div>
 
@@ -9228,7 +9231,7 @@ if ('serviceWorker' in navigator) {
   function agResumoCfg(){
     const el = $('agendaResumoCfg'); if(!el) return;
     const i = agInfo();
-    el.textContent = i.ligado ? ('Ligada' + (i.email ? ' (' + i.email + ')' : '') + (i.cal ? ' · calendário “' + i.cal.nome + '”' : ' · falta escolher o calendário')) : 'Traz os serviços da tua Agenda Google para o Trajeto, com IA.';
+    el.textContent = i.ligado ? ('Ligada' + (i.email ? ' (' + i.email + ')' : '') + (i.cal ? (agVarios(i) ? ' · ' + i.cals.length + ' calendários (“' + i.cals.map(c => c.nome).join('”, “') + '”)' : ' · calendário “' + i.cal.nome + '”') : ' · falta escolher o calendário')) : 'Traz os serviços da tua Agenda Google para o Trajeto, com IA.';
   }
   // ---- arranque ----
   function agArranque(){
