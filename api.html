@@ -1,0 +1,186 @@
+<!doctype html>
+<html lang="pt">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>API do Trajeto · para programadores</title>
+<meta name="description" content="Como ligar outra aplicação ao Trajeto Transfer: chave por conta, clientes e serviços em JSON (formato trajeto.v1), nos dois sentidos.">
+<meta name="robots" content="noindex">
+<style>
+:root{--n:#1B2646;--g:#C9A774;--g2:#DCC496;--bg:#F9F7F3;--card:#fff;--txt:#1B2646;--mut:#5d6476;--ln:#E9E2D6;--code:#F4EFE7;--ok:#1f7a45;--av:#9a6a12}
+@media (prefers-color-scheme: dark){:root{--bg:#10162a;--card:#182039;--txt:#ECE7DD;--mut:#a7adbd;--ln:#2a3352;--code:#0c1122;--n:#ECE7DD}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--txt);font:16px/1.6 -apple-system,BlinkMacSystemFont,"Helvetica Neue",Arial,sans-serif}
+header{background:#1B2646;color:#fff;padding:28px max(18px,env(safe-area-inset-right,0px)) 26px max(18px,env(safe-area-inset-left,0px))}
+header .in,main{max-width:860px;margin:0 auto}
+header small{color:var(--g2);font-weight:700;letter-spacing:.08em;text-transform:uppercase;font-size:12px}
+header h1{margin:6px 0 6px;font-size:30px;line-height:1.2;text-wrap:balance}
+header p{margin:0;color:#d9d5cc;max-width:62ch}
+main{padding:10px max(18px,env(safe-area-inset-right,0px)) 60px max(18px,env(safe-area-inset-left,0px))}
+h2{font-size:21px;margin:34px 0 8px;padding-top:6px;border-top:1px solid var(--ln)}
+h3{font-size:16px;margin:22px 0 6px}
+p,li{max-width:70ch}
+code{font:13.5px ui-monospace,SFMono-Regular,Menlo,monospace;background:var(--code);padding:1px 5px;border-radius:5px}
+pre{background:var(--code);border:1px solid var(--ln);border-radius:12px;padding:14px;overflow-x:auto;font:13px/1.5 ui-monospace,SFMono-Regular,Menlo,monospace;margin:8px 0 14px}
+pre code{background:none;padding:0}
+.tw{overflow-x:auto;border:1px solid var(--ln);border-radius:12px;margin:8px 0 14px;background:var(--card)}
+table{border-collapse:collapse;width:100%;font-size:14px;min-width:560px}
+th,td{text-align:left;padding:9px 12px;border-top:1px solid var(--ln);vertical-align:top}
+th{background:var(--code);border-top:none;font-size:12.5px;text-transform:uppercase;letter-spacing:.04em;color:var(--mut)}
+.m{font:700 12px ui-monospace,Menlo,monospace;padding:2px 7px;border-radius:6px;background:#e4f5ea;color:var(--ok)}
+.m.p{background:#fdf0d9;color:var(--av)}
+.nota{background:var(--card);border:1px solid var(--ln);border-left:4px solid var(--g);border-radius:12px;padding:12px 14px;margin:12px 0}
+.fluxo{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px;margin:12px 0}
+.fluxo div{background:var(--card);border:1px solid var(--ln);border-radius:14px;padding:14px}
+.fluxo b{display:block;margin-bottom:4px}
+nav{display:flex;flex-wrap:wrap;gap:8px;margin:18px 0 0}
+nav a{color:var(--txt);text-decoration:none;font-size:14px;border:1px solid var(--ln);border-radius:999px;padding:5px 12px;background:var(--card)}
+footer{color:var(--mut);font-size:13px;margin-top:40px}
+</style>
+</head>
+<body>
+<header><div class="in">
+<small>Trajeto Transfer · Programadores</small>
+<h1>API do Trajeto (formato trajeto.v1)</h1>
+<p>Liga a tua aplicação à conta de um motorista no Trajeto: lê e envia clientes e serviços em JSON, nos dois sentidos.</p>
+</div></header>
+<main>
+<nav><a href="#como">Como funciona</a><a href="#chave">Chave</a><a href="#ler">Ler</a><a href="#enviar">Enviar</a><a href="#formato">Formato</a><a href="#inverso">A tua app</a><a href="#erros">Erros</a><a href="#limites">Limites</a></nav>
+
+<h2 id="como">Como funciona</h2>
+<div class="fluxo">
+<div><b>1 · O motorista cria a chave</b>No Trajeto: Minhas tarifas → 🔗 Integrações → Criar chave. Cada chave só dá acesso aos dados dessa conta e pode ser apagada a qualquer momento.</div>
+<div><b>2 · A tua app usa a chave</b>Para ler os clientes e serviços e para enviar clientes e serviços novos ou alterados.</div>
+<div><b>3 · O motorista sincroniza</b>Nada é automático. Quando o motorista toca em <i>Sincronizar agora</i>, o Trajeto aplica o que enviaste e publica os dados atualizados.</div>
+</div>
+<div class="nota"><b>Importante:</b> o que envias fica <b>em fila</b> e entra no Trajeto na próxima sincronização. O que lês é o estado da <b>última sincronização</b> (o campo <code>atualizadoEm</code> diz quando foi).</div>
+<p>Endereço base:</p>
+<pre><code>https://trajeto-pagamentos.leonardospinasse.workers.dev/v1</code></pre>
+
+<h2 id="chave">Autenticação</h2>
+<p>Envia a chave em todos os pedidos, num destes cabeçalhos:</p>
+<pre><code>Authorization: Bearer trj_live_XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+X-Api-Key: trj_live_XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX</code></pre>
+<p>A chave pode ter permissão para <b>ler</b>, para <b>enviar</b>, ou para as duas coisas. Guarda-a no teu servidor, nunca no código de uma página ou app pública.</p>
+
+<h2 id="ler">Ler dados</h2>
+<div class="tw"><table>
+<tr><th>Pedido</th><th>O que devolve</th></tr>
+<tr><td><span class="m">GET</span> <code>/v1/conta</code></td><td>Nome da conta, data da última sincronização, totais e permissões da chave.</td></tr>
+<tr><td><span class="m">GET</span> <code>/v1/clientes</code></td><td>Todos os clientes. Filtros: <code>?desde=2026-11-01</code> (alterados desde), <code>?telefone=912345678</code>, <code>?nome=silva</code>.</td></tr>
+<tr><td><span class="m">GET</span> <code>/v1/clientes/{id}</code></td><td>Um cliente (id do Trajeto).</td></tr>
+<tr><td><span class="m">GET</span> <code>/v1/servicos</code></td><td>Todos os serviços, com valores e moradas. Filtros: <code>?desde=</code>, <code>?de=2026-12-01</code>, <code>?ate=2026-12-31</code> (pela data do serviço).</td></tr>
+<tr><td><span class="m">GET</span> <code>/v1/servicos/{id}</code></td><td>Um serviço (id do Trajeto).</td></tr>
+</table></div>
+<pre><code>curl -H "Authorization: Bearer trj_live_…" \
+  "https://trajeto-pagamentos.leonardospinasse.workers.dev/v1/servicos?desde=2026-11-20"</code></pre>
+<pre><code>{
+  "formato": "trajeto.v1",
+  "atualizadoEm": 1764151200000,
+  "total": 1,
+  "servicos": [
+    { "id": "m1", "tipo": "transfer", "data": "2026-11-29", "hora": "07:00",
+      "cliente": { "nome": "John Smith", "telefone": "+351912345678" },
+      "partida": "Hotel Avenida Palace", "chegada": "Aeroporto de Lisboa",
+      "valor": 40, "estado": "agendado", "atualizadoEm": 1764151200000 }
+  ]
+}</code></pre>
+<p><code>desde</code> aceita uma data (<code>2026-11-20</code>), data e hora ISO, ou milissegundos.</p>
+
+<h2 id="enviar">Enviar dados</h2>
+<div class="tw"><table>
+<tr><th>Pedido</th><th>O que faz</th></tr>
+<tr><td><span class="m p">POST</span> <code>/v1/clientes</code></td><td>Cria um cliente. Se já existir um com o mesmo telefone, o Trajeto atualiza-o em vez de duplicar.</td></tr>
+<tr><td><span class="m p">PATCH</span> <code>/v1/clientes/{id}</code></td><td>Atualiza um cliente. O <code>{id}</code> pode ser o id do Trajeto ou o id da tua app.</td></tr>
+<tr><td><span class="m p">POST</span> <code>/v1/servicos</code></td><td>Cria um serviço. Se faltarem dados, a resposta diz quais (<code>faltam</code>) e o serviço fica em “Por completar” no Trajeto.</td></tr>
+<tr><td><span class="m p">PATCH</span> <code>/v1/servicos/{id}</code></td><td>Atualiza um serviço (só os campos que envias). Serviços já concluídos não são alterados.</td></tr>
+<tr><td><span class="m p">POST</span> <code>/v1/importar</code></td><td>Vários de uma vez: <code>{"clientes":[…],"servicos":[…]}</code>, até 500 itens.</td></tr>
+</table></div>
+<p>Para criar, manda sempre o <code>id</code> do item na <b>tua</b> app. É assim que o Trajeto sabe que é o mesmo item e não duplica.</p>
+<pre><code>curl -X POST -H "Authorization: Bearer trj_live_…" -H "Content-Type: application/json" \
+  "https://trajeto-pagamentos.leonardospinasse.workers.dev/v1/servicos" \
+  -d '{ "id": "PED-1042", "tipo": "transfer", "data": "2026-11-30",
+        "cliente": { "nome": "Manuel Silva", "telefone": "+351912000488" },
+        "partida": "Aeroporto de Lisboa, T1", "chegada": "Hotel Tivoli" }'</code></pre>
+<p>Resposta (<code>202</code>: recebido, fica em fila até o motorista sincronizar):</p>
+<pre><code>{ "formato": "trajeto.v1", "recebido": true,
+  "resultado": { "eid": "e_…", "id": "PED-1042", "faltam": ["hora", "valor"] } }</code></pre>
+
+<h2 id="formato">Formato dos dados</h2>
+<h3>Cliente</h3>
+<div class="tw"><table>
+<tr><th>Campo</th><th>Tipo</th><th>Notas</th></tr>
+<tr><td><code>id</code></td><td>texto</td><td>Ao ler: id do Trajeto. Ao enviar: id na tua app (obrigatório para criar).</td></tr>
+<tr><td><code>trajetoId</code></td><td>texto</td><td>Opcional ao enviar: o id do Trajeto, se o cliente veio de lá.</td></tr>
+<tr><td><code>idExterno</code></td><td>texto</td><td>Só ao ler: o id na tua app, se o cliente veio de ti.</td></tr>
+<tr><td><code>nome</code></td><td>texto (80)</td><td>Nome ou telefone obrigatório para criar.</td></tr>
+<tr><td><code>telefone</code></td><td>texto (30)</td><td>Com ou sem indicativo. Os últimos 9 dígitos identificam o cliente.</td></tr>
+<tr><td><code>email</code>, <code>morada</code></td><td>texto</td><td></td></tr>
+<tr><td><code>nomePlaca</code></td><td>texto (80)</td><td>Nome a mostrar na placa de receção.</td></tr>
+<tr><td><code>fornecedor</code>, <code>notas</code></td><td>texto</td><td></td></tr>
+<tr><td><code>atualizadoEm</code></td><td>milissegundos</td><td>Última alteração.</td></tr>
+</table></div>
+<h3>Serviço</h3>
+<div class="tw"><table>
+<tr><th>Campo</th><th>Tipo</th><th>Notas</th></tr>
+<tr><td><code>id</code>, <code>trajetoId</code>, <code>idExterno</code></td><td>texto</td><td>Iguais aos do cliente.</td></tr>
+<tr><td><code>tipo</code></td><td><code>transfer</code> · <code>hora</code> · <code>tour</code></td><td>Por omissão <code>transfer</code>.</td></tr>
+<tr><td><code>data</code></td><td><code>AAAA-MM-DD</code></td><td>Obrigatório para ficar pronto.</td></tr>
+<tr><td><code>hora</code>, <code>fim</code></td><td><code>HH:MM</code></td><td>Hora de recolha (obrigatória) e fim previsto (opcional).</td></tr>
+<tr><td><code>cliente</code></td><td><code>{nome, telefone}</code></td><td>Também aceita só o nome em texto.</td></tr>
+<tr><td><code>partida</code>, <code>chegada</code></td><td>texto (200)</td><td>Recolha (obrigatória) e destino (obrigatório em transfers).</td></tr>
+<tr><td><code>paragens</code></td><td>lista de textos</td><td>Até 10.</td></tr>
+<tr><td><code>valor</code></td><td>número, em euros</td><td>Ex.: <code>45.5</code>. Também aceita <code>"45,50"</code>. Obrigatório, exceto no serviço por hora (calculado no fim).</td></tr>
+<tr><td><code>voo</code>, <code>pax</code>, <code>malas</code></td><td>texto · número · número</td><td>Nº do voo, passageiros e malas.</td></tr>
+<tr><td><code>nomePlaca</code>, <code>fornecedor</code>, <code>observacoes</code>, <code>tourNome</code></td><td>texto</td><td></td></tr>
+<tr><td><code>estado</code></td><td><code>agendado</code> · <code>concluido</code> · <code>cancelado</code></td><td>Serviços enviados como <code>cancelado</code> não são criados.</td></tr>
+</table></div>
+<p>Campos desconhecidos são ignorados. Textos longos demais são cortados. Datas e horas em formato errado são ignoradas e contam como “em falta”.</p>
+
+<h2 id="inverso">Ligação no outro sentido: o que a tua app tem de ter</h2>
+<p>Se quiseres que o próprio Trajeto envie e traga dados quando o motorista toca em <i>Sincronizar agora</i>, a tua app precisa de <b>um endereço https</b>. O motorista cola esse endereço e uma chave tua em Integrações → App ligada. O Trajeto chama esse endereço com:</p>
+<pre><code>Authorization: Bearer &lt;a chave que deste ao motorista&gt;
+X-Trajeto-Formato: trajeto.v1</code></pre>
+<h3><span class="m p">POST</span> o teu endereço: o Trajeto envia</h3>
+<pre><code>{ "formato": "trajeto.v1", "enviadoEm": "2026-11-26T11:00:00.000Z",
+  "conta": { "nome": "Trajeto Lisboa" },
+  "clientes": [ { "id": "cA", "nome": "Ana Costa", "telefone": "+351912345678" } ],
+  "servicos": [ { "id": "m1", "tipo": "transfer", "data": "2026-11-29", "hora": "07:00", "valor": 40, "estado": "agendado" } ] }</code></pre>
+<p>Responde com <code>200</code>. Opcionalmente, diz o que recusaste, para o motorista ver:</p>
+<pre><code>{ "clientes": { "aceites": 1, "recusados": [] },
+  "servicos": { "aceites": 0, "recusados": [ { "id": "m1", "motivo": "data no passado" } ] } }</code></pre>
+<h3><span class="m">GET</span> o teu endereço: o Trajeto traz</h3>
+<p>Recebes <code>?desde=</code> (data ISO da última vez) na segunda sincronização em diante. Devolve:</p>
+<pre><code>{ "clientes": [ { "id": "P1", "nome": "Rui Novo", "telefone": "961111111" } ],
+  "servicos": [ { "id": "PED-1042", "data": "2026-11-30", "hora": "16:40",
+                  "cliente": { "nome": "Manuel Silva" },
+                  "partida": "Aeroporto T1", "chegada": "Hotel Tivoli", "valor": 48.9 } ] }</code></pre>
+<div class="nota">Quando devolves um item que <b>veio do Trajeto</b>, manda o id do Trajeto em <code>trajetoId</code> (ou no próprio <code>id</code>). Assim não fica duplicado.</div>
+<p>O Trajeto espera no máximo 20 segundos pela resposta.</p>
+
+<h2 id="erros">Respostas e erros</h2>
+<div class="tw"><table>
+<tr><th>Código</th><th>Quando</th></tr>
+<tr><td><code>200</code></td><td>Leitura com sucesso.</td></tr>
+<tr><td><code>202</code></td><td>Envio recebido, em fila até o motorista sincronizar.</td></tr>
+<tr><td><code>400</code></td><td>JSON inválido ou endereço errado (ex.: <code>PATCH</code> sem id).</td></tr>
+<tr><td><code>401</code></td><td>Falta a chave, ou a chave é inválida ou foi apagada.</td></tr>
+<tr><td><code>403</code></td><td>A chave não tem essa permissão (ler ou enviar).</td></tr>
+<tr><td><code>404</code></td><td>Recurso ou item não encontrado.</td></tr>
+<tr><td><code>413</code></td><td>Pedido grande demais (mais de 500 itens).</td></tr>
+<tr><td><code>422</code></td><td>Item inválido (ex.: criar sem <code>id</code>).</td></tr>
+<tr><td><code>429</code></td><td>Há mais de 2000 itens à espera. O motorista tem de sincronizar primeiro.</td></tr>
+</table></div>
+<p>Os erros vêm sempre como <code>{"erro": "mensagem"}</code>.</p>
+
+<h2 id="limites">Limites e boas práticas</h2>
+<ul>
+<li>Até 5 chaves por conta, 500 itens por pedido e 2000 itens à espera.</li>
+<li>Para muitos itens, usa <code>/v1/importar</code> em vez de muitos pedidos seguidos.</li>
+<li>Envia sempre o <code>id</code> da tua app. Reenviar o mesmo item não o duplica.</li>
+<li>São dados pessoais de clientes: usa só o que precisas e trata-os segundo o RGPD. O motorista é responsável pelos dados que partilha com a chave dele.</li>
+</ul>
+<footer>Trajeto Transfer · API trajeto.v1 · Dúvidas: transfertrajeto@gmail.com</footer>
+</main>
+</body>
+</html>

@@ -1558,6 +1558,24 @@ header{background:#1B2646 !important;}
 .agd-cor{width:14px;height:14px;border-radius:50%;flex:none}
 .agd-cal input{width:20px;height:20px;margin:0;accent-color:#C9A774;flex:none}
 .agd-tag-cal{background:#EEF1F7;color:#1B2646}
+.int-sec{background:#fff;border:1px solid #E9E2D6;border-radius:14px;padding:12px;margin:10px 0}
+.int-t{font:800 15px 'Helvetica Neue',Arial,sans-serif;color:#1B2646;display:flex;align-items:center;gap:8px}
+.int-s{font-size:12.5px;color:#6B7180;line-height:1.45;margin-top:4px}
+.int-l{display:block;font-size:12px;font-weight:700;color:#4A5370;margin:10px 0 4px}
+.int-in{display:block;width:100%;box-sizing:border-box;padding:11px 12px;border:1px solid #E3CFA6;border-radius:11px;background:#fff;color:#1B2646;font:500 15px 'Helvetica Neue',Arial,sans-serif}
+.int-in.int-falta{border:1.5px solid #E9A23B;background:#FFFAF0}.int-l.int-falta{color:#9a5b00}
+.int-ck{display:flex;align-items:center;gap:8px;font-size:14px;color:#1B2646;margin-top:8px}.int-ck input{width:20px;height:20px;accent-color:#1B2646}
+.int-k{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:10px 0;border-top:1px solid #F0EBE2;font-size:13.5px}
+.int-mono{font-family:ui-monospace,Menlo,monospace;font-size:12px;color:#6B7180}
+.int-key{font-family:ui-monospace,Menlo,monospace;font-size:13px;word-break:break-all;background:#F4EFE7;border-radius:10px;padding:10px;margin-top:6px;user-select:all}
+.int-nova{border:1.5px solid #C9A774;border-radius:12px;padding:10px;margin-top:8px;background:#FBF6EC}
+.int-apagar{border:none;background:none;color:#a02f24;font:700 13px 'Helvetica Neue',Arial,sans-serif;cursor:pointer;padding:4px;flex:none}.int-apagar.int-conf{background:#fbe5e3;border-radius:8px}
+.int-det summary{cursor:pointer;font-weight:700;color:#A88452;margin-top:10px;font-size:14px}
+.int-ok,.int-av,.int-tag{font:700 11px 'Helvetica Neue',Arial,sans-serif;padding:2px 8px;border-radius:7px;background:#e4f5ea;color:#1f7a45;white-space:nowrap}
+.int-av,.int-tag.av{background:#fdf0d9;color:#9a6a12}.int-tag.er{background:#fbe5e3;color:#b3362b}.int-tag.cin{background:#EEF1F7;color:#4A5370}
+.int-row{display:flex;justify-content:space-between;align-items:center;gap:8px;font-size:13.5px;padding:8px 0;border-top:1px solid #F0EBE2;color:#1B2646}.int-row:first-of-type{border-top:none}
+.int-mini{display:flex;gap:10px;margin:10px 0}.int-mini>div{flex:1;background:#fff;border:1px solid #E9E2D6;border-radius:14px;padding:10px;text-align:center;font-size:12px;color:#6B7180}.int-mini b{display:block;font:800 26px 'Helvetica Neue',Arial,sans-serif;color:#1B2646}
+.int-pc{display:block;width:100%;text-align:left;margin-top:8px;padding:10px 12px;border:1.5px solid #E9A23B;border-radius:12px;background:#FFFAF0;color:#1B2646;font:600 14px 'Helvetica Neue',Arial,sans-serif;cursor:pointer}.int-pc span{display:block;font-size:12px;font-weight:500;color:#9a5b00;margin-top:2px}
 .agd-rodape{font-size:12px;color:#6B7180;text-align:center;margin-top:12px}
 .agd-rodape button{border:none;background:none;color:#1B2646;text-decoration:underline;font-size:12px;padding:0;cursor:pointer}
 </style>
@@ -1641,6 +1659,11 @@ header{background:#1B2646 !important;}
         <div class="cfg-titulo cfg-titulo-fixo">📅 Agenda Google</div>
         <div id="agendaResumoCfg" style="font-family:'Helvetica Neue', Arial, sans-serif; font-size:13px; color:#6B7180; margin:6px 0 10px;">Traz os serviços da tua Agenda Google para o Trajeto, com IA.</div>
         <button type="button" class="btn-config" id="btnAbrirAgenda">📅 Agenda Google</button>
+      </div>
+      <div class="cfg-grupo" style="margin-top:16px; border-top:1px solid var(--linha); padding-top:12px; padding-bottom:12px;">
+        <div class="cfg-titulo cfg-titulo-fixo">🔗 Integrações</div>
+        <div id="intResumoCfg" style="font-family:'Helvetica Neue', Arial, sans-serif; font-size:13px; color:#6B7180; margin:6px 0 10px;">Liga o Trajeto a outra app: clientes e serviços nos dois sentidos.</div>
+        <button type="button" class="btn-config" id="btnAbrirIntegracoes">🔗 Integrações</button>
       </div>
       <div class="cfg-grupo" style="margin-top:16px; border-top:1px solid var(--linha); padding-top:2px;">
         <div class="cfg-titulo cfg-titulo-fixo">☁️ Sincronização entre aparelhos</div>
@@ -2247,7 +2270,7 @@ header{background:#1B2646 !important;}
     <p class="nota">Os serviços por hora agendados ficam em "📅 Agendados". Os que estão em andamento aparecem a partir do momento em que tocas em "🚗 Ir buscar cliente" no agendamento. O tempo só começa a contar quando tocas em "▶️ Iniciar" (cliente no carro). Ao finalizar, o valor é calculado pela regra definida em "Minhas tarifas" e podes enviar o resumo ao cliente. O agendamento só sai da lista quando o marcares como "Concluído".</p>
   </div>
 
-  <p style="text-align:center; font-family:'Helvetica Neue', Arial, sans-serif; font-size:11px; color:#8a7f66; margin-top:24px;">Trajeto · v9.33.0</p>
+  <p style="text-align:center; font-family:'Helvetica Neue', Arial, sans-serif; font-size:11px; color:#8a7f66; margin-top:24px;">Trajeto · v9.34.0</p>
 
 </main>
 
@@ -3660,6 +3683,13 @@ window.TJQR=function(texto){var q=new QRCode(-1,EC.M);q.addData(texto);q.make();
     <button type="button" class="lgs-btn" id="agendaFechar">Fechar</button>
   </div>
 </div>
+<div class="lgs-overlay" id="intOverlay" hidden>
+  <div class="lgs-card agd-card" role="dialog" aria-modal="true" aria-labelledby="intTitulo">
+    <h3 id="intTitulo">🔗 Integrações</h3>
+    <div id="intCorpo"></div>
+    <button type="button" class="lgs-btn" id="intFechar">Fechar</button>
+  </div>
+</div>
 <div class="lgs-overlay" id="pagOverlay" hidden>
   <div class="lgs-card pag-card" role="dialog" aria-modal="true" aria-labelledby="pagTitulo">
     <h3 id="pagTitulo">💳 Pagamentos online</h3>
@@ -4659,6 +4689,8 @@ window.TJQR=function(texto){var q=new QRCode(-1,EC.M);q.addData(texto);q.make();
       bio: localStorage.getItem('trajeto_bio') || '',
       foto: localStorage.getItem('trajeto_foto') || '',
       clientes: lerClientes(),
+      integracao: (function(){ try{ return JSON.parse(localStorage.getItem('trajeto_integracao') || 'null'); }catch(e){ return null; } })(),
+      porCompletar: (function(){ try{ return JSON.parse(localStorage.getItem('trajeto_por_completar') || '[]'); }catch(e){ return []; } })(),
       pagConta: (function(){ try{ const c = JSON.parse(localStorage.getItem('trajeto_pag_online') || '{}') || {}; return c.conta && c.conta.id ? c.conta.id : ''; }catch(e){ return ''; } })()
     };
   }
@@ -4677,6 +4709,9 @@ window.TJQR=function(texto){var q=new QRCode(-1,EC.M);q.addData(texto);q.make();
       localStorage.setItem(CLIENTES_KEY, JSON.stringify(dados.clientes));
       renderClientesConfig();
     }
+    if(dados.integracao && typeof dados.integracao === 'object') localStorage.setItem('trajeto_integracao', JSON.stringify(dados.integracao));
+    if(Array.isArray(dados.porCompletar)) localStorage.setItem('trajeto_por_completar', JSON.stringify(dados.porCompletar));
+    try{ if(window.TrajetoIntegracao) window.TrajetoIntegracao.resumo(); }catch(e){}
     if(dados.cfg){
       cfg = { ...DEFAULTS, ...dados.cfg };
       preencherPainel(cfg);
@@ -9215,6 +9250,354 @@ if ('serviceWorker' in navigator) {
   window.TrajetoAgenda = { abrir: agAbrir, ler: agLer, classificar: agClassificar, _info: agInfo };
   if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', agArranque); else agArranque();
 })();
+</script>
+<script>
+/* v9.34: Integrações — ligar o Trajeto a outra app (formato trajeto.v1).
+   Nada é automático: o motorista toca em "Sincronizar agora".
+   1) envia os clientes e serviços para a app ligada (se houver);
+   2) traz o que a app ligada tem e o que chegou pela chave Trajeto;
+   3) junta: clientes pelo id dela ou pelo telefone; serviços completos vão para a agenda,
+      os incompletos ficam em "Por completar" (não entram nas contas até estarem completos);
+   4) publica tudo (já junto) para quem lê com a chave Trajeto. */
+(function(){
+  const INT_KEY = 'trajeto_integracao', PC_KEY = 'trajeto_por_completar';
+  const $ = id => document.getElementById(id);
+  const esc = t => String(t == null ? '' : t).replace(/[&<>"']/g, c => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' }[c]));
+  let chaves = null, chaveNova = null, ocupado = false, msg = '', vista = 'inicio', resultado = null, pcEditar = null;
+
+  // ── guardar ──
+  function intCfg(){ try{ const c = JSON.parse(localStorage.getItem(INT_KEY) || 'null'); return (c && typeof c === 'object') ? c : {}; }catch(e){ return {}; } }
+  function intGravar(c){ try{ localStorage.setItem(INT_KEY, JSON.stringify(c)); }catch(e){} try{ sincronizarNuvem(); }catch(e){} }
+  function pcLer(){ try{ const l = JSON.parse(localStorage.getItem(PC_KEY) || '[]'); return Array.isArray(l) ? l : []; }catch(e){ return []; } }
+  function pcGravar(l){ try{ localStorage.setItem(PC_KEY, JSON.stringify(l)); }catch(e){} try{ sincronizarNuvem(); }catch(e){} intResumo(); }
+  function logado(){ return !!(window.TrajetoCloud && window.TrajetoCloud.utilizadorAtual); }
+  function base(){ return (typeof pagUrl === 'function' ? pagUrl() : '') || 'https://trajeto-pagamentos.leonardospinasse.workers.dev'; }
+  async function pedir(caminho, corpo){
+    if(!logado()) throw new Error('Inicia sessão no Trajeto (Minhas tarifas → ☁️ Sincronização) para usar as integrações.');
+    const tk = await window.TrajetoCloud.obterToken();
+    const r = await fetch(base() + caminho, { method: corpo ? 'POST' : 'GET', headers: { 'Content-Type':'application/json', 'Authorization':'Bearer ' + tk }, body: corpo ? JSON.stringify(corpo) : undefined });
+    let j = {}; try{ j = await r.json(); }catch(e){}
+    if(!r.ok){ const e = new Error(j.erro || ('Erro ' + r.status)); e.status = r.status; throw e; }
+    return j;
+  }
+
+  // ── formato trajeto.v1 ──
+  const num = v => { if(v === null || v === undefined || v === '') return null; const n = Number(String(v).replace(',', '.')); return isFinite(n) ? Math.round(n * 100) / 100 : null; };
+  function clienteParaFormato(c){
+    const o = { id: c.id, nome: c.nome || '', telefone: c.telefone || '', email: c.email || '', morada: c.morada || '', nomePlaca: c.nomePlaca || '', fornecedor: c.fornecedor || '', notas: c.notas || '', atualizadoEm: c.atualizadoEm || null };
+    if(c.extId) o.idExterno = c.extId;
+    return o;
+  }
+  function servicoParaFormato(a){
+    const tipo = a.tipo === 'hora' || a.tipo === 'tour' ? a.tipo : 'transfer';
+    const o = { id: a.id, tipo, data: a.data || '', hora: a.hora || '', fim: a.fim || '', cliente: { nome: a.cliente || '', telefone: a.telefone || '' },
+      partida: a.partida || '', chegada: a.chegada || '', paragens: Array.isArray(a.paragens) ? a.paragens.filter(Boolean) : [],
+      valor: num(a.valor), voo: a.voo || '', pax: num(a.pax), malas: num(a.malas), nomePlaca: a.nomePlaca || '', fornecedor: a.fornecedor || '',
+      observacoes: a.observacoes || '', estado: a.realizado ? 'concluido' : 'agendado', atualizadoEm: a.atualizadoEm || a.criadoEm || null };
+    if(tipo === 'tour') o.tourNome = a.tourNome || '';
+    if(a.extId) o.idExterno = a.extId;
+    return o;
+  }
+  function pacote(){
+    const nome = (typeof lerLegal === 'function' && (lerLegal().empresa || lerLegal().motorista)) || localStorage.getItem('trajeto_nome') || '';
+    return { formato: 'trajeto.v1', enviadoEm: new Date().toISOString(), conta: { nome },
+      clientes: lerClientes().map(clienteParaFormato), servicos: lerAgendamentos().filter(a => a && a.id).map(servicoParaFormato) };
+  }
+
+  // ── juntar o que chega ──
+  const txt = (v, n) => (typeof v === 'string' || typeof v === 'number') ? String(v).trim().slice(0, n) : '';
+  const okData = v => /^\d{4}-\d{2}-\d{2}$/.test(String(v || '')) ? v : '';
+  const okHora = v => /^([01]\d|2[0-3]):[0-5]\d$/.test(String(v || '')) ? v : '';
+  function limparServico(x){
+    const cli = (x.cliente && typeof x.cliente === 'object') ? x.cliente : { nome: x.cliente, telefone: x.telefone };
+    const s = { id: txt(x.id, 80), trajetoId: txt(x.trajetoId, 80), tipo: ['transfer','hora','tour'].indexOf(x.tipo) >= 0 ? x.tipo : 'transfer',
+      data: okData(x.data), hora: okHora(x.hora), fim: okHora(x.fim), cliente: txt(cli && cli.nome, 80), telefone: txt(cli && cli.telefone, 30),
+      partida: txt(x.partida, 200), chegada: txt(x.chegada, 200), paragens: Array.isArray(x.paragens) ? x.paragens.map(p => txt(p, 200)).filter(Boolean).slice(0, 10) : [],
+      valor: num(x.valor), voo: txt(x.voo, 20).toUpperCase().replace(/\s+/g, ''), pax: num(x.pax), malas: num(x.malas), nomePlaca: txt(x.nomePlaca, 80),
+      fornecedor: txt(x.fornecedor, 80), observacoes: txt(x.observacoes, 1000), tourNome: txt(x.tourNome, 60), estado: txt(x.estado, 20) };
+    if(s.valor !== null && s.valor < 0) s.valor = null;
+    return s;
+  }
+  function faltam(s){
+    const f = [];
+    if(!s.cliente) f.push('cliente');
+    if(!s.data) f.push('data');
+    if(!s.hora) f.push('hora');
+    if(!s.partida) f.push('partida');
+    if(s.tipo === 'transfer' && !s.chegada) f.push('chegada');
+    if(s.tipo !== 'hora' && (s.valor === null || s.valor === undefined)) f.push('valor');
+    return f;
+  }
+  const NOMES = { cliente:'cliente', data:'data', hora:'hora', partida:'recolha', chegada:'destino', valor:'valor' };
+  function servicoParaAg(s, origem, antigo){
+    const a = antigo ? Object.assign({}, antigo) : { id: Date.now().toString(36) + Math.random().toString(36).slice(2, 8), criadoEm: Date.now(), realizado: false, apresentacao: '', mostrarGaleria: false };
+    const p = (k, v) => { if(v !== '' && v !== null && v !== undefined && !(Array.isArray(v) && !v.length)) a[k] = v; };
+    p('data', s.data); p('hora', s.hora); p('fim', s.fim); p('cliente', s.cliente); p('telefone', s.telefone);
+    p('partida', s.partida); p('chegada', s.chegada); p('paragens', s.paragens); p('voo', s.voo); p('nomePlaca', s.nomePlaca); p('observacoes', s.observacoes);
+    if(s.valor !== null && s.valor !== undefined) a.valor = String(s.valor);
+    if(s.pax !== null && s.pax !== undefined) a.pax = String(Math.round(s.pax));
+    if(s.malas !== null && s.malas !== undefined) a.malas = String(Math.round(s.malas));
+    if(!antigo){
+      if(s.tipo === 'hora'){ a.tipo = 'hora'; a.hEstado = 'agendado'; }
+      if(s.tipo === 'tour'){ a.tipo = 'tour'; a.tourNome = s.tourNome || 'Tour'; a.chegada = a.chegada || a.partida; }
+      if(s.tipo === 'hora' && !a.chegada) a.chegada = a.partida;
+      a.fornecedor = s.fornecedor || origem; a.origem = 'integracao';
+      a.paragens = a.paragens || []; a.voo = a.voo || ''; a.nomePlaca = a.nomePlaca || ''; a.observacoes = a.observacoes || ''; a.valor = a.valor || '';
+    } else if(s.fornecedor) a.fornecedor = s.fornecedor;
+    if(s.id && s.id !== a.id){ a.extId = s.id; a.extOrigem = origem; }
+    a.atualizadoEm = Date.now();
+    return a;
+  }
+  // junta uma lista de itens {tipo, acao, ref, dados} — devolve contagens
+  function juntar(itens, origem, r){
+    const clientes = lerClientes(), ags = lerAgendamentos(), pc = pcLer();
+    let mudouC = false, mudouA = false, mudouP = false;
+    itens.forEach(it => {
+      const d = it.dados || {};
+      if(it.tipo === 'cliente'){
+        const nome = txt(d.nome, 80), tel = txt(d.telefone, 30), ext = txt(d.id, 80), tid = txt(d.trajetoId || (it.acao === 'atualizar' ? it.ref : ''), 80);
+        let c = (tid && clientes.find(x => x.id === tid)) || (ext && clientes.find(x => x.id === ext)) || (ext && clientes.find(x => x.extId === ext && x.extOrigem === origem)) || (it.ref && clientes.find(x => x.extId === it.ref && x.extOrigem === origem))
+          || (tel && clientes.find(x => mesmoTelefone(x.telefone, tel))) || (!tel && nome && clientes.find(x => !x.telefone && (x.nome || '').toLowerCase() === nome.toLowerCase()));
+        if(!c && it.acao === 'atualizar'){ r.ignorados.push('Cliente ' + (nome || it.ref) + ': não existe no Trajeto'); return; }
+        if(!c && !nome && !tel){ r.ignorados.push('Cliente sem nome nem telefone'); return; }
+        const campos = { nome, telefone: tel, email: txt(d.email, 120), morada: txt(d.morada, 200), nomePlaca: txt(d.nomePlaca, 80), fornecedor: txt(d.fornecedor, 80), notas: txt(d.notas, 1000) };
+        if(c){
+          let mud = false; Object.keys(campos).forEach(k => { if(campos[k] && campos[k] !== c[k]){ c[k] = campos[k]; mud = true; } });
+          if(ext && !c.extId && ext !== c.id){ c.extId = ext; c.extOrigem = origem; mud = true; }
+          if(mud){ c.atualizadoEm = Date.now(); r.clientesAtualizados++; mudouC = true; } else r.clientesIguais++;
+        } else {
+          const n = { id: novoIdCliente(), nome: campos.nome || campos.telefone };
+          Object.keys(campos).forEach(k => { if(campos[k] && k !== 'nome') n[k] = campos[k]; });
+          if(ext){ n.extId = ext; n.extOrigem = origem; }
+          n.atualizadoEm = Date.now(); clientes.push(n); r.clientesNovos++; mudouC = true;
+        }
+        return;
+      }
+      if(it.tipo === 'servico'){
+        const s = limparServico(d), ref = it.ref || '';
+        const tid = s.trajetoId || (it.acao === 'atualizar' ? ref : '');
+        const extRef = s.id || ref;
+        // (se a outra app devolver um serviço que veio do Trajeto com o nosso id, reconhece-o e não duplica)
+        let a = (tid && ags.find(x => x.id === tid)) || (extRef && ags.find(x => x.extId === extRef && x.extOrigem === origem)) || (extRef && ags.find(x => x.id === extRef));
+        if(a){
+          if(a.realizado){ r.ignorados.push('Serviço de ' + (a.cliente || '') + ' (' + dataPt(a.data) + '): já está concluído, não foi alterado'); return; }
+          const i = ags.indexOf(a), novo = servicoParaAg(s, origem, a);
+          if(JSON.stringify(Object.assign({}, novo, { atualizadoEm: 0 })) === JSON.stringify(Object.assign({}, a, { atualizadoEm: 0 }))){ r.servicosIguais++; return; }
+          ags[i] = novo; r.servicosAtualizados++; mudouA = true; return;
+        }
+        // já está à espera em "Por completar"? atualiza lá
+        const ip = pc.findIndex(x => (extRef && x.s.id === extRef && x.origem === origem) || (tid && x.s.trajetoId === tid));
+        if(ip >= 0){
+          const v = pc[ip].s; Object.keys(s).forEach(k => { const x = s[k]; if(x !== '' && x !== null && !(Array.isArray(x) && !x.length)) v[k] = x; });
+          const f = faltam(v);
+          if(!f.length){ ags.push(servicoParaAg(v, origem)); pc.splice(ip, 1); r.servicosNovos++; mudouA = true; }
+          else { pc[ip].faltam = f; r.porCompletar++; }
+          mudouP = true; return;
+        }
+        if(it.acao === 'atualizar' && !extRef){ r.ignorados.push('Serviço sem id: não sei qual atualizar'); return; }
+        if(s.estado === 'cancelado'){ r.ignorados.push('Serviço cancelado na outra app: não foi criado'); return; }
+        const f = faltam(s);
+        if(f.length){ pc.push({ pid: 'p' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6), origem, em: Date.now(), s, faltam: f }); r.porCompletar++; mudouP = true; }
+        else { ags.push(servicoParaAg(s, origem)); r.servicosNovos++; mudouA = true; }
+      }
+    });
+    if(mudouC) gravarClientes(clientes);
+    if(mudouA){ gravarAgendamentos(ags); try{ renderLista(); }catch(e){} try{ renderFaturamento(); }catch(e){} }
+    if(mudouP) pcGravar(pc);
+  }
+  function dataPt(d){ return d ? String(d).split('-').reverse().join('/') : ''; }
+
+  // ── sincronizar ──
+  async function sincronizar(){
+    if(ocupado) return;
+    ocupado = true; msg = ''; vista = 'aSincronizar'; render();
+    const c = intCfg(), origem = (c.nome || 'App ligada').trim();
+    const r = { em: Date.now(), publicados: null, enviados: null, envioResposta: null, recebidosApp: 0, recebidosChave: 0,
+      clientesNovos: 0, clientesAtualizados: 0, clientesIguais: 0, servicosNovos: 0, servicosAtualizados: 0, servicosIguais: 0, porCompletar: 0, ignorados: [], erros: [] };
+    const pk = pacote();
+    const ligada = !!(c.url && c.ativo !== false);
+    // 2) enviar para a app ligada
+    if(ligada && c.enviar !== false){
+      const corpo = Object.assign({}, pk, { clientes: c.clientes === false ? [] : pk.clientes, servicos: c.servicos === false ? [] : pk.servicos });
+      try{
+        const x = await pedir('/v1/app/parceiro', { url: c.url, chave: c.chave || '', metodo: 'POST', corpo });
+        if(x.ok){ r.enviados = { clientes: corpo.clientes.length, servicos: corpo.servicos.length }; r.envioResposta = x.corpo || null; }
+        else r.erros.push('Enviar para ' + origem + ': ' + (x.erro || ('a app respondeu com erro ' + x.status)) + (x.texto ? ' — ' + String(x.texto).slice(0, 120) : ''));
+      }catch(e){ r.erros.push('Enviar para ' + origem + ': ' + e.message); }
+    }
+    // 3) trazer da app ligada
+    const itens = [];
+    if(ligada && c.receber !== false){
+      try{
+        const x = await pedir('/v1/app/parceiro', { url: c.url, chave: c.chave || '', metodo: 'GET', desde: c.ultimaRecepcao ? new Date(c.ultimaRecepcao).toISOString() : '' });
+        if(x.ok && x.corpo && typeof x.corpo === 'object'){
+          const cl = c.clientes === false ? [] : (Array.isArray(x.corpo.clientes) ? x.corpo.clientes : []);
+          const sv = c.servicos === false ? [] : (Array.isArray(x.corpo.servicos) ? x.corpo.servicos : []);
+          cl.slice(0, 2000).forEach(d => itens.push({ tipo: 'cliente', acao: 'criar', ref: '', dados: d }));
+          sv.slice(0, 2000).forEach(d => itens.push({ tipo: 'servico', acao: 'criar', ref: '', dados: d }));
+          r.recebidosApp = cl.length + sv.length; c.ultimaRecepcao = r.em;
+        } else if(x.ok) r.erros.push('Trazer de ' + origem + ': a resposta não está no formato trajeto.v1 (JSON com "clientes" e "servicos").');
+        else r.erros.push('Trazer de ' + origem + ': ' + (x.erro || ('a app respondeu com erro ' + x.status)));
+      }catch(e){ r.erros.push('Trazer de ' + origem + ': ' + e.message); }
+    }
+    // 4) o que outras apps enviaram pela chave Trajeto
+    let eids = [];
+    try{ const e = await pedir('/v1/app/entrada'); (e.itens || []).forEach(it => { itens.push(it); eids.push(it.eid); }); r.recebidosChave = eids.length; }
+    catch(e){ r.erros.push('Ler o que chegou pela chave: ' + e.message); }
+    try{ juntar(itens, origem, r); }catch(e){ r.erros.push('Juntar os dados: ' + e.message); eids = []; }
+    if(eids.length){ try{ await pedir('/v1/app/entrada/limpar', { eids }); }catch(e){ r.erros.push('Limpar a fila de entrada (volta a aparecer, sem duplicar): ' + e.message); } }
+    // 5) publicar (já com o que chegou) para quem lê com a chave Trajeto
+    try{ const q = pacote(), p = await pedir('/v1/app/exportar', { conta: q.conta, clientes: q.clientes, servicos: q.servicos }); r.publicados = { clientes: p.clientes, servicos: p.servicos }; }
+    catch(e){ r.erros.push('Publicar os teus dados: ' + e.message); }
+    c.ultimaSync = r.em; c.ultimoResultado = { em: r.em, erros: r.erros.length }; intGravar(c);
+    resultado = r; ocupado = false; vista = 'resultado'; render(); intResumo();
+  }
+
+  // ── ecrã ──
+  function quando(ms){ if(!ms) return 'nunca'; const d = new Date(ms), h = new Date(); const hh = String(d.getHours()).padStart(2, '0') + ':' + String(d.getMinutes()).padStart(2, '0'); return d.toDateString() === h.toDateString() ? 'hoje, ' + hh : d.toLocaleDateString('pt-PT') + ', ' + hh; }
+  function render(){
+    const el = $('intCorpo'); if(!el) return;
+    if(!logado()){ el.innerHTML = `<p class="agd-p">Para usar as integrações, entra primeiro na tua conta do Trajeto (Minhas tarifas → ☁️ Sincronização).</p>`; return; }
+    const c = intCfg(), pc = pcLer(); let h = '';
+    if(msg) h += `<div class="agd-aviso">${esc(msg)}</div>`;
+    if(vista === 'aSincronizar'){ el.innerHTML = h + '<div class="agd-load">⇅ A sincronizar…</div>'; return; }
+    if(vista === 'resultado' && resultado){ el.innerHTML = h + htmlResultado(resultado); ligar(); return; }
+    if(vista === 'completar'){ el.innerHTML = h + htmlCompletar(); ligar(); return; }
+    // chave Trajeto
+    h += `<div class="int-sec"><div class="int-t">🔑 A tua chave Trajeto</div><div class="int-s">Dá-a à outra app para ela ler e enviar dados da <b>tua conta</b>. Só vê o que é teu.</div>`;
+    if(chaveNova) h += `<div class="int-nova"><div class="int-s"><b>Copia já esta chave:</b> por segurança, não volta a aparecer.</div><div class="int-key" id="intKeyTxt">${esc(chaveNova.chave)}</div><button type="button" class="lgs-btn lgs-pri" id="intCopiar">Copiar chave</button></div>`;
+    if(chaves === null) h += `<div class="int-s">A carregar…</div>`;
+    else {
+      chaves.forEach(k => { h += `<div class="int-k"><div><b>${esc(k.nome)}</b> <span class="int-mono">trj_live_••••${esc(k.fim)}</span><div class="int-s">${k.perm.indexOf('escrever') >= 0 ? 'Ler e enviar' : 'Só ler'} · última utilização: ${esc(quando(k.ultimo))}</div></div><button type="button" class="int-apagar" data-intapagar="${esc(k.id)}">Apagar</button></div>`; });
+      if(chaves.length < 5) h += `<details class="int-det"${chaves.length ? '' : ' open'}><summary>＋ Criar chave</summary><label class="int-l">Nome (para saberes onde a usas)</label><input id="intKNome" class="int-in" placeholder="ex.: App do João" maxlength="40"><label class="int-ck"><input type="checkbox" id="intKLer" checked> Ler clientes e serviços</label><label class="int-ck"><input type="checkbox" id="intKEsc" checked> Enviar clientes e serviços para o Trajeto</label><button type="button" class="lgs-btn" id="intKCriar">Criar chave</button></details>`;
+    }
+    h += `</div>`;
+    // app ligada
+    h += `<div class="int-sec"><div class="int-t">📲 App ligada ${c.url ? '<span class="int-ok">Ligada</span>' : ''}</div>
+      <label class="int-l">Nome</label><input id="intANome" class="int-in" maxlength="40" placeholder="ex.: App do João" value="${esc(c.nome || '')}">
+      <label class="int-l">Endereço da app dela (https://…)</label><input id="intAUrl" class="int-in" inputmode="url" autocomplete="off" placeholder="https://app-dele.pt/api/trajeto" value="${esc(c.url || '')}">
+      <label class="int-l">Chave da app dela</label><input id="intAChave" class="int-in" type="password" autocomplete="off" placeholder="a chave que a outra app te deu" value="${esc(c.chave || '')}">
+      <label class="int-ck"><input type="checkbox" id="intACli" ${c.clientes === false ? '' : 'checked'}> Clientes</label><label class="int-ck"><input type="checkbox" id="intASer" ${c.servicos === false ? '' : 'checked'}> Serviços e valores</label>
+      <label class="int-ck"><input type="checkbox" id="intAEnv" ${c.enviar === false ? '' : 'checked'}> Enviar do Trajeto para lá</label><label class="int-ck"><input type="checkbox" id="intARec" ${c.receber === false ? '' : 'checked'}> Trazer de lá para o Trajeto</label>
+      <button type="button" class="lgs-btn" id="intAGuardar">Guardar</button>${c.url ? '<button type="button" class="int-apagar" id="intADesligar" style="margin-top:6px">Desligar esta app</button>' : ''}</div>`;
+    // por completar
+    if(pc.length){
+      h += `<div class="int-sec"><div class="int-t">✍️ Por completar <span class="int-av">${pc.length}</span></div><div class="int-s">Serviços que chegaram sem tudo. Não entram na agenda nem nas contas até completares.</div>`;
+      pc.forEach(p => { h += `<button type="button" class="int-pc" data-intpc="${esc(p.pid)}"><b>${esc(p.s.cliente || 'Sem cliente')}</b> · ${esc(dataPt(p.s.data) || 'sem data')}<span>Faltam: ${esc(p.faltam.map(f => NOMES[f] || f).join(', '))} · de ${esc(p.origem)}</span></button>`; });
+      h += `</div>`;
+    }
+    h += `<button type="button" class="agd-btn-ouro" id="intSync">⇅ Sincronizar agora</button><div class="agd-nota">Última vez: ${esc(quando(c.ultimaSync))}</div>
+      <div class="agd-nota"><a href="api.html" target="_blank" rel="noopener">Página para programadores (como ligar outra app)</a></div>`;
+    el.innerHTML = h; ligar();
+  }
+  function htmlResultado(r){
+    const pl = (n, um, varios) => n + ' ' + (n === 1 ? um : varios);
+    const linha = (t, v, cls) => `<div class="int-row"><span>${t}</span><span class="int-tag ${cls || 'ok'}">${v}</span></div>`;
+    const c = intCfg(), origem = esc(c.nome || 'App ligada');
+    let h = `<div class="agd-t">${r.erros.length ? '⚠️ Sincronizado com avisos' : '✅ Sincronizado'}</div>`;
+    const env = r.enviados ? r.enviados.clientes + r.enviados.servicos : 0, rec = r.recebidosApp + r.recebidosChave;
+    h += `<div class="int-mini"><div><b>${env}</b>enviados${c.url ? '<br>para ' + origem : ''}</div><div><b>${rec}</b>recebidos<br>no Trajeto</div></div>`;
+    h += `<div class="int-sec"><div class="int-t">↑ Enviados</div>`;
+    if(r.publicados) h += linha(`${pl(r.publicados.clientes, 'cliente', 'clientes')} e ${pl(r.publicados.servicos, 'serviço', 'serviços')} disponíveis pela chave`, 'Publicados');
+    if(r.enviados){
+      const resp = r.envioResposta || {}, rec2 = (o) => o && typeof o === 'object' ? (Array.isArray(o.recusados) ? o.recusados.length : 0) : 0;
+      const recus = rec2(resp.clientes) + rec2(resp.servicos);
+      h += linha(`${pl(r.enviados.clientes, 'cliente', 'clientes')} · ${pl(r.enviados.servicos, 'serviço', 'serviços')} para ${origem}`, recus ? pl(recus, 'recusado', 'recusados') : 'Aceites', recus ? 'av' : 'ok');
+      [].concat((resp.clientes && resp.clientes.recusados) || [], (resp.servicos && resp.servicos.recusados) || []).slice(0, 10).forEach(x => { h += `<div class="int-s">• ${esc((x && (x.id || '')) + (x && x.motivo ? ': ' + x.motivo : ''))}</div>`; });
+    } else if(c.url && c.enviar !== false) h += linha(`Envio para ${origem}`, 'Falhou', 'er');
+    h += `</div><div class="int-sec"><div class="int-t">↓ Recebidos</div>`;
+    let algum = false;
+    if(r.clientesNovos){ h += linha(`${r.clientesNovos} cliente${r.clientesNovos > 1 ? 's' : ''} novo${r.clientesNovos > 1 ? 's' : ''}`, 'Guardados'); algum = true; }
+    if(r.clientesAtualizados){ h += linha(`${r.clientesAtualizados} cliente${r.clientesAtualizados > 1 ? 's' : ''} atualizado${r.clientesAtualizados > 1 ? 's' : ''}`, 'Guardados'); algum = true; }
+    if(r.servicosNovos){ h += linha(`${r.servicosNovos} serviço${r.servicosNovos > 1 ? 's' : ''} novo${r.servicosNovos > 1 ? 's' : ''}`, 'Na agenda'); algum = true; }
+    if(r.servicosAtualizados){ h += linha(`${r.servicosAtualizados} serviço${r.servicosAtualizados > 1 ? 's' : ''} atualizado${r.servicosAtualizados > 1 ? 's' : ''}`, 'Na agenda'); algum = true; }
+    if(r.porCompletar){ h += linha(`${r.porCompletar} serviço${r.porCompletar > 1 ? 's' : ''} com dados em falta`, 'Por completar', 'av'); algum = true; }
+    if(r.clientesIguais + r.servicosIguais){ h += linha(`${r.clientesIguais + r.servicosIguais} sem alterações`, 'Iguais', 'cin'); algum = true; }
+    if(!algum) h += `<div class="int-s">Nada de novo.</div>`;
+    r.ignorados.slice(0, 10).forEach(t => { h += `<div class="int-s">• ${esc(t)}</div>`; });
+    h += `</div>`;
+    if(r.erros.length){ h += `<div class="agd-aviso">${r.erros.map(esc).join('<br>')}</div>`; }
+    if(pcLer().length) h += `<button type="button" class="lgs-btn" id="intIrPc">Completar o que falta (${pcLer().length})</button>`;
+    h += `<button type="button" class="lgs-btn" id="intVoltar">‹ Voltar às integrações</button>`;
+    return h;
+  }
+  function htmlCompletar(){
+    const p = pcLer().find(x => x.pid === pcEditar); if(!p){ vista = 'inicio'; return ''; }
+    const s = p.s, f = p.faltam;
+    const campo = (id, rot, val, tipo, extra) => `<label class="int-l${f.indexOf(id) >= 0 ? ' int-falta' : ''}" for="intC_${id}">${f.indexOf(id) >= 0 ? '⚠ ' : ''}${rot}${f.indexOf(id) >= 0 ? ' · em falta' : ''}</label><input id="intC_${id}" class="int-in${f.indexOf(id) >= 0 ? ' int-falta' : ''}" type="${tipo || 'text'}" value="${esc(val == null ? '' : val)}" ${extra || ''}>`;
+    let h = `<div class="agd-t">✍️ Completar serviço</div><div class="agd-ia">Veio da <b>&nbsp;${esc(p.origem)}</b>. ${f.length ? 'Falta' + (f.length > 1 ? 'm ' : ' ') + f.length + ' dado' + (f.length > 1 ? 's' : '') + ' para ficar pronto na agenda.' : 'Está completo.'}</div>`;
+    h += `<label class="int-l" for="intC_tipo">Tipo</label><select id="intC_tipo" class="int-in"><option value="transfer"${s.tipo === 'transfer' ? ' selected' : ''}>Transfer</option><option value="hora"${s.tipo === 'hora' ? ' selected' : ''}>Serviço por hora</option><option value="tour"${s.tipo === 'tour' ? ' selected' : ''}>Tour</option></select>`;
+    h += campo('cliente', 'Cliente', s.cliente) + campo('telefone', 'Telefone', s.telefone, 'tel') + campo('data', 'Data', s.data, 'date') + campo('hora', 'Hora', s.hora, 'time')
+      + campo('partida', 'Recolha', s.partida) + campo('chegada', 'Destino', s.chegada) + campo('valor', 'Valor (€)', s.valor, 'text', 'inputmode="decimal"');
+    if(s.observacoes) h += `<div class="int-s" style="margin-top:8px">Notas: ${esc(s.observacoes)}</div>`;
+    h += `<div class="agd-aviso" id="intCErro" hidden></div><button type="button" class="agd-btn-ouro" id="intCGuardar">Guardar na agenda</button>
+      <button type="button" class="lgs-btn lgs-del" id="intCDescartar">Descartar este serviço</button><button type="button" class="lgs-btn" id="intVoltar">‹ Voltar</button>`;
+    return h;
+  }
+  function guardarCompletar(){
+    const l = pcLer(), i = l.findIndex(x => x.pid === pcEditar); if(i < 0){ vista = 'inicio'; render(); return; }
+    const p = l[i], s = Object.assign({}, p.s), v = id => ($('intC_' + id) ? $('intC_' + id).value.trim() : '');
+    s.tipo = v('tipo') || s.tipo; s.cliente = v('cliente'); s.telefone = v('telefone'); s.data = okData(v('data')); s.hora = okHora(v('hora'));
+    s.partida = v('partida'); s.chegada = v('chegada'); s.valor = v('valor') === '' ? null : num(v('valor'));
+    if(v('valor') !== '' && (s.valor === null || s.valor < 0)){ const e = $('intCErro'); e.hidden = false; e.textContent = 'O valor tem de ser um número, por exemplo 45 ou 45,50.'; return; }
+    const f = faltam(s);
+    if(f.length){ const e = $('intCErro'); e.hidden = false; e.textContent = 'Ainda falta: ' + f.map(x => NOMES[x] || x).join(', ') + '.'; p.s = s; p.faltam = f; l[i] = p; pcGravar(l); return; }
+    const ags = lerAgendamentos(); ags.push(servicoParaAg(s, p.origem)); gravarAgendamentos(ags);
+    try{ renderLista(); }catch(e){} try{ renderFaturamento(); }catch(e){}
+    l.splice(i, 1); pcGravar(l); pcEditar = null; vista = 'inicio'; msg = '';
+    if(typeof mostrarToast === 'function') mostrarToast('✅ Serviço guardado na agenda'); render();
+  }
+  function ligar(){
+    const on = (id, f) => { const b = $(id); if(b) b.onclick = f; };
+    on('intSync', sincronizar);
+    on('intVoltar', () => { vista = 'inicio'; msg = ''; chaveNova = null; render(); });
+    on('intIrPc', () => { vista = 'inicio'; render(); });
+    on('intCopiar', async () => { const t = chaveNova ? chaveNova.chave : ''; try{ await navigator.clipboard.writeText(t); if(typeof mostrarToast === 'function') mostrarToast('🔑 Chave copiada'); }catch(e){ const r = document.createRange(); r.selectNodeContents($('intKeyTxt')); const s = getSelection(); s.removeAllRanges(); s.addRange(r); } });
+    on('intKCriar', async () => {
+      const perm = []; if($('intKLer').checked) perm.push('ler'); if($('intKEsc').checked) perm.push('escrever');
+      if(!perm.length){ msg = 'Escolhe pelo menos uma permissão.'; render(); return; }
+      try{ chaveNova = await pedir('/v1/app/chaves', { nome: $('intKNome').value.trim() || 'Integração', perm }); msg = ''; await carregarChaves(); }
+      catch(e){ msg = e.message; render(); }
+    });
+    document.querySelectorAll('[data-intapagar]').forEach(b => b.onclick = async () => {
+      if(b.dataset.conf !== '1'){ b.dataset.conf = '1'; b.textContent = 'Confirmar apagar'; b.classList.add('int-conf'); return; }
+      try{ await pedir('/v1/app/chaves/apagar', { id: b.dataset.intapagar }); chaveNova = null; await carregarChaves(); if(typeof mostrarToast === 'function') mostrarToast('Chave apagada: a outra app deixou de ter acesso'); }
+      catch(e){ msg = e.message; render(); }
+    });
+    on('intAGuardar', () => {
+      const url = $('intAUrl').value.trim();
+      if(url && !/^https:\/\/[^\s/]+\.[^\s]+/.test(url)){ msg = 'O endereço tem de começar por https://'; render(); return; }
+      const c = intCfg();
+      Object.assign(c, { nome: $('intANome').value.trim(), url, chave: $('intAChave').value.trim(), clientes: $('intACli').checked, servicos: $('intASer').checked, enviar: $('intAEnv').checked, receber: $('intARec').checked });
+      intGravar(c); msg = ''; render(); intResumo(); if(typeof mostrarToast === 'function') mostrarToast('💾 App ligada guardada');
+    });
+    on('intADesligar', () => { const c = intCfg(); ['url', 'chave', 'ultimaRecepcao'].forEach(k => delete c[k]); intGravar(c); render(); intResumo(); });
+    document.querySelectorAll('[data-intpc]').forEach(b => b.onclick = () => { pcEditar = b.dataset.intpc; vista = 'completar'; render(); });
+    on('intCGuardar', guardarCompletar);
+    on('intCDescartar', function(){
+      if(this.dataset.conf !== '1'){ this.dataset.conf = '1'; this.textContent = 'Confirmar: descartar'; return; }
+      pcGravar(pcLer().filter(x => x.pid !== pcEditar)); pcEditar = null; vista = 'inicio'; render();
+    });
+  }
+  async function carregarChaves(){ try{ const j = await pedir('/v1/app/chaves'); chaves = j.chaves || []; }catch(e){ chaves = []; msg = e.message; } render(); }
+  function abrir(){
+    vista = 'inicio'; msg = ''; chaveNova = null; resultado = null;
+    const o = $('intOverlay'); if(o) o.hidden = false;
+    render(); if(logado()){ chaves = null; render(); carregarChaves(); }
+  }
+  function fechar(){ const o = $('intOverlay'); if(o) o.hidden = true; chaveNova = null; }
+  function intResumo(){
+    const el = $('intResumoCfg'); if(!el) return;
+    const c = intCfg(), n = pcLer().length;
+    el.innerHTML = (c.url ? 'Ligado a ' + esc(c.nome || 'outra app') + ' · última sincronização: ' + esc(quando(c.ultimaSync)) : 'Liga o Trajeto a outra app: clientes e serviços nos dois sentidos.')
+      + (n ? ` · <b style="color:#9a5b00">${n} por completar</b>` : '');
+  }
+  const b = $('btnAbrirIntegracoes'); if(b) b.addEventListener('click', abrir);
+  const f = $('intFechar'); if(f) f.addEventListener('click', fechar);
+  intResumo();
+  window.TrajetoIntegracao = { abrir, sincronizar, juntar, pacote, faltam, limparServico, servicoParaFormato, clienteParaFormato, _cfg: intCfg, _pc: pcLer, resumo: intResumo };
+})();
+
 </script>
 
 <script type="module">
